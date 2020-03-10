@@ -1,3 +1,3 @@
 #!/bin/bash
 
-protoc -I=proto --python_out=avato/proto proto/proto_util.proto
+protoc -I=proto --python_out=avato/proto proto/avato_enclave.proto

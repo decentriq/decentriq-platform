@@ -1,0 +1,78 @@
+syntax = "proto2";
+package avato_enclave;
+
+/* =========================================================================================================
+   CONTAINERS
+ */
+
+message Request {
+  oneof request {
+    InitRequest initRequest = 1;
+    ShutDownRequest shutDownRequest = 2;
+    GetStatusRequest getStatusRequest = 3;
+    bytes avatoRequest = 4;
+  }
+}
+
+message Response {
+  oneof response {
+    SuccessfulResponse successfulResponse = 1;
+    UnsuccessfulResponse unsuccessfulResponse = 2;
+  }
+}
+
+message SuccessfulResponse {
+  oneof successful_response {
+    InitResponse initResponse = 1;
+    ShutDownResponse shutDownResponse = 2;
+    GetStatusResponse getStatusResponse = 3;
+    bytes avatoResponse = 4;
+  }
+}
+
+message UnsuccessfulResponse {
+   required string error = 1; 
+}
+
+/* =========================================================================================================
+   INIT
+ */
+
+message InitRequest {
+  required string instanceId = 2;
+  required string instanceName = 3;
+  repeated string adminIds = 4;
+  repeated string participantIds = 5;
+};
+message InitResponse {}
+
+/* =========================================================================================================
+   SHUTDOWN
+ */
+
+message ShutDownRequest {}
+message ShutDownResponse {}
+
+/* =========================================================================================================
+   GET STATUS
+ */
+
+message GetStatusRequest {};
+
+message GetStatusResponse {
+  required string instanceId = 1;
+  required string instanceName = 2;
+  repeated string adminIds = 3;
+  repeated string participantIds = 4;
+  required int32 instanceStatus = 5;
+}
+
+/* =========================================================================================================
+   ENCRYPTED MESSAGE FORMAT
+ */
+
+message DataNoncePubkey {
+  required bytes data = 1;
+  required bytes nonce = 2;
+  required bytes pubkey = 3 ;
+}

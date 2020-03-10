@@ -16,6 +16,7 @@ class Endpoints(str, Enum):
     GET_INFO = AVATO_ACTIVE_INSTANCE_INFIX + "/"
     GET_FATQUOTE = AVATO_ACTIVE_INSTANCE_INFIX + "/fatquote"
     DELETE_INSTANCE = AVATO_ACTIVE_INSTANCE_INFIX + "/"
+    POST_MESSAGE = AVATO_ACTIVE_INSTANCE_INFIX + "/message"
 
 
 class AuthorizationError(Exception):

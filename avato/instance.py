@@ -146,5 +146,14 @@ class Instance(metaclass=MetaInstance):
         )
         return cipher.decrypt(dec_data)
 
+    def _send_message(self, message):
+        encrypted = self._encrypt_and_encode_data(message.SerializeToString())
+        url = Endpoints.POST_MESSAGE.replace(":instanceId", self.id)
+        response = self.api.post(
+            url, encrypted, {"Content-Type": "application/octet-stream"},
+        )
+        decrypted_response = self._decode_and_decrypt_data(response.content)
+        return decrypted_response
+
     def __str__(self):
         return f"id={self.id}, name={self.name}, user={self.user}"

@@ -54,7 +54,7 @@ class Client:
     def get_instance(self, id):
         url = Endpoints.GET_INFO.replace(":instanceId", id)
         response = self.api.get(url)
-        instance_info = response.json()["instanceInfo"]
+        instance_info = response.json()
         instance_constructor = self._instance_from_type(instance_info["type"])
         return instance_constructor(
             self,
