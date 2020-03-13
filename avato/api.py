@@ -76,7 +76,7 @@ class API:
 
     @staticmethod
     def __check_response_status_code(response):
-        if response.status_code == 200:
+        if response.status_code >= 200 and response.status_code <= 204:
             pass
         elif response.status_code == 403:
             raise AuthorizationError

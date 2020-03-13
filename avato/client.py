@@ -58,10 +58,9 @@ class Client:
         instance_constructor = self._instance_from_type(instance_info["type"])
         return instance_constructor(
             self,
-            instance_info["id"],
+            id,
             instance_info["name"],
-            instance_info["adminIds"],
-            instance_info["participantIds"],
+            instance_info["adminId"],
         )
 
     def create_instance(self, name, type, participants):
@@ -75,7 +74,7 @@ class Client:
         response = self.api.post(url, data_json, {"Content-type": "application/json"})
         id = response.json()["instanceId"]
         instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, id, name, self.user.email, participants)
+        return instance_constructor(self, id, name, self.user.email)
 
     def reset_backend(self):
         url = Endpoints.POST_RESET

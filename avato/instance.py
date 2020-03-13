@@ -4,6 +4,7 @@ from enum import Enum
 from abc import ABC, ABCMeta, abstractmethod
 from functools import wraps
 from .proto.encrypted_message import encode, decode
+from .proto.avato_enclave_pb2 import Request, Response
 from .verification import Verification, Fatquote
 from .api import Endpoints
 
@@ -49,13 +50,12 @@ class Instance(metaclass=MetaInstance):
     def type(self):
         return self.get_type()
 
-    def __init__(self, client, id, name, admin_id, participant_ids):
+    def __init__(self, client, id, name, admin_id):
         self.user = client.user
         self.api = client.api
         self.id = id
         self.name = name
         self.admin_id = admin_id
-        self.participant_ids = participant_ids
         self.quote = None
         self.secret = None
         self.fatquote = None
@@ -148,11 +148,17 @@ class Instance(metaclass=MetaInstance):
 
     def _send_message(self, message):
         encrypted = self._encrypt_and_encode_data(message.SerializeToString())
+        request = Request()
+        request.avatoRequest = encrypted
         url = Endpoints.POST_MESSAGE.replace(":instanceId", self.id)
         response = self.api.post(
-            url, encrypted, {"Content-Type": "application/octet-stream"},
+            url, request.SerializeToString(), {"Content-Type": "application/octet-stream"},
         )
-        decrypted_response = self._decode_and_decrypt_data(response.content)
+        response_container = Response()
+        response_container.ParseFromString(response.content)
+        if response_container.HasField("unsuccessfulResponse"):
+            raise Exception(response_container.unsuccessfulResponse)
+        decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
         return decrypted_response
 
     def __str__(self):
