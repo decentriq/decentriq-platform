@@ -122,6 +122,10 @@ class Instance(metaclass=MetaInstance):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
 
+    def shutdown(self):
+        url = Endpoints.POST_SHUTDOWN.replace(":instanceId", self.id)
+        self.api.post(url)
+
     def delete(self):
         url = Endpoints.DELETE_INSTANCE.replace(":instanceId", self.id)
         self.api.delete(url)

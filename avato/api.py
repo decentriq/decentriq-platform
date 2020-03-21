@@ -15,39 +15,43 @@ class Endpoints(str, Enum):
     # Active instance shared
     GET_INFO = AVATO_ACTIVE_INSTANCE_INFIX + "/"
     GET_FATQUOTE = AVATO_ACTIVE_INSTANCE_INFIX + "/fatquote"
+    POST_SHUTDOWN = AVATO_ACTIVE_INSTANCE_INFIX + "/shutdown"
     DELETE_INSTANCE = AVATO_ACTIVE_INSTANCE_INFIX + "/"
     POST_MESSAGE = AVATO_ACTIVE_INSTANCE_INFIX + "/message"
 
 
-class AuthorizationError(Exception):
-    """ """
-
-    pass
-
-
-class NotFoundError(Exception):
-    """ """
-
-    pass
-
-
-class BadRequestError(Exception):
-    """ """
-
-    pass
-
-
-class ServerError(Exception):
-    """ """
-
-    pass
-
-
-class UnknownError(Exception):
-    """ """
-
+class APIError(Exception):
     def __init__(self, body):
         self.body = body
+
+class AuthorizationError(APIError):
+    """ """
+
+    pass
+
+
+class NotFoundError(APIError):
+    """ """
+
+    pass
+
+
+class BadRequestError(APIError):
+    """ """
+
+    pass
+
+
+class ServerError(APIError):
+    """ """
+
+    pass
+
+
+class UnknownError(APIError):
+    """ """
+
+    pass
 
 
 class API:
@@ -79,13 +83,13 @@ class API:
         if response.status_code >= 200 and response.status_code <= 204:
             pass
         elif response.status_code == 403:
-            raise AuthorizationError
+            raise AuthorizationError(response.content)
         elif response.status_code == 404:
-            raise NotFoundError
+            raise NotFoundError(response.content)
         elif response.status_code == 400:
-            raise BadRequestError
+            raise BadRequestError(response.content)
         elif response.status_code == 500:
-            raise ServerError
+            raise ServerError(response.content)
         else:
             raise UnknownError(response.content)
 
