@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "avato"
-version = "0.2.1"
+version = "0.2.3"
 description = "Python client library for the Avato platform"
 authors = ["decentriq <opensource@decentriq.ch>"]
 readme = 'README.md'
@@ -8,7 +8,7 @@ repository = "https://github.com/decentriq/avato-python-client"
 homepage = "https://github.com/decentriq/avato-python-client"
 
 [tool.poetry.dependencies]
-python = "3.6.*"
+python = "^3.6"
 
 protobuf = "^3.11.0"
 pyrebase4 = "^4.3.0"
