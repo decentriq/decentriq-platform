@@ -9,7 +9,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as f:
 
 setuptools.setup(
     name="avato",  # Replace with your own username
-    version="0.2.0",
+    version="0.2.1",
     author="Enrico Ghirardi",
     author_email="enrico.ghirardi@decentriq.ch",
     description="Python client library for the avato platform",
