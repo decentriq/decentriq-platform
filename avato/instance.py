@@ -133,9 +133,9 @@ class Instance(metaclass=MetaInstance):
     def _encrypt_and_encode_data(self, data):
         nonce = chily.Nonce.from_random()
         cipher = chily.Cipher(
-            self.secret.keypair.secret, self._get_enclave_pubkey(), nonce
+            self.secret.keypair.secret, self._get_enclave_pubkey()
         )
-        enc_data = cipher.encrypt(data)
+        enc_data = cipher.encrypt(data, nonce)
         return encode(
             bytes(enc_data),
             bytes(nonce.bytes),
@@ -144,11 +144,10 @@ class Instance(metaclass=MetaInstance):
 
     def _decode_and_decrypt_data(self, data):
         dec_data, nonceB, _ = decode(data)
-        nonce = chily.Nonce.from_bytes(nonceB)
         cipher = chily.Cipher(
-            self.secret.keypair.secret, self._get_enclave_pubkey(), nonce
+            self.secret.keypair.secret, self._get_enclave_pubkey()
         )
-        return cipher.decrypt(dec_data)
+        return cipher.decrypt(dec_data, chily.Nonce.from_bytes(nonceB))
 
     def _send_message(self, message):
         encrypted = self._encrypt_and_encode_data(message.SerializeToString())
