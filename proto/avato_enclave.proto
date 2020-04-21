@@ -1,0 +1,27 @@
+syntax = "proto2";
+package avato_enclave;
+
+/* =========================================================================================================
+   CONTAINER
+ */
+
+message Request {
+  required bytes avatoRequest = 4;
+}
+
+message Response {
+  oneof response {
+    bytes successfulResponse = 1;
+    string unsuccessfulResponse = 2;
+  }
+}
+
+/* =========================================================================================================
+   ENCRYPTED MESSAGE FORMAT
+ */
+
+message DataNoncePubkey {
+  required bytes data = 1;
+  required bytes nonce = 2;
+  required bytes pubkey = 3 ;
+}

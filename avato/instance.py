@@ -4,6 +4,7 @@ from enum import Enum
 from abc import ABC, ABCMeta, abstractmethod
 from functools import wraps
 from .proto.encrypted_message import encode, decode
+from .proto.avato_enclave_pb2 import Request, Response
 from .verification import Verification, Fatquote
 from .api import Endpoints
 
@@ -49,13 +50,12 @@ class Instance(metaclass=MetaInstance):
     def type(self):
         return self.get_type()
 
-    def __init__(self, client, id, name, admin_id, participant_ids):
+    def __init__(self, client, id, name, admin_id):
         self.user = client.user
         self.api = client.api
         self.id = id
         self.name = name
         self.admin_id = admin_id
-        self.participant_ids = participant_ids
         self.quote = None
         self.secret = None
         self.fatquote = None
@@ -122,6 +122,10 @@ class Instance(metaclass=MetaInstance):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
 
+    def shutdown(self):
+        url = Endpoints.POST_SHUTDOWN.replace(":instanceId", self.id)
+        self.api.post(url)
+
     def delete(self):
         url = Endpoints.DELETE_INSTANCE.replace(":instanceId", self.id)
         self.api.delete(url)
@@ -129,9 +133,9 @@ class Instance(metaclass=MetaInstance):
     def _encrypt_and_encode_data(self, data):
         nonce = chily.Nonce.from_random()
         cipher = chily.Cipher(
-            self.secret.keypair.secret, self._get_enclave_pubkey(), nonce
+            self.secret.keypair.secret, self._get_enclave_pubkey()
         )
-        enc_data = cipher.encrypt(data)
+        enc_data = cipher.encrypt(data, nonce)
         return encode(
             bytes(enc_data),
             bytes(nonce.bytes),
@@ -140,11 +144,25 @@ class Instance(metaclass=MetaInstance):
 
     def _decode_and_decrypt_data(self, data):
         dec_data, nonceB, _ = decode(data)
-        nonce = chily.Nonce.from_bytes(nonceB)
         cipher = chily.Cipher(
-            self.secret.keypair.secret, self._get_enclave_pubkey(), nonce
+            self.secret.keypair.secret, self._get_enclave_pubkey()
         )
-        return cipher.decrypt(dec_data)
+        return cipher.decrypt(dec_data, chily.Nonce.from_bytes(nonceB))
+
+    def _send_message(self, message):
+        encrypted = self._encrypt_and_encode_data(message.SerializeToString())
+        request = Request()
+        request.avatoRequest = encrypted
+        url = Endpoints.POST_MESSAGE.replace(":instanceId", self.id)
+        response = self.api.post(
+            url, request.SerializeToString(), {"Content-Type": "application/octet-stream"},
+        )
+        response_container = Response()
+        response_container.ParseFromString(response.content)
+        if response_container.HasField("unsuccessfulResponse"):
+            raise Exception(response_container.unsuccessfulResponse)
+        decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
+        return decrypted_response
 
     def __str__(self):
         return f"id={self.id}, name={self.name}, user={self.user}"

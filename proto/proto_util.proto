@@ -1,9 +1,0 @@
-syntax = "proto2";
-
-package proto_util;
-
-message DataNoncePubkey {
-  required bytes data = 1;
-  required bytes nonce = 2;
-  required bytes pubkey = 3 ;
-}
