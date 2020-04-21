@@ -47,7 +47,7 @@ class Client:
 
     def _instance_from_type(self, type):
         for instance in self.registered_instances:
-            if instance.get_type() == type:
+            if instance.type == type:
                 return instance
         raise Client.UnknownInstanceTypeError
 
