@@ -53,7 +53,7 @@ class Client:
         )
 
     def create_instance(self, name, type, participants):
-        url = Endpoints.POST_CREATE_INSTANCE
+        url = Endpoints.INSTANCES_COLLECTION
         data = {
             "name": name,
             "type": type,
