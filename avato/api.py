@@ -7,18 +7,19 @@ AVATO_ACTIVE_INSTANCE_INFIX = "/instance/:instanceId"
 
 
 class Endpoints(str, Enum):
-    GET_INSTANCES = AVATO_GENERAL_INFIX + "/instances"
-    POST_CREATE_INSTANCE = AVATO_GENERAL_INFIX + "/instance"
-    HEAD_USERS_EMAIL = AVATO_GENERAL_INFIX + "/users/email/:email"
-    POST_RESET = AVATO_GENERAL_INFIX + "/reset"
-
-    # Active instance shared
-    GET_INFO = AVATO_ACTIVE_INSTANCE_INFIX + "/"
-    GET_FATQUOTE = AVATO_ACTIVE_INSTANCE_INFIX + "/fatquote"
-    POST_SHUTDOWN = AVATO_ACTIVE_INSTANCE_INFIX + "/shutdown"
-    DELETE_INSTANCE = AVATO_ACTIVE_INSTANCE_INFIX + "/"
-    POST_MESSAGE = AVATO_ACTIVE_INSTANCE_INFIX + "/message"
-
+    # Instance
+    INSTANCES_COLLECTION = "/instances",
+    INSTANCE = "/instance/:instanceId",
+    INSTANCE_FATQUOTE = "/instance/:instanceId/fatquote",
+    INSTANCE_COMMANDS = "/instance/:instanceId/commands",
+    INSTANCE_LOGS = "/instance/:instanceId/logs",
+    # User
+    USERS_COLLECTION = "/users",
+    USER = "/user/:userId",
+    USER_PASSWORD = "/user/:userId/password",
+    USER_PERMISSIONS = "/user/:userId/permissions",
+    USER_TOKENS_COLLECTION = "/user/:userId/tokens",
+    USER_TOKEN = "/user/:userId/token/:tokenId"
 
 class APIError(Exception):
     def __init__(self, body):
@@ -57,7 +58,7 @@ class UnknownError(APIError):
 class API:
     def __init__(
         self,
-        authorization_token,
+        api_token,
         backend_host,
         backend_port,
         use_ssl,
@@ -74,7 +75,7 @@ class API:
                 session.proxies = {"http": http_proxy}
             protocol = "http"
         self.base_url = f"{protocol}://{backend_host}:{backend_port}{AVATO_API_PREFIX}"
-        auth_header = {"Authorization": "Bearer " + authorization_token}
+        auth_header = {"Authorization": "Bearer " + api_token}
         session.headers.update(auth_header)
         self.session = session
 
@@ -82,13 +83,13 @@ class API:
     def __check_response_status_code(response):
         if response.status_code >= 200 and response.status_code <= 204:
             pass
-        elif response.status_code == 403:
+        elif response.status_code == 400:
+            raise BadRequestError(response.content)
+        elif response.status_code == 401 or response.status_code == 403:
             raise AuthorizationError(response.content)
         elif response.status_code == 404:
             raise NotFoundError(response.content)
-        elif response.status_code == 400:
-            raise BadRequestError(response.content)
-        elif response.status_code == 500:
+        elif response.status_code >= 500 and response.status_code <= 504:
             raise ServerError(response.content)
         else:
             raise UnknownError(response.content)
@@ -96,6 +97,18 @@ class API:
     def post(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
         response = self.session.post(url, data=req_body, headers={**headers})
+        API.__check_response_status_code(response)
+        return response
+
+    def put(self, endpoint, req_body=None, headers={}):
+        url = self.base_url + endpoint
+        response = self.session.put(url, data=req_body, headers={**headers})
+        API.__check_response_status_code(response)
+        return response
+
+    def patch(self, endpoint, req_body=None, headers={}):
+        url = self.base_url + endpoint
+        response = self.session.patch(url, data=req_body, headers={**headers})
         API.__check_response_status_code(response)
         return response
 

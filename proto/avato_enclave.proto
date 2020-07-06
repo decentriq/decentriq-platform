@@ -6,7 +6,15 @@ package avato_enclave;
  */
 
 message Request {
-  required bytes avatoRequest = 4;
+  oneof request {
+    bytes avatoRequest = 1;
+    ExtensionMessage extensionMessage = 2;
+  }
+}
+
+message ExtensionMessage {
+  required string name = 1;
+  required bytes payload = 2;
 }
 
 message Response {

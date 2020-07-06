@@ -50,12 +50,11 @@ class Instance(metaclass=MetaInstance):
     def type(self):
         return self.get_type()
 
-    def __init__(self, client, id, name, admin_id):
-        self.user = client.user
+    def __init__(self, client, id, name, owner):
         self.api = client.api
         self.id = id
         self.name = name
-        self.admin_id = admin_id
+        self.owner = owner
         self.quote = None
         self.secret = None
         self.fatquote = None
@@ -78,20 +77,11 @@ class Instance(metaclass=MetaInstance):
 
         return wrapped
 
-    def _admin_required(f):
-        @wraps(f)
-        def wrapped(inst, *args, **kwargs):
-            if not inst.user.id != inst.admin_id:
-                raise Instance.AdminRequiredError
-            return f(inst, *args, **kwargs)
-
-        return wrapped
-
     def set_secret(self, secret):
         self.secret = secret
 
     def get_info(self):
-        url = Endpoints.GET_INFO.replace(":instanceId", self.id)
+        url = Endpoints.INSTANCE.replace(":instanceId", self.id)
         response = self.api.get(url)
         return response.json()
 
@@ -102,7 +92,7 @@ class Instance(metaclass=MetaInstance):
         accept_configuration_needed=False,
         accept_group_out_of_date=False,
     ):
-        url = Endpoints.GET_FATQUOTE.replace(":instanceId", self.id)
+        url = Endpoints.INSTANCE_FATQUOTE.replace(":instanceId", self.id)
         response = self.api.get(url)
         fatquote = response.json()
         certificate = fatquote["certificate"].encode("utf-8")
@@ -123,11 +113,11 @@ class Instance(metaclass=MetaInstance):
         return chily.PublicKey.from_bytes(pub_keyB)
 
     def shutdown(self):
-        url = Endpoints.POST_SHUTDOWN.replace(":instanceId", self.id)
-        self.api.post(url)
+        url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
+        self.api.post(url, json.dumps({"type": "SHUTDOWN"}), {"Content-type": "application/json"})
 
     def delete(self):
-        url = Endpoints.DELETE_INSTANCE.replace(":instanceId", self.id)
+        url = Endpoints.INSTANCE.replace(":instanceId", self.id)
         self.api.delete(url)
 
     def _encrypt_and_encode_data(self, data):
@@ -153,7 +143,7 @@ class Instance(metaclass=MetaInstance):
         encrypted = self._encrypt_and_encode_data(message.SerializeToString())
         request = Request()
         request.avatoRequest = encrypted
-        url = Endpoints.POST_MESSAGE.replace(":instanceId", self.id)
+        url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
         response = self.api.post(
             url, request.SerializeToString(), {"Content-Type": "application/octet-stream"},
         )
@@ -165,4 +155,4 @@ class Instance(metaclass=MetaInstance):
         return decrypted_response
 
     def __str__(self):
-        return f"id={self.id}, name={self.name}, user={self.user}"
+        return f"id={self.id}, name={self.name}"

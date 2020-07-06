@@ -1,5 +1,4 @@
 import json
-from .authentication import sign_in
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
 from .api import API, Endpoints, NotFoundError
 
@@ -12,8 +11,7 @@ class Client:
 
     def __init__(
         self,
-        username,
-        password,
+        api_token,
         instance_types=[],
         backend_host=AVATO_HOST,
         backend_port=AVATO_PORT,
@@ -21,10 +19,9 @@ class Client:
         http_proxy=None,
         https_proxy=None,
     ):
-        self.user = sign_in(username, password)
         self.registered_instances = instance_types
         self.api = API(
-            self.user.id_token,
+            api_token,
             backend_host,
             backend_port,
             use_ssl,
@@ -32,18 +29,10 @@ class Client:
             https_proxy,
         )
 
-    def check_user_exists(self, email):
-        url = Endpoints.HEAD_USERS_EMAIL.replace(":email", email)
-        try:
-            self.api.head(url)
-        except NotFoundError:
-            return False
-        return True
-
     def get_instances(self):
-        url = Endpoints.GET_INSTANCES
+        url = Endpoints.INSTANCES_COLLECTION
         response = self.api.get(url)
-        return response.json()["instanceIds"]
+        return response.json()
 
     def _instance_from_type(self, type):
         for instance in self.registered_instances:
@@ -52,7 +41,7 @@ class Client:
         raise Client.UnknownInstanceTypeError
 
     def get_instance(self, id):
-        url = Endpoints.GET_INFO.replace(":instanceId", id)
+        url = Endpoints.INSTANCE.replace(":instanceId", id)
         response = self.api.get(url)
         instance_info = response.json()
         instance_constructor = self._instance_from_type(instance_info["type"])
@@ -60,25 +49,18 @@ class Client:
             self,
             id,
             instance_info["name"],
-            instance_info["adminId"],
+            instance_info["owner"],
         )
 
     def create_instance(self, name, type, participants):
         url = Endpoints.POST_CREATE_INSTANCE
         data = {
-            "instanceName": name,
-            "instanceType": type,
-            "participantIds": participants,
+            "name": name,
+            "type": type,
+            "participants": list(map(lambda x: {"id": x}, participants)),
         }
         data_json = json.dumps(data)
         response = self.api.post(url, data_json, {"Content-type": "application/json"})
-        id = response.json()["instanceId"]
+        response_json = response.json()
         instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, id, name, self.user.email)
-
-    def reset_backend(self):
-        url = Endpoints.POST_RESET
-        self.api.post(url)
-
-    def __str__(self):
-        return f"Client user: {self.user}"
+        return instance_constructor(self, response_json["id"], name, response_json["owner"])
