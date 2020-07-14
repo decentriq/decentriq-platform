@@ -5,9 +5,9 @@ from abc import ABC, ABCMeta, abstractmethod
 from functools import wraps
 from .proto.encrypted_message import encode, decode
 from .proto.avato_enclave_pb2 import Request, Response
+from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import Verification, Fatquote
 from .api import Endpoints
-
 
 class MetaInstance(ABCMeta):
     @property
@@ -139,20 +139,20 @@ class Instance(metaclass=MetaInstance):
         )
         return cipher.decrypt(dec_data, chily.Nonce.from_bytes(nonceB))
 
-    def _send_message(self, message):
-        encrypted = self._encrypt_and_encode_data(message.SerializeToString())
+    def _send_message(self, message, response_object):
+        encrypted = self._encrypt_and_encode_data(serialize_length_delimited(message))
         request = Request()
         request.avatoRequest = encrypted
         url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
         response = self.api.post(
-            url, request.SerializeToString(), {"Content-Type": "application/octet-stream"},
+            url, serialize_length_delimited(request), {"Content-Type": "application/octet-stream"},
         )
         response_container = Response()
-        response_container.ParseFromString(response.content)
+        parse_length_delimited(response.content, response_container)
         if response_container.HasField("unsuccessfulResponse"):
             raise Exception(response_container.unsuccessfulResponse)
         decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
-        return decrypted_response
+        parse_length_delimited(decrypted_response, response_object)
 
     def __str__(self):
         return f"id={self.id}, name={self.name}"
