@@ -9,6 +9,11 @@ class Client:
 
         pass
 
+    class UnknownUserEmail(Exception):
+        """Raised when the user email doesn't exist"""
+
+        pass
+
     def __init__(
         self,
         api_token,
@@ -40,6 +45,15 @@ class Client:
                 return instance
         raise Client.UnknownInstanceTypeError
 
+    def _get_user_id(self, email):
+        url = f"{Endpoints.USERS_COLLECTION}?email={email}"
+        response = self.api.get(url)
+        users = response.json()
+        if len(users) != 1:
+            raise Client.UnknownUserEmail
+        user_id = users[0]["id"]
+        return user_id
+
     def get_instance(self, id):
         url = Endpoints.INSTANCE.replace(":instanceId", id)
         response = self.api.get(url)
@@ -57,7 +71,7 @@ class Client:
         data = {
             "name": name,
             "type": type,
-            "participants": list(map(lambda x: {"id": x}, participants)),
+            "participants": list(map(lambda x: {"id": self._get_user_id(x)}, participants)),
         }
         data_json = json.dumps(data)
         response = self.api.post(url, data_json, {"Content-type": "application/json"})
