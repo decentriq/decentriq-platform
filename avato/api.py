@@ -19,7 +19,12 @@ class Endpoints(str, Enum):
     USER_PASSWORD = "/user/:userId/password",
     USER_PERMISSIONS = "/user/:userId/permissions",
     USER_TOKENS_COLLECTION = "/user/:userId/tokens",
-    USER_TOKEN = "/user/:userId/token/:tokenId"
+    USER_TOKEN = "/user/:userId/token/:tokenId",
+    USER_FILES_COLLECTION = "/user/:userId/files"
+    USER_FILE = "/user/:userId/file/:fileId",
+    USER_FILE_CHUNK = "/user/:userId/file/:fileId/chunk/:chunkHash"
+
+	
 
 class APIError(Exception):
     def __init__(self, body):
@@ -97,6 +102,12 @@ class API:
     def post(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
         response = self.session.post(url, data=req_body, headers={**headers})
+        API.__check_response_status_code(response)
+        return response
+
+    def post_multipart(self, endpoint, parts=None, headers={}):
+        url = self.base_url + endpoint
+        response = self.session.post(url, files=parts, headers={**headers})
         API.__check_response_status_code(response)
         return response
 

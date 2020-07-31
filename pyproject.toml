@@ -8,8 +8,9 @@ repository = "https://github.com/decentriq/avato-python-client"
 homepage = "https://github.com/decentriq/avato-python-client"
 
 [tool.poetry.dependencies]
+pycryptodome="^3.9.8"
+typing-extensions="^3.7.4"
 python = "^3.6"
-
 protobuf = "^3.11.0"
 requests = "^2.22.0"
 asn1crypto = "^1.2.0"
