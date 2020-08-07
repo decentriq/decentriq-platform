@@ -5,7 +5,7 @@ from typing import List, Tuple
 from typing_extensions import TypedDict
 from Crypto.Hash import SHA256
 
-MAX_CHUNK_SIZE = 8*1024  # 8KB
+MAX_CHUNK_SIZE = 1024*1024  # 1MB
 CHARSET = "utf-8"
 
 class FileManifestMetadata(TypedDict):
