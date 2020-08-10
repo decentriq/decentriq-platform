@@ -1,12 +1,15 @@
 from enum import Enum
 from abc import abstractmethod
 from collections.abc import Iterator
-from typing import List, Tuple 
+from typing import List, Tuple
+
+import chily
 from typing_extensions import TypedDict
 from Crypto.Hash import SHA256
 
 MAX_CHUNK_SIZE = 1024*1024  # 1MB
 CHARSET = "utf-8"
+
 
 class FileManifestMetadata(TypedDict):
     name: str
@@ -15,6 +18,7 @@ class FileManifestMetadata(TypedDict):
     encrypted: bool
     chunks: List[str]
 
+
 class FileManifest:
     def __init__(self, chunks: List[str]):
         self.content = '\n'.join(chunks).encode(CHARSET)
@@ -22,6 +26,7 @@ class FileManifest:
         manifest_hasher.update(self.content)
         manifest_hash = manifest_hasher.hexdigest()
         self.hash = manifest_hash
+
 
 class FileFormat(Enum):
     CSV = "CSV"
@@ -100,7 +105,7 @@ class CsvChunker(Chunker):
     def reset(self):
         self.csv_file_handle.seek(0)
 
-    def __next__(self) -> Tuple[str, str]:
+    def __next__(self) -> Tuple[str, bytes]:
         current_chunk_size = 0
         chunk = []
         if self.csv_file_handle is None:
@@ -116,8 +121,8 @@ class CsvChunker(Chunker):
                 raise StopIteration
         if current_chunk_size == 0:
             raise self.CannotChunkFileError
-        chunk = '\n'.join(chunk)
-        chunk_hash = SHA256.new(chunk.encode(CHARSET))
+        chunk = ''.join(chunk).encode(CHARSET)
+        chunk_hash = SHA256.new(chunk)
         return chunk_hash.hexdigest(), chunk
 
 
@@ -125,7 +130,6 @@ class ChunkerBuilder:
     class CannotBuildChunkerError(Exception):
         """Raised when the input file is not chunk-able"""
         pass
-
     def __init__(
         self,
         file_path: str,
@@ -145,3 +149,15 @@ class ChunkerBuilder:
 
     def __exit__(self, exception_type, exception_value, traceback):
         self.chunker.close()
+
+
+class StorageCipher:
+    def __init__(self, symmetric_key):
+        self.enc_key = symmetric_key
+        self.enc_key_hash = SHA256.new(symmetric_key).digest()
+        self.cipher: chily.Cipher = chily.Cipher.from_symmetric(self.enc_key)
+
+    def encrypt(self, data: bytes):
+        nonce = chily.Nonce.from_random()
+        enc_data = self.cipher.encrypt(data, nonce)
+        return bytes(list(self.enc_key_hash)+nonce.bytes+enc_data)

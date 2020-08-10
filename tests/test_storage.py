@@ -1,4 +1,5 @@
 import os
+
 from avato.client import Client
 from avato.storage import FileFormat
 
@@ -29,4 +30,3 @@ def test_ingestion_complete():
     client.delete_user_file(user_email, uploaded_file.get("id"))
     assert uploaded_file.get("id") not in list(
             map(lambda x: x.get("id"), client.get_user_files_collection(user_email)))
-

@@ -1,9 +1,9 @@
 import json
 from typing import List
-
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
 from .api import API, Endpoints
-from .storage import FileFormat, FileManifestBuilder, ChunkerBuilder, FileDescription, FileManifestMetadata, FileManifest
+from .storage import FileFormat, FileManifestBuilder, ChunkerBuilder, FileDescription, FileManifestMetadata, \
+    FileManifest, StorageCipher
 
 
 class Client:
@@ -99,6 +99,12 @@ class Client:
             for chunk_hash, _ in chunker:
                 file_manifest_builder.add_chunk(chunk_hash)
             (manifest, manifest_metadata) = file_manifest_builder.build()
+            print("manifest chunks:")
+            print(file_manifest_builder.chunks)
+            cipher = None
+            if key is not None:
+                cipher = StorageCipher(key)
+                manifest.content = cipher.encrypt(manifest.content)
             file_description = self._upload_manifest(user_id, manifest, manifest_metadata)
             # upload chunks
             chunker.reset()
@@ -107,6 +113,8 @@ class Client:
                         .replace(":userId", user_id) \
                         .replace(":fileId", file_description.get("id")) \
                         .replace(":chunkHash", chunk_hash)
+                if cipher is not None:
+                    chunk_data = cipher.encrypt(chunk_data)
                 self.api.post(url, chunk_data, {"Content-type": "application/octet-stream"})
         return self.get_user_file(email, file_description.get("id"))
 
