@@ -7,7 +7,7 @@ import chily
 from typing_extensions import TypedDict
 from Crypto.Hash import SHA256
 
-MAX_CHUNK_SIZE = 1024*1024  # 1MB
+MAX_CHUNK_SIZE = 8*1024*1024  # 1MB
 CHARSET = "utf-8"
 
 
