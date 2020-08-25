@@ -7,7 +7,7 @@ import chily
 from typing_extensions import TypedDict
 from Crypto.Hash import SHA256
 
-MAX_CHUNK_SIZE = 8*1024*1024  # 1MB
+MAX_CHUNK_SIZE = 8*1024*1024  # 8MB
 CHARSET = "utf-8"
 
 
@@ -85,8 +85,6 @@ class Chunker(Iterator):
 
 
 class CsvChunker(Chunker):
-    NEWLINE_BC = len('\n'.encode(CHARSET))  # Newline Byte Count (should always be 1)
-
     class CannotChunkError(Exception):
         """Raised when the input file is not chunk-able"""
         pass
@@ -112,7 +110,7 @@ class CsvChunker(Chunker):
             raise CsvChunker.CannotChunkError
         for line in self.csv_file_handle:
             line_bytes = line.encode(CHARSET)
-            if current_chunk_size + len(line_bytes) + CsvChunker.NEWLINE_BC > self.chunk_size:
+            if current_chunk_size + len(line_bytes) > self.chunk_size:
                 break
             current_chunk_size += len(line_bytes)
             chunk.append(line)

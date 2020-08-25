@@ -1,5 +1,7 @@
 import requests
 from enum import Enum
+import socket
+from http.client import HTTPConnection
 
 AVATO_API_PREFIX = "/api"
 AVATO_GENERAL_INFIX = ""
@@ -59,6 +61,16 @@ class UnknownError(APIError):
 
     pass
 
+
+class MyHTTPConnection(HTTPConnection):
+    def connect(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        self.sock.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
+        if self._tunnel_host:
+            self._tunnel()
+
+requests.packages.urllib3.connectionpool.HTTPConnection = MyHTTPConnection
 
 class API:
     def __init__(

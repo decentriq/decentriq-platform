@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, wait
 import json
 from typing import List
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
@@ -90,9 +91,11 @@ class Client:
         file_name: str,
         file_path: str,
         file_format: FileFormat,
-        key=None
+        key=None,
+        parallel_uploads=2
     ) -> FileDescription:
         user_id = self._get_user_id(email)
+        uploader = ThreadPoolExecutor(max_workers=parallel_uploads)
         with ChunkerBuilder(file_path, file_format) as chunker:
             # create manifest
             file_manifest_builder = FileManifestBuilder(file_name, file_format, key is not None)
@@ -108,6 +111,7 @@ class Client:
             file_description = self._upload_manifest(user_id, manifest, manifest_metadata)
             # upload chunks
             chunker.reset()
+            uploading = []
             for chunk_hash, chunk_data in chunker:
                 url = Endpoints.USER_FILE_CHUNK \
                         .replace(":userId", user_id) \
@@ -115,7 +119,8 @@ class Client:
                         .replace(":chunkHash", chunk_hash)
                 if cipher is not None:
                     chunk_data = cipher.encrypt(chunk_data)
-                self.api.post(url, chunk_data, {"Content-type": "application/octet-stream"})
+                uploading.append(uploader.submit(self.api.post, url, chunk_data, {"Content-type": "application/octet-stream"}))
+            wait(uploading)
         return self.get_user_file(email, file_description.get("id"))
 
     def _upload_manifest(self, user_id: str, manifest: FileManifest, manifest_metadata: FileManifestMetadata) -> FileDescription:
