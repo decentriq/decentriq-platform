@@ -120,12 +120,14 @@ class Client:
             do_wait = 0
             for chunk in chunker:
                 upload_pool.append(uploader.submit(self._upload_chunk, chunk, cipher, user_id,file_description.get("id")))
-                if do_wait==parallel_uploads:
-                    do_wait=0
+                if do_wait == parallel_uploads:
                     wait(upload_pool)
                     upload_pool.clear()
+                    do_wait = 0
                 else:
-                    do_wait+=1
+                    do_wait += 1
+            wait(upload_pool)
+            upload_pool.clear()
         return self.get_user_file(email, file_description.get("id"))
 
     def _upload_chunk(self, chunk, cipher, user_id, file_id):
