@@ -1,7 +1,7 @@
 import requests
 from enum import Enum
 import socket
-from http.client import HTTPConnection
+import http
 
 AVATO_API_PREFIX = "/api"
 AVATO_GENERAL_INFIX = ""
@@ -62,15 +62,15 @@ class UnknownError(APIError):
     pass
 
 
-class MyHTTPConnection(HTTPConnection):
-    def connect(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.setsockopt( socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
-        self.sock.setsockopt(socket.SOL_TCP, socket.TCP_KEEPINTVL, 15)
-        if self._tunnel_host:
-            self._tunnel()
+class HTTPAdapterWithSocketOptions(requests.adapters.HTTPAdapter):
+    def __init__(self, *args, **kwargs):
+        self.socket_options = kwargs.pop("socket_options", None)
+        super(HTTPAdapterWithSocketOptions, self).__init__(*args, **kwargs)
 
-requests.packages.urllib3.connectionpool.HTTPConnection = MyHTTPConnection
+    def init_poolmanager(self, *args, **kwargs):
+        if self.socket_options is not None:
+            kwargs["socket_options"] = self.socket_options
+        super(HTTPAdapterWithSocketOptions, self).init_poolmanager(*args, **kwargs)
 
 class API:
     def __init__(
@@ -82,7 +82,10 @@ class API:
         http_proxy,
         https_proxy,
     ):
+        adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1), (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30), (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)])
         session = requests.Session()
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
         if use_ssl:
             if https_proxy:
                 session.proxies = {"https": https_proxy}

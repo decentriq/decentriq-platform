@@ -5,9 +5,10 @@ from typing import List, Tuple
 
 import chily
 from typing_extensions import TypedDict
-from Crypto.Hash import SHA256
+#from Crypto.Hash import SHA256
+from hashlib import sha256
 
-MAX_CHUNK_SIZE = 8*1024*1024  # 8MB
+MAX_CHUNK_SIZE = 4*1024*1024
 CHARSET = "utf-8"
 
 
@@ -22,7 +23,7 @@ class FileManifestMetadata(TypedDict):
 class FileManifest:
     def __init__(self, chunks: List[str]):
         self.content = '\n'.join(chunks).encode(CHARSET)
-        manifest_hasher = SHA256.new()
+        manifest_hasher = sha256()
         manifest_hasher.update(self.content)
         manifest_hash = manifest_hasher.hexdigest()
         self.hash = manifest_hash
@@ -108,19 +109,20 @@ class CsvChunker(Chunker):
         chunk = []
         if self.csv_file_handle is None:
             raise CsvChunker.CannotChunkError
+        chunk_hash = sha256()
         for line in self.csv_file_handle:
             line_bytes = line.encode(CHARSET)
             if current_chunk_size + len(line_bytes) > self.chunk_size:
                 break
             current_chunk_size += len(line_bytes)
-            chunk.append(line)
+            chunk.append(line_bytes)
+            chunk_hash.update(line_bytes)
         else:
             if current_chunk_size == 0:
                 raise StopIteration
         if current_chunk_size == 0:
             raise self.CannotChunkFileError
-        chunk = ''.join(chunk).encode(CHARSET)
-        chunk_hash = SHA256.new(chunk)
+        chunk = b''.join(chunk)
         return chunk_hash.hexdigest(), chunk
 
 
@@ -152,7 +154,7 @@ class ChunkerBuilder:
 class StorageCipher:
     def __init__(self, symmetric_key):
         self.enc_key = symmetric_key
-        self.enc_key_hash = SHA256.new(symmetric_key).digest()
+        self.enc_key_hash = sha256(symmetric_key).digest()
         self.cipher: chily.Cipher = chily.Cipher.from_symmetric(self.enc_key)
 
     def encrypt(self, data: bytes):
