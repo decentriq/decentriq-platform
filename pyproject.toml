@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "avato"
-version = "0.5.1"
+version = "0.5.2"
 description = "Python client library for the Avato platform"
 authors = ["decentriq <opensource@decentriq.ch>"]
 readme = 'README.md'

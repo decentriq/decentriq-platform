@@ -2,13 +2,14 @@ from enum import Enum
 from abc import abstractmethod
 from collections.abc import Iterator
 from typing import List, Tuple
+import os
 
 import chily
 from typing_extensions import TypedDict
 #from Crypto.Hash import SHA256
 from hashlib import sha256
 
-MAX_CHUNK_SIZE = 4*1024*1024
+MAX_CHUNK_SIZE = 8*1024*1024
 CHARSET = "utf-8"
 
 
@@ -96,7 +97,7 @@ class CsvChunker(Chunker):
         self.csv_file_handle = None
 
     def open(self):
-        self.csv_file_handle = open(self.csv_file_path)
+        self.csv_file_handle = open(self.csv_file_path, buffering=32*1024**2)
 
     def close(self):
         self.csv_file_handle.close()

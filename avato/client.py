@@ -1,5 +1,7 @@
-from concurrent.futures import ThreadPoolExecutor, wait
 import json
+import queue
+from concurrent import futures
+import logging
 from itertools import repeat
 from typing import List
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
@@ -7,6 +9,10 @@ from .api import API, Endpoints
 from .storage import FileFormat, FileManifestBuilder, ChunkerBuilder, FileDescription, FileManifestMetadata, \
     FileManifest, StorageCipher
 
+class ThreadPoolExecutorWithQueueSizeLimit(futures.ThreadPoolExecutor):
+    def __init__(self, maxsize=50, *args, **kwargs):
+        super(ThreadPoolExecutorWithQueueSizeLimit, self).__init__(*args, **kwargs)
+        self._work_queue = queue.Queue(maxsize=maxsize)
 
 class Client:
     class UnknownInstanceTypeError(Exception):
@@ -101,14 +107,14 @@ class Client:
         parallel_uploads=8
     ) -> FileDescription:
         user_id = self._get_user_id(email)
-        uploader = ThreadPoolExecutor(max_workers=parallel_uploads)
+        uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads)
         with ChunkerBuilder(file_path, file_format, chunk_size=chunk_size) as chunker:
             # create manifest
             file_manifest_builder = FileManifestBuilder(file_name, file_format, key is not None)
             file_manifest_builder.chunks = [a for a, _ in chunker]
             (manifest, manifest_metadata) = file_manifest_builder.build()
-            print("manifest chunks:")
-            print(file_manifest_builder.chunks)
+            logging.info("manifest chunks:")
+            logging.info(file_manifest_builder.chunks)
             cipher = None
             if key is not None:
                 cipher = StorageCipher(key)
@@ -116,23 +122,12 @@ class Client:
             file_description = self._upload_manifest(user_id, manifest, manifest_metadata)
             # upload chunks
             chunker.reset()
-            upload_pool = list()
-            do_wait = 0
             for chunk in chunker:
-                upload_pool.append(uploader.submit(self._upload_chunk, chunk, cipher, user_id,file_description.get("id")))
-                if do_wait == parallel_uploads:
-                    wait(upload_pool)
-                    upload_pool.clear()
-                    do_wait = 0
-                else:
-                    do_wait += 1
-            wait(upload_pool)
-            upload_pool.clear()
+                uploader.submit(self._upload_chunk, chunk[0], chunk[1], cipher, user_id, file_description.get("id"))
+        uploader.shutdown(wait=True)
         return self.get_user_file(email, file_description.get("id"))
 
-    def _upload_chunk(self, chunk, cipher, user_id, file_id):
-        chunk_hash = chunk[0]
-        chunk_data = chunk[1]
+    def _upload_chunk(self, chunk_hash, chunk_data, cipher, user_id, file_id):
         url = Endpoints.USER_FILE_CHUNK \
             .replace(":userId", user_id) \
             .replace(":fileId", file_id) \
