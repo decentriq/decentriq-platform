@@ -82,7 +82,8 @@ class API:
         http_proxy,
         https_proxy,
     ):
-        adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1), (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30), (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)])
+        #adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1), (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 10), (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 5), (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 100)])
+        adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1), (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 5), (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 100)])
         session = requests.Session()
         session.mount("http://", adapter)
         session.mount("https://", adapter)
