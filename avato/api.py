@@ -1,7 +1,8 @@
 import requests
-from enum import Enum
 import socket
-import http
+import platform
+from enum import Enum
+from urllib3.connection import HTTPConnection
 
 AVATO_API_PREFIX = "/api"
 AVATO_GENERAL_INFIX = ""
@@ -61,7 +62,6 @@ class UnknownError(APIError):
 
     pass
 
-
 class HTTPAdapterWithSocketOptions(requests.adapters.HTTPAdapter):
     def __init__(self, *args, **kwargs):
         self.socket_options = kwargs.pop("socket_options", None)
@@ -71,6 +71,26 @@ class HTTPAdapterWithSocketOptions(requests.adapters.HTTPAdapter):
         if self.socket_options is not None:
             kwargs["socket_options"] = self.socket_options
         super(HTTPAdapterWithSocketOptions, self).init_poolmanager(*args, **kwargs)
+
+class HTTPAdapterWithTCPKeepalive(HTTPAdapterWithSocketOptions):
+    def __init__(self, *args, **kwargs):
+        platform_socket_options = [
+            (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 60),
+            (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5),
+        ]
+        if platform.system()=="Linux":
+            platform_socket_options += [
+                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60),
+            ]
+        elif platform.system()=="Darwin":
+            TCP_KEEPALIVE = getattr(socket, 'TCP_KEEPALIVE', 0x10)
+            platform_socket_options += [
+                (socket.IPPROTO_TCP, TCP_KEEPALIVE, 60)
+            ]
+        self.socket_options = HTTPConnection.default_socket_options + \
+                [(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)] + \
+                platform_socket_options
+        super(HTTPAdapterWithTCPKeepalive, self).__init__(*args, **kwargs)
 
 class API:
     def __init__(
@@ -82,8 +102,7 @@ class API:
         http_proxy,
         https_proxy,
     ):
-        #adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1), (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 10), (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 5), (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 100)])
-        adapter = HTTPAdapterWithSocketOptions(socket_options=[(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1), (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 5), (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 100)])
+        adapter = HTTPAdapterWithTCPKeepalive()
         session = requests.Session()
         session.mount("http://", adapter)
         session.mount("https://", adapter)

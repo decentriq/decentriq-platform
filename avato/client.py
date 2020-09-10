@@ -106,15 +106,14 @@ class Client:
         parallel_uploads=8
     ) -> FileDescription:
         user_id = self._get_user_id(email)
-        uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads*3)
+        uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads*2)
         with ChunkerBuilder(file_path, file_format, chunk_size=chunk_size) as chunker:
             # create manifest
             file_manifest_builder = FileManifestBuilder(file_name, file_format, key is not None)
-            #chunker.process(None, file_manifest_builder.add_chunk)
             file_manifest_builder.chunks = [a for a, _ in chunker]
             (manifest, manifest_metadata) = file_manifest_builder.build()
-            print("manifest chunks:")
-            print(file_manifest_builder.chunks)
+            logging.debug("manifest chunks:")
+            logging.debug(file_manifest_builder.chunks)
             cipher = None
             if key is not None:
                 cipher = StorageCipher(key)
@@ -122,14 +121,9 @@ class Client:
             file_description = self._upload_manifest(user_id, manifest, manifest_metadata)
             # upload chunks
             chunker.reset()
-            #upload_pool = list()
-            #chunker.process(lambda chunk_hash, chunk_data: self._upload_chunk(chunk_hash, chunk_data, cipher, user_id, file_description.get("id")), None)
             for chunk in chunker:
                 uploader.submit(self._upload_chunk, chunk[0], chunk[1], cipher, user_id, file_description.get("id"))
         uploader.shutdown(wait=True)
-                #self._upload_chunk(chunk, cipher, user_id, file_description.get("id"))
-            #uploading = []
-            #_ = uploader.map(self._upload_chunk, chunker, repeat(cipher), repeat(user_id), repeat(file_description.get("id")))
         return self.get_user_file(email, file_description.get("id"))
 
     def _upload_chunk(self, chunk_hash, chunk_data, cipher, user_id, file_id):
