@@ -33,3 +33,63 @@ message DataNoncePubkey {
   required bytes nonce = 2;
   required bytes pubkey = 3 ;
 }
+
+/* =========================================================================================================
+   ENCRYPTED SEALED MESSAGED FORMAT
+ */
+
+message DataNonce {
+    required bytes data = 1;
+    required bytes nonce = 2;
+}
+
+message SealedEncryptedMessage {
+  required DataNonce encryptedMessage = 1;
+  required bytes sealingKeyParams = 2;
+}
+
+/* =========================================================================================================
+   ENCRYPTED STORAGE FORMAT
+ */
+
+// Encryption header (unencrypted)
+message EncryptionHeader {
+    oneof encryptionHeader {
+        ChilyKey chily_key = 1;
+        ChilyKeyClusterSecretDiversified chily_key_diversified = 2;
+    }
+}
+
+message ChilyKey {
+    required bytes key_sha256 = 1;
+    required bytes encryption_nonce = 2;
+}
+
+message ChilyKeyClusterSecretDiversified {
+    required bytes key_diversified_sha256 = 1;
+    required bytes encryption_nonce = 2;
+}
+
+message IntegrityHeader {
+    oneof integrity_header {
+        // The reader must know the SHA256 of the file body in advance.
+        BodySha256 body_sha256 = 1;
+        // The reader must know the SHA256 of the computation description producing the file, AND verify that
+        // the file has been encrypted with the cluster key to ensure authenticity.
+        ResultSha256 result_sha256 = 2;
+    }
+}
+
+message BodySha256 {
+}
+
+message ResultSha256 {
+    required bytes computation_sha256 = 1;
+}
+
+// Data format header (encrypted)
+message ChunkHeader {
+    required bytes extraEntropy = 1;
+    required string formatIdentifier = 2;
+    required bytes format = 3;
+}

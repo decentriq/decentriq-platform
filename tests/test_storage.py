@@ -1,7 +1,7 @@
 import os
 
 from avato.client import Client
-from avato.storage import FileFormat
+from avato.storage import FileFormat, ColumnType
 
 tests_root = os.path.dirname(__file__)
 fixtures_dir = os.path.join(tests_root, "fixtures")
@@ -19,7 +19,18 @@ def test_ingestion_complete():
             user_email,
             "test.csv",
             os.path.join(fixtures_dir, "test.csv"),
-            FileFormat.CSV
+            FileFormat.CSV,
+            column_types=[
+                ColumnType.INT64,
+                ColumnType.STRING,
+                ColumnType.STRING,
+                ColumnType.STRING,
+                ColumnType.STRING,
+                ColumnType.INT64,
+                ColumnType.STRING,
+            ],
+            extra_entropy=bytes(), # TODO
+            key=None
         )
     assert uploaded_file.get("id") in list(
             map(lambda x: x.get("id"), client.get_user_files_collection(user_email)))

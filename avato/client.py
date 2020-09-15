@@ -101,15 +101,17 @@ class Client:
         file_name: str,
         file_path: str,
         file_format: FileFormat,
-        key=None,
+        column_types: List[int],
+        extra_entropy: bytes,
+        key,
         chunk_size=8*1024**2,
         parallel_uploads=8
     ) -> FileDescription:
         user_id = self._get_user_id(email)
         uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads*2)
-        with ChunkerBuilder(file_path, file_format, chunk_size=chunk_size) as chunker:
+        with ChunkerBuilder(file_path, column_types, file_format, extra_entropy, chunk_size=chunk_size) as chunker:
             # create manifest
-            file_manifest_builder = FileManifestBuilder(file_name, file_format, key is not None)
+            file_manifest_builder = FileManifestBuilder(file_name, file_format, extra_entropy, key is not None)
             file_manifest_builder.chunks = [a for a, _ in chunker]
             (manifest, manifest_metadata) = file_manifest_builder.build()
             logging.debug("manifest chunks:")

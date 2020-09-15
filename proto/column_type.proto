@@ -1,0 +1,7 @@
+syntax = "proto2";
+package column_type;
+
+enum ColumnType {
+    INT64 = 1;
+    STRING = 2;
+}
