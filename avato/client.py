@@ -5,12 +5,13 @@ from concurrent import futures
 from concurrent.futures import ProcessPoolExecutor
 import logging
 from itertools import repeat
-from typing import List
+from typing import List, Tuple
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
 from .api import API, Endpoints
 from hashlib import sha256
-from .storage import FileFormat, FileManifestBuilder, ChunkerBuilder, FileDescription, FileManifestMetadata, \
-    FileManifest, StorageCipher
+from .storage import create_encrypted_json_object_chunk, CsvChunkerBuilder, FileDescription, \
+    DatasetManifestMetadata, \
+    DatasetManifest, StorageCipher
 
 class ThreadPoolExecutorWithQueueSizeLimit(futures.ThreadPoolExecutor):
     def __init__(self, maxsize=50, *args, **kwargs):
@@ -95,55 +96,71 @@ class Client:
         instance_constructor = self._instance_from_type(type)
         return instance_constructor(self, response_json["id"], name, response_json["owner"])
 
-    def upload_user_file(
-        self,
-        email: str,
-        file_name: str,
-        file_path: str,
-        file_format: FileFormat,
-        column_types: List[int],
-        extra_entropy: bytes,
-        key,
-        chunk_size=8*1024**2,
-        parallel_uploads=8
+    def upload_csv_table(
+            self,
+            email: str,
+            file_name: str,
+            file_path: str,
+            schema: List[Tuple[str, int]],
+            extra_entropy: bytes,
+            key,
+            chunk_size=8 * 1024 ** 2,
+            parallel_uploads=8
     ) -> FileDescription:
         user_id = self._get_user_id(email)
-        uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads*2)
-        with ChunkerBuilder(file_path, column_types, file_format, extra_entropy, chunk_size=chunk_size) as chunker:
+        uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads * 2)
+        column_types = [column_type for _, column_type in schema]
+        with CsvChunkerBuilder(file_path, column_types, extra_entropy, chunk_size=chunk_size) as chunker:
             # create manifest
-            file_manifest_builder = FileManifestBuilder(file_name, file_format, extra_entropy, key is not None)
-            file_manifest_builder.chunks = [a for a, _ in chunker]
-            (manifest, manifest_metadata) = file_manifest_builder.build()
+            chunk_hashes = [hash for hash, _ in chunker]
+            digest_hash, digest_encrypted = create_encrypted_json_object_chunk(key, extra_entropy, chunk_hashes)
+            manifest = DatasetManifest(
+                digestHash=digest_hash,
+                schema=schema
+            )
+            manifest_hash, manifest_encrypted = create_encrypted_json_object_chunk(key, extra_entropy, dict(manifest))
+            manifest_metadata: DatasetManifestMetadata = {
+                'name': file_name,
+                'manifestHash': manifest_hash,
+                'format': "CSV",
+                'encrypted': True,
+                # HACK!!! We include the digest hash as a "chunk".
+                # This is temporary to avoid changes in the backend logic.
+                'chunks': chunk_hashes + [digest_hash],
+            }
             logging.debug("manifest chunks:")
-            logging.debug(file_manifest_builder.chunks)
-            cipher = None
-            if key is not None:
-                cipher = StorageCipher(key)
-                manifest.content = cipher.encrypt(manifest.content)
-            file_description = self._upload_manifest(user_id, manifest, manifest_metadata)
+            logging.debug(manifest_metadata['chunks'])
+            file_description = self._upload_manifest(user_id, manifest_encrypted, manifest_metadata)
             # upload chunks
             chunker.reset()
             for chunk in chunker:
-                uploader.submit(self._upload_chunk, chunk[0], chunk[1], cipher, user_id, file_description.get("id"))
+                uploader.submit(
+                    self._encrypt_and_upload_chunk, chunk[0], chunk[1], key, user_id, file_description.get("id")
+                )
+            uploader.submit(self._upload_chunk, digest_hash, digest_encrypted, user_id, file_description.get("id"))
         uploader.shutdown(wait=True)
         return self.get_user_file(email, file_description.get("id"))
 
-    def _upload_chunk(self, chunk_hash, chunk_data, cipher, user_id, file_id):
+    def _encrypt_and_upload_chunk(self, chunk_hash, chunk_data, key, user_id, file_id):
+        cipher = StorageCipher(key)
+        chunk_data_encrypted = cipher.encrypt(chunk_data)
+        return self._upload_chunk(chunk_hash, chunk_data_encrypted, user_id, file_id)
+
+    def _upload_chunk(self, chunk_hash, chunk_data_encrypted, user_id, file_id):
         url = Endpoints.USER_FILE_CHUNK \
             .replace(":userId", user_id) \
             .replace(":fileId", file_id) \
             .replace(":chunkHash", chunk_hash)
-        if cipher is not None:
-            chunk_data = cipher.encrypt(chunk_data)
-        return self.api.post(url, chunk_data, {"Content-type": "application/octet-stream"})
+        return self.api.post(url, chunk_data_encrypted, {"Content-type": "application/octet-stream"})
 
-    def _upload_manifest(self, user_id: str, manifest: FileManifest, manifest_metadata: FileManifestMetadata) -> FileDescription:
+    def _upload_manifest(self, user_id: str, manifest_encrypted: bytes,
+                         manifest_metadata: DatasetManifestMetadata) -> FileDescription:
         manifest_metadata_json = json.dumps(dict(manifest_metadata))
         url = Endpoints.USER_FILES_COLLECTION.replace(":userId", user_id)
         parts = {
-                "manifest": manifest.content,
-                "metadata": manifest_metadata_json
-                }
+            "manifest": manifest_encrypted,
+            "metadata": manifest_metadata_json
+        }
         response = self.api.post_multipart(url, parts)
         file_description: FileDescription = response.json()
         return file_description

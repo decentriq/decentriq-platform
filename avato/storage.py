@@ -2,7 +2,7 @@ import json
 from enum import Enum
 from abc import abstractmethod
 from collections.abc import Iterator
-from typing import List, Tuple
+from typing import List, Tuple, Any
 import os
 import logging
 from .proto.avato_enclave_pb2 import EncryptionHeader, ChilyKey, ChunkHeader
@@ -15,11 +15,11 @@ import chily
 from typing_extensions import TypedDict
 from hashlib import sha256
 
-MAX_CHUNK_SIZE = 8*1024*1024
+MAX_CHUNK_SIZE = 8 * 1024 * 1024
 CHARSET = "utf-8"
 
 
-class FileManifestMetadata(TypedDict):
+class DatasetManifestMetadata(TypedDict):
     name: str
     manifestHash: str
     format: str
@@ -27,54 +27,53 @@ class FileManifestMetadata(TypedDict):
     chunks: List[str]
 
 
-class FileManifest:
-    def __init__(self, extra_entropy: bytes, chunk_hashes: List[str]):
-        manifest_chunk_bytes = []
-
-        json_object_format = JsonObjectFormat()
-        chunk_header = ChunkHeader()
-        chunk_header.extraEntropy = extra_entropy
-        chunk_header.formatIdentifier = "JsonObject"
-        chunk_header.format = serialize_length_delimited(json_object_format)
-        chunk_header_bytes = serialize_length_delimited(chunk_header)
-        manifest_chunk_bytes.append(chunk_header_bytes)
-
-        chunk_hashes_json = json.dumps(chunk_hashes).encode("utf-8")
-        manifest_chunk_bytes.append(chunk_hashes_json)
-
-        manifest_chunk = b''.join(manifest_chunk_bytes)
-        manifest_hasher = sha256()
-        manifest_hasher.update(manifest_chunk)
-
-        self.content = manifest_chunk
-        self.hash = manifest_hasher.hexdigest()
+class DatasetManifest(TypedDict):
+    digestHash: str
+    schema: List[Tuple[str, int]]
 
 
-class FileFormat(Enum):
-    CSV = "CSV"
+def create_csv_chunk_header(column_types: List[int], extra_entropy: bytes) -> bytes:
+    csv_table_format = CsvTableFormat()
+    csv_table_format.columnTypes.extend(column_types)
+
+    chunk_header = ChunkHeader()
+    chunk_header.extraEntropy = extra_entropy
+    chunk_header.formatIdentifier = "CsvTable"
+    chunk_header.format = serialize_length_delimited(csv_table_format)
+
+    chunk_header_bytes = serialize_length_delimited(chunk_header)
+    return chunk_header_bytes
 
 
-class FileManifestBuilder:
-    def __init__(self, file_name: str, data_format: FileFormat, extra_entropy: bytes, is_data_encrypted: bool):
-        self.name: str = file_name
-        self.format: FileFormat = data_format
-        self.encrypted: bool = is_data_encrypted
-        self.chunks: List[str] = list()
-        self.extra_entropy = extra_entropy
+def create_json_chunk_header(extra_entropy: bytes) -> bytes:
+    chunk_header = ChunkHeader()
+    chunk_header.extraEntropy = extra_entropy
+    chunk_header.formatIdentifier = "JsonObject"
+    chunk_header.format = serialize_length_delimited(JsonObjectFormat())
+    chunk_header_bytes = serialize_length_delimited(chunk_header)
 
-    def add_chunk(self, chunk: str):
-        self.chunks.append(chunk)
+    return chunk_header_bytes
 
-    def build(self) -> Tuple[FileManifest, FileManifestMetadata]:
-        manifest = FileManifest(self.extra_entropy, self.chunks)
-        manifest_metadata = FileManifestMetadata(
-                name=self.name,
-                manifestHash=manifest.hash,
-                format=self.format.value,
-                encrypted=self.encrypted,
-                chunks=self.chunks
-            )
-        return manifest, manifest_metadata
+
+# Returns (integrity hash, encrypted blob)
+def create_encrypted_json_object_chunk(key: bytes, extra_entropy: bytes, object: Any) -> Tuple[str, bytes]:
+    chunk_bytes = []
+
+    chunk_header = create_json_chunk_header(extra_entropy)
+    chunk_bytes.append(chunk_header)
+
+    object_json = json.dumps(object).encode("utf-8")
+    chunk_bytes.append(object_json)
+
+    chunk = b''.join(chunk_bytes)
+    chunk_hasher = sha256()
+    chunk_hasher.update(chunk)
+    chunk_hash = chunk_hasher.hexdigest()
+
+    cipher = StorageCipher(key)
+    encrypted_chunk = cipher.encrypt(chunk)
+
+    return chunk_hash, encrypted_chunk
 
 
 class ChunkDescription(TypedDict):
@@ -135,21 +134,9 @@ class CsvChunker(Chunker):
         self.csv_file_handle.seek(0)
         self.current_offset = 0
 
-    def _create_chunk_header(self) -> bytes:
-        csv_table_format = CsvTableFormat()
-        csv_table_format.columnTypes.extend(self.csv_column_types)
-
-        chunk_header = ChunkHeader()
-        chunk_header.extraEntropy = self.extra_entropy
-        chunk_header.formatIdentifier = "CsvTable"
-        chunk_header.format = serialize_length_delimited(csv_table_format)
-
-        chunk_header_bytes = serialize_length_delimited(chunk_header)
-        return chunk_header_bytes
-        
     def __next__(self) -> Tuple[str, bytes]:
         logging.debug("[", 100*self.current_offset/self.file_size, "]")
-        chunk_header_bytes = self._create_chunk_header()
+        chunk_header_bytes = create_csv_chunk_header(self.csv_column_types, self.extra_entropy)
         if self.current_offset in self.offset_to_chunk_hash_map:
             chunk_size = self.offset_to_chunk_hash_map[self.current_offset][0]
             chunk_data = b''.join([
@@ -188,22 +175,19 @@ class CsvChunker(Chunker):
         return chunk_hash, chunk
 
 
-class ChunkerBuilder:
+class CsvChunkerBuilder:
     class CannotBuildChunkerError(Exception):
         """Raised when the input file is not chunk-able"""
         pass
+
     def __init__(
-        self,
-        file_path: str,
-        column_types: List[int],
-        file_format: FileFormat,
-        extra_entropy: bytes,
-        chunk_size: int = MAX_CHUNK_SIZE
+            self,
+            file_path: str,
+            column_types: List[int],
+            extra_entropy: bytes,
+            chunk_size: int,
     ):
-        if file_format == FileFormat.CSV:
-            self.chunker = CsvChunker(file_path, column_types, extra_entropy, chunk_size)
-        else:
-            raise ChunkerBuilder.CannotBuildChunkerError
+        self.chunker = CsvChunker(file_path, column_types, extra_entropy, chunk_size)
 
     def __enter__(
         self,
