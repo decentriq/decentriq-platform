@@ -1,7 +1,6 @@
 import chily
 import json
-from enum import Enum
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod
 from functools import wraps
 from .proto.encrypted_message import encode, decode
 from .proto.avato_enclave_pb2 import Request, Response
@@ -51,7 +50,7 @@ class Instance(metaclass=MetaInstance):
         return self.get_type()
 
     def __init__(self, client, id, name, owner):
-        self.api = client.api
+        self.client = client
         self.id = id
         self.name = name
         self.owner = owner
@@ -82,7 +81,7 @@ class Instance(metaclass=MetaInstance):
 
     def get_info(self):
         url = Endpoints.INSTANCE.replace(":instanceId", self.id)
-        response = self.api.get(url)
+        response = self.client.api.get(url)
         return response.json()
 
     def validate_fatquote(
@@ -93,7 +92,7 @@ class Instance(metaclass=MetaInstance):
         accept_group_out_of_date=False,
     ):
         url = Endpoints.INSTANCE_FATQUOTE.replace(":instanceId", self.id)
-        response = self.api.get(url)
+        response = self.client.api.get(url)
         fatquote = response.json()
         certificate = fatquote["certificate"].encode("utf-8")
         message = fatquote["response"].encode("utf-8")
@@ -114,11 +113,11 @@ class Instance(metaclass=MetaInstance):
 
     def shutdown(self):
         url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
-        self.api.post(url, json.dumps({"type": "SHUTDOWN"}), {"Content-type": "application/json"})
+        self.client.api.post(url, json.dumps({"type": "SHUTDOWN"}), {"Content-type": "application/json"})
 
     def delete(self):
         url = Endpoints.INSTANCE.replace(":instanceId", self.id)
-        self.api.delete(url)
+        self.client.api.delete(url)
 
     def _encrypt_and_encode_data(self, data):
         nonce = chily.Nonce.from_random()
@@ -144,7 +143,7 @@ class Instance(metaclass=MetaInstance):
         request = Request()
         request.avatoRequest = encrypted
         url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
-        response = self.api.post(
+        response = self.client.api.post(
             url, serialize_length_delimited(request), {"Content-Type": "application/octet-stream"},
         )
         response_container = Response()

@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='avato_enclave',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\x13\x61vato_enclave.proto\x12\ravato_enclave\"i\n\x07Request\x12\x16\n\x0c\x61vatoRequest\x18\x01 \x01(\x0cH\x00\x12;\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32\x1f.avato_enclave.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0f\n\x07payload\x18\x02 \x02(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x02(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\"f\n\x16SealedEncryptedMessage\x12\x32\n\x10\x65ncryptedMessage\x18\x01 \x02(\x0b\x32\x18.avato_enclave.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x02(\x0c\"\xa6\x01\n\x10\x45ncryptionHeader\x12,\n\tchily_key\x18\x01 \x01(\x0b\x32\x17.avato_enclave.ChilyKeyH\x00\x12P\n\x15\x63hily_key_diversified\x18\x02 \x01(\x0b\x32/.avato_enclave.ChilyKeyClusterSecretDiversifiedH\x00\x42\x12\n\x10\x65ncryptionHeader\"8\n\x08\x43hilyKey\x12\x12\n\nkey_sha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\\\n ChilyKeyClusterSecretDiversified\x12\x1e\n\x16key_diversified_sha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\x8d\x01\n\x0fIntegrityHeader\x12\x30\n\x0b\x62ody_sha256\x18\x01 \x01(\x0b\x32\x19.avato_enclave.BodySha256H\x00\x12\x34\n\rresult_sha256\x18\x02 \x01(\x0b\x32\x1b.avato_enclave.ResultSha256H\x00\x42\x12\n\x10integrity_header\"\x0c\n\nBodySha256\"*\n\x0cResultSha256\x12\x1a\n\x12\x63omputation_sha256\x18\x01 \x02(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x02(\x03\"=\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x02(\x0c\x12\x18\n\x10\x66ormatIdentifier\x18\x02 \x02(\t')
+  serialized_pb=_b('\n\x13\x61vato_enclave.proto\x12\ravato_enclave\"i\n\x07Request\x12\x16\n\x0c\x61vatoRequest\x18\x01 \x01(\x0cH\x00\x12;\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32\x1f.avato_enclave.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0f\n\x07payload\x18\x02 \x02(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x02(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\"f\n\x16SealedEncryptedMessage\x12\x32\n\x10\x65ncryptedMessage\x18\x01 \x02(\x0b\x32\x18.avato_enclave.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x02(\x0c\"\xa3\x01\n\x10\x45ncryptionHeader\x12+\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x17.avato_enclave.ChilyKeyH\x00\x12N\n\x13\x63hilyKeyDiversified\x18\x02 \x01(\x0b\x32/.avato_enclave.ChilyKeyClusterSecretDiversifiedH\x00\x42\x12\n\x10\x65ncryptionHeader\"6\n\x08\x43hilyKey\x12\x11\n\tkeySha256\x18\x01 \x02(\x0c\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x02(\x0c\"Z\n ChilyKeyClusterSecretDiversified\x12\x1c\n\x14keyDiversifiedSha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\x8b\x01\n\x0fIntegrityHeader\x12/\n\nbodySha256\x18\x01 \x01(\x0b\x32\x19.avato_enclave.BodySha256H\x00\x12\x33\n\x0cresultSha256\x18\x02 \x01(\x0b\x32\x1b.avato_enclave.ResultSha256H\x00\x42\x12\n\x10integrity_header\"\x0c\n\nBodySha256\")\n\x0cResultSha256\x12\x19\n\x11\x63omputationSha256\x18\x01 \x02(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x02(\x03\"=\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x02(\x0c\x12\x18\n\x10\x66ormatIdentifier\x18\x02 \x02(\t')
 )
 
 
@@ -275,14 +275,14 @@ _ENCRYPTIONHEADER = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='chily_key', full_name='avato_enclave.EncryptionHeader.chily_key', index=0,
+      name='chilyKey', full_name='avato_enclave.EncryptionHeader.chilyKey', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='chily_key_diversified', full_name='avato_enclave.EncryptionHeader.chily_key_diversified', index=1,
+      name='chilyKeyDiversified', full_name='avato_enclave.EncryptionHeader.chilyKeyDiversified', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -304,7 +304,7 @@ _ENCRYPTIONHEADER = _descriptor.Descriptor(
       index=0, containing_type=None, fields=[]),
   ],
   serialized_start=493,
-  serialized_end=659,
+  serialized_end=656,
 )
 
 
@@ -316,14 +316,14 @@ _CHILYKEY = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key_sha256', full_name='avato_enclave.ChilyKey.key_sha256', index=0,
+      name='keySha256', full_name='avato_enclave.ChilyKey.keySha256', index=0,
       number=1, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='encryption_nonce', full_name='avato_enclave.ChilyKey.encryption_nonce', index=1,
+      name='encryptionNonce', full_name='avato_enclave.ChilyKey.encryptionNonce', index=1,
       number=2, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
@@ -341,8 +341,8 @@ _CHILYKEY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=661,
-  serialized_end=717,
+  serialized_start=658,
+  serialized_end=712,
 )
 
 
@@ -354,7 +354,7 @@ _CHILYKEYCLUSTERSECRETDIVERSIFIED = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='key_diversified_sha256', full_name='avato_enclave.ChilyKeyClusterSecretDiversified.key_diversified_sha256', index=0,
+      name='keyDiversifiedSha256', full_name='avato_enclave.ChilyKeyClusterSecretDiversified.keyDiversifiedSha256', index=0,
       number=1, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
@@ -379,8 +379,8 @@ _CHILYKEYCLUSTERSECRETDIVERSIFIED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=719,
-  serialized_end=811,
+  serialized_start=714,
+  serialized_end=804,
 )
 
 
@@ -392,14 +392,14 @@ _INTEGRITYHEADER = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='body_sha256', full_name='avato_enclave.IntegrityHeader.body_sha256', index=0,
+      name='bodySha256', full_name='avato_enclave.IntegrityHeader.bodySha256', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='result_sha256', full_name='avato_enclave.IntegrityHeader.result_sha256', index=1,
+      name='resultSha256', full_name='avato_enclave.IntegrityHeader.resultSha256', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -420,8 +420,8 @@ _INTEGRITYHEADER = _descriptor.Descriptor(
       name='integrity_header', full_name='avato_enclave.IntegrityHeader.integrity_header',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=814,
-  serialized_end=955,
+  serialized_start=807,
+  serialized_end=946,
 )
 
 
@@ -444,8 +444,8 @@ _BODYSHA256 = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=957,
-  serialized_end=969,
+  serialized_start=948,
+  serialized_end=960,
 )
 
 
@@ -457,7 +457,7 @@ _RESULTSHA256 = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='computation_sha256', full_name='avato_enclave.ResultSha256.computation_sha256', index=0,
+      name='computationSha256', full_name='avato_enclave.ResultSha256.computationSha256', index=0,
       number=1, type=12, cpp_type=9, label=2,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
@@ -475,8 +475,8 @@ _RESULTSHA256 = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=971,
-  serialized_end=1013,
+  serialized_start=962,
+  serialized_end=1003,
 )
 
 
@@ -506,8 +506,8 @@ _VERSIONHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1015,
-  serialized_end=1047,
+  serialized_start=1005,
+  serialized_end=1037,
 )
 
 
@@ -544,8 +544,8 @@ _CHUNKHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1049,
-  serialized_end=1110,
+  serialized_start=1039,
+  serialized_end=1100,
 )
 
 _REQUEST.fields_by_name['extensionMessage'].message_type = _EXTENSIONMESSAGE
@@ -562,22 +562,22 @@ _RESPONSE.oneofs_by_name['response'].fields.append(
   _RESPONSE.fields_by_name['unsuccessfulResponse'])
 _RESPONSE.fields_by_name['unsuccessfulResponse'].containing_oneof = _RESPONSE.oneofs_by_name['response']
 _SEALEDENCRYPTEDMESSAGE.fields_by_name['encryptedMessage'].message_type = _DATANONCE
-_ENCRYPTIONHEADER.fields_by_name['chily_key'].message_type = _CHILYKEY
-_ENCRYPTIONHEADER.fields_by_name['chily_key_diversified'].message_type = _CHILYKEYCLUSTERSECRETDIVERSIFIED
+_ENCRYPTIONHEADER.fields_by_name['chilyKey'].message_type = _CHILYKEY
+_ENCRYPTIONHEADER.fields_by_name['chilyKeyDiversified'].message_type = _CHILYKEYCLUSTERSECRETDIVERSIFIED
 _ENCRYPTIONHEADER.oneofs_by_name['encryptionHeader'].fields.append(
-  _ENCRYPTIONHEADER.fields_by_name['chily_key'])
-_ENCRYPTIONHEADER.fields_by_name['chily_key'].containing_oneof = _ENCRYPTIONHEADER.oneofs_by_name['encryptionHeader']
+  _ENCRYPTIONHEADER.fields_by_name['chilyKey'])
+_ENCRYPTIONHEADER.fields_by_name['chilyKey'].containing_oneof = _ENCRYPTIONHEADER.oneofs_by_name['encryptionHeader']
 _ENCRYPTIONHEADER.oneofs_by_name['encryptionHeader'].fields.append(
-  _ENCRYPTIONHEADER.fields_by_name['chily_key_diversified'])
-_ENCRYPTIONHEADER.fields_by_name['chily_key_diversified'].containing_oneof = _ENCRYPTIONHEADER.oneofs_by_name['encryptionHeader']
-_INTEGRITYHEADER.fields_by_name['body_sha256'].message_type = _BODYSHA256
-_INTEGRITYHEADER.fields_by_name['result_sha256'].message_type = _RESULTSHA256
+  _ENCRYPTIONHEADER.fields_by_name['chilyKeyDiversified'])
+_ENCRYPTIONHEADER.fields_by_name['chilyKeyDiversified'].containing_oneof = _ENCRYPTIONHEADER.oneofs_by_name['encryptionHeader']
+_INTEGRITYHEADER.fields_by_name['bodySha256'].message_type = _BODYSHA256
+_INTEGRITYHEADER.fields_by_name['resultSha256'].message_type = _RESULTSHA256
 _INTEGRITYHEADER.oneofs_by_name['integrity_header'].fields.append(
-  _INTEGRITYHEADER.fields_by_name['body_sha256'])
-_INTEGRITYHEADER.fields_by_name['body_sha256'].containing_oneof = _INTEGRITYHEADER.oneofs_by_name['integrity_header']
+  _INTEGRITYHEADER.fields_by_name['bodySha256'])
+_INTEGRITYHEADER.fields_by_name['bodySha256'].containing_oneof = _INTEGRITYHEADER.oneofs_by_name['integrity_header']
 _INTEGRITYHEADER.oneofs_by_name['integrity_header'].fields.append(
-  _INTEGRITYHEADER.fields_by_name['result_sha256'])
-_INTEGRITYHEADER.fields_by_name['result_sha256'].containing_oneof = _INTEGRITYHEADER.oneofs_by_name['integrity_header']
+  _INTEGRITYHEADER.fields_by_name['resultSha256'])
+_INTEGRITYHEADER.fields_by_name['resultSha256'].containing_oneof = _INTEGRITYHEADER.oneofs_by_name['integrity_header']
 DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
 DESCRIPTOR.message_types_by_name['ExtensionMessage'] = _EXTENSIONMESSAGE
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE

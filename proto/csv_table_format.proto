@@ -1,9 +1,0 @@
-syntax = "proto2";
-package csv_table_format;
-
-import "column_type.proto";
-
-// formatIdentifier = "CsvTable"
-message CsvTableFormat {
-    repeated column_type.ColumnType columnTypes = 1;
-}
