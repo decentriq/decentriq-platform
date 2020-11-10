@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='avato_enclave',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\x13\x61vato_enclave.proto\x12\ravato_enclave\"i\n\x07Request\x12\x16\n\x0c\x61vatoRequest\x18\x01 \x01(\x0cH\x00\x12;\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32\x1f.avato_enclave.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0f\n\x07payload\x18\x02 \x02(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x02(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\"f\n\x16SealedEncryptedMessage\x12\x32\n\x10\x65ncryptedMessage\x18\x01 \x02(\x0b\x32\x18.avato_enclave.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x02(\x0c\"\xa6\x01\n\x10\x45ncryptionHeader\x12,\n\tchily_key\x18\x01 \x01(\x0b\x32\x17.avato_enclave.ChilyKeyH\x00\x12P\n\x15\x63hily_key_diversified\x18\x02 \x01(\x0b\x32/.avato_enclave.ChilyKeyClusterSecretDiversifiedH\x00\x42\x12\n\x10\x65ncryptionHeader\"8\n\x08\x43hilyKey\x12\x12\n\nkey_sha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\\\n ChilyKeyClusterSecretDiversified\x12\x1e\n\x16key_diversified_sha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\x8d\x01\n\x0fIntegrityHeader\x12\x30\n\x0b\x62ody_sha256\x18\x01 \x01(\x0b\x32\x19.avato_enclave.BodySha256H\x00\x12\x34\n\rresult_sha256\x18\x02 \x01(\x0b\x32\x1b.avato_enclave.ResultSha256H\x00\x42\x12\n\x10integrity_header\"\x0c\n\nBodySha256\"*\n\x0cResultSha256\x12\x1a\n\x12\x63omputation_sha256\x18\x01 \x02(\x0c\"M\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x02(\x0c\x12\x18\n\x10\x66ormatIdentifier\x18\x02 \x02(\t\x12\x0e\n\x06\x66ormat\x18\x03 \x02(\x0c')
+  serialized_pb=_b('\n\x13\x61vato_enclave.proto\x12\ravato_enclave\"i\n\x07Request\x12\x16\n\x0c\x61vatoRequest\x18\x01 \x01(\x0cH\x00\x12;\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32\x1f.avato_enclave.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0f\n\x07payload\x18\x02 \x02(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x02(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\"f\n\x16SealedEncryptedMessage\x12\x32\n\x10\x65ncryptedMessage\x18\x01 \x02(\x0b\x32\x18.avato_enclave.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x02(\x0c\"\xa6\x01\n\x10\x45ncryptionHeader\x12,\n\tchily_key\x18\x01 \x01(\x0b\x32\x17.avato_enclave.ChilyKeyH\x00\x12P\n\x15\x63hily_key_diversified\x18\x02 \x01(\x0b\x32/.avato_enclave.ChilyKeyClusterSecretDiversifiedH\x00\x42\x12\n\x10\x65ncryptionHeader\"8\n\x08\x43hilyKey\x12\x12\n\nkey_sha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\\\n ChilyKeyClusterSecretDiversified\x12\x1e\n\x16key_diversified_sha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\x8d\x01\n\x0fIntegrityHeader\x12\x30\n\x0b\x62ody_sha256\x18\x01 \x01(\x0b\x32\x19.avato_enclave.BodySha256H\x00\x12\x34\n\rresult_sha256\x18\x02 \x01(\x0b\x32\x1b.avato_enclave.ResultSha256H\x00\x42\x12\n\x10integrity_header\"\x0c\n\nBodySha256\"*\n\x0cResultSha256\x12\x1a\n\x12\x63omputation_sha256\x18\x01 \x02(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x02(\x03\"=\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x02(\x0c\x12\x18\n\x10\x66ormatIdentifier\x18\x02 \x02(\t')
 )
 
 
@@ -480,6 +480,37 @@ _RESULTSHA256 = _descriptor.Descriptor(
 )
 
 
+_VERSIONHEADER = _descriptor.Descriptor(
+  name='VersionHeader',
+  full_name='avato_enclave.VersionHeader',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='version', full_name='avato_enclave.VersionHeader.version', index=0,
+      number=1, type=3, cpp_type=2, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1015,
+  serialized_end=1047,
+)
+
+
 _CHUNKHEADER = _descriptor.Descriptor(
   name='ChunkHeader',
   full_name='avato_enclave.ChunkHeader',
@@ -501,13 +532,6 @@ _CHUNKHEADER = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='format', full_name='avato_enclave.ChunkHeader.format', index=2,
-      number=3, type=12, cpp_type=9, label=2,
-      has_default_value=False, default_value=_b(""),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -520,8 +544,8 @@ _CHUNKHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1015,
-  serialized_end=1092,
+  serialized_start=1049,
+  serialized_end=1110,
 )
 
 _REQUEST.fields_by_name['extensionMessage'].message_type = _EXTENSIONMESSAGE
@@ -566,6 +590,7 @@ DESCRIPTOR.message_types_by_name['ChilyKeyClusterSecretDiversified'] = _CHILYKEY
 DESCRIPTOR.message_types_by_name['IntegrityHeader'] = _INTEGRITYHEADER
 DESCRIPTOR.message_types_by_name['BodySha256'] = _BODYSHA256
 DESCRIPTOR.message_types_by_name['ResultSha256'] = _RESULTSHA256
+DESCRIPTOR.message_types_by_name['VersionHeader'] = _VERSIONHEADER
 DESCRIPTOR.message_types_by_name['ChunkHeader'] = _CHUNKHEADER
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -652,6 +677,13 @@ ResultSha256 = _reflection.GeneratedProtocolMessageType('ResultSha256', (_messag
   # @@protoc_insertion_point(class_scope:avato_enclave.ResultSha256)
   ))
 _sym_db.RegisterMessage(ResultSha256)
+
+VersionHeader = _reflection.GeneratedProtocolMessageType('VersionHeader', (_message.Message,), dict(
+  DESCRIPTOR = _VERSIONHEADER,
+  __module__ = 'avato_enclave_pb2'
+  # @@protoc_insertion_point(class_scope:avato_enclave.VersionHeader)
+  ))
+_sym_db.RegisterMessage(VersionHeader)
 
 ChunkHeader = _reflection.GeneratedProtocolMessageType('ChunkHeader', (_message.Message,), dict(
   DESCRIPTOR = _CHUNKHEADER,

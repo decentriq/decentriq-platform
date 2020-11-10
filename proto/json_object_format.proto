@@ -1,6 +1,0 @@
-syntax = "proto2";
-package json_object_format;
-
-// formatIdentifier = "JsonObject"
-message JsonObjectFormat {
-}
