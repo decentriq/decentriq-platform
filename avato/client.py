@@ -1,6 +1,7 @@
 import json
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
 from .api import API, Endpoints
+from typing import List, Any
 
 class Client:
     class UnknownInstanceTypeError(Exception):
@@ -16,15 +17,17 @@ class Client:
         pass
 
     def __init__(
-        self,
-        api_token,
-        instance_types=[],
-        backend_host=AVATO_HOST,
-        backend_port=AVATO_PORT,
-        use_ssl=AVATO_USE_SSL,
-        http_proxy=None,
-        https_proxy=None,
+            self,
+            api_token: str,
+            instance_types: List[Any] = None,
+            backend_host: str = AVATO_HOST,
+            backend_port: int = AVATO_PORT,
+            use_ssl: bool = AVATO_USE_SSL,
+            http_proxy=None,
+            https_proxy=None,
     ):
+        if instance_types is None:
+            instance_types = []
         self.registered_instances = instance_types
         self.api = API(
             api_token,
