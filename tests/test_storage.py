@@ -34,12 +34,12 @@ def test_ingestion_complete():
         extra_entropy=bytes(),  # TODO
         key=key,
     )
-    assert uploaded_file.get("id") in list(
-        map(lambda x: x.get("id"), client.get_user_files_collection(user_email)))
+    assert uploaded_file.get("fileId") in list(
+        map(lambda x: x.get("fileId"), client.get_user_files_collection(user_email)))
 
-    requested_file = client.get_user_file(user_email, uploaded_file.get("id"))
+    requested_file = client.get_user_file(user_email, uploaded_file.get("fileId"))
     assert requested_file == uploaded_file
 
-    client.delete_user_file(user_email, uploaded_file.get("id"))
-    assert uploaded_file.get("id") not in list(
-        map(lambda x: x.get("id"), client.get_user_files_collection(user_email)))
+    client.delete_user_file(user_email, uploaded_file.get("fileId"))
+    assert uploaded_file.get("fileId") not in list(
+        map(lambda x: x.get("fileId"), client.get_user_files_collection(user_email)))

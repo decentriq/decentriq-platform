@@ -88,13 +88,13 @@ class Client:
         data = {
             "name": name,
             "type": type,
-            "participants": list(map(lambda x: {"id": self._get_user_id(x)}, participants)),
+            "participants": list(map(lambda x: {"participantId": self._get_user_id(x)}, participants)),
         }
         data_json = json.dumps(data)
         response = self.api.post(url, data_json, {"Content-type": "application/json"})
         response_json = response.json()
         instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, response_json["id"], name, response_json["owner"])
+        return instance_constructor(self, response_json["instanceId"], name, response_json["owner"])
 
     def upload_csv_table(
             self,
@@ -135,11 +135,11 @@ class Client:
             chunker.reset()
             for chunk in chunker:
                 uploader.submit(
-                    self._encrypt_and_upload_chunk, chunk[0], chunk[1], key, user_id, file_description.get("id")
+                    self._encrypt_and_upload_chunk, chunk[0], chunk[1], key, user_id, file_description.get("fileId")
                 )
-            uploader.submit(self._upload_chunk, digest_hash, digest_encrypted, user_id, file_description.get("id"))
+            uploader.submit(self._upload_chunk, digest_hash, digest_encrypted, user_id, file_description.get("fileId"))
         uploader.shutdown(wait=True)
-        return self.get_user_file(email, file_description.get("id"))
+        return self.get_user_file(email, file_description.get("fileId"))
 
     def _encrypt_and_upload_chunk(self, chunk_hash, chunk_data, key, user_id, file_id):
         cipher = StorageCipher(key)
