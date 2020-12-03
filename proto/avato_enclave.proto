@@ -31,13 +31,22 @@ message Response {
 message DataNoncePubkey {
   required bytes data = 1;
   required bytes nonce = 2;
-  required bytes pubkey = 3 ;
+  required bytes pubkey = 3;
+  optional Authentication auth = 4;
+}
+
+message Authentication{
+  required Pki pki = 1;
+}
+
+message Pki{
+  required bytes certChain = 1;
+  required bytes signature = 2;
 }
 
 /* =========================================================================================================
    ENCRYPTED SEALED MESSAGED FORMAT
  */
-
 message DataNonce {
     required bytes data = 1;
     required bytes nonce = 2;

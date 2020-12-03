@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='avato_enclave',
   syntax='proto2',
   serialized_options=None,
-  serialized_pb=_b('\n\x13\x61vato_enclave.proto\x12\ravato_enclave\"i\n\x07Request\x12\x16\n\x0c\x61vatoRequest\x18\x01 \x01(\x0cH\x00\x12;\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32\x1f.avato_enclave.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0f\n\x07payload\x18\x02 \x02(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x02(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\"f\n\x16SealedEncryptedMessage\x12\x32\n\x10\x65ncryptedMessage\x18\x01 \x02(\x0b\x32\x18.avato_enclave.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x02(\x0c\"\xa3\x01\n\x10\x45ncryptionHeader\x12+\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x17.avato_enclave.ChilyKeyH\x00\x12N\n\x13\x63hilyKeyDiversified\x18\x02 \x01(\x0b\x32/.avato_enclave.ChilyKeyClusterSecretDiversifiedH\x00\x42\x12\n\x10\x65ncryptionHeader\"6\n\x08\x43hilyKey\x12\x11\n\tkeySha256\x18\x01 \x02(\x0c\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x02(\x0c\"Z\n ChilyKeyClusterSecretDiversified\x12\x1c\n\x14keyDiversifiedSha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\x8b\x01\n\x0fIntegrityHeader\x12/\n\nbodySha256\x18\x01 \x01(\x0b\x32\x19.avato_enclave.BodySha256H\x00\x12\x33\n\x0cresultSha256\x18\x02 \x01(\x0b\x32\x1b.avato_enclave.ResultSha256H\x00\x42\x12\n\x10integrity_header\"\x0c\n\nBodySha256\")\n\x0cResultSha256\x12\x19\n\x11\x63omputationSha256\x18\x01 \x02(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x02(\x03\"=\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x02(\x0c\x12\x18\n\x10\x66ormatIdentifier\x18\x02 \x02(\t')
+  serialized_pb=_b('\n\x13\x61vato_enclave.proto\x12\ravato_enclave\"i\n\x07Request\x12\x16\n\x0c\x61vatoRequest\x18\x01 \x01(\x0cH\x00\x12;\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32\x1f.avato_enclave.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0f\n\x07payload\x18\x02 \x02(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\"k\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x02(\x0c\x12+\n\x04\x61uth\x18\x04 \x01(\x0b\x32\x1d.avato_enclave.Authentication\"1\n\x0e\x41uthentication\x12\x1f\n\x03pki\x18\x01 \x02(\x0b\x32\x12.avato_enclave.Pki\"+\n\x03Pki\x12\x11\n\tcertChain\x18\x01 \x02(\x0c\x12\x11\n\tsignature\x18\x02 \x02(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\r\n\x05nonce\x18\x02 \x02(\x0c\"f\n\x16SealedEncryptedMessage\x12\x32\n\x10\x65ncryptedMessage\x18\x01 \x02(\x0b\x32\x18.avato_enclave.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x02(\x0c\"\xa3\x01\n\x10\x45ncryptionHeader\x12+\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x17.avato_enclave.ChilyKeyH\x00\x12N\n\x13\x63hilyKeyDiversified\x18\x02 \x01(\x0b\x32/.avato_enclave.ChilyKeyClusterSecretDiversifiedH\x00\x42\x12\n\x10\x65ncryptionHeader\"6\n\x08\x43hilyKey\x12\x11\n\tkeySha256\x18\x01 \x02(\x0c\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x02(\x0c\"Z\n ChilyKeyClusterSecretDiversified\x12\x1c\n\x14keyDiversifiedSha256\x18\x01 \x02(\x0c\x12\x18\n\x10\x65ncryption_nonce\x18\x02 \x02(\x0c\"\x8b\x01\n\x0fIntegrityHeader\x12/\n\nbodySha256\x18\x01 \x01(\x0b\x32\x19.avato_enclave.BodySha256H\x00\x12\x33\n\x0cresultSha256\x18\x02 \x01(\x0b\x32\x1b.avato_enclave.ResultSha256H\x00\x42\x12\n\x10integrity_header\"\x0c\n\nBodySha256\")\n\x0cResultSha256\x12\x19\n\x11\x63omputationSha256\x18\x01 \x02(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x02(\x03\"=\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x02(\x0c\x12\x18\n\x10\x66ormatIdentifier\x18\x02 \x02(\t')
 )
 
 
@@ -174,6 +174,13 @@ _DATANONCEPUBKEY = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='auth', full_name='avato_enclave.DataNoncePubkey.auth', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -187,7 +194,76 @@ _DATANONCEPUBKEY = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=282,
-  serialized_end=344,
+  serialized_end=389,
+)
+
+
+_AUTHENTICATION = _descriptor.Descriptor(
+  name='Authentication',
+  full_name='avato_enclave.Authentication',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='pki', full_name='avato_enclave.Authentication.pki', index=0,
+      number=1, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=391,
+  serialized_end=440,
+)
+
+
+_PKI = _descriptor.Descriptor(
+  name='Pki',
+  full_name='avato_enclave.Pki',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='certChain', full_name='avato_enclave.Pki.certChain', index=0,
+      number=1, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='signature', full_name='avato_enclave.Pki.signature', index=1,
+      number=2, type=12, cpp_type=9, label=2,
+      has_default_value=False, default_value=_b(""),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=442,
+  serialized_end=485,
 )
 
 
@@ -224,8 +300,8 @@ _DATANONCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=346,
-  serialized_end=386,
+  serialized_start=487,
+  serialized_end=527,
 )
 
 
@@ -262,8 +338,8 @@ _SEALEDENCRYPTEDMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=388,
-  serialized_end=490,
+  serialized_start=529,
+  serialized_end=631,
 )
 
 
@@ -303,8 +379,8 @@ _ENCRYPTIONHEADER = _descriptor.Descriptor(
       name='encryptionHeader', full_name='avato_enclave.EncryptionHeader.encryptionHeader',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=493,
-  serialized_end=656,
+  serialized_start=634,
+  serialized_end=797,
 )
 
 
@@ -341,8 +417,8 @@ _CHILYKEY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=658,
-  serialized_end=712,
+  serialized_start=799,
+  serialized_end=853,
 )
 
 
@@ -379,8 +455,8 @@ _CHILYKEYCLUSTERSECRETDIVERSIFIED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=714,
-  serialized_end=804,
+  serialized_start=855,
+  serialized_end=945,
 )
 
 
@@ -420,8 +496,8 @@ _INTEGRITYHEADER = _descriptor.Descriptor(
       name='integrity_header', full_name='avato_enclave.IntegrityHeader.integrity_header',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=807,
-  serialized_end=946,
+  serialized_start=948,
+  serialized_end=1087,
 )
 
 
@@ -444,8 +520,8 @@ _BODYSHA256 = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=948,
-  serialized_end=960,
+  serialized_start=1089,
+  serialized_end=1101,
 )
 
 
@@ -475,8 +551,8 @@ _RESULTSHA256 = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=962,
-  serialized_end=1003,
+  serialized_start=1103,
+  serialized_end=1144,
 )
 
 
@@ -506,8 +582,8 @@ _VERSIONHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1005,
-  serialized_end=1037,
+  serialized_start=1146,
+  serialized_end=1178,
 )
 
 
@@ -544,8 +620,8 @@ _CHUNKHEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1039,
-  serialized_end=1100,
+  serialized_start=1180,
+  serialized_end=1241,
 )
 
 _REQUEST.fields_by_name['extensionMessage'].message_type = _EXTENSIONMESSAGE
@@ -561,6 +637,8 @@ _RESPONSE.fields_by_name['successfulResponse'].containing_oneof = _RESPONSE.oneo
 _RESPONSE.oneofs_by_name['response'].fields.append(
   _RESPONSE.fields_by_name['unsuccessfulResponse'])
 _RESPONSE.fields_by_name['unsuccessfulResponse'].containing_oneof = _RESPONSE.oneofs_by_name['response']
+_DATANONCEPUBKEY.fields_by_name['auth'].message_type = _AUTHENTICATION
+_AUTHENTICATION.fields_by_name['pki'].message_type = _PKI
 _SEALEDENCRYPTEDMESSAGE.fields_by_name['encryptedMessage'].message_type = _DATANONCE
 _ENCRYPTIONHEADER.fields_by_name['chilyKey'].message_type = _CHILYKEY
 _ENCRYPTIONHEADER.fields_by_name['chilyKeyDiversified'].message_type = _CHILYKEYCLUSTERSECRETDIVERSIFIED
@@ -582,6 +660,8 @@ DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
 DESCRIPTOR.message_types_by_name['ExtensionMessage'] = _EXTENSIONMESSAGE
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
 DESCRIPTOR.message_types_by_name['DataNoncePubkey'] = _DATANONCEPUBKEY
+DESCRIPTOR.message_types_by_name['Authentication'] = _AUTHENTICATION
+DESCRIPTOR.message_types_by_name['Pki'] = _PKI
 DESCRIPTOR.message_types_by_name['DataNonce'] = _DATANONCE
 DESCRIPTOR.message_types_by_name['SealedEncryptedMessage'] = _SEALEDENCRYPTEDMESSAGE
 DESCRIPTOR.message_types_by_name['EncryptionHeader'] = _ENCRYPTIONHEADER
@@ -621,6 +701,20 @@ DataNoncePubkey = _reflection.GeneratedProtocolMessageType('DataNoncePubkey', (_
   # @@protoc_insertion_point(class_scope:avato_enclave.DataNoncePubkey)
   ))
 _sym_db.RegisterMessage(DataNoncePubkey)
+
+Authentication = _reflection.GeneratedProtocolMessageType('Authentication', (_message.Message,), dict(
+  DESCRIPTOR = _AUTHENTICATION,
+  __module__ = 'avato_enclave_pb2'
+  # @@protoc_insertion_point(class_scope:avato_enclave.Authentication)
+  ))
+_sym_db.RegisterMessage(Authentication)
+
+Pki = _reflection.GeneratedProtocolMessageType('Pki', (_message.Message,), dict(
+  DESCRIPTOR = _PKI,
+  __module__ = 'avato_enclave_pb2'
+  # @@protoc_insertion_point(class_scope:avato_enclave.Pki)
+  ))
+_sym_db.RegisterMessage(Pki)
 
 DataNonce = _reflection.GeneratedProtocolMessageType('DataNonce', (_message.Message,), dict(
   DESCRIPTOR = _DATANONCE,

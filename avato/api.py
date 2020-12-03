@@ -25,7 +25,8 @@ class Endpoints(str, Enum):
     USER_TOKEN = "/user/:userId/token/:tokenId",
     USER_FILES_COLLECTION = "/user/:userId/files"
     USER_FILE = "/user/:userId/file/:fileId",
-    USER_FILE_CHUNK = "/user/:userId/file/:fileId/chunk/:chunkHash"
+    USER_FILE_CHUNK = "/user/:userId/file/:fileId/chunk/:chunkHash",
+    USER_CERTIFICATE = "/user/:userId/certificate"
 
 	
 

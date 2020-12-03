@@ -2,6 +2,9 @@ import json
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
 from .api import API, Endpoints
 from typing import List, Any
+from OpenSSL.crypto import dump_certificate_request, FILETYPE_PEM, load_certificate
+from .authentication import generate_csr, generate_key, Pki
+
 
 class Client:
     class UnknownInstanceTypeError(Exception):
@@ -82,3 +85,13 @@ class Client:
         response_json = response.json()
         instance_constructor = self._instance_from_type(type)
         return instance_constructor(self, response_json["instanceId"], name, response_json["owner"])
+
+    def get_user_pki_authenticator(self, email: str) -> Pki:
+        keypair = generate_key()
+        csr = generate_csr(email, keypair)
+        url = Endpoints.USER_CERTIFICATE.replace(":userId", self.get_user_id(email))
+        csr_str = dump_certificate_request(FILETYPE_PEM, csr).decode("utf-8")
+        csr_req = {"csrPem": csr_str}
+        resp = self.api.post(url, req_body=json.dumps(csr_req))
+        certificate = load_certificate(FILETYPE_PEM, resp.json()["certChainPem"])
+        return Pki(certificate, keypair)

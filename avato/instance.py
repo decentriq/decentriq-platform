@@ -7,6 +7,7 @@ from .proto.avato_enclave_pb2 import Request, Response
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import Verification, Fatquote
 from .api import Endpoints
+from .authentication import Pki
 
 class MetaInstance(ABCMeta):
     @property
@@ -57,6 +58,7 @@ class Instance(metaclass=MetaInstance):
         self.quote = None
         self.secret = None
         self.fatquote = None
+        self.auth_pki = None
 
     def _valid_fatquote_required(f):
         @wraps(f)
@@ -64,7 +66,6 @@ class Instance(metaclass=MetaInstance):
             if not inst.quote:
                 raise Instance.ValidFatquoteRequiredError
             return f(inst, *args, **kwargs)
-
         return wrapped
 
     def _secret_required(f):
@@ -73,11 +74,13 @@ class Instance(metaclass=MetaInstance):
             if not inst.secret:
                 raise Instance.SecretRequiredError
             return f(inst, *args, **kwargs)
-
         return wrapped
 
     def set_secret(self, secret):
         self.secret = secret
+
+    def set_pki_auth(self, pki: Pki):
+        self.auth_pki = pki
 
     def get_info(self):
         url = Endpoints.INSTANCE.replace(":instanceId", self.id)
@@ -129,6 +132,7 @@ class Instance(metaclass=MetaInstance):
             bytes(enc_data),
             bytes(nonce.bytes),
             bytes(self.secret.keypair.public_key.bytes),
+            pki=self.auth_pki
         )
 
     def _decode_and_decrypt_data(self, data):
