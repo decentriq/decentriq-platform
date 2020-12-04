@@ -127,18 +127,12 @@ message SealedEncryptedMessage {
 message EncryptionHeader {
     oneof encryptionHeader {
         ChilyKey chilyKey = 1;
-        ChilyKeyClusterSecretDiversified chilyKeyDiversified = 2;
     }
 }
 
 message ChilyKey {
-    required bytes keySha256 = 1;
+    required bytes keyId = 1;
     required bytes encryptionNonce = 2;
-}
-
-message ChilyKeyClusterSecretDiversified {
-    required bytes keyDiversifiedSha256 = 1;
-    required bytes encryption_nonce = 2;
 }
 
 message IntegrityHeader {

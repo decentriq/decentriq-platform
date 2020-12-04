@@ -18,6 +18,7 @@ class Endpoints(str, Enum):
     INSTANCE_LOGS = "/instance/:instanceId/logs",
     # User
     USERS_COLLECTION = "/users",
+    USERS_CERTIFICATE_AUTHORITY = "/users/ca",
     USER = "/user/:userId",
     USER_PASSWORD = "/user/:userId/password",
     USER_PERMISSIONS = "/user/:userId/permissions",

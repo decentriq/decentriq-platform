@@ -86,6 +86,12 @@ class Client:
         instance_constructor = self._instance_from_type(type)
         return instance_constructor(self, response_json["instanceId"], name, response_json["owner"])
 
+    def get_ca_root_certificate(self) -> bytes:
+        url = Endpoints.USERS_CERTIFICATE_AUTHORITY
+        response = self.api.get(url)
+        response_json = response.json()
+        return bytes(response_json["rootCertificate"], "utf-8")
+
     def get_user_pki_authenticator(self, email: str) -> Pki:
         keypair = generate_key()
         csr = generate_csr(email, keypair)

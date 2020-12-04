@@ -132,7 +132,8 @@ class Instance(metaclass=MetaInstance):
             bytes(enc_data),
             bytes(nonce.bytes),
             bytes(self.secret.keypair.public_key.bytes),
-            pki=self.auth_pki
+            pki=self.auth_pki,
+            unencrypted_data=data,
         )
 
     def _decode_and_decrypt_data(self, data):
