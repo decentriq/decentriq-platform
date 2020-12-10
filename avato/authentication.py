@@ -5,19 +5,16 @@ from OpenSSL.crypto import PKey, X509Req, X509, sign, dump_certificate, FILETYPE
 class Pki:
     DIGEST_ALGO = "sha512"
 
-    def __init__(self, certificate: X509, keypair: PKey):
+    def __init__(self, cert_chain_pem: bytes, keypair: PKey):
         if keypair.check():
-            self.crt_x509: X509 = certificate
-            self.kp: PKey = keypair
+            self.cert_chain_pem: bytes = cert_chain_pem
+            self.keypair: PKey = keypair
 
-    def get_certificate(self) -> X509:
-        return self.crt_x509
-
-    def get_certificate_pem(self) -> str:
-        return dump_certificate(FILETYPE_PEM, self.crt_x509)
+    def get_certificate_chain_pem(self) -> bytes:
+        return self.cert_chain_pem
 
     def sign(self, data: bytes) -> bytes:
-        return sign(self.kp, data, self.DIGEST_ALGO)
+        return sign(self.keypair, data, self.DIGEST_ALGO)
 
 
 def generate_key(key_type=crypto.TYPE_RSA, bit_size=4096) -> PKey:

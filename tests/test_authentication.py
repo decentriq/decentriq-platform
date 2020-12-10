@@ -1,7 +1,7 @@
 import os
-from OpenSSL.crypto import X509, PKey, verify
+from OpenSSL.crypto import verify, load_certificate, FILETYPE_PEM
 
-from avato.authentication import Pki, generate_key
+from avato.authentication import Pki
 from avato.client import Client
 
 tests_root = os.path.dirname(__file__)
@@ -18,4 +18,5 @@ def test_auth_complete():
     user_pki_auth: Pki = client.get_user_pki_authenticator(user_email)
     message: bytes = b"Hello Bob, this is Alice."
     signature: bytes = user_pki_auth.sign(message)
-    assert verify(user_pki_auth.get_certificate(), signature, message, Pki.DIGEST_ALGO) is None
+    certificate = load_certificate(FILETYPE_PEM, user_pki_auth.get_certificate_chain_pem())
+    assert verify(certificate, signature, message, Pki.DIGEST_ALGO) is None

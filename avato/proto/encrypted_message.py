@@ -7,7 +7,7 @@ def encode(encrypted_data, nonce, pubkey, pki=None, unencrypted_data=None):
     message.nonce = nonce
     message.pubkey = pubkey
     if pki is not None and unencrypted_data is not None:
-        message.auth.pki.certChain = pki.get_certificate_pem()
+        message.auth.pki.certChain = pki.get_certificate_chain_pem()
         message.auth.pki.signature = pki.sign(unencrypted_data)
     return serialize_length_delimited(message)
 

@@ -99,5 +99,5 @@ class Client:
         csr_str = dump_certificate_request(FILETYPE_PEM, csr).decode("utf-8")
         csr_req = {"csrPem": csr_str}
         resp = self.api.post(url, req_body=json.dumps(csr_req))
-        certificate = load_certificate(FILETYPE_PEM, resp.json()["certChainPem"])
-        return Pki(certificate, keypair)
+        cert_chain_pem = resp.json()["certChainPem"].encode()
+        return Pki(cert_chain_pem, keypair)
