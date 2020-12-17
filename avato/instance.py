@@ -117,14 +117,6 @@ class Instance(metaclass=MetaInstance):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
 
-    def shutdown(self):
-        url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
-        self.client.api.post(url, json.dumps({"type": "SHUTDOWN"}), {"Content-type": "application/json"})
-
-    def delete(self):
-        url = Endpoints.INSTANCE.replace(":instanceId", self.id)
-        self.client.api.delete(url)
-
     def _encrypt_and_encode_data(self, data):
         nonce = chily.Nonce.from_random()
         cipher = chily.Cipher(
