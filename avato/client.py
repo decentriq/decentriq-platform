@@ -2,7 +2,7 @@ import json
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
 from .api import API, Endpoints
 from typing import List, Any
-from OpenSSL.crypto import dump_certificate_request, FILETYPE_PEM, load_certificate
+from OpenSSL.crypto import dump_certificate_request, FILETYPE_PEM
 from .authentication import generate_csr, generate_key, Pki
 
 
@@ -100,4 +100,4 @@ class Client:
         csr_req = {"csrPem": csr_str}
         resp = self.api.post(url, req_body=json.dumps(csr_req))
         cert_chain_pem = resp.json()["certChainPem"].encode()
-        return Pki(cert_chain_pem, keypair)
+        return Pki(cert_chain_pem, keypair, email)
