@@ -7,10 +7,7 @@ from .proto.avato_enclave_pb2 import Request, Response
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import Verification, Fatquote
 from .api import Endpoints
-from .authentication import Pki, Sigma
-import hkdf
-import hashlib
-import hmac
+from .authentication import Pki
 
 class MetaInstance(ABCMeta):
     @property
@@ -83,7 +80,7 @@ class Instance(metaclass=MetaInstance):
         self.secret = secret
 
     def set_pki_auth(self, pki: Pki):
-        self.auth_pki: Pki = pki
+        self.auth_pki = pki
 
     def get_info(self):
         url = Endpoints.INSTANCE.replace(":instanceId", self.id)
@@ -123,20 +120,12 @@ class Instance(metaclass=MetaInstance):
             self.secret.keypair.secret, self._get_enclave_pubkey()
         )
         enc_data = cipher.encrypt(data, nonce)
-        sigma_auth = None
-        if self.auth_pki is not None:
-            public_keys = bytes(self.secret.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
-            signature = self.auth_pki.sign(public_keys)
-            shared_key = bytes(self.secret.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes)
-            kdf = hkdf.Hkdf(b'', shared_key, hash=hashlib.sha512)
-            mac_key = kdf.expand(b"IdP KDF Context", 64)
-            mac_tag = hmac.digest(mac_key, self.auth_pki.get_user_id().encode(), 'sha512')
-            sigma_auth = Sigma(signature, mac_tag, self.auth_pki)
         return encode(
             bytes(enc_data),
             bytes(nonce.bytes),
             bytes(self.secret.keypair.public_key.bytes),
-            sigma_auth=sigma_auth
+            pki=self.auth_pki,
+            unencrypted_data=data,
         )
 
     def _decode_and_decrypt_data(self, data):

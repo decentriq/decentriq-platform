@@ -42,7 +42,6 @@ message Authentication{
 message Pki{
   required bytes certChain = 1;
   required bytes signature = 2;
-  required bytes idMac = 3;
 }
 
 /* =========================================================================================================

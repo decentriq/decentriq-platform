@@ -1,45 +1,20 @@
 from OpenSSL import crypto
-from OpenSSL.crypto import PKey, X509Req, sign
+from OpenSSL.crypto import PKey, X509Req, X509, sign, dump_certificate, FILETYPE_PEM
 
 
 class Pki:
     DIGEST_ALGO = "sha512"
 
-    def __init__(self, certificate_chain: bytes, keypair: PKey, user_id: str):
+    def __init__(self, cert_chain_pem: bytes, keypair: PKey):
         if keypair.check():
-            self.certificate_chain: bytes = certificate_chain
-            self.kp: PKey = keypair
-            self.user_id: str = user_id
-
-    def get_keypair(self) -> PKey:
-        return self.kp
-
-    def get_user_id(self) -> str:
-        return self.user_id
+            self.cert_chain_pem: bytes = cert_chain_pem
+            self.keypair: PKey = keypair
 
     def get_certificate_chain_pem(self) -> bytes:
-        return self.certificate_chain
+        return self.cert_chain_pem
 
     def sign(self, data: bytes) -> bytes:
-        return sign(self.kp, data, self.DIGEST_ALGO)
-
-
-class Sigma:
-    DIGEST_ALGO = "sha512"
-
-    def __init__(self, signature: bytes, mac_tag: bytes, pki: Pki):
-        self.signature: bytes = signature
-        self.mac_tag: bytes = mac_tag
-        self.auth_pki: Pki = pki
-
-    def get_mac_tag(self) -> bytes:
-        return self.mac_tag
-
-    def get_signature(self) -> bytes:
-        return self.signature
-
-    def get_cert_chain(self) -> bytes:
-        return self.auth_pki.get_certificate_chain_pem()
+        return sign(self.keypair, data, self.DIGEST_ALGO)
 
 
 def generate_key(key_type=crypto.TYPE_RSA, bit_size=4096) -> PKey:
@@ -57,5 +32,5 @@ def generate_csr(user_email: str, key: PKey) -> X509Req:
     ])
     req.add_extensions(base_constraints)
     req.set_pubkey(key)
-    req.sign(key, "sha512")
+    req.sign(key, "sha256")
     return req
