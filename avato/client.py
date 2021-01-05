@@ -61,18 +61,7 @@ class Client:
         user_id = users[0]["id"]
         return user_id
 
-    def get_instance(self, id):
-        url = Endpoints.INSTANCE.replace(":instanceId", id)
-        response = self.api.get(url)
-        instance_info = response.json()
-        instance_constructor = self._instance_from_type(instance_info["type"])
-        return instance_constructor(
-            self,
-            id,
-            instance_info["name"],
-            instance_info["owner"],
-        )
-
+    
     def create_instance(self, name, type, participants):
         url = Endpoints.INSTANCES_COLLECTION
         data = {
