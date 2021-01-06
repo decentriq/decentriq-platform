@@ -41,11 +41,6 @@ class Client:
             https_proxy,
         )
 
-    def get_instances(self):
-        url = Endpoints.INSTANCES_COLLECTION
-        response = self.api.get(url)
-        return response.json()
-
     def _instance_from_type(self, type):
         for instance in self.registered_instances:
             if instance.type == type:
@@ -71,7 +66,7 @@ class Client:
         response = self.api.post(url, data_json, {"Content-type": "application/json"})
         response_json = response.json()
         instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, response_json["instanceId"], response_json["owner"])
+        return instance_constructor(self, response_json["sessionId"], response_json["owner"])
 
     def get_ca_root_certificate(self) -> bytes:
         url = Endpoints.USERS_CERTIFICATE_AUTHORITY
