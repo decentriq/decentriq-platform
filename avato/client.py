@@ -62,18 +62,16 @@ class Client:
         return user_id
 
     
-    def create_instance(self, name, type, participants):
+    def create_instance(self, type):
         url = Endpoints.INSTANCES_COLLECTION
         data = {
-            "name": name,
             "type": type,
-            "participants": list(map(lambda x: {"participantId": self.get_user_id(x)}, participants)),
         }
         data_json = json.dumps(data)
         response = self.api.post(url, data_json, {"Content-type": "application/json"})
         response_json = response.json()
         instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, response_json["instanceId"], name, response_json["owner"])
+        return instance_constructor(self, response_json["instanceId"], response_json["owner"])
 
     def get_ca_root_certificate(self) -> bytes:
         url = Endpoints.USERS_CERTIFICATE_AUTHORITY
