@@ -53,10 +53,9 @@ class Instance(metaclass=MetaInstance):
     def type(self):
         return self.get_type()
 
-    def __init__(self, client, id, name, owner):
+    def __init__(self, client, id, owner):
         self.client = client
         self.id = id
-        self.name = name
         self.owner = owner
         self.quote = None
         self.secret = None
@@ -160,6 +159,3 @@ class Instance(metaclass=MetaInstance):
             raise Exception(response_container.unsuccessfulResponse)
         decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
         parse_length_delimited(decrypted_response, response_object)
-
-    def __str__(self):
-        return f"id={self.id}, name={self.name}"
