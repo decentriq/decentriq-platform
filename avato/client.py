@@ -1,5 +1,5 @@
 import json
-from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_SSL
+from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_TLS
 from .api import API, Endpoints
 from typing import List, Any
 from OpenSSL.crypto import dump_certificate_request, FILETYPE_PEM
@@ -25,7 +25,7 @@ class Client:
             instance_types: List[Any] = None,
             backend_host: str = AVATO_HOST,
             backend_port: int = AVATO_PORT,
-            use_ssl: bool = AVATO_USE_SSL,
+            use_ssl: bool = AVATO_USE_TLS,
             http_proxy=None,
             https_proxy=None,
     ):
