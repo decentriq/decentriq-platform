@@ -53,10 +53,11 @@ class Instance(metaclass=MetaInstance):
     def type(self):
         return self.get_type()
 
-    def __init__(self, client, id, owner):
+    def __init__(self, client, id, owner, mrenclave):
         self.client = client
         self.id = id
         self.owner = owner
+        self.mrenclave = mrenclave
         self.quote = None
         self.secret = None
         self.fatquote = None
@@ -85,7 +86,7 @@ class Instance(metaclass=MetaInstance):
         self.auth_pki: Pki = pki
 
     def get_info(self):
-        url = Endpoints.INSTANCE.replace(":instanceId", self.id)
+        url = Endpoints.SESSION.replace(":instanceId", self.id)
         response = self.client.api.get(url)
         return response.json()
 
@@ -96,7 +97,7 @@ class Instance(metaclass=MetaInstance):
         accept_configuration_needed=False,
         accept_group_out_of_date=False,
     ):
-        url = Endpoints.INSTANCE_FATQUOTE.replace(":instanceId", self.id)
+        url = Endpoints.SESSION_FATQUOTE.replace(":instanceId", self.id)
         response = self.client.api.get(url)
         fatquote = response.json()
         certificate = fatquote["certificate"].encode("utf-8")
@@ -149,7 +150,7 @@ class Instance(metaclass=MetaInstance):
         encrypted = self._encrypt_and_encode_data(serialize_length_delimited(message))
         request = Request()
         request.avatoRequest = encrypted
-        url = Endpoints.INSTANCE_COMMANDS.replace(":instanceId", self.id)
+        url = Endpoints.SESSION_COMMANDS.replace(":instanceId", self.id)
         response = self.client.api.post(
             url, serialize_length_delimited(request), {"Content-Type": "application/octet-stream"},
         )

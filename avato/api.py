@@ -6,16 +6,16 @@ from urllib3.connection import HTTPConnection
 
 AVATO_API_PREFIX = "/api"
 AVATO_GENERAL_INFIX = ""
-AVATO_ACTIVE_INSTANCE_INFIX = "/instance/:instanceId"
+AVATO_ACTIVE_SESSION_INFIX = "/session/:instanceId"
 
 
 class Endpoints(str, Enum):
     # Instance
-    INSTANCES_COLLECTION = "/instances",
-    INSTANCE = "/instance/:instanceId",
-    INSTANCE_FATQUOTE = "/instance/:instanceId/fatquote",
-    INSTANCE_COMMANDS = "/instance/:instanceId/commands",
-    INSTANCE_LOGS = "/instance/:instanceId/logs",
+    SESSIONS = "/sessions",
+    SESSION = "/session/:instanceId",
+    SESSION_FATQUOTE = "/session/:instanceId/fatquote",
+    SESSION_COMMANDS = "/session/:instanceId/commands",
+    SESSION_LOGS = "/session/:instanceId/logs",
     # User
     USERS_COLLECTION = "/users",
     USERS_CERTIFICATE_AUTHORITY = "/users/ca",
@@ -28,8 +28,11 @@ class Endpoints(str, Enum):
     USER_FILE = "/user/:userId/file/:fileId",
     USER_FILE_CHUNK = "/user/:userId/file/:fileId/chunk/:chunkHash",
     USER_CERTIFICATE = "/user/:userId/certificate"
+    # MRENCLAVES
+    MRENCLAVES = "/mrenclaves"
+    SESSIONS_MRENCLAVE = "/sessions/:mrenclave"
 
-	
+
 
 class APIError(Exception):
     def __init__(self, body):

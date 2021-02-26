@@ -56,9 +56,9 @@ class Client:
         user_id = users[0]["id"]
         return user_id
 
-    
+
     def create_instance(self, type):
-        url = Endpoints.INSTANCES_COLLECTION
+        url = Endpoints.SESSIONS
         data = {
             "type": type,
         }
@@ -67,6 +67,24 @@ class Client:
         response_json = response.json()
         instance_constructor = self._instance_from_type(type)
         return instance_constructor(self, response_json["sessionId"], response_json["owner"])
+
+    def create_instance_from_mrenclave(self, type, mrenclave):
+        url = Endpoints.SESSIONS_MRENCLAVE.replace(":mrenclave", mrenclave)
+        data = {
+            "type": type,
+        }
+        data_json = json.dumps(data)
+        response = self.api.post(url, data_json, {"Content-type": "application/json"})
+        response_json = response.json()
+        instance_constructor = self._instance_from_type(type)
+        return instance_constructor(self, response_json["sessionId"], response_json["owner"], mrenclave)
+
+    def get_mrenclaves(self):
+        url = Endpoints.MRENCLAVES
+        response = self.api.get(url)
+        response_json = response.json()
+
+        return response_json["response"]
 
     def get_ca_root_certificate(self) -> bytes:
         url = Endpoints.USERS_CERTIFICATE_AUTHORITY
