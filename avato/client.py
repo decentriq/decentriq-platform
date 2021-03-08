@@ -1,15 +1,12 @@
 import json
 from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_TLS
 from .api import API, Endpoints
-from typing import List, Any
+from .instance import Instance
 from OpenSSL.crypto import dump_certificate_request, FILETYPE_PEM
 from .authentication import generate_csr, generate_key, Pki
 
 
 class Client:
-    class UnknownInstanceTypeError(Exception):
-        """Raised when the instance type requested is not supported"""
-        pass
 
     class UnknownUserEmail(Exception):
         """Raised when the user email doesn't exist"""
@@ -22,16 +19,13 @@ class Client:
     def __init__(
             self,
             api_token: str,
-            instance_types: List[Any] = None,
             backend_host: str = AVATO_HOST,
             backend_port: int = AVATO_PORT,
             use_ssl: bool = AVATO_USE_TLS,
             http_proxy=None,
             https_proxy=None,
     ):
-        if instance_types is None:
-            instance_types = []
-        self.registered_instances = instance_types
+        self.instance = Instance
         self.api = API(
             api_token,
             backend_host,
@@ -40,12 +34,6 @@ class Client:
             http_proxy,
             https_proxy,
         )
-
-    def _instance_from_type(self, type):
-        for instance in self.registered_instances:
-            if instance.type == type:
-                return instance
-        raise Client.UnknownInstanceTypeError
 
     def get_user_id(self, email: str):
         url = f"{Endpoints.USERS_COLLECTION}?email={email}"
@@ -56,28 +44,17 @@ class Client:
         user_id = users[0]["id"]
         return user_id
 
-
-    def create_instance(self, type):
+    def create_instance(self):
         url = Endpoints.SESSIONS
-        data = {
-            "type": type,
-        }
-        data_json = json.dumps(data)
-        response = self.api.post(url, data_json, {"Content-type": "application/json"})
+        response = self.api.post(url)
         response_json = response.json()
-        instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, response_json["sessionId"], response_json["owner"])
+        return self.instance(self, response_json["sessionId"], response_json["owner"])
 
-    def create_instance_from_mrenclave(self, type, mrenclave):
+    def create_instance_from_mrenclave(self, mrenclave):
         url = Endpoints.SESSIONS_MRENCLAVE.replace(":mrenclave", mrenclave)
-        data = {
-            "type": type,
-        }
-        data_json = json.dumps(data)
-        response = self.api.post(url, data_json, {"Content-type": "application/json"})
+        response = self.api.post(url)
         response_json = response.json()
-        instance_constructor = self._instance_from_type(type)
-        return instance_constructor(self, response_json["sessionId"], response_json["owner"], mrenclave)
+        return self.instance(self, response_json["sessionId"], response_json["owner"], mrenclave)
 
     def get_mrenclaves(self):
         url = Endpoints.MRENCLAVES
