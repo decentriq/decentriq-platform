@@ -9,7 +9,8 @@ fixtures_dir = os.path.join(tests_root, "fixtures")
 user_email = os.environ["TEST_USER_ID_1"]
 
 client = Client(
-    api_token=os.environ["TEST_API_TOKEN_1"]
+    api_token=os.environ["TEST_API_TOKEN_1"],
+    instance_types=[],
 )
 
 
