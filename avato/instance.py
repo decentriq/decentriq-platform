@@ -1,5 +1,6 @@
 import chily
 import json
+from base64 import b64encode, b64decode
 from abc import ABCMeta, abstractmethod
 from functools import wraps
 from .proto.encrypted_message import encode, decode
@@ -151,11 +152,17 @@ class Instance(metaclass=MetaInstance):
         request = Request()
         request.avatoRequest = encrypted
         url = Endpoints.SESSION_COMMANDS.replace(":instanceId", self.id)
+        serialized_request = serialize_length_delimited(request)
+        enclave_message = {
+            "data": b64encode(serialized_request).decode("ascii")
+        }
         response = self.client.api.post(
-            url, serialize_length_delimited(request), {"Content-Type": "application/octet-stream"},
+            url, json.dumps(enclave_message), {"Content-type": "application/json"}
         )
+        enclave_response = response.json()
+        enclave_response_bytes: bytes = b64decode(enclave_response["data"])
         response_container = Response()
-        parse_length_delimited(response.content, response_container)
+        parse_length_delimited(enclave_response_bytes, response_container)
         if response_container.HasField("unsuccessfulResponse"):
             raise Exception(response_container.unsuccessfulResponse)
         decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
