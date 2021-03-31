@@ -1,6 +1,6 @@
-# avato-python-client
+# decentriq-platform-client
 
-Python client library for the Avato platform.
+Python client library for the Decentriq platform.
 
 ## Installation
 

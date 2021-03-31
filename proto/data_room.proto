@@ -1,0 +1,96 @@
+syntax = "proto2";
+package data_room;
+
+message DataRoom {
+    required string id = 1;
+    repeated Table tables = 2;
+    repeated Query queries = 3;
+    repeated Role roles = 4;
+    optional QueryExecutionMode queryExecutionMode = 5;
+    optional string mrenclave = 6;
+}
+
+message QueryExecutionMode {
+    oneof query_execution_mode {
+        SingleExecutionMode singleExecutionMode = 1;
+        DistributedExecutionMode distributedExecutionMode = 2;
+    }
+}
+
+message SingleExecutionMode {
+}
+
+message DistributedExecutionMode {
+    // Parameters to the planner. This is exposed because it affects the shape of the computation graph.
+    required uint32 targetParallelism = 1;
+    required uint64 chunkSize = 2;
+    required uint64 maxChunkCountInMemory = 3;
+}
+
+message Table {
+    required string sqlCreateTableStatement = 1;
+    repeated TimeConstraint submissionConstraints = 2;
+}
+
+message Query {
+    required string queryName = 1;
+    required string sqlSelectStatement = 2;
+    repeated Constraint constraints = 3;
+}
+
+message Role {
+    required string roleName = 1;
+    required string emailRegex = 2;
+    required AuthenticationMethod authenticationMethod = 3;
+    repeated Permission permissions = 4;
+}
+
+message AuthenticationMethod {
+    required TrustedPki trustedPki = 1;
+    optional MailPki mailPki = 2;
+    optional string passwordSha256 = 3;
+}
+
+message TrustedPki {
+    required bytes rootCertificate = 1;
+}
+
+message MailPki {
+    required bytes rootCaStore = 1;
+}
+
+message Permission {
+    oneof permission {
+        SubmitQueryPermission submitQueryPermission = 1;
+        TableCrudPermission tableCrudPermission = 2;
+        DataroomRetrievalPermission dataRoomRetrievalPermission = 3;
+    }
+}
+
+message SubmitQueryPermission {
+    required string queryName = 1;
+}
+
+message TableCrudPermission {
+    required string tableName = 1;
+}
+
+message DataroomRetrievalPermission {}
+
+message Constraint {
+    required string description = 1;
+    oneof constraint {
+        SqlConstraint sqlConstraint = 2;
+        TimeConstraint timeConstraint = 3;
+    }
+}
+
+message SqlConstraint {
+    required string statement = 1;
+}
+
+message TimeConstraint {
+    // Unix timestamp in seconds
+    required int64 timestamp = 1;
+    required bool before = 2;
+}

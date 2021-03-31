@@ -1,0 +1,81 @@
+syntax = "proto2";
+package waterfront;
+
+import "column_type.proto";
+import "data_room.proto";
+
+message WaterfrontRequest {
+    oneof waterfront_request {
+        SqlQueryRequest sqlQueryRequest = 2;
+        CreateDataRoomRequest createDataRoomRequest = 5;
+        PublishDatasetToDataRoomRequest publishDatasetToDataRoomRequest = 6;
+        RetrieveDataRoomRequest retrieveDataRoomRequest = 7;
+    }
+}
+
+message WaterfrontResponse {
+    oneof waterfront_response {
+        string failure = 1;
+        SqlQueryResponse sqlQueryResponse = 3;
+        CreateDataRoomResponse createDataRoomResponse = 6;
+        PublishDatasetToDataRoomResponse publishDatasetToDataRoomResponse = 7;
+        RetrieveDataRoomResponse retrieveDataRoomResponse = 8;
+    }
+}
+
+message CreateDataRoomRequest {
+    required data_room.DataRoom dataRoom = 1;
+}
+
+message CreateDataRoomResponse {
+    required bytes dataRoomHash = 1;
+}
+
+message PublishDatasetToDataRoomRequest {
+    required bytes manifestHash = 1;
+    required bytes dataRoomHash = 2;
+    required string dataRoomTableName = 3;
+    required EncryptionKey encryptionKey = 4;
+}
+
+message PublishDatasetToDataRoomResponse {
+}
+
+message SqlQueryRequest {
+    required string queryName = 1;
+    required bytes dataRoomHash = 2;
+}
+
+// If the content bytes here are empty, then we use this to indicate
+// that the query is not finished yet. This facilitates polling.
+message SqlQueryResponse {
+    optional bytes data = 1;
+}
+
+message RetrieveDataRoomRequest {
+    required bytes dataRoomHash = 1;
+}
+
+message RetrieveDataRoomResponse {
+    required data_room.DataRoom dataRoom = 1;
+}
+
+// Storage
+message EncryptionKey {
+    required bytes material = 1;
+    required bytes salt = 2;
+}
+
+message TableSchema {
+    repeated NamedColumn namedColumns = 1;
+}
+
+message NamedColumn {
+    required string name = 1;
+    required column_type.ColumnType columnType = 2;
+}
+
+message DatasetManifest {
+    required bytes digestHash = 1;
+    required TableSchema schema = 2;
+}

@@ -1,38 +1,28 @@
 import requests
+from requests import adapters
 import socket
 import platform
 from enum import Enum
 from urllib3.connection import HTTPConnection
 
-AVATO_API_PREFIX = "/api"
-AVATO_GENERAL_INFIX = ""
-AVATO_ACTIVE_SESSION_INFIX = "/session/:instanceId"
-
+DECENTRIQ_PLATFORM_API_PREFIX = "/api"
 
 class Endpoints(str, Enum):
-    # Instance
+    # System
+    SYSTEM_ENCLAVE_IDENTIFIERS = "/system/enclave-identifiers",
+    SYSTEM_CERTIFICATE_AUTHORITY = "/system/certificate-authority",
+    # Session
     SESSIONS = "/sessions",
-    SESSION = "/session/:instanceId",
-    SESSION_FATQUOTE = "/session/:instanceId/fatquote",
-    SESSION_COMMANDS = "/session/:instanceId/commands",
-    SESSION_LOGS = "/session/:instanceId/logs",
+    SESSION = "/session/:sessionId",
+    SESSION_FATQUOTE = "/session/:sessionId/fatquote",
+    SESSION_MESSAGES = "/session/:sessionId/messages",
     # User
     USERS_COLLECTION = "/users",
-    USERS_CERTIFICATE_AUTHORITY = "/users/ca",
     USER = "/user/:userId",
-    USER_PASSWORD = "/user/:userId/password",
-    USER_PERMISSIONS = "/user/:userId/permissions",
-    USER_TOKENS_COLLECTION = "/user/:userId/tokens",
-    USER_TOKEN = "/user/:userId/token/:tokenId",
-    USER_FILES_COLLECTION = "/user/:userId/files"
+    USER_FILES_COLLECTION = "/user/:userId/files",
     USER_FILE = "/user/:userId/file/:fileId",
     USER_FILE_CHUNK = "/user/:userId/file/:fileId/chunk/:chunkHash",
-    USER_CERTIFICATE = "/user/:userId/certificate"
-    # MRENCLAVES
-    MRENCLAVES = "/mrenclaves"
-    SESSIONS_MRENCLAVE = "/sessions/:mrenclave"
-
-
+    USER_CERTIFICATE = "/user/:userId/certificate",
 
 class APIError(Exception):
     def __init__(self, body):
@@ -67,7 +57,7 @@ class UnknownError(APIError):
 
     pass
 
-class HTTPAdapterWithSocketOptions(requests.adapters.HTTPAdapter):
+class HTTPAdapterWithSocketOptions(adapters.HTTPAdapter):
     def __init__(self, *args, **kwargs):
         self.socket_options = kwargs.pop("socket_options", None)
         super(HTTPAdapterWithSocketOptions, self).__init__(*args, **kwargs)
@@ -101,25 +91,19 @@ class API:
     def __init__(
         self,
         api_token,
-        backend_host,
-        backend_port,
-        use_ssl,
-        http_proxy,
-        https_proxy,
+        host,
+        port,
+        use_tls
     ):
         adapter = HTTPAdapterWithTCPKeepalive()
         session = requests.Session()
         session.mount("http://", adapter)
         session.mount("https://", adapter)
-        if use_ssl:
-            if https_proxy:
-                session.proxies = {"https": https_proxy}
+        if use_tls:
             protocol = "https"
         else:
-            if http_proxy:
-                session.proxies = {"http": http_proxy}
             protocol = "http"
-        self.base_url = f"{protocol}://{backend_host}:{backend_port}{AVATO_API_PREFIX}"
+        self.base_url = f"{protocol}://{host}:{port}{DECENTRIQ_PLATFORM_API_PREFIX}"
         auth_header = {"Authorization": "Bearer " + api_token}
         session.headers.update(auth_header)
         self.session = session

@@ -39,19 +39,6 @@ DaVzWh5aiEx+idkSGMnX
 -----END CERTIFICATE-----
 """
 
-
-class Fatquote:
-    """Represents at Fatquote response of the IAS service"""
-
-    def __init__(self, fatquote):
-        self.certificate = fatquote["certificate"]
-        self.message = fatquote["response"]
-        self.signature = bytes(fatquote["signature"]["data"]).hex()
-
-    def __str__(self):
-        return json.dumps(self.__dict__, indent=4)
-
-
 class QuoteBody:
     """Represents the body of the SGX IAS Quote"""
 
@@ -141,16 +128,12 @@ class Verification:
         self.accept_configuration_needed = accept_configuration_needed
         self.accept_group_out_of_date = accept_group_out_of_date
         trust_roots = []
-        for _, _, der_bytes in pem.unarmor(intel_sgx_root_ca, multiple=True):
+        for _, _, der_bytes in pem.unarmor(intel_sgx_root_ca, multiple=True): # type: ignore
             trust_roots.append(der_bytes)
         self.context = ValidationContext(trust_roots=trust_roots)
 
-    def verify(self, certificate, message, signature):
+    def verify(self, certificate, message, signature) -> QuoteBody:
         """
-        :param expected_measurement:
-            Hex-String of the expected measurement, 
-            e.g. "4ff505f350698c78e8b3b49b8e479146ce3896a06cd9e5109dfec8f393f14025"
-
         :param certificate:
             A byte string of the certificate
  

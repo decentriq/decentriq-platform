@@ -1,6 +1,6 @@
 import os
 import pytest
-from avato.verification import Verification, EnclaveQuoteFlagsError
+from decentriq_platform.verification import Verification, EnclaveQuoteFlagsError
 
 tests_root = os.path.dirname(__file__)
 fixtures_dir = os.path.join(tests_root, "fixtures")
