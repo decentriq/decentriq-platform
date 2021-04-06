@@ -5,7 +5,7 @@ import platform
 from enum import Enum
 from urllib3.connection import HTTPConnection
 
-DECENTRIQ_PLATFORM_API_PREFIX = "/api"
+API_PREFIX = "/api/core"
 
 class Endpoints(str, Enum):
     # System
@@ -103,7 +103,7 @@ class API:
             protocol = "https"
         else:
             protocol = "http"
-        self.base_url = f"{protocol}://{host}:{port}{DECENTRIQ_PLATFORM_API_PREFIX}"
+        self.base_url = f"{protocol}://{host}:{port}{API_PREFIX}"
         auth_header = {"Authorization": "Bearer " + api_token}
         session.headers.update(auth_header)
         self.session = session
