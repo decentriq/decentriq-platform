@@ -43,7 +43,7 @@ class SystemCaResponse(TypedDict):
 class CreateSessionRequest(TypedDict):
     enclaveIdentifier: str
 
-class CreateSessionResponse(TypedDict):
+class SessionJsonResponse(TypedDict):
     sessionId: str
     enclaveIdentifier: str
 
@@ -108,7 +108,7 @@ class Client:
     ) -> Session:
         url = Endpoints.SESSIONS
         req_body = CreateSessionRequest(enclaveIdentifier=enclave_identifier)
-        response: CreateSessionResponse = self.api.post(
+        response: SessionJsonResponse = self.api.post(
                 url,
                 json.dumps(req_body),
                 {"Content-type": "application/json"}
