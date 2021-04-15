@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from base64 import b64encode, b64decode
 from .proto.data_room_pb2 import DataRoom
 from .proto.avato_enclave_pb2 import Request, Response, DataNoncePubkey
-from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse
+from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import QuoteBody, Verification
 from .api import Endpoints
@@ -134,7 +134,7 @@ class Session():
         else: 
             return None
 
-    def create_data_room(self, data_room: DataRoom) -> bytes:
+    def create_data_room(self, data_room: DataRoom) -> CreateDataRoomResponse:
         req = WaterfrontRequest()
         req.createDataRoomRequest.dataRoom.CopyFrom(data_room)
         response = self._send_and_parse_message(req)
@@ -143,7 +143,7 @@ class Session():
                 "Expected createDataRoomResponse, got "
                 + response.WhichOneof("waterfront_response")
             )
-        return response.createDataRoomResponse.dataRoomHash
+        return response.createDataRoomResponse
 
     def retrieve_data_room(self, data_room_hash: bytes) -> DataRoom:
         req = WaterfrontRequest()

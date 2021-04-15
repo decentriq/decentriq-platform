@@ -13,6 +13,9 @@ from decentriq_platform.proto.data_room_pb2 import (
         Query, Role,
         Permission
 )
+from decentriq_platform.proto.waterfront_pb2 import (
+        CreateDataRoomResponse, DataRoomValidationError
+)
 from decentriq_platform.authentication import generate_key
 from collections import Counter
 from io import StringIO
@@ -226,6 +229,18 @@ def get_dwelltime_deltas_query(table):
            f"FROM ({joined}) AS joined \n" \
            f"GROUP BY port, date"
 
+def expect_create_data_room_response_hash(response: CreateDataRoomResponse) -> bytes:
+    if response.HasField("dataRoomValidationError"):
+        raise Exception(response.dataRoomValidationError)
+    else:
+        return response.dataRoomHash
+
+def expect_create_data_room_response_error(response: CreateDataRoomResponse) -> DataRoomValidationError:
+    if response.HasField("dataRoomHash"):
+        raise Exception("Expected validation error, got data room hash")
+    else:
+        return response.dataRoomValidationError
+
 
 def test_get_initial_weights_containers_distrib():
     # Create sessions
@@ -248,7 +263,7 @@ def test_get_initial_weights_containers_distrib():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, True)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
@@ -287,7 +302,7 @@ def test_get_initial_weights_containers():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, True)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
@@ -326,7 +341,7 @@ def test_get_delta_weights_containers():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, False)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
@@ -365,7 +380,7 @@ def test_get_delta_weights_containers_distrib():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, True)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
@@ -404,7 +419,7 @@ def test_get_delta_dwelltime_distrib():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, True)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
@@ -443,7 +458,7 @@ def test_get_delta_dwelltime():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, False)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
@@ -468,7 +483,7 @@ def test_valid_data_room_creation():
     # Create data room
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, False)
-    analyst_session.create_data_room(data_room)
+    expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
 
 
 def test_invalid_data_room_duplicate_table():
@@ -481,8 +496,8 @@ def test_invalid_data_room_duplicate_table():
     second_events_table.sqlCreateTableStatement = get_events_create_table("dr_events")
     data_room.tables.append(second_events_table)
 
-    with pytest.raises(Exception):
-        analyst_session.create_data_room(data_room)
+    validation_error = expect_create_data_room_response_error(analyst_session.create_data_room(data_room))
+    assert validation_error.tableIndex == 1
 
 
 def test_invalid_data_room_invalid_query():
@@ -496,12 +511,12 @@ def test_invalid_data_room_invalid_query():
     invalid_query.sqlSelectStatement = "SELECT * FROM nonexistent"
     data_room.queries.append(invalid_query)
 
-    with pytest.raises(Exception):
-        analyst_session.create_data_room(data_room)
+    validation_error = expect_create_data_room_response_error(analyst_session.create_data_room(data_room))
+    assert validation_error.queryIndex == 3;
 
     invalid_query.sqlSelectStatement = "Robert'); DROP TABLE Students;--"
-    with pytest.raises(Exception):
-        analyst_session.create_data_room(data_room)
+    validation_error = expect_create_data_room_response_error(analyst_session.create_data_room(data_room))
+    assert validation_error.queryIndex == 3;
 
 
 def test_invalid_data_room_invalid_role():
@@ -519,8 +534,8 @@ def test_invalid_data_room_invalid_role():
     invalid_role.permissions.append(invalid_permission)
     data_room.roles.append(invalid_role)
 
-    with pytest.raises(Exception):
-        analyst_session.create_data_room(data_room)
+    validation_error = expect_create_data_room_response_error(analyst_session.create_data_room(data_room))
+    assert validation_error.roleIndex == 2;
 
 
 def test_multiple_data_providers():
@@ -531,7 +546,7 @@ def test_multiple_data_providers():
 
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, False)
-    data_room_hash = data_provider_session_1.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session_1.create_data_room(data_room))
 
     conf: List[Tuple[Client, Session, str, str]] = [
         (data_provider_client_1, data_provider_session_1, os.environ["TEST_USER_ID_2"], "my_events_1"),
@@ -571,7 +586,7 @@ def test_multiple_data_providers_distrib():
 
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = create_events_data_room("dr_events", root_ca_cert, False)
-    data_room_hash = data_provider_session_1.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session_1.create_data_room(data_room))
 
     conf: List[Tuple[Client, Session, str, str]] = [
         (data_provider_client_1, data_provider_session_1, os.environ["TEST_USER_ID_2"], "my_events_1"),
@@ -643,7 +658,7 @@ def test_synthetic_user_id():
 
     data_room.roles.append(role)
 
-    data_room_hash = analyst_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
 
     # Provider 1
     provider_1_client, provider_1_session = create_session(
@@ -797,7 +812,7 @@ def test_non_default_pki():
 
     data_room.roles.append(role)
 
-    data_room_hash = analyst_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
 
     # Provider 1
     custom_provider_1_pki = create_custom_user_pki(custom_root_pki, os.environ["TEST_USER_ID_2"])
@@ -907,7 +922,7 @@ def test_different_root_same_user():
     role2.permissions.append(upload_permission)
     data_room.roles.append(role2)
 
-    data_room_hash = analyst_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
 
     # Provider 1, use custom PKI
     custom_provider_1_pki = create_custom_user_pki(custom_root_pki, os.environ["TEST_USER_ID_2"])
@@ -1005,7 +1020,7 @@ def test_dataroom_retrieval():
 
     data_room.roles.append(role)
 
-    data_room_hash = analyst_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
 
     retrieved_data_room = analyst_session.retrieve_data_room(data_room_hash)
     assert data_room == retrieved_data_room
@@ -1156,7 +1171,7 @@ def test_slow_boat_to_nagasaki_distrib():
     data_provider_role.permissions.append(upload_permission)
 
     data_room.roles.append(data_provider_role)
-    data_room_hash = data_provider_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(data_provider_session.create_data_room(data_room))
 
 
     # Publish dataset to data room
@@ -1224,7 +1239,7 @@ def test_fuzzy_matching():
     data_room.queryExecutionMode.distributedExecutionMode.chunkSize = 1048576
     data_room.queryExecutionMode.distributedExecutionMode.maxChunkCountInMemory = 16
 
-    data_room_hash = analyst_session.create_data_room(data_room)
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
 
     schema1 = Schema(
         "CREATE TABLE customer1 (name TEXT NOT NULL, company TEXT NOT NULL)")

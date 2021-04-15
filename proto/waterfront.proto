@@ -28,7 +28,20 @@ message CreateDataRoomRequest {
 }
 
 message CreateDataRoomResponse {
-    required bytes dataRoomHash = 1;
+    oneof create_data_room_response {
+        bytes dataRoomHash = 1;
+        DataRoomValidationError dataRoomValidationError = 2;
+    }
+}
+
+message DataRoomValidationError {
+    required string message = 1;
+    optional uint64 queryIndex = 2;
+    optional uint64 columnIndex = 3;
+    optional uint64 tableIndex = 4;
+    optional uint64 roleIndex = 5;
+    optional uint64 permissionIndex = 6;
+    optional uint64 constraintIndex = 7;
 }
 
 message PublishDatasetToDataRoomRequest {
