@@ -1106,6 +1106,60 @@ def slow_query_create_table(table_name) -> str:
         f"blorf BIGINT NOT NULL" \
         f")"
 
+def test_malformed_input_validation():
+    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
+    data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])
+    enclave_identifiers = analyst_client.get_enclave_identifiers()
+
+    # Upload dataset. Note the different name. This is referring to the user-specific table, and is used to
+    # identify an upload for the user. The dataroom table name is shared between users.
+    schema = Schema(slow_query_create_table("slow_table"))
+    encryption_key = Key()
+    with open(os.path.join(fixtures_dir, "malformed.csv"), "r", buffering=1024 ** 2) as events_stream:
+        manifest_hash = data_provider_client.upload_dataset(
+            os.environ["TEST_USER_ID_2"],
+            schema.table_name,
+            events_stream,
+            schema,
+            encryption_key
+        )
+
+    # validate it
+    reply = data_provider_session.validate_dataset(
+            manifest_hash,
+            encryption_key
+    )
+
+    assert reply.failure.row == 20
+
+
+def test_correct_input_validation():
+    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
+    data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])
+    enclave_identifiers = analyst_client.get_enclave_identifiers()
+
+    # Upload dataset. Note the different name. This is referring to the user-specific table, and is used to
+    # identify an upload for the user. The dataroom table name is shared between users.
+    schema = Schema(slow_query_create_table("slow_table"))
+    encryption_key = Key()
+    with open(os.path.join(fixtures_dir, "slow_boat.csv"), "r", buffering=1024 ** 2) as events_stream:
+        manifest_hash = data_provider_client.upload_dataset(
+            os.environ["TEST_USER_ID_2"],
+            schema.table_name,
+            events_stream,
+            schema,
+            encryption_key
+        )
+
+    # validate it
+    reply = data_provider_session.validate_dataset(
+            manifest_hash,
+            encryption_key
+    )
+
+    assert reply.HasField("failure") == False
+
+
 def test_slow_boat_to_nagasaki_distrib():
     analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
     data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])

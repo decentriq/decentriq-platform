@@ -176,6 +176,23 @@ class Session():
                 + response.WhichOneof("waterfront_response")
             )
 
+    def validate_dataset(
+            self,
+            manifest_hash: bytes,
+            key: Key
+    ):
+        req = WaterfrontRequest()
+        req.validateDatasetRequest.manifestHash = manifest_hash
+        req.validateDatasetRequest.encryptionKey.material = key.material
+        req.validateDatasetRequest.encryptionKey.salt = key.salt
+        response = self._send_and_parse_message(req)
+        if not response.HasField("validateDatasetResponse"):
+            raise Exception(
+                "Expected validateDatasetResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.validateDatasetResponse
+    
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)

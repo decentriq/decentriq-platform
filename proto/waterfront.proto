@@ -10,6 +10,7 @@ message WaterfrontRequest {
         CreateDataRoomRequest createDataRoomRequest = 5;
         PublishDatasetToDataRoomRequest publishDatasetToDataRoomRequest = 6;
         RetrieveDataRoomRequest retrieveDataRoomRequest = 7;
+        ValidateDatasetRequest validateDatasetRequest = 8;
     }
 }
 
@@ -20,6 +21,7 @@ message WaterfrontResponse {
         CreateDataRoomResponse createDataRoomResponse = 6;
         PublishDatasetToDataRoomResponse publishDatasetToDataRoomResponse = 7;
         RetrieveDataRoomResponse retrieveDataRoomResponse = 8;
+        ValidateDatasetResponse validateDatasetResponse = 9;
     }
 }
 
@@ -52,6 +54,22 @@ message PublishDatasetToDataRoomRequest {
 }
 
 message PublishDatasetToDataRoomResponse {
+}
+
+message ValidateDatasetRequest {
+    required bytes manifestHash = 1;
+    required EncryptionKey encryptionKey = 2;
+}
+// If validation fails because of malformed input,
+// communicate back to the sender the row that failed
+// along with a descriptive message. 
+message ValidateDatasetFailure {
+    required string message = 1;
+    optional uint64 row = 2;
+}
+
+message ValidateDatasetResponse {
+    optional ValidateDatasetFailure failure = 1;    
 }
 
 message SqlQueryRequest {
