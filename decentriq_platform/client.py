@@ -6,7 +6,7 @@ from concurrent import futures
 from typing_extensions import TypedDict
 from typing import List, TypeVar
 from .session import B64EncodedMessage, Session, SessionOptions
-from .config import AVATO_HOST, AVATO_PORT, AVATO_USE_TLS
+from .config import DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
 from .api import API, Endpoints
 from .authentication import generate_csr, generate_key, Auth
 from base64 import b64encode
@@ -59,9 +59,9 @@ class Client:
     def __init__(
             self,
             api_token: str,
-            host: str = AVATO_HOST,
-            port: int = AVATO_PORT,
-            use_tls: bool = AVATO_USE_TLS,
+            host: str = DECENTRIQ_HOST,
+            port: int = DECENTRIQ_PORT,
+            use_tls: bool = DECENTRIQ_USE_TLS,
     ):
         self.api = API(
             api_token,
