@@ -21,17 +21,9 @@ def test_schema_parsing():
     with pytest.raises(Exception, match="No CREATE TABLE statements found"):
         Schema("")
 
-    with pytest.raises(Exception, match="NOT NULL option must be specified, NULL values are not supported"):
-        Schema(
-                "CREATE TABLE data_provider_table ("
-                + "name TEXT,"
-                + "salary BIGINT"
-                + ")"
-        )
-
     schema = Schema(
             "CREATE TABLE data_provider_table ("
-            + "name TEXT NOT NULL,"
+            + "name TEXT,"
             + "salary BIGINT NOT NULL"
             + ")"
     )
@@ -39,11 +31,17 @@ def test_schema_parsing():
     assert json.loads(MessageToJson(schema.proto_schema)) == {
             "namedColumns": [
                 {
-                    "columnType": "STRING",
+                    "columnType": {
+                        "primitiveType": "STRING",
+                        "nullable": True,
+                    },
                     "name": "name",
                     },
                 {
-                    "columnType": "INT64",
+                    "columnType": {
+                        "primitiveType": "INT64",
+                        "nullable": False,
+                    },
                     "name": "salary",
                     },
                 ],

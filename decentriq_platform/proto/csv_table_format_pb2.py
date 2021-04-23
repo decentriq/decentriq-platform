@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16\x63sv_table_format.proto\x12\x10\x63sv_table_format\x1a\x11\x63olumn_type.proto\">\n\x0e\x43svTableFormat\x12,\n\x0b\x63olumnTypes\x18\x01 \x03(\x0e\x32\x17.column_type.ColumnType'
+  serialized_pb=b'\n\x16\x63sv_table_format.proto\x12\x10\x63sv_table_format\x1a\x11\x63olumn_type.proto\">\n\x0e\x43svTableFormat\x12,\n\x0b\x63olumnTypes\x18\x01 \x03(\x0b\x32\x17.column_type.ColumnType'
   ,
   dependencies=[column__type__pb2.DESCRIPTOR,])
 
@@ -37,7 +37,7 @@ _CSVTABLEFORMAT = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='columnTypes', full_name='csv_table_format.CsvTableFormat.columnTypes', index=0,
-      number=1, type=14, cpp_type=8, label=3,
+      number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -58,7 +58,7 @@ _CSVTABLEFORMAT = _descriptor.Descriptor(
   serialized_end=125,
 )
 
-_CSVTABLEFORMAT.fields_by_name['columnTypes'].enum_type = column__type__pb2._COLUMNTYPE
+_CSVTABLEFORMAT.fields_by_name['columnTypes'].message_type = column__type__pb2._COLUMNTYPE
 DESCRIPTOR.message_types_by_name['CsvTableFormat'] = _CSVTABLEFORMAT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 

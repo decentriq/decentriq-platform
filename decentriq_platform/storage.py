@@ -4,7 +4,7 @@ import argon2
 import os
 from collections.abc import Iterator
 from typing import List, Tuple, Any, Union
-from decentriq_platform.proto.column_type_pb2 import ColumnType
+from decentriq_platform.proto.column_type_pb2 import ColumnType, PrimitiveType
 from google.protobuf.message import Message
 from .proto.avato_enclave_pb2 import EncryptionHeader, VersionHeader, ChunkHeader
 from .proto.length_delimited import serialize_length_delimited
@@ -50,6 +50,8 @@ class Key():
 
 
 def sql_data_type_to_column_type(column_type: str, options) -> ColumnType:
+    type = ColumnType()
+
     is_not_null = False
     for option in options:
         option_value = option["option"]
@@ -57,17 +59,19 @@ def sql_data_type_to_column_type(column_type: str, options) -> ColumnType:
             is_not_null = True
         else:
             raise Exception(f"Column option {option_value} not supported")
-    if not is_not_null:
-        raise Exception("NOT NULL option must be specified, NULL values are not supported")
+
+    type.nullable = not is_not_null
 
     if column_type == "Text" or column_type == "Char" or column_type == "Varchar":
-        return ColumnType.STRING # type: ignore
+        type.primitiveType = PrimitiveType.STRING
     elif column_type == "Float" or column_type == "Real" or column_type == "Double":
-        return ColumnType.FLOAT64 # type: ignore
+        type.primitiveType = PrimitiveType.FLOAT64
     elif column_type == "SmallInt" or column_type == "Int" or column_type == "BigInt":
-        return ColumnType.INT64 # type: ignore
+        type.primitiveType = PrimitiveType.INT64
     else:
         raise Exception(f"Unsupported data type {column_type}")
+    
+    return type
 
 
 class Schema():

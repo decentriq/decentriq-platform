@@ -5,18 +5,36 @@ isort:skip_file
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.internal.enum_type_wrapper
+import google.protobuf.message
 import typing
+import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
 
-global___ColumnType = ColumnType
-class _ColumnType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[ColumnType.V], builtins.type):
+global___PrimitiveType = PrimitiveType
+class _PrimitiveType(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[PrimitiveType.V], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
-    INT64 = ColumnType.V(1)
-    STRING = ColumnType.V(2)
-    FLOAT64 = ColumnType.V(3)
-class ColumnType(metaclass=_ColumnType):
+    INT64 = PrimitiveType.V(1)
+    STRING = PrimitiveType.V(2)
+    FLOAT64 = PrimitiveType.V(3)
+class PrimitiveType(metaclass=_PrimitiveType):
     V = typing.NewType('V', builtins.int)
-INT64 = ColumnType.V(1)
-STRING = ColumnType.V(2)
-FLOAT64 = ColumnType.V(3)
+INT64 = PrimitiveType.V(1)
+STRING = PrimitiveType.V(2)
+FLOAT64 = PrimitiveType.V(3)
+
+class ColumnType(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    PRIMITIVETYPE_FIELD_NUMBER: builtins.int
+    NULLABLE_FIELD_NUMBER: builtins.int
+    primitiveType: global___PrimitiveType.V = ...
+    nullable: builtins.bool = ...
+
+    def __init__(self,
+        *,
+        primitiveType : typing.Optional[global___PrimitiveType.V] = ...,
+        nullable : typing.Optional[builtins.bool] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"nullable",b"nullable",u"primitiveType",b"primitiveType"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"nullable",b"nullable",u"primitiveType",b"primitiveType"]) -> None: ...
+global___ColumnType = ColumnType

@@ -20,12 +20,12 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11\x63olumn_type.proto\x12\x0b\x63olumn_type*0\n\nColumnType\x12\t\n\x05INT64\x10\x01\x12\n\n\x06STRING\x10\x02\x12\x0b\n\x07\x46LOAT64\x10\x03'
+  serialized_pb=b'\n\x11\x63olumn_type.proto\x12\x0b\x63olumn_type\"Q\n\nColumnType\x12\x31\n\rprimitiveType\x18\x01 \x02(\x0e\x32\x1a.column_type.PrimitiveType\x12\x10\n\x08nullable\x18\x02 \x02(\x08*3\n\rPrimitiveType\x12\t\n\x05INT64\x10\x01\x12\n\n\x06STRING\x10\x02\x12\x0b\n\x07\x46LOAT64\x10\x03'
 )
 
-_COLUMNTYPE = _descriptor.EnumDescriptor(
-  name='ColumnType',
-  full_name='column_type.ColumnType',
+_PRIMITIVETYPE = _descriptor.EnumDescriptor(
+  name='PrimitiveType',
+  full_name='column_type.PrimitiveType',
   filename=None,
   file=DESCRIPTOR,
   create_key=_descriptor._internal_create_key,
@@ -48,19 +48,67 @@ _COLUMNTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=34,
-  serialized_end=82,
+  serialized_start=117,
+  serialized_end=168,
 )
-_sym_db.RegisterEnumDescriptor(_COLUMNTYPE)
+_sym_db.RegisterEnumDescriptor(_PRIMITIVETYPE)
 
-ColumnType = enum_type_wrapper.EnumTypeWrapper(_COLUMNTYPE)
+PrimitiveType = enum_type_wrapper.EnumTypeWrapper(_PRIMITIVETYPE)
 INT64 = 1
 STRING = 2
 FLOAT64 = 3
 
 
-DESCRIPTOR.enum_types_by_name['ColumnType'] = _COLUMNTYPE
+
+_COLUMNTYPE = _descriptor.Descriptor(
+  name='ColumnType',
+  full_name='column_type.ColumnType',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='primitiveType', full_name='column_type.ColumnType.primitiveType', index=0,
+      number=1, type=14, cpp_type=8, label=2,
+      has_default_value=False, default_value=1,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='nullable', full_name='column_type.ColumnType.nullable', index=1,
+      number=2, type=8, cpp_type=7, label=2,
+      has_default_value=False, default_value=False,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=34,
+  serialized_end=115,
+)
+
+_COLUMNTYPE.fields_by_name['primitiveType'].enum_type = _PRIMITIVETYPE
+DESCRIPTOR.message_types_by_name['ColumnType'] = _COLUMNTYPE
+DESCRIPTOR.enum_types_by_name['PrimitiveType'] = _PRIMITIVETYPE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+ColumnType = _reflection.GeneratedProtocolMessageType('ColumnType', (_message.Message,), {
+  'DESCRIPTOR' : _COLUMNTYPE,
+  '__module__' : 'column_type_pb2'
+  # @@protoc_insertion_point(class_scope:column_type.ColumnType)
+  })
+_sym_db.RegisterMessage(ColumnType)
 
 
 # @@protoc_insertion_point(module_scope)

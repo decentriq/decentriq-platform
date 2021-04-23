@@ -1,7 +1,12 @@
 syntax = "proto2";
 package column_type;
 
-enum ColumnType {
+message ColumnType {
+    required PrimitiveType primitiveType = 1;
+    required bool nullable = 2;
+}
+
+enum PrimitiveType {
     INT64 = 1;
     STRING = 2;
     FLOAT64 = 3;
