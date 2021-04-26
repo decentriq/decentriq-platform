@@ -4,24 +4,15 @@ Python client library for the Decentriq platform.
 
 ## Installation
 
-After cloning the repository you can use different installation methods:
+After cloning the repository you can install the library using pip:
 
-### Poetry
+### Virtual environment(optional)
 
-To install with poetry just run:
-```
-poetry install
-```
-
-#### Notes:
-
-1. If you get an error during the installation try to delete the `poetry.lock` file
-
-2. Poetry installs the library in its own virtualenv, if you want to use it in your
-global python installation disable virtualenvs in poetry
+Before installing the library you may want to worki inside a virual environment:
 
 ```
-poetry config settings.virtualenvs.create false
+python -m venv env
+source env/bin/activate
 ```
 
 ### Pip
@@ -34,9 +25,8 @@ pip install .
 
 ## Usage:
 
-This library is just the entrypoint to the avato platform. You will need one of 
-instance libraries to play around with the platform.
-
+To have an idea of how to use this library, you can check the demo in the `example`
+ directory.
 
 ## Testing
 
