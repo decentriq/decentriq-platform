@@ -51,8 +51,9 @@ def test_schema_parsing():
 def test_dataset_uploading():
     user_email = os.environ["TEST_USER_ID_1"]
     api_token = os.environ["TEST_API_TOKEN_1"]
+    client_id = os.environ["DECENTRIQ_CLIENT_ID"]
 
-    client = Client(api_token=api_token)
+    client = Client(api_token=api_token, client_id=client_id)
     schema = Schema(
             "CREATE TABLE data_provider_table ("
             + "name TEXT NOT NULL,"

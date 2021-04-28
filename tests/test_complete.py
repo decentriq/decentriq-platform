@@ -24,9 +24,10 @@ from cryptography.hazmat.primitives import hashes, serialization
 
 tests_root = os.path.dirname(__file__)
 fixtures_dir = os.path.join(tests_root, "fixtures")
+client_id = os.environ["DECENTRIQ_CLIENT_ID"]
 
 def create_session(email: str, api_token: str, custom_auth: Auth = None) -> Tuple[Client, Session]:
-    analyst = Client(api_token=api_token)
+    analyst = Client(api_token=api_token, client_id=client_id)
     if custom_auth == None:
         analyst_auth = analyst.create_auth(email)
     else:
@@ -83,7 +84,7 @@ def get_events_create_table(table_name) -> str:
 
 @pytest.mark.skip(reason="helper function")
 def create_events_data_room(events_table_name: str, root_ca_cert: bytes, distributed: bool) -> DataRoom:
-    client = Client(api_token=os.environ["TEST_API_TOKEN_1"])
+    client = Client(api_token=os.environ["TEST_API_TOKEN_1"], client_id=client_id)
     enclave_identifiers = client.get_enclave_identifiers()
 
     data_room = DataRoom()

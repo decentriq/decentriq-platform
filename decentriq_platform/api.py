@@ -91,6 +91,7 @@ class API:
     def __init__(
         self,
         api_token,
+        client_id,
         host,
         port,
         use_tls
@@ -104,8 +105,12 @@ class API:
         else:
             protocol = "http"
         self.base_url = f"{protocol}://{host}:{port}{API_PREFIX}"
-        auth_header = {"Authorization": "Bearer " + api_token}
-        session.headers.update(auth_header)
+        auth_headers = {
+                "Authorization": "Bearer " + api_token,
+                "Authorization-Type": "app",
+                "Authorization-Client": client_id
+        }
+        session.headers.update(auth_headers)
         self.session = session
 
     @staticmethod

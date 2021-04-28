@@ -6,7 +6,9 @@ from concurrent import futures
 from typing_extensions import TypedDict
 from typing import List, TypeVar
 from .session import B64EncodedMessage, Session, SessionOptions
-from .config import DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
+from .config import (
+        DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
+)
 from .api import API, Endpoints
 from .authentication import generate_csr, generate_key, Auth
 from base64 import b64encode
@@ -48,23 +50,17 @@ class SessionJsonResponse(TypedDict):
     enclaveIdentifier: str
 
 class Client:
-    class UnknownUserEmail(Exception):
-        """Raised when the user email doesn't exist"""
-        pass
-
-    class FileUploadError(Exception):
-        """Raised when file upload fails"""
-        pass
-
     def __init__(
             self,
             api_token: str,
+            client_id: str = DECENTRIQ_CLIENT_ID,
             host: str = DECENTRIQ_HOST,
             port: int = DECENTRIQ_PORT,
             use_tls: bool = DECENTRIQ_USE_TLS,
     ):
         self.api = API(
             api_token,
+            client_id,
             host,
             port,
             use_tls
@@ -83,21 +79,12 @@ class Client:
     def create_auth(self, email: str) -> Auth:
         keypair = generate_key()
         csr = generate_csr(email, keypair)
-        url = Endpoints.USER_CERTIFICATE.replace(":userId", self.get_user_id(email))
+        url = Endpoints.USER_CERTIFICATE.replace(":userId", email)
         csr_req = UserCsrRequest(csrPem=csr.decode("utf-8"))
         resp: UserCsrResponse = self.api.post(url, req_body=json.dumps(csr_req)).json()
         cert_chain_pem = resp["certChainPem"].encode("utf-8")
         auth = Auth(cert_chain_pem, keypair, email)
         return auth
-
-
-    def get_user_id(self, email: str) -> str:
-        url = f"{Endpoints.USERS_COLLECTION}?email={email}"
-        users: List[UserResponse] = self.api.get(url).json()
-        if len(users) != 1:
-            raise Client.UnknownUserEmail
-        user_id = users[0]["id"]
-        return user_id
 
 
     def create_session(
@@ -135,7 +122,6 @@ class Client:
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8
     ) -> bytes:
-        user_id = self.get_user_id(email)
         uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads * 2)
         column_types = [named_column.columnType for named_column in schema.proto_schema.namedColumns]
         chunker = CsvChunker(csv_input_stream, column_types, os.urandom(16), chunk_size=chunk_size)
@@ -157,15 +143,15 @@ class Client:
             # This is temporary to avoid changes in the backend logic.
             chunks=chunk_hashes + [digest_hash.hex()]
         )
-        file_description = self._upload_manifest(user_id, manifest_encrypted, manifest_metadata)
+        file_description = self._upload_manifest(email, manifest_encrypted, manifest_metadata)
         # upload chunks
         chunker.reset()
         for chunk in chunker:
             uploader.submit(
-                self._encrypt_and_upload_chunk, chunk[0], chunk[1], key.material, key.id, user_id,
+                self._encrypt_and_upload_chunk, chunk[0], chunk[1], key.material, key.id, email,
                 file_description["fileId"]
             )
-        uploader.submit(self._upload_chunk, digest_hash, digest_encrypted, user_id, file_description["fileId"])
+        uploader.submit(self._upload_chunk, digest_hash, digest_encrypted, email, file_description["fileId"])
         uploader.shutdown(wait=True)
         return manifest_hash
 
@@ -216,17 +202,17 @@ class Client:
 
     def delete_user_file(self, email: str, file_id: str):
         url = Endpoints.USER_FILE \
-            .replace(":userId", self.get_user_id(email)) \
+            .replace(":userId", email) \
             .replace(":fileId", file_id)
         self.api.delete(url)
 
     def get_user_file(self, email: str, file_id: str) -> FileDescription:
-        url = Endpoints.USER_FILE.replace(":userId", self.get_user_id(email)).replace(":fileId", file_id)
+        url = Endpoints.USER_FILE.replace(":userId", email).replace(":fileId", file_id)
         response = self.api.get(url)
         return response.json()
 
     def get_user_files_collection(self, email: str) -> List[FileDescription]:
-        url = Endpoints.USER_FILES_COLLECTION.replace(":userId", self.get_user_id(email))
+        url = Endpoints.USER_FILES_COLLECTION.replace(":userId", email)
         response = self.api.get(url)
         return response.json()
 
