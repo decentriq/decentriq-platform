@@ -24,6 +24,10 @@ def test_schema_parsing():
     schema = Schema(
             "CREATE TABLE data_provider_table ("
             + "name TEXT,"
+            + "surname CHAR(10) NOT NULL,"
+            + "email VARCHAR(10) NOT NULL,"
+            + "password TEXT NOT NULL,"
+            + "age FLOAT(10) NOT NULL,"
             + "salary BIGINT NOT NULL"
             + ")"
     )
@@ -36,14 +40,42 @@ def test_schema_parsing():
                         "nullable": True,
                     },
                     "name": "name",
+                },
+                {
+                    "columnType": {
+                        "primitiveType": "STRING",
+                        "nullable": False,
                     },
+                    "name": "surname",
+                },
+                {
+                    "columnType": {
+                        "primitiveType": "STRING",
+                        "nullable": False,
+                    },
+                    "name": "email",
+                },
+                {
+                    "columnType": {
+                        "primitiveType": "STRING",
+                        "nullable": False,
+                    },
+                    "name": "password",
+                },
+                {
+                    "columnType": {
+                        "primitiveType": "FLOAT64",
+                        "nullable": False,
+                    },
+                    "name": "age",
+                },
                 {
                     "columnType": {
                         "primitiveType": "INT64",
                         "nullable": False,
                     },
                     "name": "salary",
-                    },
+                },
                 ],
             }
 

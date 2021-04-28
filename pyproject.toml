@@ -17,7 +17,7 @@ cryptography = "^3.4.6"
 asn1crypto = "^1.2.0"
 certvalidator = "^0.11.1"
 argon2-cffi = "^20.1.0"
-sqloxide = "^0.1.9"
+sqloxide = "^0.1.10"
 chily = "^0.5.1"
 
 [tool.poetry.dev-dependencies]

@@ -48,10 +48,8 @@ class Key():
         self.material: bytes = key_bytes
         self.salt: bytes = salt_bytes
 
-
-def sql_data_type_to_column_type(column_type: str, options) -> ColumnType:
+def sql_data_type_to_column_type(column_type: Union[str, dict], options) -> ColumnType:
     type = ColumnType()
-
     is_not_null = False
     for option in options:
         option_value = option["option"]
@@ -62,15 +60,21 @@ def sql_data_type_to_column_type(column_type: str, options) -> ColumnType:
 
     type.nullable = not is_not_null
 
-    if column_type == "Text" or column_type == "Char" or column_type == "Varchar":
-        type.primitiveType = PrimitiveType.STRING
-    elif column_type == "Float" or column_type == "Real" or column_type == "Double":
-        type.primitiveType = PrimitiveType.FLOAT64
-    elif column_type == "SmallInt" or column_type == "Int" or column_type == "BigInt":
-        type.primitiveType = PrimitiveType.INT64
+    if isinstance(column_type, str):
+        if column_type == "Text":
+            type.primitiveType =  PrimitiveType.STRING
+        elif column_type == "Real" or column_type == "Double":
+            type.primitiveType = PrimitiveType.FLOAT64 # type: ignore
+        elif column_type == "SmallInt" or column_type == "Int" or column_type == "BigInt":
+            type.primitiveType = PrimitiveType.INT64
+    elif isinstance(column_type, dict):
+        if "Char" in column_type or "Varchar" in column_type:
+            type.primitiveType =  PrimitiveType.STRING
+        elif "Float" in column_type:
+            type.primitiveType = PrimitiveType.FLOAT64
     else:
         raise Exception(f"Unsupported data type {column_type}")
-    
+
     return type
 
 
