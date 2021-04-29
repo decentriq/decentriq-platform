@@ -1,250 +1,249 @@
 #!/usr/bin/env python
+
 import os
 from decentriq_platform import (Client, Schema, Key)
 from decentriq_platform import VerificationOptions, SessionOptions, PollingOptions
 import random
 
 from decentriq_platform.proto.data_room_pb2 import (
-        DataRoom, Table,
-        Query, Role,
-        Permission
+    DataRoom, Table,
+    Query, Role,
+    Permission
 )
 
-# Credentials
-insurance_email = os.environ["USER_MAIL_1"]
-api_token1 = os.environ["API_TOKEN_1"]
+# ============================================================================================================================
+# 0. INTRO
+# An insurance and a bank decide to collaborate in a privacy-preserving on their customer data using the Decentriq platform.
+# For the purpose of this demo, both users are represented in the same script. In a production setup, the users would of course
+# operate from different locations.
 
-bank_email = os.environ["USER_MAIL_2"]
-api_token2 = os.environ["API_TOKEN_2"]
+# Get credentials from previously set environment variables
+email_i = os.environ["USER_MAIL_1"]
+api_token_i = os.environ["API_TOKEN_1"]
 
-# =========================================================================================
+email_b = os.environ["USER_MAIL_2"]
+api_token_b = os.environ["API_TOKEN_2"]
 
-# 1. Create Client & Session
-# The insurance company and the bank decide to collaborate sing their data and agrees
-# to use DecentriQ platform. First of all they run a client each and open a session with
-# the enclave.
+print("Insurance user: {}".format(email_i))
+print("Bank user: {}".format(email_b))
 
-# Creates a new client and initializes an API inside it with host, port, use_tls and the token
-# The purpouse of the client is to enstablish the connection to our backend and allow then
-# the communication with the enclaves.
-# The API itself initializes a requests session by setting the base URL, the token, etc.
-# In the API, also the endpoints are defined.
-
-# Client for the insurance company
-client_insurance = Client(api_token=api_token1)
-# Client for the bank
-client_bank = Client(api_token=api_token2)
-
-# This returns the root cert of the client
-root_ca_cert_insurance = client_insurance.get_ca_root_certificate()
-root_ca_cert_bank = client_bank.get_ca_root_certificate()
-
-# Generates an RSA (asymmetric) keypair
-# Generates a certificate signing request (email address + public key,
-# signed over with private part of the newly generated key).
-# Posts it to the USER_CERTIFICATES endpoint (replaced by the user id) to get the signed certificate
-# Creates and returns an Auth object that can (get user id, get certificate chain, sign data)
-
-auth_insurance = client_insurance.create_auth(insurance_email)
-auth_bank = client_bank.create_auth(bank_email)
-
-# Posts enclave identifier (aka MRENCLAVE) to SESSIONS endpoint and parses a session id from the response
-# Creates and returns a Sessions object
-# - GET SESSION_FATQUOTE returns (certificate, message, signature, fatquote)
-# - verifies (certificate, message, signature) against enclave identifier
-
-enclave_identifiers = client_bank.get_enclave_identifiers()
-# We take the fist enclave identifier for the demo, since the version we use is not important.
-# In a production scenario, the identifier here should be a value of an enclave
-# for which the client audited or trusts the code.
-# When enclaves share the same identifier, they are part of the same cluster
-# and queries executed in distribued execution mode
-# will be divided in tasks to be solved indipendently inside the cluster.
-mrenclave = enclave_identifiers[0]
+# ============================================================================================================================
+# 1. CREATE CLIENT & SESSION
+# First, both each create a client and open a session with the enclave.
+#
+# The purpose of the client is to enstablish the connection to the backend and allow then
+# the communication with the enclaves (the confidential computing system).
+#
+# Using the client it is possible to create a session object, which enables communication
+# with the enclave, so that the user can create a data room, provision data or send queries.
 
 
-# Using the client it is possible to create a Session object, which allow the communication
-# with the enclave, so that the user can create a dataroom, upload data to it or send queries
-session_insurance = client_insurance.create_session(
+def create_client_and_session(email, api_token):
+
+    client = Client(api_token=api_token)
+
+    # The auth object contains the information required to open a secure connection with the enclave
+    auth = client.create_auth(email)
+
+    # NOTE:
+    # We take the first available enclave identifier (hash of the binary, also referred to as "mrenclave") for the demo.
+    # In a production scenario, the identifier here should be a value of an enclave for which the user audited or trusts the code.
+    enclave_identifiers = client.get_enclave_identifiers()
+    mrenclave = enclave_identifiers[0]
+
+    session = client.create_session(
         mrenclave,
-        auth_insurance,  # The auth object contains the information required to open a secure connection with the enclave
+        auth,
         SessionOptions(
             VerificationOptions(
-                accept_debug=True,  # Accept enclaves quotes with the DEBUG flag
-                accept_configuration_needed=True,  # Accept quotes with the CONFIGURATION_NEEDED status
-                accept_group_out_of_date=True  # Accept quotest with the GROUP_OUT_OF_DATE status
+                accept_debug=True,  # Accept enclaves quotes with the DEBUG flag (demo only)
+                # Accept quotes with the CONFIGURATION_NEEDED status (demo only)
+                accept_configuration_needed=True,
+                # Accept quotest with the GROUP_OUT_OF_DATE status (demo only)
+                accept_group_out_of_date=True
             )
         )
     )
 
-session_bank = client_bank.create_session(
-    mrenclave,
-    auth_bank,
-    SessionOptions(
-        VerificationOptions(
-            accept_debug=True,
-            accept_configuration_needed=True,
-            accept_group_out_of_date=True
-        )
-    )
-)
+    return client, session, mrenclave
 
 
-# =========================================================================================
+client_i, session_i, mrenclave = create_client_and_session(email_i, api_token_i)
+client_b, session_b, _ = create_client_and_session(email_b, api_token_b)
 
-# 2. Create DataRoom
-# Both the insurance company and the bank have an open session with our enclave
-# The insurance company creates a dataroom
+print("Created insurance and bank clients and sessions.")
 
-# A dataroom is a declaration of how a particular data collaboration between different users looks like.
-# It declares the shape of the shared data (SQL schemas) and defines access control over
-# how the data can be uploaded and queried.
-data_room = DataRoom()
-# set a random ID
-data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
-# set the MRENCLAVE
-data_room.mrenclave = mrenclave
+# ============================================================================================================================
+# 2. CREATE DATA ROOM
+# The insurance company creates a data room. A data room is a declaration of how a particular data collaboration
+# between the users looks like. It declares who should provide what data (SQL schemas and upload permissions) and
+# who can run and access which queries (SQL and query permissions).
 
-# query execution mode
-# if distributed:
-#     # force distributed queries..
-#     data_room.queryExecutionMode.distributedExecutionMode.targetParallelism = 64
-#     data_room.queryExecutionMode.distributedExecutionMode.chunkSize = 8388608
-#     data_room.queryExecutionMode.distributedExecutionMode.maxChunkCountInMemory = 64
 
-# add insurance table
-create_table_i = "CREATE TABLE insurance_customers (first_name TEXT NOT NULL, \
-surname TEXT NOT NULL,zipcode INT NOT NULL,age TEXT NOT NULL,gender TEXT NOT NULL,\
-insurproduct TEXT NOT NULL);"
-schema_i = Schema(create_table_i)
-table_i = Table()
-table_i.sqlCreateTableStatement = create_table_i
-data_room.tables.append(table_i)
+def build_insurance_bank_data_room(mrenclave, create_table_i, create_table_b, query_name_overlap, query_overlap_select_statement, email_i, email_b, root_ca_cert):
 
-# add banking table
-create_table_b = "CREATE TABLE bank_customers (first_name TEXT NOT NULL,surname TEXT NOT NULL\
-,zipcode INT NOT NULL,age TEXT NOT NULL,gender TEXT NOT NULL,bankproduct TEXT NOT NULL,\
-income TEXT NOT NULL);"
-schema_b = Schema(create_table_b)
-table_b = Table()
-table_b.sqlCreateTableStatement = create_table_b
-data_room.tables.append(table_b)
+    data_room = DataRoom()
 
-# add queries
-# The query regards the geographical overlap of common customers.
+    # set a random ID
+    data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
+
+    # set mrenclave
+    data_room.mrenclave = mrenclave
+
+    # add tables
+    table_i = Table()
+    schema_i = Schema(create_table_i)
+    table_i.sqlCreateTableStatement = create_table_i
+    data_room.tables.append(table_i)
+
+    table_b = Table()
+    schema_b = Schema(create_table_b)
+    table_b.sqlCreateTableStatement = create_table_b
+    data_room.tables.append(table_b)
+
+    # add queries
+    query_overlap = Query()
+    query_overlap.queryName = query_name_overlap
+    query_overlap.sqlSelectStatement = query_overlap_select_statement
+    data_room.queries.append(query_overlap)
+
+    # add roles
+
+    # role_b (can upload the bank_customers table and run query_overlap)
+    role_b = Role()
+    role_b.roleName = "bank_data_owner"
+    role_b.emailRegex = email_b
+    role_b.authenticationMethod.trustedPki.rootCertificate = root_ca_cert
+
+    upload_permission_b = Permission()
+    upload_permission_b.tableCrudPermission.tableName = schema_b.table_name
+    role_b.permissions.append(upload_permission_b)
+
+    query_overlap_permission = Permission()
+    query_overlap_permission.submitQueryPermission.queryName = query_name_overlap
+    role_b.permissions.append(query_overlap_permission)
+
+    data_room.roles.append(role_b)
+
+    # role_i (can only upload to the insurance_customers table)
+    role_i = Role()
+    role_i.roleName = "insurance_data_owner"
+    role_i.emailRegex = email_i
+    role_i.authenticationMethod.trustedPki.rootCertificate = root_ca_cert
+
+    upload_permission_i = Permission()
+    upload_permission_i.tableCrudPermission.tableName = schema_i.table_name
+    role_i.permissions.append(upload_permission_i)
+
+    data_room.roles.append(role_i)
+
+    return data_room
+
+
+# insurance_customers table
+create_table_i = """
+    CREATE TABLE insurance_customers (
+        first_name TEXT NOT NULL,
+        surname TEXT NOT NULL,
+        zipcode INT NOT NULL,
+        age TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        insurproduct TEXT NOT NULL
+    );"""
+
+# bank_customers table
+create_table_b = """
+    CREATE TABLE bank_customers (
+        first_name TEXT NOT NULL,
+        surname TEXT NOT NULL,
+        zipcode INT NOT NULL,
+        age TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        bankproduct TEXT NOT NULL,
+        income TEXT NOT NULL
+    );"""
+
+# overlap_query
 query_name_overlap = "overlap_query"
-query_overlap_select_statement = "SELECT insurance_customers.zipcode, COUNT(*)\nFROM insurance_customers\
- INNER JOIN bank_customers ON insurance_customers.first_name = bank_customers.first_name AND \
-  \tinsurance_customers.surname = bank_customers.surname AND\tinsurance_customers.zipcode = bank_customers.zipcode \
-  \nGROUP BY insurance_customers.zipcode"
-query_overlap = Query()
-query_overlap.queryName = query_name_overlap
-query_overlap.sqlSelectStatement = query_overlap_select_statement
-data_room.queries.append(query_overlap)
+query_overlap_select_statement = """
+    SELECT insurance_customers.zipcode, COUNT(*)
+    FROM insurance_customers INNER JOIN bank_customers 
+        ON insurance_customers.first_name = bank_customers.first_name AND
+           insurance_customers.surname = bank_customers.surname AND
+           insurance_customers.zipcode = bank_customers.zipcode
+    GROUP BY insurance_customers.zipcode
+ """
 
-# add roles
-# Data owner from the bank
-bank_role = Role()
-bank_role.roleName = "bank_data_owner"
-bank_role.emailRegex = bank_email
-bank_role.authenticationMethod.trustedPki.rootCertificate = root_ca_cert_bank
+# This is the root certificate of an identity provider that is trusted with signing user certificates
+# Currently, Decentriq's identity provider is used - but custom providers can be used.
+root_ca_cert = client_i.get_ca_root_certificate()
 
-# Can upload the bank table
-upload_permission_b = Permission()
-upload_permission_b.tableCrudPermission.tableName = schema_b.table_name
-bank_role.permissions.append(upload_permission_b)
+# build the data room
+data_room = build_insurance_bank_data_room(mrenclave, create_table_i, create_table_b, query_name_overlap,
+                                           query_overlap_select_statement, email_i, email_b, root_ca_cert)
 
-# Has permition for query 1
-query_overlap_permission = Permission()
-query_overlap_permission.submitQueryPermission.queryName = query_name_overlap
-bank_role.permissions.append(query_overlap_permission)
+# create the dataroom in the enclave
+data_room_hash = session_i.create_data_room(data_room).dataRoomHash
 
-data_room.roles.append(bank_role)
+print("Successfully published data room with hash: {}".format(data_room_hash.hex()))
 
-# Data owner from the insurance company
-insurance_role = Role()
-insurance_role.roleName = "insurance_data_owner"
-insurance_role.emailRegex = insurance_email
-insurance_role.authenticationMethod.trustedPki.rootCertificate = root_ca_cert_insurance
+# ============================================================================================================================
+# 3. UPLOAD AND PUBLISH DATA
+# Now the data room has been created, the insurance and the bank can provision their datasets. They do this in two steps.
+# First they encrypt their data locally and upload it to the Decentriq platform. Then in a second step, they provision the
+# decryption key to the enclave.
 
-# Can upload the insurance table
-upload_permission_i = Permission()
-upload_permission_i.tableCrudPermission.tableName = schema_i.table_name
-insurance_role.permissions.append(upload_permission_i)
-
-# Has permition for the query
-insurance_role.permissions.append(query_overlap_permission)
-
-data_room.roles.append(insurance_role)
-
-# create dataroom
-data_room_hash = session_insurance.create_data_room(data_room).dataRoomHash
+# Encrypt & upload data
 
 
-# =========================================================================================
+def encrypt_and_upload_dataset(client, schema, email, path):
+    key = Key()
+    with open(path, "r", buffering=1024 ** 2) as events_stream:
+        manifest_hash = client.upload_dataset(
+            email,
+            schema.table_name,
+            events_stream,
+            schema,
+            key
+        )
+    return manifest_hash, key
 
-# 3. Upload and publish data
-# Now the insurance company and the bank can upload their datasets to the dataroom
 
-
-# Insurance Dataset
-create_table_i = "CREATE TABLE insurance_customers (first_name TEXT NOT NULL, \
-surname TEXT NOT NULL,zipcode INT NOT NULL,age TEXT NOT NULL,gender TEXT NOT NULL,\
-insurproduct TEXT NOT NULL);"
-schema_i = Schema(create_table_i)
-key_i = Key()
 path_i = "./fixtures/B+I-v2_Insurance_1000.csv"
-with open(path_i, "r", buffering=1024 ** 2) as events_stream:
-    manifest_hash_i = client_insurance.upload_dataset(
-        insurance_email,
-        schema_i.table_name,
-        events_stream,
-        schema_i,
-        key_i
-    )
+schema_i = Schema(create_table_i)
+manifest_hash_i, key_i = encrypt_and_upload_dataset(
+    client_i, schema_i, email_i, path_i)
 
-# Bank Dataset
-create_table_b = "CREATE TABLE bank_customers (first_name TEXT NOT NULL,surname TEXT NOT NULL\
-,zipcode INT NOT NULL,age TEXT NOT NULL,gender TEXT NOT NULL,bankproduct TEXT NOT NULL,\
-income TEXT NOT NULL);"
-schema_b = Schema(create_table_b)
-key_b = Key()
 path_b = "./fixtures/B+I-v2_Bank_1000.csv"
-with open(path_b, "r", buffering=1024 ** 2) as events_stream:
-    manifest_hash_b = client_bank.upload_dataset(
-        bank_email,
-        schema_b.table_name,
-        events_stream,
-        schema_b,
-        key_b
-    )
+schema_b = Schema(create_table_b)
+manifest_hash_b, key_b = encrypt_and_upload_dataset(client_b, schema_b, email_b, path_b)
 
-# publish bank dataset
-session_bank.publish_dataset_to_data_room(
-        manifest_hash_b,
-        data_room_hash,
-        schema_b.table_name,
-        key_b
+# Publish datasets by providing the encryption keys to the enclave
+session_i.publish_dataset_to_data_room(
+    manifest_hash_i,
+    data_room_hash,
+    schema_i.table_name,
+    key_i
 )
 
-# publish insurance dataset
-session_insurance.publish_dataset_to_data_room(
-        manifest_hash_i,
-        data_room_hash,
-        schema_i.table_name,
-        key_i
+session_b.publish_dataset_to_data_room(
+    manifest_hash_b,
+    data_room_hash,
+    schema_b.table_name,
+    key_b
 )
 
+print("Encrypted, uploaded and provisioned insurance and bank data sets to data room.")
 
-# =========================================================================================
+# ============================================================================================================================
+# 4. RUN THE QUERY
+# The bank runs the overlap query and prints the results
 
-# 4. Running the query
-# The insurance company runs the overlap query
-
-results = session_insurance.make_sql_query(
-        data_room_hash,
-        "overlap_query",
-        PollingOptions(interval=1000)
+results = session_b.make_sql_query(
+    data_room_hash,
+    query_name_overlap,
+    PollingOptions(interval=1000)
 )
 
+print("Submitted query and received results:")
 print(results)
