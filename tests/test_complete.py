@@ -9,7 +9,7 @@ from decentriq_platform import (
         Session, SessionOptions, VerificationOptions, PollingOptions
 )
 from decentriq_platform.proto.data_room_pb2 import (
-        DataRoom, Table, 
+        DataRoom, Table,
         Query, Role,
         Permission
 )
@@ -35,7 +35,7 @@ def create_session(email: str, api_token: str, custom_auth: Auth = None) -> Tupl
     enclave_identifiers = analyst.get_enclave_identifiers()
     analyst_session = analyst.create_session(
             enclave_identifiers[0],
-            analyst_auth,
+            {"role": analyst_auth},
             SessionOptions(
                 VerificationOptions(
                     accept_debug=True,
@@ -92,7 +92,7 @@ def create_events_data_room(events_table_name: str, root_ca_cert: bytes, distrib
     data_room.mrenclave = enclave_identifiers[0]
 
     if distributed:
-        # force distributed queries.. 
+        # force distributed queries..
         data_room.queryExecutionMode.distributedExecutionMode.targetParallelism = 64
         data_room.queryExecutionMode.distributedExecutionMode.chunkSize = 8388608
         data_room.queryExecutionMode.distributedExecutionMode.maxChunkCountInMemory = 64
@@ -277,7 +277,7 @@ def test_get_initial_weights_containers_distrib():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "initial_weights_containers",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -316,7 +316,8 @@ def test_get_initial_weights_containers():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "initial_weights_containers",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
+
     )
     assert len(results) > 100
 
@@ -355,7 +356,8 @@ def test_get_delta_weights_containers():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "delta_weights_containers",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
+
     )
     assert len(results) > 100
 
@@ -394,7 +396,7 @@ def test_get_delta_weights_containers_distrib():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "delta_weights_containers",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -433,7 +435,7 @@ def test_get_delta_dwelltime_distrib():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "dwelltime_deltas",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -472,7 +474,7 @@ def test_get_delta_dwelltime():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "dwelltime_deltas",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -575,7 +577,7 @@ def test_multiple_data_providers():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "dwelltime_deltas",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -616,7 +618,7 @@ def test_multiple_data_providers_distrib():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "dwelltime_deltas",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -711,7 +713,7 @@ def test_synthetic_user_id():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "positivea",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     users = map(lambda l: l[0].split(':')[0], results)
     assert Counter(users) == Counter([os.environ["TEST_USER_ID_2"]] * 2 + [os.environ["TEST_USER_ID_3"]] * 2)
@@ -868,7 +870,7 @@ def test_non_default_pki():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "positivea",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     roots = map(lambda l: l[0].split(':')[1], results)
     assert len(Counter(roots)) == 1
@@ -979,7 +981,7 @@ def test_different_root_same_user():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "positivea",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     user_ids = map(lambda l: l[0], results)
     assert len(Counter(user_ids)) == 2
@@ -1240,7 +1242,7 @@ def test_slow_boat_to_nagasaki_distrib():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "slow_boat",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
     assert len(results) > 100
 
@@ -1337,7 +1339,7 @@ def test_fuzzy_matching():
     results = analyst_session.make_sql_query(
             data_room_hash,
             "simple_query",
-            PollingOptions(interval=1000)
+            polling_options = PollingOptions(interval=1000)
     )
 
     assert len(results) == 1

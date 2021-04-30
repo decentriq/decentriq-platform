@@ -25,6 +25,11 @@ message WaterfrontResponse {
     }
 }
 
+message AuthenticationData {
+    required string role = 1;
+    optional string passwordSha256 = 2;
+}
+
 message CreateDataRoomRequest {
     required data_room.DataRoom dataRoom = 1;
 }
@@ -51,6 +56,7 @@ message PublishDatasetToDataRoomRequest {
     required bytes dataRoomHash = 2;
     required string dataRoomTableName = 3;
     required EncryptionKey encryptionKey = 4;
+    required AuthenticationData auth = 5;
 }
 
 message PublishDatasetToDataRoomResponse {
@@ -75,6 +81,7 @@ message ValidateDatasetResponse {
 message SqlQueryRequest {
     required string queryName = 1;
     required bytes dataRoomHash = 2;
+    required AuthenticationData auth = 5;
 }
 
 // If the content bytes here are empty, then we use this to indicate
@@ -85,6 +92,7 @@ message SqlQueryResponse {
 
 message RetrieveDataRoomRequest {
     required bytes dataRoomHash = 1;
+    required AuthenticationData auth = 5;
 }
 
 message RetrieveDataRoomResponse {

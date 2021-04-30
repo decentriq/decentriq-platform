@@ -4,7 +4,7 @@ import queue
 import os
 from concurrent import futures
 from typing_extensions import TypedDict
-from typing import List, TypeVar
+from typing import List, TypeVar, Dict
 from .session import B64EncodedMessage, Session, SessionOptions
 from .config import (
         DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
@@ -76,21 +76,20 @@ class Client:
         response: EnclaveIdentifiersResponse = self.api.get(url).json()
         return response["enclaveIdentifiers"]
 
-    def create_auth(self, email: str) -> Auth:
+    def create_auth(self, email: str, access_token: str = None) -> Auth:
         keypair = generate_key()
         csr = generate_csr(email, keypair)
         url = Endpoints.USER_CERTIFICATE.replace(":userId", email)
         csr_req = UserCsrRequest(csrPem=csr.decode("utf-8"))
         resp: UserCsrResponse = self.api.post(url, req_body=json.dumps(csr_req)).json()
         cert_chain_pem = resp["certChainPem"].encode("utf-8")
-        auth = Auth(cert_chain_pem, keypair, email)
+        auth = Auth(cert_chain_pem, keypair, email, access_token)
         return auth
-
 
     def create_session(
             self,
             enclave_identifier: str,
-            auth: Auth,
+            auth: Dict[str, Auth],
             options: SessionOptions
     ) -> Session:
         url = Endpoints.SESSIONS

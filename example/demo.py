@@ -38,7 +38,7 @@ print("Bank user: {}".format(email_b))
 # with the enclave, so that the user can create a data room, provision data or send queries.
 
 
-def create_client_and_session(email, api_token):
+def create_client_and_session(email, api_token, role):
 
     client = Client(api_token=api_token)
 
@@ -53,7 +53,7 @@ def create_client_and_session(email, api_token):
 
     session = client.create_session(
         mrenclave,
-        auth,
+        {role: auth},
         SessionOptions(
             VerificationOptions(
                 accept_debug=True,  # Accept enclaves quotes with the DEBUG flag (demo only)
@@ -68,8 +68,8 @@ def create_client_and_session(email, api_token):
     return client, session, mrenclave
 
 
-client_i, session_i, mrenclave = create_client_and_session(email_i, api_token_i)
-client_b, session_b, _ = create_client_and_session(email_b, api_token_b)
+client_i, session_i, mrenclave = create_client_and_session(email_i, api_token_i, "insurance_data_owner")
+client_b, session_b, _ = create_client_and_session(email_b, api_token_b, "bank_data_owner")
 
 print("Created insurance and bank clients and sessions.")
 
@@ -167,7 +167,7 @@ create_table_b = """
 query_name_overlap = "overlap_query"
 query_overlap_select_statement = """
     SELECT insurance_customers.zipcode, COUNT(*)
-    FROM insurance_customers INNER JOIN bank_customers 
+    FROM insurance_customers INNER JOIN bank_customers
         ON insurance_customers.first_name = bank_customers.first_name AND
            insurance_customers.surname = bank_customers.surname AND
            insurance_customers.zipcode = bank_customers.zipcode

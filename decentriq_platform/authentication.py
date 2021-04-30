@@ -6,13 +6,17 @@ from cryptography.hazmat.primitives import hashes, serialization
 PKey = rsa.RSAPrivateKey;
 
 class Auth:
-    def __init__(self, certificate_chain: bytes, keypair: PKey, user_id: str):
+    def __init__(self, certificate_chain: bytes, keypair: PKey, user_id: str, access_token: str = None):
         self.certificate_chain: bytes = certificate_chain
         self.kp: PKey = keypair
         self.user_id: str = user_id
+        self.access_token: str = access_token
 
     def get_user_id(self) -> str:
         return self.user_id
+
+    def get_access_token(self) -> str:
+        return self.access_token
 
     def get_certificate_chain_pem(self) -> bytes:
         return self.certificate_chain

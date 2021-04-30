@@ -20,7 +20,7 @@ from .verification import QuoteBody, Verification
 from .api import Endpoints
 from .storage import Key
 from .authentication import Auth, Sigma
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 if TYPE_CHECKING:
     from .client import Client
 
@@ -79,7 +79,7 @@ class Session():
             client: Client,
             session_id: str,
             enclave_identifier: str,
-            auth: Auth,
+            auth: Dict[str, Auth],
             options: SessionOptions
     ):
         url = Endpoints.SESSION_FATQUOTE.replace(":sessionId", session_id)
@@ -107,22 +107,28 @@ class Session():
     @overload
     def make_sql_query(self, data_room_hash: bytes, query_name: str) -> Union[List[List[str]], None]: ...
     @overload
-    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: PollingOptions) -> List[List[str]]: ...
-    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: Optional[PollingOptions] = None) -> Union[List[List[str]], None]:
+    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: PollingOptions, role: str = None) -> List[List[str]]: ...
+    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: Optional[PollingOptions] = None, role: str = None) -> Union[List[List[str]], None]:
         req = WaterfrontRequest()
         req.sqlQueryRequest.queryName = query_name
         req.sqlQueryRequest.dataRoomHash = data_room_hash
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.sqlQueryRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.sqlQueryRequest.auth.passwordSha256 = auth.get_access_token()
+
         if polling_options is None:
-            return self._get_query_results(req)
+            return self._get_query_results(req, auth)
         else:
             while True:
-                results = self._get_query_results(req)
+                results = self._get_query_results(req, auth)
                 if results is not None:
                     return results
                 time.sleep(polling_options.interval/1000)
 
-    def _get_query_results(self, request: WaterfrontRequest) -> Union[List[List[str]], None]:
-        response = self._send_and_parse_message(request)
+    def _get_query_results(self, request: WaterfrontRequest, auth: Auth) -> Union[List[List[str]], None]:
+        response = self._send_and_parse_message(request, auth)
         if not response.HasField("sqlQueryResponse"):
             raise Exception(
                 "Expected inference response, got "
@@ -131,13 +137,15 @@ class Session():
         if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
             response_content = response.sqlQueryResponse.data.decode('utf-8')
             return list(csv.reader(io.StringIO(response_content)))
-        else: 
+        else:
             return None
 
-    def create_data_room(self, data_room: DataRoom) -> CreateDataRoomResponse:
+    def create_data_room(self, data_room: DataRoom, role: str = None) -> CreateDataRoomResponse:
         req = WaterfrontRequest()
         req.createDataRoomRequest.dataRoom.CopyFrom(data_room)
-        response = self._send_and_parse_message(req)
+
+        _, auth = self._get_auth_for_role(role)
+        response = self._send_and_parse_message(req, auth)
         if not response.HasField("createDataRoomResponse"):
             raise Exception(
                 "Expected createDataRoomResponse, got "
@@ -145,10 +153,16 @@ class Session():
             )
         return response.createDataRoomResponse
 
-    def retrieve_data_room(self, data_room_hash: bytes) -> DataRoom:
+    def retrieve_data_room(self, data_room_hash: bytes, role: str = None) -> DataRoom:
         req = WaterfrontRequest()
         req.retrieveDataRoomRequest.dataRoomHash = data_room_hash
-        response = self._send_and_parse_message(req)
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.retrieveDataRoomRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.retrieveDataRoomRequest.auth.passwordSha256 = auth.get_access_token()
+
+        response = self._send_and_parse_message(req, auth)
         if not response.HasField("retrieveDataRoomResponse"):
             raise Exception(
                 "Expected retrieveDataRoomResponse, got "
@@ -161,7 +175,8 @@ class Session():
             manifest_hash: bytes,
             data_room_hash: bytes,
             data_room_table_name: str,
-            key: Key
+            key: Key,
+            role: str = None
     ):
         req = WaterfrontRequest()
         req.publishDatasetToDataRoomRequest.manifestHash = manifest_hash
@@ -169,7 +184,13 @@ class Session():
         req.publishDatasetToDataRoomRequest.dataRoomTableName = data_room_table_name
         req.publishDatasetToDataRoomRequest.encryptionKey.material = key.material
         req.publishDatasetToDataRoomRequest.encryptionKey.salt = key.salt
-        response = self._send_and_parse_message(req)
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.publishDatasetToDataRoomRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.publishDatasetToDataRoomRequest.auth.passwordSha256 = auth.get_access_token()
+
+        response = self._send_and_parse_message(req, auth)
         if not response.HasField("publishDatasetToDataRoomResponse"):
             raise Exception(
                 "Expected publishDatasetToDataRoomResponse, got "
@@ -179,37 +200,40 @@ class Session():
     def validate_dataset(
             self,
             manifest_hash: bytes,
-            key: Key
+            key: Key,
+            role: str = None
     ):
+
+        _, auth = self._get_auth_for_role(role)
         req = WaterfrontRequest()
         req.validateDatasetRequest.manifestHash = manifest_hash
         req.validateDatasetRequest.encryptionKey.material = key.material
         req.validateDatasetRequest.encryptionKey.salt = key.salt
-        response = self._send_and_parse_message(req)
+        response = self._send_and_parse_message(req, auth)
         if not response.HasField("validateDatasetResponse"):
             raise Exception(
                 "Expected validateDatasetResponse, got "
                 + response.WhichOneof("waterfront_response")
             )
         return response.validateDatasetResponse
-    
+
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
 
-    def _encrypt_and_encode_data(self, data: bytes) -> bytes:
+    def _encrypt_and_encode_data(self, data: bytes, auth: Auth) -> bytes:
         nonce = chily.Nonce.from_random()
         cipher = chily.Cipher(
             self.keypair.secret, self._get_enclave_pubkey()
         )
         enc_data = cipher.encrypt(data, nonce)
         public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
-        signature = self.auth.sign(public_keys)
+        signature = auth.sign(public_keys)
         shared_key = bytes(self.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes)
         hkdf = HKDF(algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b"")
         mac_key = hkdf.derive(shared_key)
-        mac_tag = hmac.digest(mac_key, self.auth.get_user_id().encode(), "sha512")
-        sigma_auth = Sigma(signature, mac_tag, self.auth)
+        mac_tag = hmac.digest(mac_key, auth.get_user_id().encode(), "sha512")
+        sigma_auth = Sigma(signature, mac_tag, auth)
         return datanoncepubkey_to_message(
             bytes(enc_data),
             bytes(nonce.bytes),
@@ -224,21 +248,21 @@ class Session():
         )
         return cipher.decrypt(dec_data, chily.Nonce.from_bytes(nonceB))
 
-    def _send_and_parse_message(self, message: WaterfrontRequest) -> WaterfrontResponse:
+    def _send_and_parse_message(self, message: WaterfrontRequest, auth: Auth) -> WaterfrontResponse:
         waterfront_response = WaterfrontResponse()
-        self._send_message(message, waterfront_response)
+        self._send_message(message, waterfront_response, auth)
         if waterfront_response.HasField("failure"):
             raise Exception(waterfront_response.failure)
         return waterfront_response
 
-    def _send_message(self, message: Message, response_object: Message):
-        encrypted = self._encrypt_and_encode_data(serialize_length_delimited(message))
+    def _send_message(self, message: Message, response_object: Message, auth: Auth):
+        encrypted = self._encrypt_and_encode_data(serialize_length_delimited(message), auth)
         request = Request()
         request.avatoRequest = encrypted
         url = Endpoints.SESSION_MESSAGES.replace(":sessionId", self.session_id)
         serialized_request = serialize_length_delimited(request)
         enclave_message = B64EncodedMessage(data=b64encode(serialized_request).decode("ascii"))
-        
+
         enclave_response: B64EncodedMessage = self.client.api.post(
             url, json.dumps(enclave_message), {"Content-type": "application/json"}
         ).json()
@@ -250,3 +274,16 @@ class Session():
         decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
         parse_length_delimited(decrypted_response, response_object)
 
+    def _get_auth_for_role(self, role: str = None) -> Tuple[str, Auth]:
+        if len(self.auth) == 0:
+            raise Exception("No auth objects")
+        if role is None:
+            if len(self.auth) > 1:
+                raise Exception("No role specififed but multiple auths")
+            else:
+                return (list(self.auth.keys())[0], list(self.auth.values())[0])
+        else:
+            if self.auth.has_key(role):
+                return (role, self.auth.get(role))
+            else:
+                raise Exception("No auth found for specififed role")

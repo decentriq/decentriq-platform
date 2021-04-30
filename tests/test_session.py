@@ -8,8 +8,10 @@ def test_session_creation():
 
     client = Client(api_token=api_token, client_id=client_id)
     enclave_identifier = client.get_enclave_identifiers()[0]
+
     auth = client.create_auth(user_email)
-    client.create_session(enclave_identifier, auth, SessionOptions(
+    client.create_session(enclave_identifier, {"role": auth}, SessionOptions(
+
         VerificationOptions(
             accept_debug=True,
             accept_group_out_of_date=True,

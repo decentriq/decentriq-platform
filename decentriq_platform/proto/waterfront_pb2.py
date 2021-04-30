@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10waterfront.proto\x12\nwaterfront\x1a\x11\x63olumn_type.proto\x1a\x0f\x64\x61ta_room.proto\"\x8b\x03\n\x11WaterfrontRequest\x12\x36\n\x0fsqlQueryRequest\x18\x02 \x01(\x0b\x32\x1b.waterfront.SqlQueryRequestH\x00\x12\x42\n\x15\x63reateDataRoomRequest\x18\x05 \x01(\x0b\x32!.waterfront.CreateDataRoomRequestH\x00\x12V\n\x1fpublishDatasetToDataRoomRequest\x18\x06 \x01(\x0b\x32+.waterfront.PublishDatasetToDataRoomRequestH\x00\x12\x46\n\x17retrieveDataRoomRequest\x18\x07 \x01(\x0b\x32#.waterfront.RetrieveDataRoomRequestH\x00\x12\x44\n\x16validateDatasetRequest\x18\x08 \x01(\x0b\x32\".waterfront.ValidateDatasetRequestH\x00\x42\x14\n\x12waterfront_request\"\xaa\x03\n\x12WaterfrontResponse\x12\x11\n\x07\x66\x61ilure\x18\x01 \x01(\tH\x00\x12\x38\n\x10sqlQueryResponse\x18\x03 \x01(\x0b\x32\x1c.waterfront.SqlQueryResponseH\x00\x12\x44\n\x16\x63reateDataRoomResponse\x18\x06 \x01(\x0b\x32\".waterfront.CreateDataRoomResponseH\x00\x12X\n publishDatasetToDataRoomResponse\x18\x07 \x01(\x0b\x32,.waterfront.PublishDatasetToDataRoomResponseH\x00\x12H\n\x18retrieveDataRoomResponse\x18\x08 \x01(\x0b\x32$.waterfront.RetrieveDataRoomResponseH\x00\x12\x46\n\x17validateDatasetResponse\x18\t \x01(\x0b\x32#.waterfront.ValidateDatasetResponseH\x00\x42\x15\n\x13waterfront_response\">\n\x15\x43reateDataRoomRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"\x95\x01\n\x16\x43reateDataRoomResponse\x12\x16\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\x0cH\x00\x12\x46\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32#.waterfront.DataRoomValidationErrorH\x00\x42\x1b\n\x19\x63reate_data_room_response\"\xac\x01\n\x17\x44\x61taRoomValidationError\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x12\n\nqueryIndex\x18\x02 \x01(\x04\x12\x13\n\x0b\x63olumnIndex\x18\x03 \x01(\x04\x12\x12\n\ntableIndex\x18\x04 \x01(\x04\x12\x11\n\troleIndex\x18\x05 \x01(\x04\x12\x17\n\x0fpermissionIndex\x18\x06 \x01(\x04\x12\x17\n\x0f\x63onstraintIndex\x18\x07 \x01(\x04\"\x9a\x01\n\x1fPublishDatasetToDataRoomRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12\x19\n\x11\x64\x61taRoomTableName\x18\x03 \x02(\t\x12\x30\n\rencryptionKey\x18\x04 \x02(\x0b\x32\x19.waterfront.EncryptionKey\"\"\n PublishDatasetToDataRoomResponse\"`\n\x16ValidateDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x30\n\rencryptionKey\x18\x02 \x02(\x0b\x32\x19.waterfront.EncryptionKey\"6\n\x16ValidateDatasetFailure\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x0b\n\x03row\x18\x02 \x01(\x04\"N\n\x17ValidateDatasetResponse\x12\x33\n\x07\x66\x61ilure\x18\x01 \x01(\x0b\x32\".waterfront.ValidateDatasetFailure\":\n\x0fSqlQueryRequest\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\" \n\x10SqlQueryResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"/\n\x17RetrieveDataRoomRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\"A\n\x18RetrieveDataRoomResponse\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"/\n\rEncryptionKey\x12\x10\n\x08material\x18\x01 \x02(\x0c\x12\x0c\n\x04salt\x18\x02 \x02(\x0c\"<\n\x0bTableSchema\x12-\n\x0cnamedColumns\x18\x01 \x03(\x0b\x32\x17.waterfront.NamedColumn\"H\n\x0bNamedColumn\x12\x0c\n\x04name\x18\x01 \x02(\t\x12+\n\ncolumnType\x18\x02 \x02(\x0b\x32\x17.column_type.ColumnType\"N\n\x0f\x44\x61tasetManifest\x12\x12\n\ndigestHash\x18\x01 \x02(\x0c\x12\'\n\x06schema\x18\x02 \x02(\x0b\x32\x17.waterfront.TableSchema'
+  serialized_pb=b'\n\x10waterfront.proto\x12\nwaterfront\x1a\x11\x63olumn_type.proto\x1a\x0f\x64\x61ta_room.proto\"\x8b\x03\n\x11WaterfrontRequest\x12\x36\n\x0fsqlQueryRequest\x18\x02 \x01(\x0b\x32\x1b.waterfront.SqlQueryRequestH\x00\x12\x42\n\x15\x63reateDataRoomRequest\x18\x05 \x01(\x0b\x32!.waterfront.CreateDataRoomRequestH\x00\x12V\n\x1fpublishDatasetToDataRoomRequest\x18\x06 \x01(\x0b\x32+.waterfront.PublishDatasetToDataRoomRequestH\x00\x12\x46\n\x17retrieveDataRoomRequest\x18\x07 \x01(\x0b\x32#.waterfront.RetrieveDataRoomRequestH\x00\x12\x44\n\x16validateDatasetRequest\x18\x08 \x01(\x0b\x32\".waterfront.ValidateDatasetRequestH\x00\x42\x14\n\x12waterfront_request\"\xaa\x03\n\x12WaterfrontResponse\x12\x11\n\x07\x66\x61ilure\x18\x01 \x01(\tH\x00\x12\x38\n\x10sqlQueryResponse\x18\x03 \x01(\x0b\x32\x1c.waterfront.SqlQueryResponseH\x00\x12\x44\n\x16\x63reateDataRoomResponse\x18\x06 \x01(\x0b\x32\".waterfront.CreateDataRoomResponseH\x00\x12X\n publishDatasetToDataRoomResponse\x18\x07 \x01(\x0b\x32,.waterfront.PublishDatasetToDataRoomResponseH\x00\x12H\n\x18retrieveDataRoomResponse\x18\x08 \x01(\x0b\x32$.waterfront.RetrieveDataRoomResponseH\x00\x12\x46\n\x17validateDatasetResponse\x18\t \x01(\x0b\x32#.waterfront.ValidateDatasetResponseH\x00\x42\x15\n\x13waterfront_response\":\n\x12\x41uthenticationData\x12\x0c\n\x04role\x18\x01 \x02(\t\x12\x16\n\x0epasswordSha256\x18\x02 \x01(\t\">\n\x15\x43reateDataRoomRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"\x95\x01\n\x16\x43reateDataRoomResponse\x12\x16\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\x0cH\x00\x12\x46\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32#.waterfront.DataRoomValidationErrorH\x00\x42\x1b\n\x19\x63reate_data_room_response\"\xac\x01\n\x17\x44\x61taRoomValidationError\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x12\n\nqueryIndex\x18\x02 \x01(\x04\x12\x13\n\x0b\x63olumnIndex\x18\x03 \x01(\x04\x12\x12\n\ntableIndex\x18\x04 \x01(\x04\x12\x11\n\troleIndex\x18\x05 \x01(\x04\x12\x17\n\x0fpermissionIndex\x18\x06 \x01(\x04\x12\x17\n\x0f\x63onstraintIndex\x18\x07 \x01(\x04\"\xc8\x01\n\x1fPublishDatasetToDataRoomRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12\x19\n\x11\x64\x61taRoomTableName\x18\x03 \x02(\t\x12\x30\n\rencryptionKey\x18\x04 \x02(\x0b\x32\x19.waterfront.EncryptionKey\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"\"\n PublishDatasetToDataRoomResponse\"`\n\x16ValidateDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x30\n\rencryptionKey\x18\x02 \x02(\x0b\x32\x19.waterfront.EncryptionKey\"6\n\x16ValidateDatasetFailure\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x0b\n\x03row\x18\x02 \x01(\x04\"N\n\x17ValidateDatasetResponse\x12\x33\n\x07\x66\x61ilure\x18\x01 \x01(\x0b\x32\".waterfront.ValidateDatasetFailure\"h\n\x0fSqlQueryRequest\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\" \n\x10SqlQueryResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"]\n\x17RetrieveDataRoomRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"A\n\x18RetrieveDataRoomResponse\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"/\n\rEncryptionKey\x12\x10\n\x08material\x18\x01 \x02(\x0c\x12\x0c\n\x04salt\x18\x02 \x02(\x0c\"<\n\x0bTableSchema\x12-\n\x0cnamedColumns\x18\x01 \x03(\x0b\x32\x17.waterfront.NamedColumn\"H\n\x0bNamedColumn\x12\x0c\n\x04name\x18\x01 \x02(\t\x12+\n\ncolumnType\x18\x02 \x02(\x0b\x32\x17.column_type.ColumnType\"N\n\x0f\x44\x61tasetManifest\x12\x12\n\ndigestHash\x18\x01 \x02(\x0c\x12\'\n\x06schema\x18\x02 \x02(\x0b\x32\x17.waterfront.TableSchema'
   ,
   dependencies=[column__type__pb2.DESCRIPTOR,data__room__pb2.DESCRIPTOR,])
 
@@ -165,6 +165,45 @@ _WATERFRONTRESPONSE = _descriptor.Descriptor(
 )
 
 
+_AUTHENTICATIONDATA = _descriptor.Descriptor(
+  name='AuthenticationData',
+  full_name='waterfront.AuthenticationData',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='role', full_name='waterfront.AuthenticationData.role', index=0,
+      number=1, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='passwordSha256', full_name='waterfront.AuthenticationData.passwordSha256', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=895,
+  serialized_end=953,
+)
+
+
 _CREATEDATAROOMREQUEST = _descriptor.Descriptor(
   name='CreateDataRoomRequest',
   full_name='waterfront.CreateDataRoomRequest',
@@ -192,8 +231,8 @@ _CREATEDATAROOMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=895,
-  serialized_end=957,
+  serialized_start=955,
+  serialized_end=1017,
 )
 
 
@@ -236,8 +275,8 @@ _CREATEDATAROOMRESPONSE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=960,
-  serialized_end=1109,
+  serialized_start=1020,
+  serialized_end=1169,
 )
 
 
@@ -310,8 +349,8 @@ _DATAROOMVALIDATIONERROR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1112,
-  serialized_end=1284,
+  serialized_start=1172,
+  serialized_end=1344,
 )
 
 
@@ -351,6 +390,13 @@ _PUBLISHDATASETTODATAROOMREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='auth', full_name='waterfront.PublishDatasetToDataRoomRequest.auth', index=4,
+      number=5, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -363,8 +409,8 @@ _PUBLISHDATASETTODATAROOMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1287,
-  serialized_end=1441,
+  serialized_start=1347,
+  serialized_end=1547,
 )
 
 
@@ -388,8 +434,8 @@ _PUBLISHDATASETTODATAROOMRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1443,
-  serialized_end=1477,
+  serialized_start=1549,
+  serialized_end=1583,
 )
 
 
@@ -427,8 +473,8 @@ _VALIDATEDATASETREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1479,
-  serialized_end=1575,
+  serialized_start=1585,
+  serialized_end=1681,
 )
 
 
@@ -466,8 +512,8 @@ _VALIDATEDATASETFAILURE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1577,
-  serialized_end=1631,
+  serialized_start=1683,
+  serialized_end=1737,
 )
 
 
@@ -498,8 +544,8 @@ _VALIDATEDATASETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1633,
-  serialized_end=1711,
+  serialized_start=1739,
+  serialized_end=1817,
 )
 
 
@@ -525,6 +571,13 @@ _SQLQUERYREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='auth', full_name='waterfront.SqlQueryRequest.auth', index=2,
+      number=5, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -537,8 +590,8 @@ _SQLQUERYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1713,
-  serialized_end=1771,
+  serialized_start=1819,
+  serialized_end=1923,
 )
 
 
@@ -569,8 +622,8 @@ _SQLQUERYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1773,
-  serialized_end=1805,
+  serialized_start=1925,
+  serialized_end=1957,
 )
 
 
@@ -589,6 +642,13 @@ _RETRIEVEDATAROOMREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='auth', full_name='waterfront.RetrieveDataRoomRequest.auth', index=1,
+      number=5, type=11, cpp_type=10, label=2,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -601,8 +661,8 @@ _RETRIEVEDATAROOMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1807,
-  serialized_end=1854,
+  serialized_start=1959,
+  serialized_end=2052,
 )
 
 
@@ -633,8 +693,8 @@ _RETRIEVEDATAROOMRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1856,
-  serialized_end=1921,
+  serialized_start=2054,
+  serialized_end=2119,
 )
 
 
@@ -672,8 +732,8 @@ _ENCRYPTIONKEY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1923,
-  serialized_end=1970,
+  serialized_start=2121,
+  serialized_end=2168,
 )
 
 
@@ -704,8 +764,8 @@ _TABLESCHEMA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1972,
-  serialized_end=2032,
+  serialized_start=2170,
+  serialized_end=2230,
 )
 
 
@@ -743,8 +803,8 @@ _NAMEDCOLUMN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2034,
-  serialized_end=2106,
+  serialized_start=2232,
+  serialized_end=2304,
 )
 
 
@@ -782,8 +842,8 @@ _DATASETMANIFEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2108,
-  serialized_end=2186,
+  serialized_start=2306,
+  serialized_end=2384,
 )
 
 _WATERFRONTREQUEST.fields_by_name['sqlQueryRequest'].message_type = _SQLQUERYREQUEST
@@ -838,14 +898,18 @@ _CREATEDATAROOMRESPONSE.oneofs_by_name['create_data_room_response'].fields.appen
   _CREATEDATAROOMRESPONSE.fields_by_name['dataRoomValidationError'])
 _CREATEDATAROOMRESPONSE.fields_by_name['dataRoomValidationError'].containing_oneof = _CREATEDATAROOMRESPONSE.oneofs_by_name['create_data_room_response']
 _PUBLISHDATASETTODATAROOMREQUEST.fields_by_name['encryptionKey'].message_type = _ENCRYPTIONKEY
+_PUBLISHDATASETTODATAROOMREQUEST.fields_by_name['auth'].message_type = _AUTHENTICATIONDATA
 _VALIDATEDATASETREQUEST.fields_by_name['encryptionKey'].message_type = _ENCRYPTIONKEY
 _VALIDATEDATASETRESPONSE.fields_by_name['failure'].message_type = _VALIDATEDATASETFAILURE
+_SQLQUERYREQUEST.fields_by_name['auth'].message_type = _AUTHENTICATIONDATA
+_RETRIEVEDATAROOMREQUEST.fields_by_name['auth'].message_type = _AUTHENTICATIONDATA
 _RETRIEVEDATAROOMRESPONSE.fields_by_name['dataRoom'].message_type = data__room__pb2._DATAROOM
 _TABLESCHEMA.fields_by_name['namedColumns'].message_type = _NAMEDCOLUMN
 _NAMEDCOLUMN.fields_by_name['columnType'].message_type = column__type__pb2._COLUMNTYPE
 _DATASETMANIFEST.fields_by_name['schema'].message_type = _TABLESCHEMA
 DESCRIPTOR.message_types_by_name['WaterfrontRequest'] = _WATERFRONTREQUEST
 DESCRIPTOR.message_types_by_name['WaterfrontResponse'] = _WATERFRONTRESPONSE
+DESCRIPTOR.message_types_by_name['AuthenticationData'] = _AUTHENTICATIONDATA
 DESCRIPTOR.message_types_by_name['CreateDataRoomRequest'] = _CREATEDATAROOMREQUEST
 DESCRIPTOR.message_types_by_name['CreateDataRoomResponse'] = _CREATEDATAROOMRESPONSE
 DESCRIPTOR.message_types_by_name['DataRoomValidationError'] = _DATAROOMVALIDATIONERROR
@@ -877,6 +941,13 @@ WaterfrontResponse = _reflection.GeneratedProtocolMessageType('WaterfrontRespons
   # @@protoc_insertion_point(class_scope:waterfront.WaterfrontResponse)
   })
 _sym_db.RegisterMessage(WaterfrontResponse)
+
+AuthenticationData = _reflection.GeneratedProtocolMessageType('AuthenticationData', (_message.Message,), {
+  'DESCRIPTOR' : _AUTHENTICATIONDATA,
+  '__module__' : 'waterfront_pb2'
+  # @@protoc_insertion_point(class_scope:waterfront.AuthenticationData)
+  })
+_sym_db.RegisterMessage(AuthenticationData)
 
 CreateDataRoomRequest = _reflection.GeneratedProtocolMessageType('CreateDataRoomRequest', (_message.Message,), {
   'DESCRIPTOR' : _CREATEDATAROOMREQUEST,
