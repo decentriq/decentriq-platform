@@ -4,8 +4,8 @@ version = "0.1.0"
 description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.ch>"]
 readme = 'README.md'
-repository = "https://github.com/decentriq/decentriq-platform-python-client"
-homepage = "https://github.com/decentriq/decentriq-platform-python-client"
+repository = "https://github.com/decentriq/decentriq-platform"
+homepage = "https://github.com/decentriq/decentriq-platform"
 
 [tool.poetry.dependencies]
 python = "^3.6"
