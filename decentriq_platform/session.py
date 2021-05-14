@@ -128,17 +128,19 @@ class Session():
                 time.sleep(polling_options.interval/1000)
 
     def _get_query_results(self, request: WaterfrontRequest, auth: Auth) -> Union[List[List[str]], None]:
-        response = self._send_and_parse_message(request, auth)
-        if not response.HasField("sqlQueryResponse"):
-            raise Exception(
-                "Expected inference response, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
-            response_content = response.sqlQueryResponse.data.decode('utf-8')
-            return list(csv.reader(io.StringIO(response_content)))
-        else:
+        responses = self._send_message_many_responses(request, auth)
+        if len(responses) == 1 and not responses[0].sqlQueryResponse.HasField("data"):
             return None
+        contents = []
+        for response in responses:
+            if not response.HasField("sqlQueryResponse"):
+                raise Exception("Expected inference response, got " + response.WhichOneof("waterfront_response"))
+            if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
+                contents.append(response.sqlQueryResponse.data)
+            else:
+                return None
+        full_csv = b''.join(contents).decode('utf-8')
+        return list(csv.reader(io.StringIO(full_csv)))
 
     def create_data_room(self, data_room: DataRoom, role: str = None) -> CreateDataRoomResponse:
         req = WaterfrontRequest()
@@ -255,7 +257,34 @@ class Session():
             raise Exception(waterfront_response.failure)
         return waterfront_response
 
-    def _send_message(self, message: Message, response_object: Message, auth: Auth):
+    def _send_message(self, message: Message, response_object: WaterfrontResponse, auth: Auth):
+        enclave_response_bytes = self._send_message_raw(message, auth)
+        response_container = Response()
+        parse_length_delimited(enclave_response_bytes, response_container)
+        if response_container.HasField("unsuccessfulResponse"):
+            raise Exception(response_container.unsuccessfulResponse)
+        decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
+        parse_length_delimited(decrypted_response, response_object)
+
+    def _send_message_many_responses(self, message: Message, auth: Auth) -> List[WaterfrontResponse]:
+        enclave_response_bytes = self._send_message_raw(message, auth)
+        responses = []
+        offset = 0
+        while offset < len(enclave_response_bytes):
+            response_container = Response()
+            offset += parse_length_delimited(enclave_response_bytes[offset:], response_container)
+            if response_container.HasField("unsuccessfulResponse"):
+                raise Exception(response_container.unsuccessfulResponse)
+            else:
+                waterfront_response = WaterfrontResponse()
+                decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
+                parse_length_delimited(decrypted_response, waterfront_response)
+                if waterfront_response.HasField("failure"):
+                    raise Exception(waterfront_response.failure)
+                responses.append(waterfront_response)
+        return responses
+
+    def _send_message_raw(self, message: Message, auth: Auth) -> bytes:
         encrypted = self._encrypt_and_encode_data(serialize_length_delimited(message), auth)
         request = Request()
         request.avatoRequest = encrypted
@@ -267,12 +296,8 @@ class Session():
             url, json.dumps(enclave_message), {"Content-type": "application/json"}
         ).json()
         enclave_response_bytes  = b64decode(enclave_response["data"])
-        response_container = Response()
-        parse_length_delimited(enclave_response_bytes, response_container)
-        if response_container.HasField("unsuccessfulResponse"):
-            raise Exception(response_container.unsuccessfulResponse)
-        decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
-        parse_length_delimited(decrypted_response, response_object)
+        return enclave_response_bytes
+
 
     def _get_auth_for_role(self, role: str = None) -> Tuple[str, Auth]:
         if len(self.auth) == 0:

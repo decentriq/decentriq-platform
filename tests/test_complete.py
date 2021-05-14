@@ -1343,3 +1343,69 @@ def test_fuzzy_matching():
     )
 
     assert len(results) == 1
+
+
+def test_large_result():
+    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
+    data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])
+    enclave_identifiers = analyst_client.get_enclave_identifiers()
+    root_ca_cert = analyst_client.get_ca_root_certificate()
+
+    data_room = DataRoom()
+    data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
+    data_room.mrenclave = enclave_identifiers[0]
+
+    table = Table()
+    table.sqlCreateTableStatement = \
+        "CREATE TABLE table (string TEXT NOT NULL)"
+    data_room.tables.append(table)
+
+    query = Query()
+    query.queryName = "query"
+    query.sqlSelectStatement = f'SELECT * FROM table'
+    data_room.queries.append(query)
+
+    role = Role()
+    role.roleName = "role"
+    role.emailRegex = ".*"
+    role.authenticationMethod.trustedPki.rootCertificate = root_ca_cert
+
+    query_permission = Permission()
+    query_permission.submitQueryPermission.queryName = "query"
+    role.permissions.append(query_permission)
+
+    upload_permission = Permission()
+    upload_permission.tableCrudPermission.tableName = "table"
+    role.permissions.append(upload_permission)
+
+    data_room.roles.append(role)
+
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
+
+    schema1 = Schema("CREATE TABLE table (string TEXT NOT NULL)")
+    encryption_key1 = Key()
+
+    n = 1800
+    manifest_hash = data_provider_client.upload_dataset(
+        os.environ["TEST_USER_ID_2"],
+        schema1.table_name,
+        # Sufficiently large to trigger distributed mode
+        StringIO(''.join([f'{str(i) * 16}\n' * 1000 for i in range(0,n)])),
+        schema1,
+        encryption_key1
+    )
+
+    data_provider_session.publish_dataset_to_data_room(
+        manifest_hash,
+        data_room_hash,
+        "table",
+        encryption_key1
+    )
+
+    results = analyst_session.make_sql_query(
+        data_room_hash,
+        "query",
+        polling_options = PollingOptions(interval=1000)
+    )
+
+    assert len(results) == n * 1000
