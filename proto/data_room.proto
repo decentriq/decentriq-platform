@@ -6,25 +6,7 @@ message DataRoom {
     repeated Table tables = 2;
     repeated Query queries = 3;
     repeated Role roles = 4;
-    optional QueryExecutionMode queryExecutionMode = 5;
     optional string mrenclave = 6;
-}
-
-message QueryExecutionMode {
-    oneof query_execution_mode {
-        SingleExecutionMode singleExecutionMode = 1;
-        DistributedExecutionMode distributedExecutionMode = 2;
-    }
-}
-
-message SingleExecutionMode {
-}
-
-message DistributedExecutionMode {
-    // Parameters to the planner. This is exposed because it affects the shape of the computation graph.
-    required uint32 targetParallelism = 1;
-    required uint64 chunkSize = 2;
-    required uint64 maxChunkCountInMemory = 3;
 }
 
 message Table {
@@ -64,6 +46,7 @@ message Permission {
         SubmitQueryPermission submitQueryPermission = 1;
         TableCrudPermission tableCrudPermission = 2;
         DataroomRetrievalPermission dataRoomRetrievalPermission = 3;
+        AuditLogRetrievalPermission auditLogRetrievalPermission = 4;
     }
 }
 
@@ -76,6 +59,8 @@ message TableCrudPermission {
 }
 
 message DataroomRetrievalPermission {}
+
+message AuditLogRetrievalPermission {}
 
 message Constraint {
     required string description = 1;

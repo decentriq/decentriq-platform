@@ -172,6 +172,23 @@ class Session():
             )
         return response.retrieveDataRoomResponse.dataRoom
 
+    def retrieve_audit_log(self, data_room_hash: bytes, role: str = None) -> str:
+        req = WaterfrontRequest()
+        req.retrieveAuditLogRequest.dataRoomHash = data_room_hash
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.retrieveAuditLogRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.retrieveAuditLogRequest.auth.passwordSha256 = auth.get_access_token()
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrieveAuditLogResponse"):
+            raise Exception(
+                "Expected retrieveAuditLogResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrieveAuditLogResponse.data
+
     def publish_dataset_to_data_room(
             self,
             manifest_hash: bytes,

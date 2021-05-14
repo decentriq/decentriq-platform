@@ -11,6 +11,7 @@ message WaterfrontRequest {
         PublishDatasetToDataRoomRequest publishDatasetToDataRoomRequest = 6;
         RetrieveDataRoomRequest retrieveDataRoomRequest = 7;
         ValidateDatasetRequest validateDatasetRequest = 8;
+        RetrieveAuditLogRequest retrieveAuditLogRequest = 9;
     }
 }
 
@@ -22,6 +23,7 @@ message WaterfrontResponse {
         PublishDatasetToDataRoomResponse publishDatasetToDataRoomResponse = 7;
         RetrieveDataRoomResponse retrieveDataRoomResponse = 8;
         ValidateDatasetResponse validateDatasetResponse = 9;
+        RetrieveAuditLogResponse retrieveAuditLogResponse = 10;
     }
 }
 
@@ -97,6 +99,16 @@ message RetrieveDataRoomRequest {
 
 message RetrieveDataRoomResponse {
     required data_room.DataRoom dataRoom = 1;
+}
+
+message RetrieveAuditLogRequest {
+    required bytes dataRoomHash = 1;
+    required AuthenticationData auth = 2;
+}
+
+// logs come back as a big csv type bunch of text.
+message RetrieveAuditLogResponse {
+    optional bytes data = 1;
 }
 
 // Storage

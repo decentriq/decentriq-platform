@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\"\xc9\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x02(\t\x12 \n\x06tables\x18\x02 \x03(\x0b\x32\x10.data_room.Table\x12!\n\x07queries\x18\x03 \x03(\x0b\x32\x10.data_room.Query\x12\x1e\n\x05roles\x18\x04 \x03(\x0b\x32\x0f.data_room.Role\x12\x39\n\x12queryExecutionMode\x18\x05 \x01(\x0b\x32\x1d.data_room.QueryExecutionMode\x12\x11\n\tmrenclave\x18\x06 \x01(\t\"\xb4\x01\n\x12QueryExecutionMode\x12=\n\x13singleExecutionMode\x18\x01 \x01(\x0b\x32\x1e.data_room.SingleExecutionModeH\x00\x12G\n\x18\x64istributedExecutionMode\x18\x02 \x01(\x0b\x32#.data_room.DistributedExecutionModeH\x00\x42\x16\n\x14query_execution_mode\"\x15\n\x13SingleExecutionMode\"g\n\x18\x44istributedExecutionMode\x12\x19\n\x11targetParallelism\x18\x01 \x02(\r\x12\x11\n\tchunkSize\x18\x02 \x02(\x04\x12\x1d\n\x15maxChunkCountInMemory\x18\x03 \x02(\x04\"b\n\x05Table\x12\x1f\n\x17sqlCreateTableStatement\x18\x01 \x02(\t\x12\x38\n\x15submissionConstraints\x18\x02 \x03(\x0b\x32\x19.data_room.TimeConstraint\"b\n\x05Query\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x1a\n\x12sqlSelectStatement\x18\x02 \x02(\t\x12*\n\x0b\x63onstraints\x18\x03 \x03(\x0b\x32\x15.data_room.Constraint\"\x97\x01\n\x04Role\x12\x10\n\x08roleName\x18\x01 \x02(\t\x12\x12\n\nemailRegex\x18\x02 \x02(\t\x12=\n\x14\x61uthenticationMethod\x18\x03 \x02(\x0b\x32\x1f.data_room.AuthenticationMethod\x12*\n\x0bpermissions\x18\x04 \x03(\x0b\x32\x15.data_room.Permission\"~\n\x14\x41uthenticationMethod\x12)\n\ntrustedPki\x18\x01 \x02(\x0b\x32\x15.data_room.TrustedPki\x12#\n\x07mailPki\x18\x02 \x01(\x0b\x32\x12.data_room.MailPki\x12\x16\n\x0epasswordSha256\x18\x03 \x01(\t\"%\n\nTrustedPki\x12\x17\n\x0frootCertificate\x18\x01 \x02(\x0c\"\x1e\n\x07MailPki\x12\x13\n\x0brootCaStore\x18\x01 \x02(\x0c\"\xeb\x01\n\nPermission\x12\x41\n\x15submitQueryPermission\x18\x01 \x01(\x0b\x32 .data_room.SubmitQueryPermissionH\x00\x12=\n\x13tableCrudPermission\x18\x02 \x01(\x0b\x32\x1e.data_room.TableCrudPermissionH\x00\x12M\n\x1b\x64\x61taRoomRetrievalPermission\x18\x03 \x01(\x0b\x32&.data_room.DataroomRetrievalPermissionH\x00\x42\x0c\n\npermission\"*\n\x15SubmitQueryPermission\x12\x11\n\tqueryName\x18\x01 \x02(\t\"(\n\x13TableCrudPermission\x12\x11\n\ttableName\x18\x01 \x02(\t\"\x1d\n\x1b\x44\x61taroomRetrievalPermission\"\x97\x01\n\nConstraint\x12\x13\n\x0b\x64\x65scription\x18\x01 \x02(\t\x12\x31\n\rsqlConstraint\x18\x02 \x01(\x0b\x32\x18.data_room.SqlConstraintH\x00\x12\x33\n\x0etimeConstraint\x18\x03 \x01(\x0b\x32\x19.data_room.TimeConstraintH\x00\x42\x0c\n\nconstraint\"\"\n\rSqlConstraint\x12\x11\n\tstatement\x18\x01 \x02(\t\"3\n\x0eTimeConstraint\x12\x11\n\ttimestamp\x18\x01 \x02(\x03\x12\x0e\n\x06\x62\x65\x66ore\x18\x02 \x02(\x08'
+  serialized_pb=b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\"\x8e\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x02(\t\x12 \n\x06tables\x18\x02 \x03(\x0b\x32\x10.data_room.Table\x12!\n\x07queries\x18\x03 \x03(\x0b\x32\x10.data_room.Query\x12\x1e\n\x05roles\x18\x04 \x03(\x0b\x32\x0f.data_room.Role\x12\x11\n\tmrenclave\x18\x06 \x01(\t\"b\n\x05Table\x12\x1f\n\x17sqlCreateTableStatement\x18\x01 \x02(\t\x12\x38\n\x15submissionConstraints\x18\x02 \x03(\x0b\x32\x19.data_room.TimeConstraint\"b\n\x05Query\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x1a\n\x12sqlSelectStatement\x18\x02 \x02(\t\x12*\n\x0b\x63onstraints\x18\x03 \x03(\x0b\x32\x15.data_room.Constraint\"\x97\x01\n\x04Role\x12\x10\n\x08roleName\x18\x01 \x02(\t\x12\x12\n\nemailRegex\x18\x02 \x02(\t\x12=\n\x14\x61uthenticationMethod\x18\x03 \x02(\x0b\x32\x1f.data_room.AuthenticationMethod\x12*\n\x0bpermissions\x18\x04 \x03(\x0b\x32\x15.data_room.Permission\"~\n\x14\x41uthenticationMethod\x12)\n\ntrustedPki\x18\x01 \x02(\x0b\x32\x15.data_room.TrustedPki\x12#\n\x07mailPki\x18\x02 \x01(\x0b\x32\x12.data_room.MailPki\x12\x16\n\x0epasswordSha256\x18\x03 \x01(\t\"%\n\nTrustedPki\x12\x17\n\x0frootCertificate\x18\x01 \x02(\x0c\"\x1e\n\x07MailPki\x12\x13\n\x0brootCaStore\x18\x01 \x02(\x0c\"\xba\x02\n\nPermission\x12\x41\n\x15submitQueryPermission\x18\x01 \x01(\x0b\x32 .data_room.SubmitQueryPermissionH\x00\x12=\n\x13tableCrudPermission\x18\x02 \x01(\x0b\x32\x1e.data_room.TableCrudPermissionH\x00\x12M\n\x1b\x64\x61taRoomRetrievalPermission\x18\x03 \x01(\x0b\x32&.data_room.DataroomRetrievalPermissionH\x00\x12M\n\x1b\x61uditLogRetrievalPermission\x18\x04 \x01(\x0b\x32&.data_room.AuditLogRetrievalPermissionH\x00\x42\x0c\n\npermission\"*\n\x15SubmitQueryPermission\x12\x11\n\tqueryName\x18\x01 \x02(\t\"(\n\x13TableCrudPermission\x12\x11\n\ttableName\x18\x01 \x02(\t\"\x1d\n\x1b\x44\x61taroomRetrievalPermission\"\x1d\n\x1b\x41uditLogRetrievalPermission\"\x97\x01\n\nConstraint\x12\x13\n\x0b\x64\x65scription\x18\x01 \x02(\t\x12\x31\n\rsqlConstraint\x18\x02 \x01(\x0b\x32\x18.data_room.SqlConstraintH\x00\x12\x33\n\x0etimeConstraint\x18\x03 \x01(\x0b\x32\x19.data_room.TimeConstraintH\x00\x42\x0c\n\nconstraint\"\"\n\rSqlConstraint\x12\x11\n\tstatement\x18\x01 \x02(\t\"3\n\x0eTimeConstraint\x12\x11\n\ttimestamp\x18\x01 \x02(\x03\x12\x0e\n\x06\x62\x65\x66ore\x18\x02 \x02(\x08'
 )
 
 
@@ -62,14 +62,7 @@ _DATAROOM = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='queryExecutionMode', full_name='data_room.DataRoom.queryExecutionMode', index=4,
-      number=5, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='mrenclave', full_name='data_room.DataRoom.mrenclave', index=5,
+      name='mrenclave', full_name='data_room.DataRoom.mrenclave', index=4,
       number=6, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -88,122 +81,7 @@ _DATAROOM = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=31,
-  serialized_end=232,
-)
-
-
-_QUERYEXECUTIONMODE = _descriptor.Descriptor(
-  name='QueryExecutionMode',
-  full_name='data_room.QueryExecutionMode',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='singleExecutionMode', full_name='data_room.QueryExecutionMode.singleExecutionMode', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='distributedExecutionMode', full_name='data_room.QueryExecutionMode.distributedExecutionMode', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='query_execution_mode', full_name='data_room.QueryExecutionMode.query_execution_mode',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-  ],
-  serialized_start=235,
-  serialized_end=415,
-)
-
-
-_SINGLEEXECUTIONMODE = _descriptor.Descriptor(
-  name='SingleExecutionMode',
-  full_name='data_room.SingleExecutionMode',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=417,
-  serialized_end=438,
-)
-
-
-_DISTRIBUTEDEXECUTIONMODE = _descriptor.Descriptor(
-  name='DistributedExecutionMode',
-  full_name='data_room.DistributedExecutionMode',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='targetParallelism', full_name='data_room.DistributedExecutionMode.targetParallelism', index=0,
-      number=1, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='chunkSize', full_name='data_room.DistributedExecutionMode.chunkSize', index=1,
-      number=2, type=4, cpp_type=4, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='maxChunkCountInMemory', full_name='data_room.DistributedExecutionMode.maxChunkCountInMemory', index=2,
-      number=3, type=4, cpp_type=4, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=440,
-  serialized_end=543,
+  serialized_end=173,
 )
 
 
@@ -241,8 +119,8 @@ _TABLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=545,
-  serialized_end=643,
+  serialized_start=175,
+  serialized_end=273,
 )
 
 
@@ -287,8 +165,8 @@ _QUERY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=645,
-  serialized_end=743,
+  serialized_start=275,
+  serialized_end=373,
 )
 
 
@@ -340,8 +218,8 @@ _ROLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=746,
-  serialized_end=897,
+  serialized_start=376,
+  serialized_end=527,
 )
 
 
@@ -386,8 +264,8 @@ _AUTHENTICATIONMETHOD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=899,
-  serialized_end=1025,
+  serialized_start=529,
+  serialized_end=655,
 )
 
 
@@ -418,8 +296,8 @@ _TRUSTEDPKI = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1027,
-  serialized_end=1064,
+  serialized_start=657,
+  serialized_end=694,
 )
 
 
@@ -450,8 +328,8 @@ _MAILPKI = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1066,
-  serialized_end=1096,
+  serialized_start=696,
+  serialized_end=726,
 )
 
 
@@ -484,6 +362,13 @@ _PERMISSION = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='auditLogRetrievalPermission', full_name='data_room.Permission.auditLogRetrievalPermission', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -501,8 +386,8 @@ _PERMISSION = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1099,
-  serialized_end=1334,
+  serialized_start=729,
+  serialized_end=1043,
 )
 
 
@@ -533,8 +418,8 @@ _SUBMITQUERYPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1336,
-  serialized_end=1378,
+  serialized_start=1045,
+  serialized_end=1087,
 )
 
 
@@ -565,8 +450,8 @@ _TABLECRUDPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1380,
-  serialized_end=1420,
+  serialized_start=1089,
+  serialized_end=1129,
 )
 
 
@@ -590,8 +475,33 @@ _DATAROOMRETRIEVALPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1422,
-  serialized_end=1451,
+  serialized_start=1131,
+  serialized_end=1160,
+)
+
+
+_AUDITLOGRETRIEVALPERMISSION = _descriptor.Descriptor(
+  name='AuditLogRetrievalPermission',
+  full_name='data_room.AuditLogRetrievalPermission',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1162,
+  serialized_end=1191,
 )
 
 
@@ -641,8 +551,8 @@ _CONSTRAINT = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1454,
-  serialized_end=1605,
+  serialized_start=1194,
+  serialized_end=1345,
 )
 
 
@@ -673,8 +583,8 @@ _SQLCONSTRAINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1607,
-  serialized_end=1641,
+  serialized_start=1347,
+  serialized_end=1381,
 )
 
 
@@ -712,22 +622,13 @@ _TIMECONSTRAINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1643,
-  serialized_end=1694,
+  serialized_start=1383,
+  serialized_end=1434,
 )
 
 _DATAROOM.fields_by_name['tables'].message_type = _TABLE
 _DATAROOM.fields_by_name['queries'].message_type = _QUERY
 _DATAROOM.fields_by_name['roles'].message_type = _ROLE
-_DATAROOM.fields_by_name['queryExecutionMode'].message_type = _QUERYEXECUTIONMODE
-_QUERYEXECUTIONMODE.fields_by_name['singleExecutionMode'].message_type = _SINGLEEXECUTIONMODE
-_QUERYEXECUTIONMODE.fields_by_name['distributedExecutionMode'].message_type = _DISTRIBUTEDEXECUTIONMODE
-_QUERYEXECUTIONMODE.oneofs_by_name['query_execution_mode'].fields.append(
-  _QUERYEXECUTIONMODE.fields_by_name['singleExecutionMode'])
-_QUERYEXECUTIONMODE.fields_by_name['singleExecutionMode'].containing_oneof = _QUERYEXECUTIONMODE.oneofs_by_name['query_execution_mode']
-_QUERYEXECUTIONMODE.oneofs_by_name['query_execution_mode'].fields.append(
-  _QUERYEXECUTIONMODE.fields_by_name['distributedExecutionMode'])
-_QUERYEXECUTIONMODE.fields_by_name['distributedExecutionMode'].containing_oneof = _QUERYEXECUTIONMODE.oneofs_by_name['query_execution_mode']
 _TABLE.fields_by_name['submissionConstraints'].message_type = _TIMECONSTRAINT
 _QUERY.fields_by_name['constraints'].message_type = _CONSTRAINT
 _ROLE.fields_by_name['authenticationMethod'].message_type = _AUTHENTICATIONMETHOD
@@ -737,6 +638,7 @@ _AUTHENTICATIONMETHOD.fields_by_name['mailPki'].message_type = _MAILPKI
 _PERMISSION.fields_by_name['submitQueryPermission'].message_type = _SUBMITQUERYPERMISSION
 _PERMISSION.fields_by_name['tableCrudPermission'].message_type = _TABLECRUDPERMISSION
 _PERMISSION.fields_by_name['dataRoomRetrievalPermission'].message_type = _DATAROOMRETRIEVALPERMISSION
+_PERMISSION.fields_by_name['auditLogRetrievalPermission'].message_type = _AUDITLOGRETRIEVALPERMISSION
 _PERMISSION.oneofs_by_name['permission'].fields.append(
   _PERMISSION.fields_by_name['submitQueryPermission'])
 _PERMISSION.fields_by_name['submitQueryPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
@@ -746,6 +648,9 @@ _PERMISSION.fields_by_name['tableCrudPermission'].containing_oneof = _PERMISSION
 _PERMISSION.oneofs_by_name['permission'].fields.append(
   _PERMISSION.fields_by_name['dataRoomRetrievalPermission'])
 _PERMISSION.fields_by_name['dataRoomRetrievalPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
+_PERMISSION.oneofs_by_name['permission'].fields.append(
+  _PERMISSION.fields_by_name['auditLogRetrievalPermission'])
+_PERMISSION.fields_by_name['auditLogRetrievalPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
 _CONSTRAINT.fields_by_name['sqlConstraint'].message_type = _SQLCONSTRAINT
 _CONSTRAINT.fields_by_name['timeConstraint'].message_type = _TIMECONSTRAINT
 _CONSTRAINT.oneofs_by_name['constraint'].fields.append(
@@ -755,9 +660,6 @@ _CONSTRAINT.oneofs_by_name['constraint'].fields.append(
   _CONSTRAINT.fields_by_name['timeConstraint'])
 _CONSTRAINT.fields_by_name['timeConstraint'].containing_oneof = _CONSTRAINT.oneofs_by_name['constraint']
 DESCRIPTOR.message_types_by_name['DataRoom'] = _DATAROOM
-DESCRIPTOR.message_types_by_name['QueryExecutionMode'] = _QUERYEXECUTIONMODE
-DESCRIPTOR.message_types_by_name['SingleExecutionMode'] = _SINGLEEXECUTIONMODE
-DESCRIPTOR.message_types_by_name['DistributedExecutionMode'] = _DISTRIBUTEDEXECUTIONMODE
 DESCRIPTOR.message_types_by_name['Table'] = _TABLE
 DESCRIPTOR.message_types_by_name['Query'] = _QUERY
 DESCRIPTOR.message_types_by_name['Role'] = _ROLE
@@ -768,6 +670,7 @@ DESCRIPTOR.message_types_by_name['Permission'] = _PERMISSION
 DESCRIPTOR.message_types_by_name['SubmitQueryPermission'] = _SUBMITQUERYPERMISSION
 DESCRIPTOR.message_types_by_name['TableCrudPermission'] = _TABLECRUDPERMISSION
 DESCRIPTOR.message_types_by_name['DataroomRetrievalPermission'] = _DATAROOMRETRIEVALPERMISSION
+DESCRIPTOR.message_types_by_name['AuditLogRetrievalPermission'] = _AUDITLOGRETRIEVALPERMISSION
 DESCRIPTOR.message_types_by_name['Constraint'] = _CONSTRAINT
 DESCRIPTOR.message_types_by_name['SqlConstraint'] = _SQLCONSTRAINT
 DESCRIPTOR.message_types_by_name['TimeConstraint'] = _TIMECONSTRAINT
@@ -779,27 +682,6 @@ DataRoom = _reflection.GeneratedProtocolMessageType('DataRoom', (_message.Messag
   # @@protoc_insertion_point(class_scope:data_room.DataRoom)
   })
 _sym_db.RegisterMessage(DataRoom)
-
-QueryExecutionMode = _reflection.GeneratedProtocolMessageType('QueryExecutionMode', (_message.Message,), {
-  'DESCRIPTOR' : _QUERYEXECUTIONMODE,
-  '__module__' : 'data_room_pb2'
-  # @@protoc_insertion_point(class_scope:data_room.QueryExecutionMode)
-  })
-_sym_db.RegisterMessage(QueryExecutionMode)
-
-SingleExecutionMode = _reflection.GeneratedProtocolMessageType('SingleExecutionMode', (_message.Message,), {
-  'DESCRIPTOR' : _SINGLEEXECUTIONMODE,
-  '__module__' : 'data_room_pb2'
-  # @@protoc_insertion_point(class_scope:data_room.SingleExecutionMode)
-  })
-_sym_db.RegisterMessage(SingleExecutionMode)
-
-DistributedExecutionMode = _reflection.GeneratedProtocolMessageType('DistributedExecutionMode', (_message.Message,), {
-  'DESCRIPTOR' : _DISTRIBUTEDEXECUTIONMODE,
-  '__module__' : 'data_room_pb2'
-  # @@protoc_insertion_point(class_scope:data_room.DistributedExecutionMode)
-  })
-_sym_db.RegisterMessage(DistributedExecutionMode)
 
 Table = _reflection.GeneratedProtocolMessageType('Table', (_message.Message,), {
   'DESCRIPTOR' : _TABLE,
@@ -870,6 +752,13 @@ DataroomRetrievalPermission = _reflection.GeneratedProtocolMessageType('Dataroom
   # @@protoc_insertion_point(class_scope:data_room.DataroomRetrievalPermission)
   })
 _sym_db.RegisterMessage(DataroomRetrievalPermission)
+
+AuditLogRetrievalPermission = _reflection.GeneratedProtocolMessageType('AuditLogRetrievalPermission', (_message.Message,), {
+  'DESCRIPTOR' : _AUDITLOGRETRIEVALPERMISSION,
+  '__module__' : 'data_room_pb2'
+  # @@protoc_insertion_point(class_scope:data_room.AuditLogRetrievalPermission)
+  })
+_sym_db.RegisterMessage(AuditLogRetrievalPermission)
 
 Constraint = _reflection.GeneratedProtocolMessageType('Constraint', (_message.Message,), {
   'DESCRIPTOR' : _CONSTRAINT,
