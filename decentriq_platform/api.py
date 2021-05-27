@@ -20,8 +20,10 @@ class Endpoints(str, Enum):
     USERS_COLLECTION = "/users",
     USER = "/user/:userId",
     USER_FILES_COLLECTION = "/user/:userId/files",
-    USER_FILE = "/user/:userId/file/:fileId",
-    USER_FILE_CHUNK = "/user/:userId/file/:fileId/chunk/:chunkHash",
+    USER_FILE = "/user/:userId/file/:manifestHash",
+    USER_UPLOADS_COLLECTION = "/user/:userId/uploads",
+    USER_UPLOAD = "/user/:userId/upload/:uploadId",
+    USER_UPLOAD_CHUNKS = "/user/:userId/upload/:uploadId/chunks",
     USER_CERTIFICATE = "/user/:userId/certificate",
 
 class APIError(Exception):

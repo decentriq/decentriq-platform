@@ -5,7 +5,7 @@ import os
 from concurrent import futures
 from typing_extensions import TypedDict
 from typing import List, TypeVar, Dict
-from .session import B64EncodedMessage, Session, SessionOptions
+from .session import Session, SessionOptions
 from .config import (
         DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
 )
@@ -20,7 +20,9 @@ from .storage import (
     create_encrypted_json_object_chunk,
     create_encrypted_protobuf_object_chunk,
     CsvChunker,
+    ChunkWrapper,
     FileDescription,
+    UploadDescription,
     DatasetManifestMetadata,
     StorageCipher
 )
@@ -48,6 +50,13 @@ class CreateSessionRequest(TypedDict):
 class SessionJsonResponse(TypedDict):
     sessionId: str
     enclaveIdentifier: str
+
+class FinalizeUpload(TypedDict):
+    uploadId: str
+    manifest: str
+    name: str
+    manifestHash: str
+    chunks: List[str]
 
 class Client:
     def __init__(
@@ -123,35 +132,61 @@ class Client:
     ) -> bytes:
         uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads * 2)
         column_types = [named_column.columnType for named_column in schema.proto_schema.namedColumns]
-        chunker = CsvChunker(csv_input_stream, column_types, os.urandom(16), chunk_size=chunk_size)
-        # create manifest
-        chunk_hashes = [hash.hex() for hash, _ in chunker]
+
+        # create and upload chunks
+        chunker = CsvChunker(csv_input_stream, column_types, chunk_size=chunk_size)
+        chunk_hashes = []
+        chunk_uploads_futures = []
+        upload_description = self._create_upload(email)
+        for chunk_hash, chunk_data in chunker:
+            chunk_uploads_futures.append(
+                uploader.submit(
+                    self._encrypt_and_upload_chunk,
+                    chunk_hash,
+                    chunk_data,
+                    key.material,
+                    key.id,
+                    email,
+                    upload_description["uploadId"]
+                )
+            )
+            chunk_hashes.append(chunk_hash.hex())
+
+        # create digest chunks list and upload 
         digest_hash, digest_encrypted = \
             create_encrypted_json_object_chunk(key.id, key.material, os.urandom(16), chunk_hashes)
+        chunk_uploads_futures.append(
+            uploader.submit(
+                self._upload_chunk,
+                digest_hash,
+                digest_encrypted,
+                email,
+                upload_description["uploadId"]
+            )
+        )
+        # check chunks uploads were successful
+        completed, pending = futures.wait(chunk_uploads_futures, None, futures.FIRST_EXCEPTION)
+        if len(pending):
+            # reraise exception
+            for future in completed: future.result()
+        uploader.shutdown(wait=False)
 
+        # create manifest and upload 
         manifest = DatasetManifest()
         manifest.digestHash = digest_hash
         manifest.schema.CopyFrom(schema.proto_schema)
-
         manifest_hash, manifest_encrypted = \
             create_encrypted_protobuf_object_chunk(key.id, key.material, os.urandom(16), manifest)
-        manifest_metadata = DatasetManifestMetadata(
+        self._finalize_upload(
+            user_id=email,
+            upload_id=upload_description["uploadId"],
             name=name,
-            manifestHash=manifest_hash.hex(),
+            manifest_hash=manifest_hash,
+            manifest_encrypted=manifest_encrypted,
             # HACK!!! We include the digest hash as a "chunk".
             # This is temporary to avoid changes in the backend logic.
             chunks=chunk_hashes + [digest_hash.hex()]
         )
-        file_description = self._upload_manifest(email, manifest_encrypted, manifest_metadata)
-        # upload chunks
-        chunker.reset()
-        for chunk in chunker:
-            uploader.submit(
-                self._encrypt_and_upload_chunk, chunk[0], chunk[1], key.material, key.id, email,
-                file_description["fileId"]
-            )
-        uploader.submit(self._upload_chunk, digest_hash, digest_encrypted, email, file_description["fileId"])
-        uploader.shutdown(wait=True)
         return manifest_hash
 
     def _encrypt_and_upload_chunk(
@@ -161,52 +196,83 @@ class Client:
             key: bytes,
             key_id: bytes,
             user_id: str,
-            file_id: str
+            upload_id: str
     ):
         cipher = StorageCipher(key, key_id)
         chunk_data_encrypted = cipher.encrypt(chunk_data)
-        self._upload_chunk(chunk_hash, chunk_data_encrypted, user_id, file_id)
+        self._upload_chunk(chunk_hash, chunk_data_encrypted, user_id, upload_id)
+
+    def _create_upload(self, user_id: str) -> UploadDescription:
+        url = Endpoints.USER_UPLOADS_COLLECTION.replace(":userId", user_id)
+        response = self.api.post(url, {}, {"Content-type": "application/json"})
+        upload_description: UploadDescription = response.json()
+        return upload_description
 
     def _upload_chunk(
             self,
             chunk_hash: bytes,
             chunk_data_encrypted: bytes,
             user_id: str,
-            file_id: str
+            upload_id: str
     ):
-        url = Endpoints.USER_FILE_CHUNK \
+        url = Endpoints.USER_UPLOAD_CHUNKS \
             .replace(":userId", user_id) \
-            .replace(":fileId", file_id) \
-            .replace(":chunkHash", chunk_hash.hex())
-        wrapped_chunk= B64EncodedMessage(
-                data=b64encode(chunk_data_encrypted).decode("ascii")
+            .replace(":uploadId", upload_id)
+        wrapped_chunk= ChunkWrapper(
+            hash=chunk_hash.hex(),
+            data=b64encode(chunk_data_encrypted).decode("ascii")
         )
         self.api.post(url, json.dumps(wrapped_chunk), {"Content-type": "application/json"})
 
-    def _upload_manifest(
-            self,
-            user_id: str,
-            manifest_encrypted: bytes,
-            manifest_metadata: DatasetManifestMetadata
-    ) -> FileDescription:
-        manifest_metadata_json = json.dumps(dict(manifest_metadata))
-        url = Endpoints.USER_FILES_COLLECTION.replace(":userId", user_id)
-        parts = {
-            "manifest": b64encode(manifest_encrypted).decode("ascii"),
-            "metadata": b64encode(bytes(manifest_metadata_json, "utf-8")).decode("ascii")
-        }
-        response = self.api.post(url, json.dumps(parts), {"Content-type": "application/json"})
-        file_description: FileDescription = response.json()
-        return file_description
-
-    def delete_user_file(self, email: str, file_id: str):
-        url = Endpoints.USER_FILE \
+    def _delete_user_upload(self, email: str, upload_id: str):
+        url = Endpoints.USER_UPLOAD \
             .replace(":userId", email) \
-            .replace(":fileId", file_id)
+            .replace(":uploadId", upload_id)
         self.api.delete(url)
 
-    def get_user_file(self, email: str, file_id: str) -> FileDescription:
-        url = Endpoints.USER_FILE.replace(":userId", email).replace(":fileId", file_id)
+    def _get_user_upload(self, email: str, upload_id: str) -> UploadDescription:
+        url = Endpoints.USER_UPLOAD.replace(":userId", email).replace(":uploadId", upload_id)
+        response = self.api.get(url)
+        return response.json()
+
+    def _get_user_uploads_collection(self, email: str) -> List[UploadDescription]:
+        url = Endpoints.USER_UPLOADS_COLLECTION.replace(":userId", email)
+        response = self.api.get(url)
+        return response.json()
+
+    def _finalize_upload(
+            self,
+            user_id: str,
+            upload_id: str,
+            name: str,
+            manifest_hash: bytes,
+            manifest_encrypted: bytes,
+            chunks: List[str]
+    ) -> FileDescription:
+        url = Endpoints.USER_FILES_COLLECTION.replace(":userId", user_id)
+        payload = FinalizeUpload(
+            uploadId=upload_id,
+            manifest=b64encode(manifest_encrypted).decode("ascii"),
+            manifestHash=manifest_hash.hex(),
+            name=name,
+            chunks=chunks
+        )
+        file_description: FileDescription = self.api.post(
+            url,
+            json.dumps(payload),
+            {"Content-type": "application/json"}
+        ).json()
+        return file_description
+
+
+    def delete_user_file(self, email: str, manifest_hash: str):
+        url = Endpoints.USER_FILE \
+            .replace(":userId", email) \
+            .replace(":manifestHash", manifest_hash)
+        self.api.delete(url)
+
+    def get_user_file(self, email: str, manifest_hash: str) -> FileDescription:
+        url = Endpoints.USER_FILE.replace(":userId", email).replace(":manifestHash", manifest_hash)
         response = self.api.get(url)
         return response.json()
 

@@ -20,6 +20,10 @@ CHARSET = "utf-8"
 KEY_LEN = 32
 SALT_LEN = 16
 
+class ChunkWrapper(TypedDict):
+    hash: str
+    data: str
+
 class Key():
     def __init__(self, material: Union[bytes, None] = None, salt: Union[bytes, None] = None):
         if material == None:
@@ -207,24 +211,23 @@ def create_encrypted_protobuf_object_chunk(
     return chunk_hash, encrypted_chunk
 
 
+class UploadDescription(TypedDict):
+    uploadId: str
+
 class ChunkDescription(TypedDict):
     chunkHash: str
-    uploaded: bool
-
 
 class FileDescription(TypedDict):
-    fileId: str
     manifestHash: str
     filename: str
     chunks: List[ChunkDescription]
 
 
 class CsvChunker(Iterator):
-    def __init__(self, input_stream: TextIOBase, csv_column_types: List[int], extra_entropy: bytes, chunk_size: int):
+    def __init__(self, input_stream: TextIOBase, csv_column_types: List[int], chunk_size: int):
         self.chunk_size = chunk_size
         self.input_stream = input_stream
         self.csv_column_types = csv_column_types
-        self.extra_entropy = extra_entropy
         self.beginning_stream_offset = input_stream.tell()
 
     def reset(self):
@@ -233,7 +236,7 @@ class CsvChunker(Iterator):
     # returns (hash, chunk)
     def __next__(self) -> Tuple[bytes, bytes]:
         version_header_bytes = create_version_header()
-        chunk_header_bytes = create_csv_chunk_header(self.extra_entropy)
+        chunk_header_bytes = create_csv_chunk_header(os.urandom(16))
 
         csv_table_format = CsvTableFormat()
         csv_table_format.columnTypes.extend(self.csv_column_types)
