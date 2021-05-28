@@ -7,11 +7,22 @@ import column_type_pb2
 import data_room_pb2
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 import typing
 import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
+
+global___DataRoomStatus = DataRoomStatus
+class _DataRoomStatus(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[DataRoomStatus.V], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
+    Active = DataRoomStatus.V(1)
+    Stopped = DataRoomStatus.V(2)
+class DataRoomStatus(metaclass=_DataRoomStatus):
+    V = typing.NewType('V', builtins.int)
+Active = DataRoomStatus.V(1)
+Stopped = DataRoomStatus.V(2)
 
 class WaterfrontRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
@@ -21,6 +32,8 @@ class WaterfrontRequest(google.protobuf.message.Message):
     RETRIEVEDATAROOMREQUEST_FIELD_NUMBER: builtins.int
     VALIDATEDATASETREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVEAUDITLOGREQUEST_FIELD_NUMBER: builtins.int
+    RETRIEVEDATAROOMSTATUSREQUEST_FIELD_NUMBER: builtins.int
+    UPDATEDATAROOMSTATUSREQUEST_FIELD_NUMBER: builtins.int
 
     @property
     def sqlQueryRequest(self) -> global___SqlQueryRequest: ...
@@ -40,6 +53,12 @@ class WaterfrontRequest(google.protobuf.message.Message):
     @property
     def retrieveAuditLogRequest(self) -> global___RetrieveAuditLogRequest: ...
 
+    @property
+    def retrieveDataRoomStatusRequest(self) -> global___RetrieveDataRoomStatusRequest: ...
+
+    @property
+    def updateDataRoomStatusRequest(self) -> global___UpdateDataRoomStatusRequest: ...
+
     def __init__(self,
         *,
         sqlQueryRequest : typing.Optional[global___SqlQueryRequest] = ...,
@@ -48,10 +67,12 @@ class WaterfrontRequest(google.protobuf.message.Message):
         retrieveDataRoomRequest : typing.Optional[global___RetrieveDataRoomRequest] = ...,
         validateDatasetRequest : typing.Optional[global___ValidateDatasetRequest] = ...,
         retrieveAuditLogRequest : typing.Optional[global___RetrieveAuditLogRequest] = ...,
+        retrieveDataRoomStatusRequest : typing.Optional[global___RetrieveDataRoomStatusRequest] = ...,
+        updateDataRoomStatusRequest : typing.Optional[global___UpdateDataRoomStatusRequest] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"createDataRoomRequest",b"createDataRoomRequest",u"publishDatasetToDataRoomRequest",b"publishDatasetToDataRoomRequest",u"retrieveAuditLogRequest",b"retrieveAuditLogRequest",u"retrieveDataRoomRequest",b"retrieveDataRoomRequest",u"sqlQueryRequest",b"sqlQueryRequest",u"validateDatasetRequest",b"validateDatasetRequest",u"waterfront_request",b"waterfront_request"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"createDataRoomRequest",b"createDataRoomRequest",u"publishDatasetToDataRoomRequest",b"publishDatasetToDataRoomRequest",u"retrieveAuditLogRequest",b"retrieveAuditLogRequest",u"retrieveDataRoomRequest",b"retrieveDataRoomRequest",u"sqlQueryRequest",b"sqlQueryRequest",u"validateDatasetRequest",b"validateDatasetRequest",u"waterfront_request",b"waterfront_request"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"waterfront_request",b"waterfront_request"]) -> typing_extensions.Literal["sqlQueryRequest","createDataRoomRequest","publishDatasetToDataRoomRequest","retrieveDataRoomRequest","validateDatasetRequest","retrieveAuditLogRequest"]: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"createDataRoomRequest",b"createDataRoomRequest",u"publishDatasetToDataRoomRequest",b"publishDatasetToDataRoomRequest",u"retrieveAuditLogRequest",b"retrieveAuditLogRequest",u"retrieveDataRoomRequest",b"retrieveDataRoomRequest",u"retrieveDataRoomStatusRequest",b"retrieveDataRoomStatusRequest",u"sqlQueryRequest",b"sqlQueryRequest",u"updateDataRoomStatusRequest",b"updateDataRoomStatusRequest",u"validateDatasetRequest",b"validateDatasetRequest",u"waterfront_request",b"waterfront_request"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"createDataRoomRequest",b"createDataRoomRequest",u"publishDatasetToDataRoomRequest",b"publishDatasetToDataRoomRequest",u"retrieveAuditLogRequest",b"retrieveAuditLogRequest",u"retrieveDataRoomRequest",b"retrieveDataRoomRequest",u"retrieveDataRoomStatusRequest",b"retrieveDataRoomStatusRequest",u"sqlQueryRequest",b"sqlQueryRequest",u"updateDataRoomStatusRequest",b"updateDataRoomStatusRequest",u"validateDatasetRequest",b"validateDatasetRequest",u"waterfront_request",b"waterfront_request"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"waterfront_request",b"waterfront_request"]) -> typing_extensions.Literal["sqlQueryRequest","createDataRoomRequest","publishDatasetToDataRoomRequest","retrieveDataRoomRequest","validateDatasetRequest","retrieveAuditLogRequest","retrieveDataRoomStatusRequest","updateDataRoomStatusRequest"]: ...
 global___WaterfrontRequest = WaterfrontRequest
 
 class WaterfrontResponse(google.protobuf.message.Message):
@@ -63,6 +84,8 @@ class WaterfrontResponse(google.protobuf.message.Message):
     RETRIEVEDATAROOMRESPONSE_FIELD_NUMBER: builtins.int
     VALIDATEDATASETRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVEAUDITLOGRESPONSE_FIELD_NUMBER: builtins.int
+    RETRIEVEDATAROOMSTATUSRESPONSE_FIELD_NUMBER: builtins.int
+    UPDATEDATAROOMSTATUSRESPONSE_FIELD_NUMBER: builtins.int
     failure: typing.Text = ...
 
     @property
@@ -83,6 +106,12 @@ class WaterfrontResponse(google.protobuf.message.Message):
     @property
     def retrieveAuditLogResponse(self) -> global___RetrieveAuditLogResponse: ...
 
+    @property
+    def retrieveDataRoomStatusResponse(self) -> global___RetrieveDataRoomStatusResponse: ...
+
+    @property
+    def updateDataRoomStatusResponse(self) -> global___UpdateDataRoomStatusResponse: ...
+
     def __init__(self,
         *,
         failure : typing.Optional[typing.Text] = ...,
@@ -92,10 +121,12 @@ class WaterfrontResponse(google.protobuf.message.Message):
         retrieveDataRoomResponse : typing.Optional[global___RetrieveDataRoomResponse] = ...,
         validateDatasetResponse : typing.Optional[global___ValidateDatasetResponse] = ...,
         retrieveAuditLogResponse : typing.Optional[global___RetrieveAuditLogResponse] = ...,
+        retrieveDataRoomStatusResponse : typing.Optional[global___RetrieveDataRoomStatusResponse] = ...,
+        updateDataRoomStatusResponse : typing.Optional[global___UpdateDataRoomStatusResponse] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"createDataRoomResponse",b"createDataRoomResponse",u"failure",b"failure",u"publishDatasetToDataRoomResponse",b"publishDatasetToDataRoomResponse",u"retrieveAuditLogResponse",b"retrieveAuditLogResponse",u"retrieveDataRoomResponse",b"retrieveDataRoomResponse",u"sqlQueryResponse",b"sqlQueryResponse",u"validateDatasetResponse",b"validateDatasetResponse",u"waterfront_response",b"waterfront_response"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"createDataRoomResponse",b"createDataRoomResponse",u"failure",b"failure",u"publishDatasetToDataRoomResponse",b"publishDatasetToDataRoomResponse",u"retrieveAuditLogResponse",b"retrieveAuditLogResponse",u"retrieveDataRoomResponse",b"retrieveDataRoomResponse",u"sqlQueryResponse",b"sqlQueryResponse",u"validateDatasetResponse",b"validateDatasetResponse",u"waterfront_response",b"waterfront_response"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"waterfront_response",b"waterfront_response"]) -> typing_extensions.Literal["failure","sqlQueryResponse","createDataRoomResponse","publishDatasetToDataRoomResponse","retrieveDataRoomResponse","validateDatasetResponse","retrieveAuditLogResponse"]: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"createDataRoomResponse",b"createDataRoomResponse",u"failure",b"failure",u"publishDatasetToDataRoomResponse",b"publishDatasetToDataRoomResponse",u"retrieveAuditLogResponse",b"retrieveAuditLogResponse",u"retrieveDataRoomResponse",b"retrieveDataRoomResponse",u"retrieveDataRoomStatusResponse",b"retrieveDataRoomStatusResponse",u"sqlQueryResponse",b"sqlQueryResponse",u"updateDataRoomStatusResponse",b"updateDataRoomStatusResponse",u"validateDatasetResponse",b"validateDatasetResponse",u"waterfront_response",b"waterfront_response"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"createDataRoomResponse",b"createDataRoomResponse",u"failure",b"failure",u"publishDatasetToDataRoomResponse",b"publishDatasetToDataRoomResponse",u"retrieveAuditLogResponse",b"retrieveAuditLogResponse",u"retrieveDataRoomResponse",b"retrieveDataRoomResponse",u"retrieveDataRoomStatusResponse",b"retrieveDataRoomStatusResponse",u"sqlQueryResponse",b"sqlQueryResponse",u"updateDataRoomStatusResponse",b"updateDataRoomStatusResponse",u"validateDatasetResponse",b"validateDatasetResponse",u"waterfront_response",b"waterfront_response"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"waterfront_response",b"waterfront_response"]) -> typing_extensions.Literal["failure","sqlQueryResponse","createDataRoomResponse","publishDatasetToDataRoomResponse","retrieveDataRoomResponse","validateDatasetResponse","retrieveAuditLogResponse","retrieveDataRoomStatusResponse","updateDataRoomStatusResponse"]: ...
 global___WaterfrontResponse = WaterfrontResponse
 
 class AuthenticationData(google.protobuf.message.Message):
@@ -361,6 +392,65 @@ class RetrieveAuditLogResponse(google.protobuf.message.Message):
     def HasField(self, field_name: typing_extensions.Literal[u"data",b"data"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal[u"data",b"data"]) -> None: ...
 global___RetrieveAuditLogResponse = RetrieveAuditLogResponse
+
+class RetrieveDataRoomStatusRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DATAROOMHASH_FIELD_NUMBER: builtins.int
+    AUTH_FIELD_NUMBER: builtins.int
+    dataRoomHash: builtins.bytes = ...
+
+    @property
+    def auth(self) -> global___AuthenticationData: ...
+
+    def __init__(self,
+        *,
+        dataRoomHash : typing.Optional[builtins.bytes] = ...,
+        auth : typing.Optional[global___AuthenticationData] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"auth",b"auth",u"dataRoomHash",b"dataRoomHash"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"auth",b"auth",u"dataRoomHash",b"dataRoomHash"]) -> None: ...
+global___RetrieveDataRoomStatusRequest = RetrieveDataRoomStatusRequest
+
+class RetrieveDataRoomStatusResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    STATUS_FIELD_NUMBER: builtins.int
+    status: global___DataRoomStatus.V = ...
+
+    def __init__(self,
+        *,
+        status : typing.Optional[global___DataRoomStatus.V] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"status",b"status"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"status",b"status"]) -> None: ...
+global___RetrieveDataRoomStatusResponse = RetrieveDataRoomStatusResponse
+
+class UpdateDataRoomStatusRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DATAROOMHASH_FIELD_NUMBER: builtins.int
+    AUTH_FIELD_NUMBER: builtins.int
+    STATUS_FIELD_NUMBER: builtins.int
+    dataRoomHash: builtins.bytes = ...
+    status: global___DataRoomStatus.V = ...
+
+    @property
+    def auth(self) -> global___AuthenticationData: ...
+
+    def __init__(self,
+        *,
+        dataRoomHash : typing.Optional[builtins.bytes] = ...,
+        auth : typing.Optional[global___AuthenticationData] = ...,
+        status : typing.Optional[global___DataRoomStatus.V] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"auth",b"auth",u"dataRoomHash",b"dataRoomHash",u"status",b"status"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"auth",b"auth",u"dataRoomHash",b"dataRoomHash",u"status",b"status"]) -> None: ...
+global___UpdateDataRoomStatusRequest = UpdateDataRoomStatusRequest
+
+class UpdateDataRoomStatusResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    def __init__(self,
+        ) -> None: ...
+global___UpdateDataRoomStatusResponse = UpdateDataRoomStatusResponse
 
 class EncryptionKey(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...

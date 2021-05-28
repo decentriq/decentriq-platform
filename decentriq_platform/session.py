@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from base64 import b64encode, b64decode
 from .proto.data_room_pb2 import DataRoom
 from .proto.avato_enclave_pb2 import Request, Response, DataNoncePubkey
-from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse
+from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse, DataRoomStatus
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import QuoteBody, Verification
 from .api import Endpoints
@@ -236,6 +236,46 @@ class Session():
             )
         return response.validateDatasetResponse
 
+    def retrieve_data_room_status(
+        self,
+        data_room_hash: bytes,
+        role: str = None
+    ):
+        role, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.retrieveDataRoomStatusRequest.dataRoomHash = data_room_hash
+        req.retrieveDataRoomStatusRequest.auth.role = role
+        if auth.get_access_token() is not None:
+            req.retrieveDataRoomStatusRequest.auth.passwordSha256 = auth.get_access_token()
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrieveDataRoomStatusResponse"):
+            raise Exception(
+                "Expected retrieveDataRoomStatusResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrieveDataRoomStatusResponse
+
+    def update_data_room_status(
+        self,
+        data_room_hash: bytes,
+        status: DataRoomStatus,
+        role: str = None
+    ):
+        role, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.updateDataRoomStatusRequest.dataRoomHash = data_room_hash
+        req.updateDataRoomStatusRequest.auth.role = role
+        if auth.get_access_token() is not None:
+            req.updateDataRoomStatusRequest.auth.passwordSha256 = auth.get_access_token()
+        req.updateDataRoomStatusRequest.status = status
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("updateDataRoomStatusResponse"):
+            raise Exception(
+                "Expected updateDataRoomStatusResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.updateDataRoomStatusResponse
+
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
@@ -314,7 +354,6 @@ class Session():
         ).json()
         enclave_response_bytes  = b64decode(enclave_response["data"])
         return enclave_response_bytes
-
 
     def _get_auth_for_role(self, role: str = None) -> Tuple[str, Auth]:
         if len(self.auth) == 0:

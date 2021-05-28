@@ -12,6 +12,8 @@ message WaterfrontRequest {
         RetrieveDataRoomRequest retrieveDataRoomRequest = 7;
         ValidateDatasetRequest validateDatasetRequest = 8;
         RetrieveAuditLogRequest retrieveAuditLogRequest = 9;
+        RetrieveDataRoomStatusRequest retrieveDataRoomStatusRequest = 10;
+        UpdateDataRoomStatusRequest updateDataRoomStatusRequest = 11;
     }
 }
 
@@ -24,6 +26,8 @@ message WaterfrontResponse {
         RetrieveDataRoomResponse retrieveDataRoomResponse = 8;
         ValidateDatasetResponse validateDatasetResponse = 9;
         RetrieveAuditLogResponse retrieveAuditLogResponse = 10;
+        RetrieveDataRoomStatusResponse retrieveDataRoomStatusResponse = 11;
+        UpdateDataRoomStatusResponse updateDataRoomStatusResponse = 12;
     }
 }
 
@@ -70,14 +74,14 @@ message ValidateDatasetRequest {
 }
 // If validation fails because of malformed input,
 // communicate back to the sender the row that failed
-// along with a descriptive message. 
+// along with a descriptive message.
 message ValidateDatasetFailure {
     required string message = 1;
     optional uint64 row = 2;
 }
 
 message ValidateDatasetResponse {
-    optional ValidateDatasetFailure failure = 1;    
+    optional ValidateDatasetFailure failure = 1;
 }
 
 message SqlQueryRequest {
@@ -109,6 +113,29 @@ message RetrieveAuditLogRequest {
 // logs come back as a big csv type bunch of text.
 message RetrieveAuditLogResponse {
     optional bytes data = 1;
+}
+
+enum DataRoomStatus {
+    Active = 1;
+    Stopped = 2;
+}
+
+message RetrieveDataRoomStatusRequest {
+    required bytes dataRoomHash = 1;
+    required AuthenticationData auth = 2;
+}
+
+message RetrieveDataRoomStatusResponse {
+    required DataRoomStatus status = 1;
+}
+
+message UpdateDataRoomStatusRequest {
+    required bytes dataRoomHash = 1;
+    required AuthenticationData auth = 2;
+    required DataRoomStatus status = 3;
+}
+
+message UpdateDataRoomStatusResponse {
 }
 
 // Storage

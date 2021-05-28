@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\"\x8e\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x02(\t\x12 \n\x06tables\x18\x02 \x03(\x0b\x32\x10.data_room.Table\x12!\n\x07queries\x18\x03 \x03(\x0b\x32\x10.data_room.Query\x12\x1e\n\x05roles\x18\x04 \x03(\x0b\x32\x0f.data_room.Role\x12\x11\n\tmrenclave\x18\x06 \x01(\t\"b\n\x05Table\x12\x1f\n\x17sqlCreateTableStatement\x18\x01 \x02(\t\x12\x38\n\x15submissionConstraints\x18\x02 \x03(\x0b\x32\x19.data_room.TimeConstraint\"b\n\x05Query\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x1a\n\x12sqlSelectStatement\x18\x02 \x02(\t\x12*\n\x0b\x63onstraints\x18\x03 \x03(\x0b\x32\x15.data_room.Constraint\"\x97\x01\n\x04Role\x12\x10\n\x08roleName\x18\x01 \x02(\t\x12\x12\n\nemailRegex\x18\x02 \x02(\t\x12=\n\x14\x61uthenticationMethod\x18\x03 \x02(\x0b\x32\x1f.data_room.AuthenticationMethod\x12*\n\x0bpermissions\x18\x04 \x03(\x0b\x32\x15.data_room.Permission\"~\n\x14\x41uthenticationMethod\x12)\n\ntrustedPki\x18\x01 \x02(\x0b\x32\x15.data_room.TrustedPki\x12#\n\x07mailPki\x18\x02 \x01(\x0b\x32\x12.data_room.MailPki\x12\x16\n\x0epasswordSha256\x18\x03 \x01(\t\"%\n\nTrustedPki\x12\x17\n\x0frootCertificate\x18\x01 \x02(\x0c\"\x1e\n\x07MailPki\x12\x13\n\x0brootCaStore\x18\x01 \x02(\x0c\"\xba\x02\n\nPermission\x12\x41\n\x15submitQueryPermission\x18\x01 \x01(\x0b\x32 .data_room.SubmitQueryPermissionH\x00\x12=\n\x13tableCrudPermission\x18\x02 \x01(\x0b\x32\x1e.data_room.TableCrudPermissionH\x00\x12M\n\x1b\x64\x61taRoomRetrievalPermission\x18\x03 \x01(\x0b\x32&.data_room.DataroomRetrievalPermissionH\x00\x12M\n\x1b\x61uditLogRetrievalPermission\x18\x04 \x01(\x0b\x32&.data_room.AuditLogRetrievalPermissionH\x00\x42\x0c\n\npermission\"*\n\x15SubmitQueryPermission\x12\x11\n\tqueryName\x18\x01 \x02(\t\"(\n\x13TableCrudPermission\x12\x11\n\ttableName\x18\x01 \x02(\t\"\x1d\n\x1b\x44\x61taroomRetrievalPermission\"\x1d\n\x1b\x41uditLogRetrievalPermission\"\x97\x01\n\nConstraint\x12\x13\n\x0b\x64\x65scription\x18\x01 \x02(\t\x12\x31\n\rsqlConstraint\x18\x02 \x01(\x0b\x32\x18.data_room.SqlConstraintH\x00\x12\x33\n\x0etimeConstraint\x18\x03 \x01(\x0b\x32\x19.data_room.TimeConstraintH\x00\x42\x0c\n\nconstraint\"\"\n\rSqlConstraint\x12\x11\n\tstatement\x18\x01 \x02(\t\"3\n\x0eTimeConstraint\x12\x11\n\ttimestamp\x18\x01 \x02(\x03\x12\x0e\n\x06\x62\x65\x66ore\x18\x02 \x02(\x08'
+  serialized_pb=b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\"\x8e\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x02(\t\x12 \n\x06tables\x18\x02 \x03(\x0b\x32\x10.data_room.Table\x12!\n\x07queries\x18\x03 \x03(\x0b\x32\x10.data_room.Query\x12\x1e\n\x05roles\x18\x04 \x03(\x0b\x32\x0f.data_room.Role\x12\x11\n\tmrenclave\x18\x06 \x01(\t\"b\n\x05Table\x12\x1f\n\x17sqlCreateTableStatement\x18\x01 \x02(\t\x12\x38\n\x15submissionConstraints\x18\x02 \x03(\x0b\x32\x19.data_room.TimeConstraint\"b\n\x05Query\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x1a\n\x12sqlSelectStatement\x18\x02 \x02(\t\x12*\n\x0b\x63onstraints\x18\x03 \x03(\x0b\x32\x15.data_room.Constraint\"\x97\x01\n\x04Role\x12\x10\n\x08roleName\x18\x01 \x02(\t\x12\x12\n\nemailRegex\x18\x02 \x02(\t\x12=\n\x14\x61uthenticationMethod\x18\x03 \x02(\x0b\x32\x1f.data_room.AuthenticationMethod\x12*\n\x0bpermissions\x18\x04 \x03(\x0b\x32\x15.data_room.Permission\"~\n\x14\x41uthenticationMethod\x12)\n\ntrustedPki\x18\x01 \x02(\x0b\x32\x15.data_room.TrustedPki\x12#\n\x07mailPki\x18\x02 \x01(\x0b\x32\x12.data_room.MailPki\x12\x16\n\x0epasswordSha256\x18\x03 \x01(\t\"%\n\nTrustedPki\x12\x17\n\x0frootCertificate\x18\x01 \x02(\x0c\"\x1e\n\x07MailPki\x12\x13\n\x0brootCaStore\x18\x01 \x02(\x0c\"\xe8\x03\n\nPermission\x12\x41\n\x15submitQueryPermission\x18\x01 \x01(\x0b\x32 .data_room.SubmitQueryPermissionH\x00\x12=\n\x13tableCrudPermission\x18\x02 \x01(\x0b\x32\x1e.data_room.TableCrudPermissionH\x00\x12M\n\x1b\x64\x61taRoomRetrievalPermission\x18\x03 \x01(\x0b\x32&.data_room.DataroomRetrievalPermissionH\x00\x12M\n\x1b\x61uditLogRetrievalPermission\x18\x04 \x01(\x0b\x32&.data_room.AuditLogRetrievalPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x42\x0c\n\npermission\"*\n\x15SubmitQueryPermission\x12\x11\n\tqueryName\x18\x01 \x02(\t\"(\n\x13TableCrudPermission\x12\x11\n\ttableName\x18\x01 \x02(\t\"\x1d\n\x1b\x44\x61taroomRetrievalPermission\"\x1d\n\x1b\x41uditLogRetrievalPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"\x97\x01\n\nConstraint\x12\x13\n\x0b\x64\x65scription\x18\x01 \x02(\t\x12\x31\n\rsqlConstraint\x18\x02 \x01(\x0b\x32\x18.data_room.SqlConstraintH\x00\x12\x33\n\x0etimeConstraint\x18\x03 \x01(\x0b\x32\x19.data_room.TimeConstraintH\x00\x42\x0c\n\nconstraint\"\"\n\rSqlConstraint\x12\x11\n\tstatement\x18\x01 \x02(\t\"3\n\x0eTimeConstraint\x12\x11\n\ttimestamp\x18\x01 \x02(\x03\x12\x0e\n\x06\x62\x65\x66ore\x18\x02 \x02(\x08'
 )
 
 
@@ -369,6 +369,20 @@ _PERMISSION = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='retrieveDataRoomStatusPermission', full_name='data_room.Permission.retrieveDataRoomStatusPermission', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='updateDataRoomStatusPermission', full_name='data_room.Permission.updateDataRoomStatusPermission', index=5,
+      number=6, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -387,7 +401,7 @@ _PERMISSION = _descriptor.Descriptor(
     fields=[]),
   ],
   serialized_start=729,
-  serialized_end=1043,
+  serialized_end=1217,
 )
 
 
@@ -418,8 +432,8 @@ _SUBMITQUERYPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1045,
-  serialized_end=1087,
+  serialized_start=1219,
+  serialized_end=1261,
 )
 
 
@@ -450,8 +464,8 @@ _TABLECRUDPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1089,
-  serialized_end=1129,
+  serialized_start=1263,
+  serialized_end=1303,
 )
 
 
@@ -475,8 +489,8 @@ _DATAROOMRETRIEVALPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1131,
-  serialized_end=1160,
+  serialized_start=1305,
+  serialized_end=1334,
 )
 
 
@@ -500,8 +514,58 @@ _AUDITLOGRETRIEVALPERMISSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1162,
-  serialized_end=1191,
+  serialized_start=1336,
+  serialized_end=1365,
+)
+
+
+_RETRIEVEDATAROOMSTATUSPERMISSION = _descriptor.Descriptor(
+  name='RetrieveDataRoomStatusPermission',
+  full_name='data_room.RetrieveDataRoomStatusPermission',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1367,
+  serialized_end=1401,
+)
+
+
+_UPDATEDATAROOMSTATUSPERMISSION = _descriptor.Descriptor(
+  name='UpdateDataRoomStatusPermission',
+  full_name='data_room.UpdateDataRoomStatusPermission',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1403,
+  serialized_end=1435,
 )
 
 
@@ -551,8 +615,8 @@ _CONSTRAINT = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=1194,
-  serialized_end=1345,
+  serialized_start=1438,
+  serialized_end=1589,
 )
 
 
@@ -583,8 +647,8 @@ _SQLCONSTRAINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1347,
-  serialized_end=1381,
+  serialized_start=1591,
+  serialized_end=1625,
 )
 
 
@@ -622,8 +686,8 @@ _TIMECONSTRAINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1383,
-  serialized_end=1434,
+  serialized_start=1627,
+  serialized_end=1678,
 )
 
 _DATAROOM.fields_by_name['tables'].message_type = _TABLE
@@ -639,6 +703,8 @@ _PERMISSION.fields_by_name['submitQueryPermission'].message_type = _SUBMITQUERYP
 _PERMISSION.fields_by_name['tableCrudPermission'].message_type = _TABLECRUDPERMISSION
 _PERMISSION.fields_by_name['dataRoomRetrievalPermission'].message_type = _DATAROOMRETRIEVALPERMISSION
 _PERMISSION.fields_by_name['auditLogRetrievalPermission'].message_type = _AUDITLOGRETRIEVALPERMISSION
+_PERMISSION.fields_by_name['retrieveDataRoomStatusPermission'].message_type = _RETRIEVEDATAROOMSTATUSPERMISSION
+_PERMISSION.fields_by_name['updateDataRoomStatusPermission'].message_type = _UPDATEDATAROOMSTATUSPERMISSION
 _PERMISSION.oneofs_by_name['permission'].fields.append(
   _PERMISSION.fields_by_name['submitQueryPermission'])
 _PERMISSION.fields_by_name['submitQueryPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
@@ -651,6 +717,12 @@ _PERMISSION.fields_by_name['dataRoomRetrievalPermission'].containing_oneof = _PE
 _PERMISSION.oneofs_by_name['permission'].fields.append(
   _PERMISSION.fields_by_name['auditLogRetrievalPermission'])
 _PERMISSION.fields_by_name['auditLogRetrievalPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
+_PERMISSION.oneofs_by_name['permission'].fields.append(
+  _PERMISSION.fields_by_name['retrieveDataRoomStatusPermission'])
+_PERMISSION.fields_by_name['retrieveDataRoomStatusPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
+_PERMISSION.oneofs_by_name['permission'].fields.append(
+  _PERMISSION.fields_by_name['updateDataRoomStatusPermission'])
+_PERMISSION.fields_by_name['updateDataRoomStatusPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
 _CONSTRAINT.fields_by_name['sqlConstraint'].message_type = _SQLCONSTRAINT
 _CONSTRAINT.fields_by_name['timeConstraint'].message_type = _TIMECONSTRAINT
 _CONSTRAINT.oneofs_by_name['constraint'].fields.append(
@@ -671,6 +743,8 @@ DESCRIPTOR.message_types_by_name['SubmitQueryPermission'] = _SUBMITQUERYPERMISSI
 DESCRIPTOR.message_types_by_name['TableCrudPermission'] = _TABLECRUDPERMISSION
 DESCRIPTOR.message_types_by_name['DataroomRetrievalPermission'] = _DATAROOMRETRIEVALPERMISSION
 DESCRIPTOR.message_types_by_name['AuditLogRetrievalPermission'] = _AUDITLOGRETRIEVALPERMISSION
+DESCRIPTOR.message_types_by_name['RetrieveDataRoomStatusPermission'] = _RETRIEVEDATAROOMSTATUSPERMISSION
+DESCRIPTOR.message_types_by_name['UpdateDataRoomStatusPermission'] = _UPDATEDATAROOMSTATUSPERMISSION
 DESCRIPTOR.message_types_by_name['Constraint'] = _CONSTRAINT
 DESCRIPTOR.message_types_by_name['SqlConstraint'] = _SQLCONSTRAINT
 DESCRIPTOR.message_types_by_name['TimeConstraint'] = _TIMECONSTRAINT
@@ -759,6 +833,20 @@ AuditLogRetrievalPermission = _reflection.GeneratedProtocolMessageType('AuditLog
   # @@protoc_insertion_point(class_scope:data_room.AuditLogRetrievalPermission)
   })
 _sym_db.RegisterMessage(AuditLogRetrievalPermission)
+
+RetrieveDataRoomStatusPermission = _reflection.GeneratedProtocolMessageType('RetrieveDataRoomStatusPermission', (_message.Message,), {
+  'DESCRIPTOR' : _RETRIEVEDATAROOMSTATUSPERMISSION,
+  '__module__' : 'data_room_pb2'
+  # @@protoc_insertion_point(class_scope:data_room.RetrieveDataRoomStatusPermission)
+  })
+_sym_db.RegisterMessage(RetrieveDataRoomStatusPermission)
+
+UpdateDataRoomStatusPermission = _reflection.GeneratedProtocolMessageType('UpdateDataRoomStatusPermission', (_message.Message,), {
+  'DESCRIPTOR' : _UPDATEDATAROOMSTATUSPERMISSION,
+  '__module__' : 'data_room_pb2'
+  # @@protoc_insertion_point(class_scope:data_room.UpdateDataRoomStatusPermission)
+  })
+_sym_db.RegisterMessage(UpdateDataRoomStatusPermission)
 
 Constraint = _reflection.GeneratedProtocolMessageType('Constraint', (_message.Message,), {
   'DESCRIPTOR' : _CONSTRAINT,

@@ -47,6 +47,8 @@ message Permission {
         TableCrudPermission tableCrudPermission = 2;
         DataroomRetrievalPermission dataRoomRetrievalPermission = 3;
         AuditLogRetrievalPermission auditLogRetrievalPermission = 4;
+        RetrieveDataRoomStatusPermission retrieveDataRoomStatusPermission = 5;
+        UpdateDataRoomStatusPermission updateDataRoomStatusPermission = 6;
     }
 }
 
@@ -61,6 +63,10 @@ message TableCrudPermission {
 message DataroomRetrievalPermission {}
 
 message AuditLogRetrievalPermission {}
+
+message RetrieveDataRoomStatusPermission {}
+
+message UpdateDataRoomStatusPermission {}
 
 message Constraint {
     required string description = 1;
