@@ -4,7 +4,7 @@ import queue
 import os
 from concurrent import futures
 from typing_extensions import TypedDict
-from typing import List, TypeVar, Dict
+from typing import List, TypeVar, Dict, Tuple
 from .session import Session, SessionOptions
 from .config import (
         DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
@@ -38,8 +38,12 @@ class UserCsrRequest(TypedDict):
 class UserCsrResponse(TypedDict):
     certChainPem: str
 
+class EnclaveIdentifier(TypedDict):
+    enclaveIdentifier: str
+    version: str
+
 class EnclaveIdentifiersResponse(TypedDict):
-    enclaveIdentifiers: List[str]
+    enclaveIdentifiers: List[EnclaveIdentifier]
 
 class SystemCaResponse(TypedDict):
     rootCertificate: str
@@ -80,7 +84,7 @@ class Client:
         response = self.api.get(url).json()
         return response["rootCertificate"].encode("utf-8")
 
-    def get_enclave_identifiers(self) -> List[str]:
+    def get_enclave_identifiers(self) -> List[EnclaveIdentifier]:
         url = Endpoints.SYSTEM_ENCLAVE_IDENTIFIERS
         response: EnclaveIdentifiersResponse = self.api.get(url).json()
         return response["enclaveIdentifiers"]
@@ -97,12 +101,12 @@ class Client:
 
     def create_session(
             self,
-            enclave_identifier: str,
+            enclave_identifier: EnclaveIdentifier,
             auth: Dict[str, Auth],
             options: SessionOptions
     ) -> Session:
         url = Endpoints.SESSIONS
-        req_body = CreateSessionRequest(enclaveIdentifier=enclave_identifier)
+        req_body = CreateSessionRequest(enclaveIdentifier=enclave_identifier["enclaveIdentifier"])
         response: SessionJsonResponse = self.api.post(
                 url,
                 json.dumps(req_body),
@@ -152,7 +156,7 @@ class Client:
             )
             chunk_hashes.append(chunk_hash.hex())
 
-        # create digest chunks list and upload 
+        # create digest chunks list and upload
         digest_hash, digest_encrypted = \
             create_encrypted_json_object_chunk(key.id, key.material, os.urandom(16), chunk_hashes)
         chunk_uploads_futures.append(
@@ -171,7 +175,7 @@ class Client:
             for future in completed: future.result()
         uploader.shutdown(wait=False)
 
-        # create manifest and upload 
+        # create manifest and upload
         manifest = DatasetManifest()
         manifest.digestHash = digest_hash
         manifest.schema.CopyFrom(schema.proto_schema)

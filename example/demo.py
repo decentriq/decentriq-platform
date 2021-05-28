@@ -88,7 +88,7 @@ def build_insurance_bank_data_room(mrenclave, create_table_i, create_table_b, qu
     data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
 
     # set mrenclave
-    data_room.mrenclave = mrenclave
+    data_room.mrenclave = mrenclave["enclaveIdentifier"]
 
     # add tables
     table_i = Table()

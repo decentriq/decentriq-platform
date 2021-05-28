@@ -89,7 +89,7 @@ def create_events_data_room(events_table_name: str, root_ca_cert: bytes) -> Data
 
     data_room = DataRoom()
     data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
-    data_room.mrenclave = enclave_identifiers[0]
+    data_room.mrenclave = enclave_identifiers[0]["enclaveIdentifier"]
 
     events_table = Table()
     events_table.sqlCreateTableStatement = get_events_create_table(events_table_name)
@@ -1225,7 +1225,7 @@ def test_slow_boat_to_nagasaki_distrib():
     root_ca_cert = analyst_client.get_ca_root_certificate()
     data_room = DataRoom()
     data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
-    data_room.mrenclave = enclave_identifiers[0]
+    data_room.mrenclave = enclave_identifiers[0]["enclaveIdentifier"]
 
     slow_table = Table()
     slow_table.sqlCreateTableStatement = slow_query_create_table("slow_table")
@@ -1289,7 +1289,7 @@ def test_fuzzy_matching():
 
     data_room = DataRoom()
     data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
-    data_room.mrenclave = enclave_identifiers[0]
+    data_room.mrenclave = enclave_identifiers[0]["enclaveIdentifier"]
 
     table1 = Table()
     table1.sqlCreateTableStatement = \
@@ -1385,7 +1385,7 @@ def test_large_result():
 
     data_room = DataRoom()
     data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
-    data_room.mrenclave = enclave_identifiers[0]
+    data_room.mrenclave = enclave_identifiers[0]["enclaveIdentifier"]
 
     table = Table()
     table.sqlCreateTableStatement = \
