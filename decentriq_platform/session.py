@@ -276,6 +276,49 @@ class Session():
             )
         return response.updateDataRoomStatusResponse
 
+    def retrieve_provisioned_datasests(
+        self,
+        data_room_hash: bytes,
+        role: str = None
+    ):
+        role, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.retrievePublishedDatasetRequest.dataRoomHash = data_room_hash
+        req.retrievePublishedDatasetRequest.auth.role = role
+        if auth.get_access_token() is not None:
+            req.retrievePublishedDatasetRequest.auth.passwordSha256 = auth.get_access_token()
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrievePublishedDatasetResponse"):
+            raise Exception(
+                "Expected retrievePublishedDatasetRequest, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrievePublishedDatasetResponse
+
+    def remove_published_dataset(
+        self,
+        manifest_hash: bytes,
+        data_room_hash: bytes,
+        data_room_table_name: str,
+        role: str = None
+    ):
+        req = WaterfrontRequest()
+        req.removePublishedDatasetRequest.manifestHash = manifest_hash
+        req.removePublishedDatasetRequest.dataRoomHash = data_room_hash
+        req.removePublishedDatasetRequest.dataRoomTableName = data_room_table_name
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.removePublishedDatasetRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.removePublishedDatasetRequest.auth.passwordSha256 = auth.get_access_token()
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("removePublishedDatasetResponse"):
+            raise Exception(
+                "Expected removePublishedDatasetResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.quote.reportdata[:32])
         return chily.PublicKey.from_bytes(pub_keyB)

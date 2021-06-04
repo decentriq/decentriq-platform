@@ -164,6 +164,7 @@ class Permission(google.protobuf.message.Message):
     AUDITLOGRETRIEVALPERMISSION_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMSTATUSPERMISSION_FIELD_NUMBER: builtins.int
     UPDATEDATAROOMSTATUSPERMISSION_FIELD_NUMBER: builtins.int
+    RETRIEVEPUBLISHEDDATASETSPERMISSION_FIELD_NUMBER: builtins.int
 
     @property
     def submitQueryPermission(self) -> global___SubmitQueryPermission: ...
@@ -183,6 +184,9 @@ class Permission(google.protobuf.message.Message):
     @property
     def updateDataRoomStatusPermission(self) -> global___UpdateDataRoomStatusPermission: ...
 
+    @property
+    def retrievePublishedDatasetsPermission(self) -> global___RetrievePublishedDatasetsPermission: ...
+
     def __init__(self,
         *,
         submitQueryPermission : typing.Optional[global___SubmitQueryPermission] = ...,
@@ -191,10 +195,11 @@ class Permission(google.protobuf.message.Message):
         auditLogRetrievalPermission : typing.Optional[global___AuditLogRetrievalPermission] = ...,
         retrieveDataRoomStatusPermission : typing.Optional[global___RetrieveDataRoomStatusPermission] = ...,
         updateDataRoomStatusPermission : typing.Optional[global___UpdateDataRoomStatusPermission] = ...,
+        retrievePublishedDatasetsPermission : typing.Optional[global___RetrievePublishedDatasetsPermission] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"auditLogRetrievalPermission",b"auditLogRetrievalPermission",u"dataRoomRetrievalPermission",b"dataRoomRetrievalPermission",u"permission",b"permission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"submitQueryPermission",b"submitQueryPermission",u"tableCrudPermission",b"tableCrudPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"auditLogRetrievalPermission",b"auditLogRetrievalPermission",u"dataRoomRetrievalPermission",b"dataRoomRetrievalPermission",u"permission",b"permission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"submitQueryPermission",b"submitQueryPermission",u"tableCrudPermission",b"tableCrudPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"permission",b"permission"]) -> typing_extensions.Literal["submitQueryPermission","tableCrudPermission","dataRoomRetrievalPermission","auditLogRetrievalPermission","retrieveDataRoomStatusPermission","updateDataRoomStatusPermission"]: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"auditLogRetrievalPermission",b"auditLogRetrievalPermission",u"dataRoomRetrievalPermission",b"dataRoomRetrievalPermission",u"permission",b"permission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"submitQueryPermission",b"submitQueryPermission",u"tableCrudPermission",b"tableCrudPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"auditLogRetrievalPermission",b"auditLogRetrievalPermission",u"dataRoomRetrievalPermission",b"dataRoomRetrievalPermission",u"permission",b"permission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"submitQueryPermission",b"submitQueryPermission",u"tableCrudPermission",b"tableCrudPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"permission",b"permission"]) -> typing_extensions.Literal["submitQueryPermission","tableCrudPermission","dataRoomRetrievalPermission","auditLogRetrievalPermission","retrieveDataRoomStatusPermission","updateDataRoomStatusPermission","retrievePublishedDatasetsPermission"]: ...
 global___Permission = Permission
 
 class SubmitQueryPermission(google.protobuf.message.Message):
@@ -250,6 +255,13 @@ class UpdateDataRoomStatusPermission(google.protobuf.message.Message):
     def __init__(self,
         ) -> None: ...
 global___UpdateDataRoomStatusPermission = UpdateDataRoomStatusPermission
+
+class RetrievePublishedDatasetsPermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    def __init__(self,
+        ) -> None: ...
+global___RetrievePublishedDatasetsPermission = RetrievePublishedDatasetsPermission
 
 class Constraint(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...

@@ -14,6 +14,8 @@ message WaterfrontRequest {
         RetrieveAuditLogRequest retrieveAuditLogRequest = 9;
         RetrieveDataRoomStatusRequest retrieveDataRoomStatusRequest = 10;
         UpdateDataRoomStatusRequest updateDataRoomStatusRequest = 11;
+        RetrievePublishedDatasetRequest retrievePublishedDatasetRequest = 12;
+        RemovePublishedDatasetRequest removePublishedDatasetRequest = 13;
     }
 }
 
@@ -28,6 +30,8 @@ message WaterfrontResponse {
         RetrieveAuditLogResponse retrieveAuditLogResponse = 10;
         RetrieveDataRoomStatusResponse retrieveDataRoomStatusResponse = 11;
         UpdateDataRoomStatusResponse updateDataRoomStatusResponse = 12;
+        RetrievePublishedDatasetResponse retrievePublishedDatasetResponse = 13;
+        RemovePublishedDatasetResponse removePublishedDatasetResponse = 14;
     }
 }
 
@@ -137,6 +141,31 @@ message UpdateDataRoomStatusRequest {
 
 message UpdateDataRoomStatusResponse {
 }
+
+message RetrievePublishedDatasetRequest {
+    required bytes dataRoomHash = 1;
+    required AuthenticationData auth = 2;
+}
+
+message PublishedDataset {
+    required string table = 1;
+    required string user = 2;
+    required uint64 timestamp = 3;
+    required bytes dataset_hash = 4;
+}
+
+message RetrievePublishedDatasetResponse {
+    repeated PublishedDataset publishedDatasets = 1;
+}
+
+message RemovePublishedDatasetRequest {
+    required bytes manifestHash = 1;
+    required bytes dataRoomHash = 2;
+    required string dataRoomTableName = 3;
+    required AuthenticationData auth = 4;
+}
+
+message RemovePublishedDatasetResponse {}
 
 // Storage
 message EncryptionKey {

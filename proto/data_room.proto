@@ -49,6 +49,7 @@ message Permission {
         AuditLogRetrievalPermission auditLogRetrievalPermission = 4;
         RetrieveDataRoomStatusPermission retrieveDataRoomStatusPermission = 5;
         UpdateDataRoomStatusPermission updateDataRoomStatusPermission = 6;
+        RetrievePublishedDatasetsPermission retrievePublishedDatasetsPermission = 7;
     }
 }
 
@@ -67,6 +68,8 @@ message AuditLogRetrievalPermission {}
 message RetrieveDataRoomStatusPermission {}
 
 message UpdateDataRoomStatusPermission {}
+
+message RetrievePublishedDatasetsPermission {}
 
 message Constraint {
     required string description = 1;

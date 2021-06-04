@@ -1441,3 +1441,107 @@ def test_large_result():
     )
 
     assert len(results) == n * 1000
+
+
+def test_retrieve_provisioned_datasets():
+    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
+    data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])
+    enclave_identifiers = analyst_client.get_enclave_identifiers()
+    root_ca_cert = analyst_client.get_ca_root_certificate()
+
+    data_room = DataRoom()
+    data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
+    data_room.mrenclave = enclave_identifiers[0]["enclaveIdentifier"]
+
+    table1 = Table()
+    table1.sqlCreateTableStatement = \
+        "CREATE TABLE customer1 (name TEXT NOT NULL, company TEXT NOT NULL)"
+    data_room.tables.append(table1)
+
+    table2 = Table()
+    table2.sqlCreateTableStatement = \
+        "CREATE TABLE customer2 (name TEXT NOT NULL, role TEXT NOT NULL)"
+    data_room.tables.append(table2)
+
+    query = Query()
+    query.queryName = "simple_query"
+    query.sqlSelectStatement = "SELECT customer2.role FROM customer1 INNER JOIN customer2 ON fuzzystrmatch(customer1.name, customer2.name, 2)"
+    data_room.queries.append(query)
+
+    role = Role()
+    role.roleName = "role"
+    role.emailRegex = ".*"
+    role.authenticationMethod.trustedPki.rootCertificate = root_ca_cert
+
+    query_permission = Permission()
+    query_permission.submitQueryPermission.queryName = "simple_query"
+    role.permissions.append(query_permission)
+
+    upload_permission = Permission()
+    upload_permission.tableCrudPermission.tableName = "customer1"
+    role.permissions.append(upload_permission)
+
+    upload_permission = Permission()
+    upload_permission.tableCrudPermission.tableName = "customer2"
+    role.permissions.append(upload_permission)
+
+    dataroom_retrieval_permission = Permission()
+    dataroom_retrieval_permission.dataRoomRetrievalPermission.SetInParent()
+    role.permissions.append(dataroom_retrieval_permission)
+
+    perm = Permission()
+    perm.retrievePublishedDatasetsPermission.SetInParent()
+    role.permissions.append(perm)
+    data_room.roles.append(role)
+
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
+
+    schema1 = Schema(
+        "CREATE TABLE customer1 (name TEXT NOT NULL, company TEXT NOT NULL)")
+    encryption_key1 = Key()
+
+    manifest_hash = data_provider_client.upload_dataset(
+        os.environ["TEST_USER_ID_2"],
+        schema1.table_name,
+        StringIO("aaa,bbb\nhhh,nnn"),
+        schema1,
+        encryption_key1
+    )
+
+    data_provider_session.publish_dataset_to_data_room(
+            manifest_hash,
+            data_room_hash,
+            "customer1",
+            encryption_key1
+    )
+
+    schema2 = Schema(
+        "CREATE TABLE customer2 (name TEXT NOT NULL, role TEXT NOT NULL)")
+    encryption_key2 = Key()
+    manifest_hash = data_provider_client.upload_dataset(
+        os.environ["TEST_USER_ID_2"],
+        schema2.table_name,
+        StringIO("aac,fff\nccc,aaa"),
+        schema2,
+        encryption_key2
+    )
+
+    data_provider_session.publish_dataset_to_data_room(
+            manifest_hash,
+            data_room_hash,
+            "customer2",
+            encryption_key2
+    )
+
+    result1 = analyst_session.retrieve_provisioned_datasests(data_room_hash)
+
+    assert(len(result1.publishedDatasets) == 2)
+
+    data_provider_session.remove_published_dataset(
+        manifest_hash,
+        data_room_hash,
+        "customer2"
+    )
+
+    result2 = analyst_session.retrieve_provisioned_datasests(data_room_hash)
+    assert(len(result2.publishedDatasets) == 1)
