@@ -6,7 +6,7 @@ from collections.abc import Iterator
 from typing import List, Tuple, Any, Union
 from decentriq_platform.proto.column_type_pb2 import ColumnType, PrimitiveType
 from google.protobuf.message import Message
-from .proto.avato_enclave_pb2 import EncryptionHeader, VersionHeader, ChunkHeader
+from .proto.delta_enclave_api_pb2 import EncryptionHeader, VersionHeader, ChunkHeader
 from .proto.length_delimited import serialize_length_delimited
 from .proto.csv_table_format_pb2 import CsvTableFormat
 from .proto.waterfront_pb2 import NamedColumn, TableSchema

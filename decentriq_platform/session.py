@@ -13,7 +13,7 @@ from typing import Optional, Union, Tuple, List, overload, TYPE_CHECKING
 from dataclasses import dataclass
 from base64 import b64encode, b64decode
 from .proto.data_room_pb2 import DataRoom
-from .proto.avato_enclave_pb2 import Request, Response, DataNoncePubkey
+from .proto.delta_enclave_api_pb2 import Request, Response, DataNoncePubkey
 from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse, DataRoomStatus
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import QuoteBody, Verification
