@@ -16,6 +16,8 @@ message WaterfrontRequest {
         UpdateDataRoomStatusRequest updateDataRoomStatusRequest = 11;
         RetrievePublishedDatasetRequest retrievePublishedDatasetRequest = 12;
         RemovePublishedDatasetRequest removePublishedDatasetRequest = 13;
+        JobStatusRequest jobStatusRequest = 14;
+        GetResultsRequest getResultsRequest = 15;
     }
 }
 
@@ -32,6 +34,7 @@ message WaterfrontResponse {
         UpdateDataRoomStatusResponse updateDataRoomStatusResponse = 12;
         RetrievePublishedDatasetResponse retrievePublishedDatasetResponse = 13;
         RemovePublishedDatasetResponse removePublishedDatasetResponse = 14;
+        JobStatusResponse jobStatusResponse = 15;
     }
 }
 
@@ -97,7 +100,32 @@ message SqlQueryRequest {
 // If the content bytes here are empty, then we use this to indicate
 // that the query is not finished yet. This facilitates polling.
 message SqlQueryResponse {
-    optional bytes data = 1;
+    oneof sql_query_response {
+        bytes data = 1;
+        bytes jobId = 2;
+    }
+}
+
+message JobStatusRequest {
+    required bytes jobId = 1;
+    required AuthenticationData auth = 2;
+}
+
+// this communicates back the three possible job
+// states. Error, the job id supplied is
+// not recognized. If false, the job is still running. 
+// if true, the job is complete.
+message JobStatusResponse {
+    required bool completed = 1;
+}
+
+// get job results. This
+// currently resubmits the query internally, 
+// as if one had been doing the full-weight query polling.
+// the reply comes back as SqlQueryResponse.
+message GetResultsRequest {
+    required bytes jobId = 1;
+    required AuthenticationData auth = 2;
 }
 
 message RetrieveDataRoomRequest {

@@ -118,29 +118,41 @@ class Session():
         if auth.get_access_token() is not None:
             req.sqlQueryRequest.auth.passwordSha256 = auth.get_access_token()
 
+        results, job_id = self._submit_query_request(req, auth)
+
+        # if we're not polling, always return the results, even if None
         if polling_options is None:
-            return self._get_query_results(req, auth)
+            return results
         else:
+            # if response already has data return it. else poll. 
+            if results:
+                return results
+            
             while True:
-                results = self._get_query_results(req, auth)
-                if results is not None:
+                # poll status
+                status = self.get_job_status(job_id, role)
+                if status is True:
+                    results = self.get_job_results(job_id, role)
                     return results
                 time.sleep(polling_options.interval/1000)
 
-    def _get_query_results(self, request: WaterfrontRequest, auth: Auth) -> Union[List[List[str]], None]:
+    # submit a query, once.
+    def _submit_query_request(self, request: WaterfrontRequest, auth: Auth) -> Tuple[Union[List[List[str]], None], bytes]:
         responses = self._send_message_many_responses(request, auth)
         if len(responses) == 1 and not responses[0].sqlQueryResponse.HasField("data"):
-            return None
+            return None, responses[0].sqlQueryResponse.jobId
         contents = []
         for response in responses:
             if not response.HasField("sqlQueryResponse"):
                 raise Exception("Expected inference response, got " + response.WhichOneof("waterfront_response"))
+            if response.sqlQueryResponse.HasField("jobId"):
+                return None, responses[0].sqlQueryResponse.jobId
             if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
                 contents.append(response.sqlQueryResponse.data)
             else:
-                return None
+                return None, None
         full_csv = b''.join(contents).decode('utf-8')
-        return list(csv.reader(io.StringIO(full_csv)))
+        return list(csv.reader(io.StringIO(full_csv))), None
 
     def create_data_room(self, data_room: DataRoom, role: str = None) -> CreateDataRoomResponse:
         req = WaterfrontRequest()
@@ -188,6 +200,41 @@ class Session():
                 + response.WhichOneof("waterfront_response")
             )
         return response.retrieveAuditLogResponse.data
+
+    def get_job_status(self, job_id: bytes, role: str = None) -> bool:
+        req = WaterfrontRequest()
+        req.jobStatusRequest.jobId = job_id
+        role_name, auth = self._get_auth_for_role(role)
+        req.jobStatusRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.jobStatusRequest.auth.passwordSha256 = auth.get_access_token()
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("jobStatusResponse"):
+            raise Exception(
+                "Expected jobStatusResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        if not response.jobStatusResponse.HasField("completed"):
+            raise Exception(
+                "Expected completed field, did not find it.")
+        return response.jobStatusResponse.completed
+
+    def get_job_results(self, job_id: bytes, role: str = None) -> Union[List[List[str]], None]:
+        req = WaterfrontRequest()
+        req.getResultsRequest.jobId = job_id
+        role_name, auth = self._get_auth_for_role(role)
+        req.getResultsRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.getResultsRequest.auth.passwordSha256 = auth.get_access_token()
+        responses = self._send_message_many_responses(req, auth)
+        contents = []
+        for response in responses:
+            if not response.HasField("sqlQueryResponse"):
+                raise Exception("Expected inference response, got " + response.WhichOneof("waterfront_response"))
+            if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
+                contents.append(response.sqlQueryResponse.data)
+        full_csv = b''.join(contents).decode('utf-8')
+        return list(csv.reader(io.StringIO(full_csv))) 
 
     def publish_dataset_to_data_room(
             self,

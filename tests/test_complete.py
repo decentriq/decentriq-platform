@@ -279,7 +279,6 @@ def test_get_initial_weights_containers_distrib():
     )
     assert len(results) > 100
 
-
 def test_get_initial_weights_containers():
     # Create sessions
     analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
