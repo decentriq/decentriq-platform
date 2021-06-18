@@ -101,9 +101,18 @@ message SqlQueryRequest {
 // that the query is not finished yet. This facilitates polling.
 message SqlQueryResponse {
     oneof sql_query_response {
-        bytes data = 1;
-        bytes jobId = 2;
+        SqlQueryInProgress inProgress = 1;
+        SqlQueryFinished finished = 2;
     }
+}
+
+message SqlQueryInProgress {
+    required bytes jobId = 1;
+}
+
+message SqlQueryFinished {
+    required bytes data = 1;
+    repeated string header = 2;
 }
 
 message JobStatusRequest {

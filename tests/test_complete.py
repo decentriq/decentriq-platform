@@ -21,11 +21,13 @@ from collections import Counter
 from io import StringIO
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
+import csv
 
 tests_root = os.path.dirname(__file__)
 fixtures_dir = os.path.join(tests_root, "fixtures")
 client_id = os.environ["DECENTRIQ_CLIENT_ID"]
 
+@pytest.mark.skip(reason="helper function")
 def create_session(email: str, api_token: str, custom_auth: Auth = None) -> Tuple[Client, Session]:
     analyst = Client(api_token=api_token, client_id=client_id)
     if custom_auth == None:
@@ -46,6 +48,9 @@ def create_session(email: str, api_token: str, custom_auth: Auth = None) -> Tupl
     )
     return analyst, analyst_session
 
+@pytest.mark.skip(reason="helper function")
+def parse_csv(data: bytes) -> List[List[str]]:
+    return list(csv.reader(StringIO(data.decode())))
 
 @pytest.mark.skip(reason="helper function")
 def get_containers_create_table(table_name) -> str:
@@ -277,7 +282,7 @@ def test_get_initial_weights_containers_distrib():
             "initial_weights_containers",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 def test_get_initial_weights_containers():
     # Create sessions
@@ -316,7 +321,7 @@ def test_get_initial_weights_containers():
             polling_options = PollingOptions(interval=1000)
 
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 
 def test_get_delta_weights_containers():
@@ -356,7 +361,7 @@ def test_get_delta_weights_containers():
             polling_options = PollingOptions(interval=1000)
 
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 
 def test_get_delta_weights_containers_distrib():
@@ -395,7 +400,7 @@ def test_get_delta_weights_containers_distrib():
             "delta_weights_containers",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 
 def test_get_delta_dwelltime_distrib():
@@ -434,7 +439,7 @@ def test_get_delta_dwelltime_distrib():
             "dwelltime_deltas",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 
 def test_get_delta_dwelltime():
@@ -473,7 +478,7 @@ def test_get_delta_dwelltime():
             "dwelltime_deltas",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 def test_event_auditlog():
     # Create sessions
@@ -618,7 +623,7 @@ def test_multiple_data_providers():
             "dwelltime_deltas",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 def test_multiple_data_providers_distrib():
     # Create sessions
@@ -659,7 +664,7 @@ def test_multiple_data_providers_distrib():
             "dwelltime_deltas",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 
 def test_synthetic_user_id():
@@ -754,7 +759,7 @@ def test_synthetic_user_id():
             "positivea",
             polling_options = PollingOptions(interval=1000)
     )
-    users = map(lambda l: l[0].split(':')[0], results)
+    users = map(lambda l: l[0].split(':')[0], parse_csv(results.data))
     assert Counter(users) == Counter([os.environ["TEST_USER_ID_2"]] * 2 + [os.environ["TEST_USER_ID_3"]] * 2)
 
 @pytest.mark.skip(reason="helper function")
@@ -911,7 +916,7 @@ def test_non_default_pki():
             "positivea",
             polling_options = PollingOptions(interval=1000)
     )
-    roots = map(lambda l: l[0].split(':')[1], results)
+    roots = map(lambda l: l[0].split(':')[1], parse_csv(results.data))
     assert len(Counter(roots)) == 1
 
 
@@ -1022,7 +1027,7 @@ def test_different_root_same_user():
             "positivea",
             polling_options = PollingOptions(interval=1000)
     )
-    user_ids = map(lambda l: l[0], results)
+    user_ids = map(lambda l: l[0], parse_csv(results.data))
     assert len(Counter(user_ids)) == 2
 
 def test_dataroom_retrieval():
@@ -1278,7 +1283,7 @@ def test_slow_boat_to_nagasaki_distrib():
             "slow_boat",
             polling_options = PollingOptions(interval=1000)
     )
-    assert len(results) > 100
+    assert len(parse_csv(results.data)) > 100
 
 def test_fuzzy_matching():
     analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
@@ -1373,7 +1378,7 @@ def test_fuzzy_matching():
             polling_options = PollingOptions(interval=1000)
     )
 
-    assert len(results) == 1
+    assert len(parse_csv(results.data)) == 1
 
 
 def test_large_result():
@@ -1439,7 +1444,7 @@ def test_large_result():
         polling_options = PollingOptions(interval=1000)
     )
 
-    assert len(results) == n * 1000
+    assert len(parse_csv(results.data)) == n * 1000
 
 
 def test_retrieve_provisioned_datasets():

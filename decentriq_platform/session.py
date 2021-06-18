@@ -1,8 +1,6 @@
 from __future__ import annotations
 import chily
 import json
-import csv
-import io
 import time
 from google.protobuf.message import Message
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -14,7 +12,7 @@ from dataclasses import dataclass
 from base64 import b64encode, b64decode
 from .proto.data_room_pb2 import DataRoom
 from .proto.delta_enclave_api_pb2 import Request, Response, DataNoncePubkey
-from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse, DataRoomStatus
+from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse, DataRoomStatus, SqlQueryResponse, SqlQueryFinished
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import QuoteBody, Verification
 from .api import Endpoints
@@ -104,11 +102,7 @@ class Session():
         self.fatquote: Fatquote = fatquote
         self.quote: QuoteBody = quote
 
-    @overload
-    def make_sql_query(self, data_room_hash: bytes, query_name: str) -> Union[List[List[str]], None]: ...
-    @overload
-    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: PollingOptions, role: str = None) -> List[List[str]]: ...
-    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: Optional[PollingOptions] = None, role: str = None) -> Union[List[List[str]], None]:
+    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: PollingOptions, role: str = None) -> SqlQueryFinished:
         req = WaterfrontRequest()
         req.sqlQueryRequest.queryName = query_name
         req.sqlQueryRequest.dataRoomHash = data_room_hash
@@ -118,41 +112,53 @@ class Session():
         if auth.get_access_token() is not None:
             req.sqlQueryRequest.auth.passwordSha256 = auth.get_access_token()
 
-        results, job_id = self._submit_query_request(req, auth)
+        response = self._submit_query_request(req, auth)
+        if response.HasField("finished"):
+            return response.finished
+        
+        job_id = response.inProgress.jobId
+        while True:
+            # poll status
+            status = self.get_job_status(job_id, role)
+            if status is True:
+                response = self.get_job_results(job_id, role)
+                return response
+            time.sleep(polling_options.interval/1000)
 
-        # if we're not polling, always return the results, even if None
-        if polling_options is None:
-            return results
-        else:
-            # if response already has data return it. else poll. 
-            if results:
-                return results
-            
-            while True:
-                # poll status
-                status = self.get_job_status(job_id, role)
-                if status is True:
-                    results = self.get_job_results(job_id, role)
-                    return results
-                time.sleep(polling_options.interval/1000)
+    def make_sql_query_poll(self, data_room_hash: bytes, query_name: str, role: str = None) -> SqlQueryResponse:
+        req = WaterfrontRequest()
+        req.sqlQueryRequest.queryName = query_name
+        req.sqlQueryRequest.dataRoomHash = data_room_hash
 
-    # submit a query, once.
-    def _submit_query_request(self, request: WaterfrontRequest, auth: Auth) -> Tuple[Union[List[List[str]], None], bytes]:
-        responses = self._send_message_many_responses(request, auth)
-        if len(responses) == 1 and not responses[0].sqlQueryResponse.HasField("data"):
-            return None, responses[0].sqlQueryResponse.jobId
+        role_name, auth = self._get_auth_for_role(role)
+        req.sqlQueryRequest.auth.role = role_name
+        if auth.get_access_token() is not None:
+            req.sqlQueryRequest.auth.passwordSha256 = auth.get_access_token()
+
+        return self._submit_query_request(req, auth)
+
+    def _concatenate_sql_query_responses(self, responses: List[WaterfrontResponse]) -> SqlQueryResponse:
+        if len(responses) == 1:
+            return responses[0].sqlQueryResponse
         contents = []
+        final_response = SqlQueryResponse()
         for response in responses:
             if not response.HasField("sqlQueryResponse"):
-                raise Exception("Expected inference response, got " + response.WhichOneof("waterfront_response"))
-            if response.sqlQueryResponse.HasField("jobId"):
-                return None, responses[0].sqlQueryResponse.jobId
-            if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
-                contents.append(response.sqlQueryResponse.data)
+                raise Exception("Expected query response, got " + response.WhichOneof("waterfront_response"))
+            if response.sqlQueryResponse.HasField("inProgress"):
+                return response.sqlQueryResponse
+            if response.sqlQueryResponse.HasField("finished"):
+                final_response.finished.header[:] = response.sqlQueryResponse.finished.header
+                contents.append(response.sqlQueryResponse.finished.data)
             else:
-                return None, None
-        full_csv = b''.join(contents).decode('utf-8')
-        return list(csv.reader(io.StringIO(full_csv))), None
+                raise Exception("Expected inProgress or finished query response")
+        final_response.finished.data = b''.join(contents)
+        return final_response
+        
+    # submit a query, once.
+    def _submit_query_request(self, request: WaterfrontRequest, auth: Auth) -> SqlQueryResponse:
+        responses = self._send_message_many_responses(request, auth)
+        return self._concatenate_sql_query_responses(responses)
 
     def create_data_room(self, data_room: DataRoom, role: str = None) -> CreateDataRoomResponse:
         req = WaterfrontRequest()
@@ -219,7 +225,7 @@ class Session():
                 "Expected completed field, did not find it.")
         return response.jobStatusResponse.completed
 
-    def get_job_results(self, job_id: bytes, role: str = None) -> Union[List[List[str]], None]:
+    def get_job_results(self, job_id: bytes, role: str = None) -> SqlQueryFinished:
         req = WaterfrontRequest()
         req.getResultsRequest.jobId = job_id
         role_name, auth = self._get_auth_for_role(role)
@@ -227,14 +233,11 @@ class Session():
         if auth.get_access_token() is not None:
             req.getResultsRequest.auth.passwordSha256 = auth.get_access_token()
         responses = self._send_message_many_responses(req, auth)
-        contents = []
-        for response in responses:
-            if not response.HasField("sqlQueryResponse"):
-                raise Exception("Expected inference response, got " + response.WhichOneof("waterfront_response"))
-            if response.sqlQueryResponse.HasField("data") and response.sqlQueryResponse.data != None:
-                contents.append(response.sqlQueryResponse.data)
-        full_csv = b''.join(contents).decode('utf-8')
-        return list(csv.reader(io.StringIO(full_csv))) 
+        final_response = self._concatenate_sql_query_responses(responses)
+        if final_response.HasField("finished"):
+            return final_response.finished
+        else:
+            raise Exception("Expected finished sql query response, got " + final_response.WhichOneof("sql_query_response"))
 
     def publish_dataset_to_data_room(
             self,
@@ -269,7 +272,6 @@ class Session():
             key: Key,
             role: str = None
     ):
-
         _, auth = self._get_auth_for_role(role)
         req = WaterfrontRequest()
         req.validateDatasetRequest.manifestHash = manifest_hash
