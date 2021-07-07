@@ -7,6 +7,7 @@ message DataRoom {
     repeated Query queries = 3;
     repeated Role roles = 4;
     optional string mrenclave = 6;
+    optional bool singleExecutionMode = 7;
 }
 
 message Table {
