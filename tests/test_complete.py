@@ -1030,6 +1030,7 @@ def test_different_root_same_user():
     user_ids = map(lambda l: l[0], parse_csv(results.data))
     assert len(Counter(user_ids)) == 2
 
+
 def test_dataroom_retrieval():
     analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
     root_ca_cert = analyst_client.get_ca_root_certificate()
@@ -1071,6 +1072,7 @@ def test_dataroom_retrieval():
 
     retrieved_data_room = analyst_session.retrieve_data_room(data_room_hash)
     assert data_room == retrieved_data_room
+
 
 # generate some large slow queries for testing polling
 # query b, some joins as well
@@ -1549,3 +1551,44 @@ def test_retrieve_provisioned_datasets():
 
     result2 = analyst_session.retrieve_provisioned_datasests(data_room_hash)
     assert(len(result2.publishedDatasets) == 1)
+
+
+def test_query_validation():
+    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
+    root_ca_cert = analyst_client.get_ca_root_certificate()
+
+    data_room = DataRoom()
+    data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
+    data_room.mrenclave = analyst_session.enclave_identifier
+
+    table = Table()
+    table.sqlCreateTableStatement = \
+        "CREATE TABLE simple (a BIGINT NOT NULL)"
+    data_room.tables.append(table)
+
+    query = Query()
+    query.queryName = "simple_query"
+    query.sqlSelectStatement = "SELECT a FROM simple WHERE a > 0"
+    data_room.queries.append(query)
+
+    role = Role()
+    role.roleName = "role"
+    role.emailRegex = ".*"
+    role.authenticationMethod.trustedPki.rootCertificate = root_ca_cert
+
+    query_permission = Permission()
+    query_permission.submitQueryPermission.queryName = "simple_query"
+    role.permissions.append(query_permission)
+
+    upload_permission = Permission()
+    upload_permission.tableCrudPermission.tableName = "simple"
+    role.permissions.append(upload_permission)
+
+    dataroom_retrieval_permission = Permission()
+    dataroom_retrieval_permission.dataRoomRetrievalPermission.SetInParent()
+    role.permissions.append(dataroom_retrieval_permission)
+
+    data_room.roles.append(role)
+
+    result = analyst_session.validate_queries(data_room)
+    assert(result.querySchemas is not None)

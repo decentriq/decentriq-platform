@@ -18,6 +18,7 @@ message WaterfrontRequest {
         RemovePublishedDatasetRequest removePublishedDatasetRequest = 13;
         JobStatusRequest jobStatusRequest = 14;
         GetResultsRequest getResultsRequest = 15;
+        ValidateQueriesRequest validateQueriesRequest = 16;
     }
 }
 
@@ -35,6 +36,7 @@ message WaterfrontResponse {
         RetrievePublishedDatasetResponse retrievePublishedDatasetResponse = 13;
         RemovePublishedDatasetResponse removePublishedDatasetResponse = 14;
         JobStatusResponse jobStatusResponse = 15;
+        ValidateQueriesResponse validateQueriesResponse = 16;
     }
 }
 
@@ -122,14 +124,14 @@ message JobStatusRequest {
 
 // this communicates back the three possible job
 // states. Error, the job id supplied is
-// not recognized. If false, the job is still running. 
+// not recognized. If false, the job is still running.
 // if true, the job is complete.
 message JobStatusResponse {
     required bool completed = 1;
 }
 
 // get job results. This
-// currently resubmits the query internally, 
+// currently resubmits the query internally,
 // as if one had been doing the full-weight query polling.
 // the reply comes back as SqlQueryResponse.
 message GetResultsRequest {
@@ -203,6 +205,22 @@ message RemovePublishedDatasetRequest {
 }
 
 message RemovePublishedDatasetResponse {}
+
+message ValidateQueriesRequest {
+    optional data_room.DataRoom dataRoom = 1;
+}
+
+message QuerySchemas {
+    repeated TableSchema tableSchemas = 1;
+}
+
+message ValidateQueriesResponse {
+    oneof validate_queries_response {
+        // key is query_index
+        QuerySchemas querySchemas = 1;
+        DataRoomValidationError dataRoomValidationError = 2;
+    }
+}
 
 // Storage
 message EncryptionKey {

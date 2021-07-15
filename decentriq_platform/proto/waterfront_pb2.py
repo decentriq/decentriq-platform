@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10waterfront.proto\x12\nwaterfront\x1a\x11\x63olumn_type.proto\x1a\x0f\x64\x61ta_room.proto\"\x99\x07\n\x11WaterfrontRequest\x12\x36\n\x0fsqlQueryRequest\x18\x02 \x01(\x0b\x32\x1b.waterfront.SqlQueryRequestH\x00\x12\x42\n\x15\x63reateDataRoomRequest\x18\x05 \x01(\x0b\x32!.waterfront.CreateDataRoomRequestH\x00\x12V\n\x1fpublishDatasetToDataRoomRequest\x18\x06 \x01(\x0b\x32+.waterfront.PublishDatasetToDataRoomRequestH\x00\x12\x46\n\x17retrieveDataRoomRequest\x18\x07 \x01(\x0b\x32#.waterfront.RetrieveDataRoomRequestH\x00\x12\x44\n\x16validateDatasetRequest\x18\x08 \x01(\x0b\x32\".waterfront.ValidateDatasetRequestH\x00\x12\x46\n\x17retrieveAuditLogRequest\x18\t \x01(\x0b\x32#.waterfront.RetrieveAuditLogRequestH\x00\x12R\n\x1dretrieveDataRoomStatusRequest\x18\n \x01(\x0b\x32).waterfront.RetrieveDataRoomStatusRequestH\x00\x12N\n\x1bupdateDataRoomStatusRequest\x18\x0b \x01(\x0b\x32\'.waterfront.UpdateDataRoomStatusRequestH\x00\x12V\n\x1fretrievePublishedDatasetRequest\x18\x0c \x01(\x0b\x32+.waterfront.RetrievePublishedDatasetRequestH\x00\x12R\n\x1dremovePublishedDatasetRequest\x18\r \x01(\x0b\x32).waterfront.RemovePublishedDatasetRequestH\x00\x12\x38\n\x10jobStatusRequest\x18\x0e \x01(\x0b\x32\x1c.waterfront.JobStatusRequestH\x00\x12:\n\x11getResultsRequest\x18\x0f \x01(\x0b\x32\x1d.waterfront.GetResultsRequestH\x00\x42\x14\n\x12waterfront_request\"\x88\x07\n\x12WaterfrontResponse\x12\x11\n\x07\x66\x61ilure\x18\x01 \x01(\tH\x00\x12\x38\n\x10sqlQueryResponse\x18\x03 \x01(\x0b\x32\x1c.waterfront.SqlQueryResponseH\x00\x12\x44\n\x16\x63reateDataRoomResponse\x18\x06 \x01(\x0b\x32\".waterfront.CreateDataRoomResponseH\x00\x12X\n publishDatasetToDataRoomResponse\x18\x07 \x01(\x0b\x32,.waterfront.PublishDatasetToDataRoomResponseH\x00\x12H\n\x18retrieveDataRoomResponse\x18\x08 \x01(\x0b\x32$.waterfront.RetrieveDataRoomResponseH\x00\x12\x46\n\x17validateDatasetResponse\x18\t \x01(\x0b\x32#.waterfront.ValidateDatasetResponseH\x00\x12H\n\x18retrieveAuditLogResponse\x18\n \x01(\x0b\x32$.waterfront.RetrieveAuditLogResponseH\x00\x12T\n\x1eretrieveDataRoomStatusResponse\x18\x0b \x01(\x0b\x32*.waterfront.RetrieveDataRoomStatusResponseH\x00\x12P\n\x1cupdateDataRoomStatusResponse\x18\x0c \x01(\x0b\x32(.waterfront.UpdateDataRoomStatusResponseH\x00\x12X\n retrievePublishedDatasetResponse\x18\r \x01(\x0b\x32,.waterfront.RetrievePublishedDatasetResponseH\x00\x12T\n\x1eremovePublishedDatasetResponse\x18\x0e \x01(\x0b\x32*.waterfront.RemovePublishedDatasetResponseH\x00\x12:\n\x11jobStatusResponse\x18\x0f \x01(\x0b\x32\x1d.waterfront.JobStatusResponseH\x00\x42\x15\n\x13waterfront_response\":\n\x12\x41uthenticationData\x12\x0c\n\x04role\x18\x01 \x02(\t\x12\x16\n\x0epasswordSha256\x18\x02 \x01(\t\">\n\x15\x43reateDataRoomRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"\x95\x01\n\x16\x43reateDataRoomResponse\x12\x16\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\x0cH\x00\x12\x46\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32#.waterfront.DataRoomValidationErrorH\x00\x42\x1b\n\x19\x63reate_data_room_response\"\xac\x01\n\x17\x44\x61taRoomValidationError\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x12\n\nqueryIndex\x18\x02 \x01(\x04\x12\x13\n\x0b\x63olumnIndex\x18\x03 \x01(\x04\x12\x12\n\ntableIndex\x18\x04 \x01(\x04\x12\x11\n\troleIndex\x18\x05 \x01(\x04\x12\x17\n\x0fpermissionIndex\x18\x06 \x01(\x04\x12\x17\n\x0f\x63onstraintIndex\x18\x07 \x01(\x04\"\xc8\x01\n\x1fPublishDatasetToDataRoomRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12\x19\n\x11\x64\x61taRoomTableName\x18\x03 \x02(\t\x12\x30\n\rencryptionKey\x18\x04 \x02(\x0b\x32\x19.waterfront.EncryptionKey\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"\"\n PublishDatasetToDataRoomResponse\"`\n\x16ValidateDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x30\n\rencryptionKey\x18\x02 \x02(\x0b\x32\x19.waterfront.EncryptionKey\"6\n\x16ValidateDatasetFailure\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x0b\n\x03row\x18\x02 \x01(\x04\"N\n\x17ValidateDatasetResponse\x12\x33\n\x07\x66\x61ilure\x18\x01 \x01(\x0b\x32\".waterfront.ValidateDatasetFailure\"h\n\x0fSqlQueryRequest\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"\x90\x01\n\x10SqlQueryResponse\x12\x34\n\ninProgress\x18\x01 \x01(\x0b\x32\x1e.waterfront.SqlQueryInProgressH\x00\x12\x30\n\x08\x66inished\x18\x02 \x01(\x0b\x32\x1c.waterfront.SqlQueryFinishedH\x00\x42\x14\n\x12sql_query_response\"#\n\x12SqlQueryInProgress\x12\r\n\x05jobId\x18\x01 \x02(\x0c\"0\n\x10SqlQueryFinished\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\x0e\n\x06header\x18\x02 \x03(\t\"O\n\x10JobStatusRequest\x12\r\n\x05jobId\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"&\n\x11JobStatusResponse\x12\x11\n\tcompleted\x18\x01 \x02(\x08\"P\n\x11GetResultsRequest\x12\r\n\x05jobId\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"]\n\x17RetrieveDataRoomRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"A\n\x18RetrieveDataRoomResponse\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"]\n\x17RetrieveAuditLogRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"(\n\x18RetrieveAuditLogResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"c\n\x1dRetrieveDataRoomStatusRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"L\n\x1eRetrieveDataRoomStatusResponse\x12*\n\x06status\x18\x01 \x02(\x0e\x32\x1a.waterfront.DataRoomStatus\"\x8d\x01\n\x1bUpdateDataRoomStatusRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\x12*\n\x06status\x18\x03 \x02(\x0e\x32\x1a.waterfront.DataRoomStatus\"\x1e\n\x1cUpdateDataRoomStatusResponse\"e\n\x1fRetrievePublishedDatasetRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"X\n\x10PublishedDataset\x12\r\n\x05table\x18\x01 \x02(\t\x12\x0c\n\x04user\x18\x02 \x02(\t\x12\x11\n\ttimestamp\x18\x03 \x02(\x04\x12\x14\n\x0c\x64\x61taset_hash\x18\x04 \x02(\x0c\"[\n RetrievePublishedDatasetResponse\x12\x37\n\x11publishedDatasets\x18\x01 \x03(\x0b\x32\x1c.waterfront.PublishedDataset\"\x94\x01\n\x1dRemovePublishedDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12\x19\n\x11\x64\x61taRoomTableName\x18\x03 \x02(\t\x12,\n\x04\x61uth\x18\x04 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\" \n\x1eRemovePublishedDatasetResponse\"/\n\rEncryptionKey\x12\x10\n\x08material\x18\x01 \x02(\x0c\x12\x0c\n\x04salt\x18\x02 \x02(\x0c\"<\n\x0bTableSchema\x12-\n\x0cnamedColumns\x18\x01 \x03(\x0b\x32\x17.waterfront.NamedColumn\"H\n\x0bNamedColumn\x12\x0c\n\x04name\x18\x01 \x02(\t\x12+\n\ncolumnType\x18\x02 \x02(\x0b\x32\x17.column_type.ColumnType\"N\n\x0f\x44\x61tasetManifest\x12\x12\n\ndigestHash\x18\x01 \x02(\x0c\x12\'\n\x06schema\x18\x02 \x02(\x0b\x32\x17.waterfront.TableSchema*)\n\x0e\x44\x61taRoomStatus\x12\n\n\x06\x41\x63tive\x10\x01\x12\x0b\n\x07Stopped\x10\x02'
+  serialized_pb=b'\n\x10waterfront.proto\x12\nwaterfront\x1a\x11\x63olumn_type.proto\x1a\x0f\x64\x61ta_room.proto\"\xdf\x07\n\x11WaterfrontRequest\x12\x36\n\x0fsqlQueryRequest\x18\x02 \x01(\x0b\x32\x1b.waterfront.SqlQueryRequestH\x00\x12\x42\n\x15\x63reateDataRoomRequest\x18\x05 \x01(\x0b\x32!.waterfront.CreateDataRoomRequestH\x00\x12V\n\x1fpublishDatasetToDataRoomRequest\x18\x06 \x01(\x0b\x32+.waterfront.PublishDatasetToDataRoomRequestH\x00\x12\x46\n\x17retrieveDataRoomRequest\x18\x07 \x01(\x0b\x32#.waterfront.RetrieveDataRoomRequestH\x00\x12\x44\n\x16validateDatasetRequest\x18\x08 \x01(\x0b\x32\".waterfront.ValidateDatasetRequestH\x00\x12\x46\n\x17retrieveAuditLogRequest\x18\t \x01(\x0b\x32#.waterfront.RetrieveAuditLogRequestH\x00\x12R\n\x1dretrieveDataRoomStatusRequest\x18\n \x01(\x0b\x32).waterfront.RetrieveDataRoomStatusRequestH\x00\x12N\n\x1bupdateDataRoomStatusRequest\x18\x0b \x01(\x0b\x32\'.waterfront.UpdateDataRoomStatusRequestH\x00\x12V\n\x1fretrievePublishedDatasetRequest\x18\x0c \x01(\x0b\x32+.waterfront.RetrievePublishedDatasetRequestH\x00\x12R\n\x1dremovePublishedDatasetRequest\x18\r \x01(\x0b\x32).waterfront.RemovePublishedDatasetRequestH\x00\x12\x38\n\x10jobStatusRequest\x18\x0e \x01(\x0b\x32\x1c.waterfront.JobStatusRequestH\x00\x12:\n\x11getResultsRequest\x18\x0f \x01(\x0b\x32\x1d.waterfront.GetResultsRequestH\x00\x12\x44\n\x16validateQueriesRequest\x18\x10 \x01(\x0b\x32\".waterfront.ValidateQueriesRequestH\x00\x42\x14\n\x12waterfront_request\"\xd0\x07\n\x12WaterfrontResponse\x12\x11\n\x07\x66\x61ilure\x18\x01 \x01(\tH\x00\x12\x38\n\x10sqlQueryResponse\x18\x03 \x01(\x0b\x32\x1c.waterfront.SqlQueryResponseH\x00\x12\x44\n\x16\x63reateDataRoomResponse\x18\x06 \x01(\x0b\x32\".waterfront.CreateDataRoomResponseH\x00\x12X\n publishDatasetToDataRoomResponse\x18\x07 \x01(\x0b\x32,.waterfront.PublishDatasetToDataRoomResponseH\x00\x12H\n\x18retrieveDataRoomResponse\x18\x08 \x01(\x0b\x32$.waterfront.RetrieveDataRoomResponseH\x00\x12\x46\n\x17validateDatasetResponse\x18\t \x01(\x0b\x32#.waterfront.ValidateDatasetResponseH\x00\x12H\n\x18retrieveAuditLogResponse\x18\n \x01(\x0b\x32$.waterfront.RetrieveAuditLogResponseH\x00\x12T\n\x1eretrieveDataRoomStatusResponse\x18\x0b \x01(\x0b\x32*.waterfront.RetrieveDataRoomStatusResponseH\x00\x12P\n\x1cupdateDataRoomStatusResponse\x18\x0c \x01(\x0b\x32(.waterfront.UpdateDataRoomStatusResponseH\x00\x12X\n retrievePublishedDatasetResponse\x18\r \x01(\x0b\x32,.waterfront.RetrievePublishedDatasetResponseH\x00\x12T\n\x1eremovePublishedDatasetResponse\x18\x0e \x01(\x0b\x32*.waterfront.RemovePublishedDatasetResponseH\x00\x12:\n\x11jobStatusResponse\x18\x0f \x01(\x0b\x32\x1d.waterfront.JobStatusResponseH\x00\x12\x46\n\x17validateQueriesResponse\x18\x10 \x01(\x0b\x32#.waterfront.ValidateQueriesResponseH\x00\x42\x15\n\x13waterfront_response\":\n\x12\x41uthenticationData\x12\x0c\n\x04role\x18\x01 \x02(\t\x12\x16\n\x0epasswordSha256\x18\x02 \x01(\t\">\n\x15\x43reateDataRoomRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"\x95\x01\n\x16\x43reateDataRoomResponse\x12\x16\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\x0cH\x00\x12\x46\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32#.waterfront.DataRoomValidationErrorH\x00\x42\x1b\n\x19\x63reate_data_room_response\"\xac\x01\n\x17\x44\x61taRoomValidationError\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x12\n\nqueryIndex\x18\x02 \x01(\x04\x12\x13\n\x0b\x63olumnIndex\x18\x03 \x01(\x04\x12\x12\n\ntableIndex\x18\x04 \x01(\x04\x12\x11\n\troleIndex\x18\x05 \x01(\x04\x12\x17\n\x0fpermissionIndex\x18\x06 \x01(\x04\x12\x17\n\x0f\x63onstraintIndex\x18\x07 \x01(\x04\"\xc8\x01\n\x1fPublishDatasetToDataRoomRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12\x19\n\x11\x64\x61taRoomTableName\x18\x03 \x02(\t\x12\x30\n\rencryptionKey\x18\x04 \x02(\x0b\x32\x19.waterfront.EncryptionKey\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"\"\n PublishDatasetToDataRoomResponse\"`\n\x16ValidateDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x30\n\rencryptionKey\x18\x02 \x02(\x0b\x32\x19.waterfront.EncryptionKey\"6\n\x16ValidateDatasetFailure\x12\x0f\n\x07message\x18\x01 \x02(\t\x12\x0b\n\x03row\x18\x02 \x01(\x04\"N\n\x17ValidateDatasetResponse\x12\x33\n\x07\x66\x61ilure\x18\x01 \x01(\x0b\x32\".waterfront.ValidateDatasetFailure\"h\n\x0fSqlQueryRequest\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"\x90\x01\n\x10SqlQueryResponse\x12\x34\n\ninProgress\x18\x01 \x01(\x0b\x32\x1e.waterfront.SqlQueryInProgressH\x00\x12\x30\n\x08\x66inished\x18\x02 \x01(\x0b\x32\x1c.waterfront.SqlQueryFinishedH\x00\x42\x14\n\x12sql_query_response\"#\n\x12SqlQueryInProgress\x12\r\n\x05jobId\x18\x01 \x02(\x0c\"0\n\x10SqlQueryFinished\x12\x0c\n\x04\x64\x61ta\x18\x01 \x02(\x0c\x12\x0e\n\x06header\x18\x02 \x03(\t\"O\n\x10JobStatusRequest\x12\r\n\x05jobId\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"&\n\x11JobStatusResponse\x12\x11\n\tcompleted\x18\x01 \x02(\x08\"P\n\x11GetResultsRequest\x12\r\n\x05jobId\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"]\n\x17RetrieveDataRoomRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x05 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"A\n\x18RetrieveDataRoomResponse\x12%\n\x08\x64\x61taRoom\x18\x01 \x02(\x0b\x32\x13.data_room.DataRoom\"]\n\x17RetrieveAuditLogRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"(\n\x18RetrieveAuditLogResponse\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"c\n\x1dRetrieveDataRoomStatusRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"L\n\x1eRetrieveDataRoomStatusResponse\x12*\n\x06status\x18\x01 \x02(\x0e\x32\x1a.waterfront.DataRoomStatus\"\x8d\x01\n\x1bUpdateDataRoomStatusRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\x12*\n\x06status\x18\x03 \x02(\x0e\x32\x1a.waterfront.DataRoomStatus\"\x1e\n\x1cUpdateDataRoomStatusResponse\"e\n\x1fRetrievePublishedDatasetRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x02(\x0c\x12,\n\x04\x61uth\x18\x02 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\"X\n\x10PublishedDataset\x12\r\n\x05table\x18\x01 \x02(\t\x12\x0c\n\x04user\x18\x02 \x02(\t\x12\x11\n\ttimestamp\x18\x03 \x02(\x04\x12\x14\n\x0c\x64\x61taset_hash\x18\x04 \x02(\x0c\"[\n RetrievePublishedDatasetResponse\x12\x37\n\x11publishedDatasets\x18\x01 \x03(\x0b\x32\x1c.waterfront.PublishedDataset\"\x94\x01\n\x1dRemovePublishedDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x02(\x0c\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x02(\x0c\x12\x19\n\x11\x64\x61taRoomTableName\x18\x03 \x02(\t\x12,\n\x04\x61uth\x18\x04 \x02(\x0b\x32\x1e.waterfront.AuthenticationData\" \n\x1eRemovePublishedDatasetResponse\"?\n\x16ValidateQueriesRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x01(\x0b\x32\x13.data_room.DataRoom\"=\n\x0cQuerySchemas\x12-\n\x0ctableSchemas\x18\x01 \x03(\x0b\x32\x17.waterfront.TableSchema\"\xb0\x01\n\x17ValidateQueriesResponse\x12\x30\n\x0cquerySchemas\x18\x01 \x01(\x0b\x32\x18.waterfront.QuerySchemasH\x00\x12\x46\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32#.waterfront.DataRoomValidationErrorH\x00\x42\x1b\n\x19validate_queries_response\"/\n\rEncryptionKey\x12\x10\n\x08material\x18\x01 \x02(\x0c\x12\x0c\n\x04salt\x18\x02 \x02(\x0c\"<\n\x0bTableSchema\x12-\n\x0cnamedColumns\x18\x01 \x03(\x0b\x32\x17.waterfront.NamedColumn\"H\n\x0bNamedColumn\x12\x0c\n\x04name\x18\x01 \x02(\t\x12+\n\ncolumnType\x18\x02 \x02(\x0b\x32\x17.column_type.ColumnType\"N\n\x0f\x44\x61tasetManifest\x12\x12\n\ndigestHash\x18\x01 \x02(\x0c\x12\'\n\x06schema\x18\x02 \x02(\x0b\x32\x17.waterfront.TableSchema*)\n\x0e\x44\x61taRoomStatus\x12\n\n\x06\x41\x63tive\x10\x01\x12\x0b\n\x07Stopped\x10\x02'
   ,
   dependencies=[column__type__pb2.DESCRIPTOR,data__room__pb2.DESCRIPTOR,])
 
@@ -46,8 +46,8 @@ _DATAROOMSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=4756,
-  serialized_end=4797,
+  serialized_start=5205,
+  serialized_end=5246,
 )
 _sym_db.RegisterEnumDescriptor(_DATAROOMSTATUS)
 
@@ -149,6 +149,13 @@ _WATERFRONTREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='validateQueriesRequest', full_name='waterfront.WaterfrontRequest.validateQueriesRequest', index=12,
+      number=16, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -167,7 +174,7 @@ _WATERFRONTREQUEST = _descriptor.Descriptor(
     fields=[]),
   ],
   serialized_start=69,
-  serialized_end=990,
+  serialized_end=1060,
 )
 
 
@@ -263,6 +270,13 @@ _WATERFRONTRESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='validateQueriesResponse', full_name='waterfront.WaterfrontResponse.validateQueriesResponse', index=12,
+      number=16, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -280,8 +294,8 @@ _WATERFRONTRESPONSE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=993,
-  serialized_end=1897,
+  serialized_start=1063,
+  serialized_end=2039,
 )
 
 
@@ -319,8 +333,8 @@ _AUTHENTICATIONDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1899,
-  serialized_end=1957,
+  serialized_start=2041,
+  serialized_end=2099,
 )
 
 
@@ -351,8 +365,8 @@ _CREATEDATAROOMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1959,
-  serialized_end=2021,
+  serialized_start=2101,
+  serialized_end=2163,
 )
 
 
@@ -395,8 +409,8 @@ _CREATEDATAROOMRESPONSE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=2024,
-  serialized_end=2173,
+  serialized_start=2166,
+  serialized_end=2315,
 )
 
 
@@ -469,8 +483,8 @@ _DATAROOMVALIDATIONERROR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2176,
-  serialized_end=2348,
+  serialized_start=2318,
+  serialized_end=2490,
 )
 
 
@@ -529,8 +543,8 @@ _PUBLISHDATASETTODATAROOMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2351,
-  serialized_end=2551,
+  serialized_start=2493,
+  serialized_end=2693,
 )
 
 
@@ -554,8 +568,8 @@ _PUBLISHDATASETTODATAROOMRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2553,
-  serialized_end=2587,
+  serialized_start=2695,
+  serialized_end=2729,
 )
 
 
@@ -593,8 +607,8 @@ _VALIDATEDATASETREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2589,
-  serialized_end=2685,
+  serialized_start=2731,
+  serialized_end=2827,
 )
 
 
@@ -632,8 +646,8 @@ _VALIDATEDATASETFAILURE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2687,
-  serialized_end=2741,
+  serialized_start=2829,
+  serialized_end=2883,
 )
 
 
@@ -664,8 +678,8 @@ _VALIDATEDATASETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2743,
-  serialized_end=2821,
+  serialized_start=2885,
+  serialized_end=2963,
 )
 
 
@@ -710,8 +724,8 @@ _SQLQUERYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2823,
-  serialized_end=2927,
+  serialized_start=2965,
+  serialized_end=3069,
 )
 
 
@@ -754,8 +768,8 @@ _SQLQUERYRESPONSE = _descriptor.Descriptor(
       create_key=_descriptor._internal_create_key,
     fields=[]),
   ],
-  serialized_start=2930,
-  serialized_end=3074,
+  serialized_start=3072,
+  serialized_end=3216,
 )
 
 
@@ -786,8 +800,8 @@ _SQLQUERYINPROGRESS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3076,
-  serialized_end=3111,
+  serialized_start=3218,
+  serialized_end=3253,
 )
 
 
@@ -825,8 +839,8 @@ _SQLQUERYFINISHED = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3113,
-  serialized_end=3161,
+  serialized_start=3255,
+  serialized_end=3303,
 )
 
 
@@ -864,8 +878,8 @@ _JOBSTATUSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3163,
-  serialized_end=3242,
+  serialized_start=3305,
+  serialized_end=3384,
 )
 
 
@@ -896,8 +910,8 @@ _JOBSTATUSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3244,
-  serialized_end=3282,
+  serialized_start=3386,
+  serialized_end=3424,
 )
 
 
@@ -935,8 +949,8 @@ _GETRESULTSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3284,
-  serialized_end=3364,
+  serialized_start=3426,
+  serialized_end=3506,
 )
 
 
@@ -974,8 +988,8 @@ _RETRIEVEDATAROOMREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3366,
-  serialized_end=3459,
+  serialized_start=3508,
+  serialized_end=3601,
 )
 
 
@@ -1006,8 +1020,8 @@ _RETRIEVEDATAROOMRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3461,
-  serialized_end=3526,
+  serialized_start=3603,
+  serialized_end=3668,
 )
 
 
@@ -1045,8 +1059,8 @@ _RETRIEVEAUDITLOGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3528,
-  serialized_end=3621,
+  serialized_start=3670,
+  serialized_end=3763,
 )
 
 
@@ -1077,8 +1091,8 @@ _RETRIEVEAUDITLOGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3623,
-  serialized_end=3663,
+  serialized_start=3765,
+  serialized_end=3805,
 )
 
 
@@ -1116,8 +1130,8 @@ _RETRIEVEDATAROOMSTATUSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3665,
-  serialized_end=3764,
+  serialized_start=3807,
+  serialized_end=3906,
 )
 
 
@@ -1148,8 +1162,8 @@ _RETRIEVEDATAROOMSTATUSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3766,
-  serialized_end=3842,
+  serialized_start=3908,
+  serialized_end=3984,
 )
 
 
@@ -1194,8 +1208,8 @@ _UPDATEDATAROOMSTATUSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3845,
-  serialized_end=3986,
+  serialized_start=3987,
+  serialized_end=4128,
 )
 
 
@@ -1219,8 +1233,8 @@ _UPDATEDATAROOMSTATUSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3988,
-  serialized_end=4018,
+  serialized_start=4130,
+  serialized_end=4160,
 )
 
 
@@ -1258,8 +1272,8 @@ _RETRIEVEPUBLISHEDDATASETREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4020,
-  serialized_end=4121,
+  serialized_start=4162,
+  serialized_end=4263,
 )
 
 
@@ -1311,8 +1325,8 @@ _PUBLISHEDDATASET = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4123,
-  serialized_end=4211,
+  serialized_start=4265,
+  serialized_end=4353,
 )
 
 
@@ -1343,8 +1357,8 @@ _RETRIEVEPUBLISHEDDATASETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4213,
-  serialized_end=4304,
+  serialized_start=4355,
+  serialized_end=4446,
 )
 
 
@@ -1396,8 +1410,8 @@ _REMOVEPUBLISHEDDATASETREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4307,
-  serialized_end=4455,
+  serialized_start=4449,
+  serialized_end=4597,
 )
 
 
@@ -1421,8 +1435,116 @@ _REMOVEPUBLISHEDDATASETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4457,
-  serialized_end=4489,
+  serialized_start=4599,
+  serialized_end=4631,
+)
+
+
+_VALIDATEQUERIESREQUEST = _descriptor.Descriptor(
+  name='ValidateQueriesRequest',
+  full_name='waterfront.ValidateQueriesRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='dataRoom', full_name='waterfront.ValidateQueriesRequest.dataRoom', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4633,
+  serialized_end=4696,
+)
+
+
+_QUERYSCHEMAS = _descriptor.Descriptor(
+  name='QuerySchemas',
+  full_name='waterfront.QuerySchemas',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='tableSchemas', full_name='waterfront.QuerySchemas.tableSchemas', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=4698,
+  serialized_end=4759,
+)
+
+
+_VALIDATEQUERIESRESPONSE = _descriptor.Descriptor(
+  name='ValidateQueriesResponse',
+  full_name='waterfront.ValidateQueriesResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='querySchemas', full_name='waterfront.ValidateQueriesResponse.querySchemas', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='dataRoomValidationError', full_name='waterfront.ValidateQueriesResponse.dataRoomValidationError', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='validate_queries_response', full_name='waterfront.ValidateQueriesResponse.validate_queries_response',
+      index=0, containing_type=None,
+      create_key=_descriptor._internal_create_key,
+    fields=[]),
+  ],
+  serialized_start=4762,
+  serialized_end=4938,
 )
 
 
@@ -1460,8 +1582,8 @@ _ENCRYPTIONKEY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4491,
-  serialized_end=4538,
+  serialized_start=4940,
+  serialized_end=4987,
 )
 
 
@@ -1492,8 +1614,8 @@ _TABLESCHEMA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4540,
-  serialized_end=4600,
+  serialized_start=4989,
+  serialized_end=5049,
 )
 
 
@@ -1531,8 +1653,8 @@ _NAMEDCOLUMN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4602,
-  serialized_end=4674,
+  serialized_start=5051,
+  serialized_end=5123,
 )
 
 
@@ -1570,8 +1692,8 @@ _DATASETMANIFEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=4676,
-  serialized_end=4754,
+  serialized_start=5125,
+  serialized_end=5203,
 )
 
 _WATERFRONTREQUEST.fields_by_name['sqlQueryRequest'].message_type = _SQLQUERYREQUEST
@@ -1586,6 +1708,7 @@ _WATERFRONTREQUEST.fields_by_name['retrievePublishedDatasetRequest'].message_typ
 _WATERFRONTREQUEST.fields_by_name['removePublishedDatasetRequest'].message_type = _REMOVEPUBLISHEDDATASETREQUEST
 _WATERFRONTREQUEST.fields_by_name['jobStatusRequest'].message_type = _JOBSTATUSREQUEST
 _WATERFRONTREQUEST.fields_by_name['getResultsRequest'].message_type = _GETRESULTSREQUEST
+_WATERFRONTREQUEST.fields_by_name['validateQueriesRequest'].message_type = _VALIDATEQUERIESREQUEST
 _WATERFRONTREQUEST.oneofs_by_name['waterfront_request'].fields.append(
   _WATERFRONTREQUEST.fields_by_name['sqlQueryRequest'])
 _WATERFRONTREQUEST.fields_by_name['sqlQueryRequest'].containing_oneof = _WATERFRONTREQUEST.oneofs_by_name['waterfront_request']
@@ -1622,6 +1745,9 @@ _WATERFRONTREQUEST.fields_by_name['jobStatusRequest'].containing_oneof = _WATERF
 _WATERFRONTREQUEST.oneofs_by_name['waterfront_request'].fields.append(
   _WATERFRONTREQUEST.fields_by_name['getResultsRequest'])
 _WATERFRONTREQUEST.fields_by_name['getResultsRequest'].containing_oneof = _WATERFRONTREQUEST.oneofs_by_name['waterfront_request']
+_WATERFRONTREQUEST.oneofs_by_name['waterfront_request'].fields.append(
+  _WATERFRONTREQUEST.fields_by_name['validateQueriesRequest'])
+_WATERFRONTREQUEST.fields_by_name['validateQueriesRequest'].containing_oneof = _WATERFRONTREQUEST.oneofs_by_name['waterfront_request']
 _WATERFRONTRESPONSE.fields_by_name['sqlQueryResponse'].message_type = _SQLQUERYRESPONSE
 _WATERFRONTRESPONSE.fields_by_name['createDataRoomResponse'].message_type = _CREATEDATAROOMRESPONSE
 _WATERFRONTRESPONSE.fields_by_name['publishDatasetToDataRoomResponse'].message_type = _PUBLISHDATASETTODATAROOMRESPONSE
@@ -1633,6 +1759,7 @@ _WATERFRONTRESPONSE.fields_by_name['updateDataRoomStatusResponse'].message_type 
 _WATERFRONTRESPONSE.fields_by_name['retrievePublishedDatasetResponse'].message_type = _RETRIEVEPUBLISHEDDATASETRESPONSE
 _WATERFRONTRESPONSE.fields_by_name['removePublishedDatasetResponse'].message_type = _REMOVEPUBLISHEDDATASETRESPONSE
 _WATERFRONTRESPONSE.fields_by_name['jobStatusResponse'].message_type = _JOBSTATUSRESPONSE
+_WATERFRONTRESPONSE.fields_by_name['validateQueriesResponse'].message_type = _VALIDATEQUERIESRESPONSE
 _WATERFRONTRESPONSE.oneofs_by_name['waterfront_response'].fields.append(
   _WATERFRONTRESPONSE.fields_by_name['failure'])
 _WATERFRONTRESPONSE.fields_by_name['failure'].containing_oneof = _WATERFRONTRESPONSE.oneofs_by_name['waterfront_response']
@@ -1669,6 +1796,9 @@ _WATERFRONTRESPONSE.fields_by_name['removePublishedDatasetResponse'].containing_
 _WATERFRONTRESPONSE.oneofs_by_name['waterfront_response'].fields.append(
   _WATERFRONTRESPONSE.fields_by_name['jobStatusResponse'])
 _WATERFRONTRESPONSE.fields_by_name['jobStatusResponse'].containing_oneof = _WATERFRONTRESPONSE.oneofs_by_name['waterfront_response']
+_WATERFRONTRESPONSE.oneofs_by_name['waterfront_response'].fields.append(
+  _WATERFRONTRESPONSE.fields_by_name['validateQueriesResponse'])
+_WATERFRONTRESPONSE.fields_by_name['validateQueriesResponse'].containing_oneof = _WATERFRONTRESPONSE.oneofs_by_name['waterfront_response']
 _CREATEDATAROOMREQUEST.fields_by_name['dataRoom'].message_type = data__room__pb2._DATAROOM
 _CREATEDATAROOMRESPONSE.fields_by_name['dataRoomValidationError'].message_type = _DATAROOMVALIDATIONERROR
 _CREATEDATAROOMRESPONSE.oneofs_by_name['create_data_room_response'].fields.append(
@@ -1702,6 +1832,16 @@ _UPDATEDATAROOMSTATUSREQUEST.fields_by_name['status'].enum_type = _DATAROOMSTATU
 _RETRIEVEPUBLISHEDDATASETREQUEST.fields_by_name['auth'].message_type = _AUTHENTICATIONDATA
 _RETRIEVEPUBLISHEDDATASETRESPONSE.fields_by_name['publishedDatasets'].message_type = _PUBLISHEDDATASET
 _REMOVEPUBLISHEDDATASETREQUEST.fields_by_name['auth'].message_type = _AUTHENTICATIONDATA
+_VALIDATEQUERIESREQUEST.fields_by_name['dataRoom'].message_type = data__room__pb2._DATAROOM
+_QUERYSCHEMAS.fields_by_name['tableSchemas'].message_type = _TABLESCHEMA
+_VALIDATEQUERIESRESPONSE.fields_by_name['querySchemas'].message_type = _QUERYSCHEMAS
+_VALIDATEQUERIESRESPONSE.fields_by_name['dataRoomValidationError'].message_type = _DATAROOMVALIDATIONERROR
+_VALIDATEQUERIESRESPONSE.oneofs_by_name['validate_queries_response'].fields.append(
+  _VALIDATEQUERIESRESPONSE.fields_by_name['querySchemas'])
+_VALIDATEQUERIESRESPONSE.fields_by_name['querySchemas'].containing_oneof = _VALIDATEQUERIESRESPONSE.oneofs_by_name['validate_queries_response']
+_VALIDATEQUERIESRESPONSE.oneofs_by_name['validate_queries_response'].fields.append(
+  _VALIDATEQUERIESRESPONSE.fields_by_name['dataRoomValidationError'])
+_VALIDATEQUERIESRESPONSE.fields_by_name['dataRoomValidationError'].containing_oneof = _VALIDATEQUERIESRESPONSE.oneofs_by_name['validate_queries_response']
 _TABLESCHEMA.fields_by_name['namedColumns'].message_type = _NAMEDCOLUMN
 _NAMEDCOLUMN.fields_by_name['columnType'].message_type = column__type__pb2._COLUMNTYPE
 _DATASETMANIFEST.fields_by_name['schema'].message_type = _TABLESCHEMA
@@ -1736,6 +1876,9 @@ DESCRIPTOR.message_types_by_name['PublishedDataset'] = _PUBLISHEDDATASET
 DESCRIPTOR.message_types_by_name['RetrievePublishedDatasetResponse'] = _RETRIEVEPUBLISHEDDATASETRESPONSE
 DESCRIPTOR.message_types_by_name['RemovePublishedDatasetRequest'] = _REMOVEPUBLISHEDDATASETREQUEST
 DESCRIPTOR.message_types_by_name['RemovePublishedDatasetResponse'] = _REMOVEPUBLISHEDDATASETRESPONSE
+DESCRIPTOR.message_types_by_name['ValidateQueriesRequest'] = _VALIDATEQUERIESREQUEST
+DESCRIPTOR.message_types_by_name['QuerySchemas'] = _QUERYSCHEMAS
+DESCRIPTOR.message_types_by_name['ValidateQueriesResponse'] = _VALIDATEQUERIESRESPONSE
 DESCRIPTOR.message_types_by_name['EncryptionKey'] = _ENCRYPTIONKEY
 DESCRIPTOR.message_types_by_name['TableSchema'] = _TABLESCHEMA
 DESCRIPTOR.message_types_by_name['NamedColumn'] = _NAMEDCOLUMN
@@ -1959,6 +2102,27 @@ RemovePublishedDatasetResponse = _reflection.GeneratedProtocolMessageType('Remov
   # @@protoc_insertion_point(class_scope:waterfront.RemovePublishedDatasetResponse)
   })
 _sym_db.RegisterMessage(RemovePublishedDatasetResponse)
+
+ValidateQueriesRequest = _reflection.GeneratedProtocolMessageType('ValidateQueriesRequest', (_message.Message,), {
+  'DESCRIPTOR' : _VALIDATEQUERIESREQUEST,
+  '__module__' : 'waterfront_pb2'
+  # @@protoc_insertion_point(class_scope:waterfront.ValidateQueriesRequest)
+  })
+_sym_db.RegisterMessage(ValidateQueriesRequest)
+
+QuerySchemas = _reflection.GeneratedProtocolMessageType('QuerySchemas', (_message.Message,), {
+  'DESCRIPTOR' : _QUERYSCHEMAS,
+  '__module__' : 'waterfront_pb2'
+  # @@protoc_insertion_point(class_scope:waterfront.QuerySchemas)
+  })
+_sym_db.RegisterMessage(QuerySchemas)
+
+ValidateQueriesResponse = _reflection.GeneratedProtocolMessageType('ValidateQueriesResponse', (_message.Message,), {
+  'DESCRIPTOR' : _VALIDATEQUERIESRESPONSE,
+  '__module__' : 'waterfront_pb2'
+  # @@protoc_insertion_point(class_scope:waterfront.ValidateQueriesResponse)
+  })
+_sym_db.RegisterMessage(ValidateQueriesResponse)
 
 EncryptionKey = _reflection.GeneratedProtocolMessageType('EncryptionKey', (_message.Message,), {
   'DESCRIPTOR' : _ENCRYPTIONKEY,

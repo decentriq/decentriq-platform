@@ -115,7 +115,7 @@ class Session():
         response = self._submit_query_request(req, auth)
         if response.HasField("finished"):
             return response.finished
-        
+
         job_id = response.inProgress.jobId
         while True:
             # poll status
@@ -154,7 +154,7 @@ class Session():
                 raise Exception("Expected inProgress or finished query response")
         final_response.finished.data = b''.join(contents)
         return final_response
-        
+
     # submit a query, once.
     def _submit_query_request(self, request: WaterfrontRequest, auth: Auth) -> SqlQueryResponse:
         responses = self._send_message_many_responses(request, auth)
@@ -367,6 +367,23 @@ class Session():
                 "Expected removePublishedDatasetResponse, got "
                 + response.WhichOneof("waterfront_response")
             )
+
+    def validate_queries(
+        self,
+        data_room: DataRoom,
+        role: str = None
+    ):
+        req = WaterfrontRequest()
+        req.validateQueriesRequest.dataRoom.CopyFrom(data_room)
+
+        _, auth = self._get_auth_for_role(role)
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("validateQueriesResponse"):
+            raise Exception(
+                "Expected validateQueriesResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.validateQueriesResponse
 
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.quote.reportdata[:32])
