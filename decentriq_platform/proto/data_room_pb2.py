@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\"\xab\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x02(\t\x12 \n\x06tables\x18\x02 \x03(\x0b\x32\x10.data_room.Table\x12!\n\x07queries\x18\x03 \x03(\x0b\x32\x10.data_room.Query\x12\x1e\n\x05roles\x18\x04 \x03(\x0b\x32\x0f.data_room.Role\x12\x11\n\tmrenclave\x18\x06 \x01(\t\x12\x1b\n\x13singleExecutionMode\x18\x07 \x01(\x08\"b\n\x05Table\x12\x1f\n\x17sqlCreateTableStatement\x18\x01 \x02(\t\x12\x38\n\x15submissionConstraints\x18\x02 \x03(\x0b\x32\x19.data_room.TimeConstraint\"b\n\x05Query\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x1a\n\x12sqlSelectStatement\x18\x02 \x02(\t\x12*\n\x0b\x63onstraints\x18\x03 \x03(\x0b\x32\x15.data_room.Constraint\"\x97\x01\n\x04Role\x12\x10\n\x08roleName\x18\x01 \x02(\t\x12\x12\n\nemailRegex\x18\x02 \x02(\t\x12=\n\x14\x61uthenticationMethod\x18\x03 \x02(\x0b\x32\x1f.data_room.AuthenticationMethod\x12*\n\x0bpermissions\x18\x04 \x03(\x0b\x32\x15.data_room.Permission\"~\n\x14\x41uthenticationMethod\x12)\n\ntrustedPki\x18\x01 \x02(\x0b\x32\x15.data_room.TrustedPki\x12#\n\x07mailPki\x18\x02 \x01(\x0b\x32\x12.data_room.MailPki\x12\x16\n\x0epasswordSha256\x18\x03 \x01(\t\"%\n\nTrustedPki\x12\x17\n\x0frootCertificate\x18\x01 \x02(\x0c\"\x1e\n\x07MailPki\x12\x13\n\x0brootCaStore\x18\x01 \x02(\x0c\"\xc7\x04\n\nPermission\x12\x41\n\x15submitQueryPermission\x18\x01 \x01(\x0b\x32 .data_room.SubmitQueryPermissionH\x00\x12=\n\x13tableCrudPermission\x18\x02 \x01(\x0b\x32\x1e.data_room.TableCrudPermissionH\x00\x12M\n\x1b\x64\x61taRoomRetrievalPermission\x18\x03 \x01(\x0b\x32&.data_room.DataroomRetrievalPermissionH\x00\x12M\n\x1b\x61uditLogRetrievalPermission\x18\x04 \x01(\x0b\x32&.data_room.AuditLogRetrievalPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x12]\n#retrievePublishedDatasetsPermission\x18\x07 \x01(\x0b\x32..data_room.RetrievePublishedDatasetsPermissionH\x00\x42\x0c\n\npermission\"*\n\x15SubmitQueryPermission\x12\x11\n\tqueryName\x18\x01 \x02(\t\"(\n\x13TableCrudPermission\x12\x11\n\ttableName\x18\x01 \x02(\t\"\x1d\n\x1b\x44\x61taroomRetrievalPermission\"\x1d\n\x1b\x41uditLogRetrievalPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"%\n#RetrievePublishedDatasetsPermission\"\x97\x01\n\nConstraint\x12\x13\n\x0b\x64\x65scription\x18\x01 \x02(\t\x12\x31\n\rsqlConstraint\x18\x02 \x01(\x0b\x32\x18.data_room.SqlConstraintH\x00\x12\x33\n\x0etimeConstraint\x18\x03 \x01(\x0b\x32\x19.data_room.TimeConstraintH\x00\x42\x0c\n\nconstraint\"\"\n\rSqlConstraint\x12\x11\n\tstatement\x18\x01 \x02(\t\"3\n\x0eTimeConstraint\x12\x11\n\ttimestamp\x18\x01 \x02(\x03\x12\x0e\n\x06\x62\x65\x66ore\x18\x02 \x02(\x08'
+  serialized_pb=b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\"\xab\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x02(\t\x12 \n\x06tables\x18\x02 \x03(\x0b\x32\x10.data_room.Table\x12!\n\x07queries\x18\x03 \x03(\x0b\x32\x10.data_room.Query\x12\x1e\n\x05roles\x18\x04 \x03(\x0b\x32\x0f.data_room.Role\x12\x11\n\tmrenclave\x18\x06 \x01(\t\x12\x1b\n\x13singleExecutionMode\x18\x07 \x01(\x08\"b\n\x05Table\x12\x1f\n\x17sqlCreateTableStatement\x18\x01 \x02(\t\x12\x38\n\x15submissionConstraints\x18\x02 \x03(\x0b\x32\x19.data_room.TimeConstraint\"b\n\x05Query\x12\x11\n\tqueryName\x18\x01 \x02(\t\x12\x1a\n\x12sqlSelectStatement\x18\x02 \x02(\t\x12*\n\x0b\x63onstraints\x18\x03 \x03(\x0b\x32\x15.data_room.Constraint\"\x97\x01\n\x04Role\x12\x10\n\x08roleName\x18\x01 \x02(\t\x12\x12\n\nemailRegex\x18\x02 \x02(\t\x12=\n\x14\x61uthenticationMethod\x18\x03 \x02(\x0b\x32\x1f.data_room.AuthenticationMethod\x12*\n\x0bpermissions\x18\x04 \x03(\x0b\x32\x15.data_room.Permission\"~\n\x14\x41uthenticationMethod\x12)\n\ntrustedPki\x18\x01 \x02(\x0b\x32\x15.data_room.TrustedPki\x12#\n\x07mailPki\x18\x02 \x01(\x0b\x32\x12.data_room.MailPki\x12\x16\n\x0epasswordSha256\x18\x03 \x01(\t\"%\n\nTrustedPki\x12\x17\n\x0frootCertificate\x18\x01 \x02(\x0c\"\x1e\n\x07MailPki\x12\x13\n\x0brootCaStore\x18\x01 \x02(\x0c\"\xc7\x04\n\nPermission\x12\x41\n\x15submitQueryPermission\x18\x01 \x01(\x0b\x32 .data_room.SubmitQueryPermissionH\x00\x12=\n\x13tableCrudPermission\x18\x02 \x01(\x0b\x32\x1e.data_room.TableCrudPermissionH\x00\x12M\n\x1b\x64\x61taRoomRetrievalPermission\x18\x03 \x01(\x0b\x32&.data_room.DataroomRetrievalPermissionH\x00\x12M\n\x1b\x61uditLogRetrievalPermission\x18\x04 \x01(\x0b\x32&.data_room.AuditLogRetrievalPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x12]\n#retrievePublishedDatasetsPermission\x18\x07 \x01(\x0b\x32..data_room.RetrievePublishedDatasetsPermissionH\x00\x42\x0c\n\npermission\"*\n\x15SubmitQueryPermission\x12\x11\n\tqueryName\x18\x01 \x02(\t\"(\n\x13TableCrudPermission\x12\x11\n\ttableName\x18\x01 \x02(\t\"\x1d\n\x1b\x44\x61taroomRetrievalPermission\"\x1d\n\x1b\x41uditLogRetrievalPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"%\n#RetrievePublishedDatasetsPermission\"\xd2\x01\n\nConstraint\x12\x13\n\x0b\x64\x65scription\x18\x01 \x02(\t\x12\x31\n\rsqlConstraint\x18\x02 \x01(\x0b\x32\x18.data_room.SqlConstraintH\x00\x12\x33\n\x0etimeConstraint\x18\x03 \x01(\x0b\x32\x19.data_room.TimeConstraintH\x00\x12\x39\n\x11\x64\x61tasetConstraint\x18\x04 \x01(\x0b\x32\x1c.data_room.DatasetConstraintH\x00\x42\x0c\n\nconstraint\"\"\n\rSqlConstraint\x12\x11\n\tstatement\x18\x01 \x02(\t\"3\n\x0eTimeConstraint\x12\x11\n\ttimestamp\x18\x01 \x02(\x03\x12\x0e\n\x06\x62\x65\x66ore\x18\x02 \x02(\x08\"7\n\x11\x44\x61tasetConstraint\x12\r\n\x05table\x18\x01 \x01(\t\x12\x13\n\x0bsubmissions\x18\x02 \x01(\x03'
 )
 
 
@@ -637,6 +637,13 @@ _CONSTRAINT = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='datasetConstraint', full_name='data_room.Constraint.datasetConstraint', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -655,7 +662,7 @@ _CONSTRAINT = _descriptor.Descriptor(
     fields=[]),
   ],
   serialized_start=1601,
-  serialized_end=1752,
+  serialized_end=1811,
 )
 
 
@@ -686,8 +693,8 @@ _SQLCONSTRAINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1754,
-  serialized_end=1788,
+  serialized_start=1813,
+  serialized_end=1847,
 )
 
 
@@ -725,8 +732,47 @@ _TIMECONSTRAINT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1790,
-  serialized_end=1841,
+  serialized_start=1849,
+  serialized_end=1900,
+)
+
+
+_DATASETCONSTRAINT = _descriptor.Descriptor(
+  name='DatasetConstraint',
+  full_name='data_room.DatasetConstraint',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='table', full_name='data_room.DatasetConstraint.table', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='submissions', full_name='data_room.DatasetConstraint.submissions', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto2',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1902,
+  serialized_end=1957,
 )
 
 _DATAROOM.fields_by_name['tables'].message_type = _TABLE
@@ -768,12 +814,16 @@ _PERMISSION.oneofs_by_name['permission'].fields.append(
 _PERMISSION.fields_by_name['retrievePublishedDatasetsPermission'].containing_oneof = _PERMISSION.oneofs_by_name['permission']
 _CONSTRAINT.fields_by_name['sqlConstraint'].message_type = _SQLCONSTRAINT
 _CONSTRAINT.fields_by_name['timeConstraint'].message_type = _TIMECONSTRAINT
+_CONSTRAINT.fields_by_name['datasetConstraint'].message_type = _DATASETCONSTRAINT
 _CONSTRAINT.oneofs_by_name['constraint'].fields.append(
   _CONSTRAINT.fields_by_name['sqlConstraint'])
 _CONSTRAINT.fields_by_name['sqlConstraint'].containing_oneof = _CONSTRAINT.oneofs_by_name['constraint']
 _CONSTRAINT.oneofs_by_name['constraint'].fields.append(
   _CONSTRAINT.fields_by_name['timeConstraint'])
 _CONSTRAINT.fields_by_name['timeConstraint'].containing_oneof = _CONSTRAINT.oneofs_by_name['constraint']
+_CONSTRAINT.oneofs_by_name['constraint'].fields.append(
+  _CONSTRAINT.fields_by_name['datasetConstraint'])
+_CONSTRAINT.fields_by_name['datasetConstraint'].containing_oneof = _CONSTRAINT.oneofs_by_name['constraint']
 DESCRIPTOR.message_types_by_name['DataRoom'] = _DATAROOM
 DESCRIPTOR.message_types_by_name['Table'] = _TABLE
 DESCRIPTOR.message_types_by_name['Query'] = _QUERY
@@ -792,6 +842,7 @@ DESCRIPTOR.message_types_by_name['RetrievePublishedDatasetsPermission'] = _RETRI
 DESCRIPTOR.message_types_by_name['Constraint'] = _CONSTRAINT
 DESCRIPTOR.message_types_by_name['SqlConstraint'] = _SQLCONSTRAINT
 DESCRIPTOR.message_types_by_name['TimeConstraint'] = _TIMECONSTRAINT
+DESCRIPTOR.message_types_by_name['DatasetConstraint'] = _DATASETCONSTRAINT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 DataRoom = _reflection.GeneratedProtocolMessageType('DataRoom', (_message.Message,), {
@@ -919,6 +970,13 @@ TimeConstraint = _reflection.GeneratedProtocolMessageType('TimeConstraint', (_me
   # @@protoc_insertion_point(class_scope:data_room.TimeConstraint)
   })
 _sym_db.RegisterMessage(TimeConstraint)
+
+DatasetConstraint = _reflection.GeneratedProtocolMessageType('DatasetConstraint', (_message.Message,), {
+  'DESCRIPTOR' : _DATASETCONSTRAINT,
+  '__module__' : 'data_room_pb2'
+  # @@protoc_insertion_point(class_scope:data_room.DatasetConstraint)
+  })
+_sym_db.RegisterMessage(DatasetConstraint)
 
 
 # @@protoc_insertion_point(module_scope)

@@ -77,6 +77,7 @@ message Constraint {
     oneof constraint {
         SqlConstraint sqlConstraint = 2;
         TimeConstraint timeConstraint = 3;
+        DatasetConstraint datasetConstraint = 4;
     }
 }
 
@@ -88,4 +89,9 @@ message TimeConstraint {
     // Unix timestamp in seconds
     required int64 timestamp = 1;
     required bool before = 2;
+}
+
+message DatasetConstraint {
+    optional string table = 1;
+    optional int64 submissions = 2;
 }
