@@ -19,6 +19,7 @@ message Query {
     required string queryName = 1;
     required string sqlSelectStatement = 2;
     repeated Constraint constraints = 3;
+    optional PrivacySettings privacySettings = 4;
 }
 
 message Role {
@@ -26,6 +27,10 @@ message Role {
     required string emailRegex = 2;
     required AuthenticationMethod authenticationMethod = 3;
     repeated Permission permissions = 4;
+}
+
+message PrivacySettings {
+    optional int64 minAggregationGroupSize = 1;
 }
 
 message AuthenticationMethod {

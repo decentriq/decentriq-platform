@@ -11,7 +11,8 @@ from decentriq_platform import (
 from decentriq_platform.proto.data_room_pb2 import (
         DataRoom, Table,
         Query, Role,
-        Permission
+        Permission,
+        PrivacySettings
 )
 from decentriq_platform.proto.waterfront_pb2 import (
         CreateDataRoomResponse, DataRoomValidationError
@@ -1592,3 +1593,105 @@ def test_query_validation():
 
     result = analyst_session.validate_queries(data_room)
     assert(result.querySchemas is not None)
+
+
+def test_min_aggregation_group_size():
+    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
+    root_ca_cert = analyst_client.get_ca_root_certificate()
+
+    data_room = DataRoom()
+    data_room.id = random.getrandbits(64).to_bytes(8, byteorder='little').hex()
+    data_room.mrenclave = analyst_session.enclave_identifier
+
+    table = Table()
+    table.sqlCreateTableStatement = \
+        "CREATE TABLE simple (a BIGINT NOT NULL, b BIGINT NOT NULL)"
+    data_room.tables.append(table)
+
+    query = Query()
+    query.queryName = "simple_query"
+    query.sqlSelectStatement = "SELECT a FROM simple WHERE a > 0"
+    query.privacySettings.minAggregationGroupSize = 1
+
+    data_room.queries.append(query)
+
+    role = Role()
+    role.roleName = "role"
+    role.emailRegex = ".*"
+    role.authenticationMethod.trustedPki.rootCertificate = root_ca_cert
+
+    query_permission = Permission()
+    query_permission.submitQueryPermission.queryName = "simple_query"
+    role.permissions.append(query_permission)
+
+    upload_permission = Permission()
+    upload_permission.tableCrudPermission.tableName = "simple"
+    role.permissions.append(upload_permission)
+
+    dataroom_retrieval_permission = Permission()
+    dataroom_retrieval_permission.dataRoomRetrievalPermission.SetInParent()
+    role.permissions.append(dataroom_retrieval_permission)
+
+    data_room.roles.append(role)
+
+    error = expect_create_data_room_response_error(analyst_session.create_data_room(data_room))
+    assert error.queryIndex == 0
+
+    data_room.queries[0].ClearField("privacySettings")
+    expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
+
+    query2 = Query()
+    query2.queryName = "aggregation_query"
+    query2.sqlSelectStatement = "SELECT a, SUM(b) FROM simple GROUP BY a"
+    query2.privacySettings.minAggregationGroupSize = 2
+
+    data_room.queries.append(query2)
+
+    query2_permission = Permission()
+    query2_permission.submitQueryPermission.queryName = "aggregation_query"
+    role.permissions.append(query2_permission)
+
+    data_room.roles[0].permissions.append(query2_permission)
+
+    data_room_hash = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
+
+    schema = Schema(table.sqlCreateTableStatement)
+
+    encryption_key = Key()
+
+    manifest_hash = analyst_client.upload_dataset(
+        os.environ["TEST_USER_ID_1"],
+        "simple",
+        StringIO("1,2\n1,5\n2,3"),
+        schema,
+        encryption_key
+    )
+
+    analyst_session.publish_dataset_to_data_room(
+        manifest_hash,
+        data_room_hash,
+        "simple",
+        encryption_key
+    )
+
+    results = analyst_session.make_sql_query(
+        data_room_hash,
+        "aggregation_query",
+        polling_options=None,
+    )
+    assert results.data == b"1,7\n"
+
+    data_room.queries[1].ClearField("privacySettings")
+    data_room_hash_2 = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
+    analyst_session.publish_dataset_to_data_room(
+        manifest_hash,
+        data_room_hash_2,
+        "simple",
+        encryption_key
+    )
+    results = analyst_session.make_sql_query(
+        data_room_hash_2,
+        "aggregation_query",
+        polling_options=None,
+    )
+    assert results.data == b"1,7\n2,3\n"
