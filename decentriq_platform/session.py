@@ -33,6 +33,7 @@ def datanoncepubkey_to_message(encrypted_data: bytes, nonce: bytes, pubkey: byte
     message.auth.pki.idMac = sigma_auth.get_mac_tag()
     return serialize_length_delimited(message)
 
+
 def message_to_datanoncepubkey(message: bytes) -> Tuple[bytes, bytes, bytes]:
     parsed_msg = DataNoncePubkey()
     parse_length_delimited(message, parsed_msg)
@@ -45,31 +46,38 @@ class Fatquote():
     certificate: bytes
     message: bytes
 
+
 @dataclass
 class VerificationOptions():
     accept_debug: bool
     accept_configuration_needed: bool
     accept_group_out_of_date: bool
 
+
 @dataclass
 class SessionOptions():
     verification_options: VerificationOptions
+
 
 @dataclass
 class PollingOptions():
     interval: int
 
+
 class SignatureResponse(TypedDict):
     type: str
     data: List[int]
 
+
 class B64EncodedMessage(TypedDict):
     data: str
+
 
 class FatquoteResBody(TypedDict):
     signature: SignatureResponse
     response: str
     certificate: str
+
 
 class Session():
     def __init__(
@@ -97,7 +105,7 @@ class Session():
         self.client = client
         self.session_id: str = session_id
         self.enclave_identifier: str = enclave_identifier
-        self.auth: Auth = auth
+        self.auth: Dict[str, Auth] = auth
         self.keypair = chily.Keypair.from_random()
         self.fatquote: Fatquote = fatquote
         self.quote: QuoteBody = quote
@@ -144,7 +152,8 @@ class Session():
         final_response = SqlQueryResponse()
         for response in responses:
             if not response.HasField("sqlQueryResponse"):
-                raise Exception("Expected query response, got " + response.WhichOneof("waterfront_response"))
+                raise Exception("Expected query response, got "
+                                + response.WhichOneof("waterfront_response"))
             if response.sqlQueryResponse.HasField("inProgress"):
                 return response.sqlQueryResponse
             if response.sqlQueryResponse.HasField("finished"):
@@ -237,7 +246,8 @@ class Session():
         if final_response.HasField("finished"):
             return final_response.finished
         else:
-            raise Exception("Expected finished sql query response, got " + final_response.WhichOneof("sql_query_response"))
+            raise Exception("Expected finished sql query response, got "
+                            + final_response.WhichOneof("sql_query_response"))
 
     def publish_dataset_to_data_room(
             self,
@@ -443,7 +453,8 @@ class Session():
                 raise Exception(response_container.unsuccessfulResponse)
             else:
                 waterfront_response = WaterfrontResponse()
-                decrypted_response = self._decode_and_decrypt_data(response_container.successfulResponse)
+                decrypted_response = self._decode_and_decrypt_data(
+                    response_container.successfulResponse)
                 parse_length_delimited(decrypted_response, waterfront_response)
                 if waterfront_response.HasField("failure"):
                     raise Exception(waterfront_response.failure)
@@ -461,7 +472,7 @@ class Session():
         enclave_response: B64EncodedMessage = self.client.api.post(
             url, json.dumps(enclave_message), {"Content-type": "application/json"}
         ).json()
-        enclave_response_bytes  = b64decode(enclave_response["data"])
+        enclave_response_bytes = b64decode(enclave_response["data"])
         return enclave_response_bytes
 
     def _get_auth_for_role(self, role: str = None) -> Tuple[str, Auth]:
@@ -473,7 +484,7 @@ class Session():
             else:
                 return (list(self.auth.keys())[0], list(self.auth.values())[0])
         else:
-            if self.auth.has_key(role):
+            if role in self.auth:
                 return (role, self.auth.get(role))
             else:
                 raise Exception("No auth found for specififed role")
