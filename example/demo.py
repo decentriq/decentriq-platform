@@ -220,6 +220,7 @@ manifest_hash_b, key_b = encrypt_and_upload_dataset(client_b, schema_b, email_b,
 
 # Publish datasets by providing the encryption keys to the enclave
 session_i.publish_dataset_to_data_room(
+    email_i,
     manifest_hash_i,
     data_room_hash,
     schema_i.table_name,
@@ -227,6 +228,7 @@ session_i.publish_dataset_to_data_room(
 )
 
 session_b.publish_dataset_to_data_room(
+    email_b,
     manifest_hash_b,
     data_room_hash,
     schema_b.table_name,

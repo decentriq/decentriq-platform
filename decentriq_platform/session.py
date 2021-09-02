@@ -251,12 +251,14 @@ class Session():
 
     def publish_dataset_to_data_room(
             self,
+            user_id: str,
             manifest_hash: bytes,
             data_room_hash: bytes,
             data_room_table_name: str,
             key: Key,
             role: str = None
     ):
+        current_file = self.client.get_user_file(user_id, manifest_hash)
         req = WaterfrontRequest()
         req.publishDatasetToDataRoomRequest.manifestHash = manifest_hash
         req.publishDatasetToDataRoomRequest.dataRoomHash = data_room_hash
@@ -275,6 +277,7 @@ class Session():
                 "Expected publishDatasetToDataRoomResponse, got "
                 + response.WhichOneof("waterfront_response")
             )
+        self.client._add_dataroom_to_user_file(user_id, data_room_hash, data_room_table_name, current_file)
 
     def validate_dataset(
             self,
@@ -356,11 +359,13 @@ class Session():
 
     def remove_published_dataset(
         self,
+        user_id: str,
         manifest_hash: bytes,
         data_room_hash: bytes,
         data_room_table_name: str,
         role: str = None
     ):
+        current_file = self.client.get_user_file(user_id, manifest_hash)
         req = WaterfrontRequest()
         req.removePublishedDatasetRequest.manifestHash = manifest_hash
         req.removePublishedDatasetRequest.dataRoomHash = data_room_hash
@@ -377,6 +382,7 @@ class Session():
                 "Expected removePublishedDatasetResponse, got "
                 + response.WhichOneof("waterfront_response")
             )
+        self.client._add_dataroom_to_user_file(user_id, data_room_hash, data_room_table_name, current_file)
 
     def validate_queries(
         self,

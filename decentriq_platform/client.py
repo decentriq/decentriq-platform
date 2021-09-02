@@ -16,7 +16,7 @@ from .proto.waterfront_pb2 import (
     DatasetManifest,
 )
 from .storage import (
-    Key, Schema,
+    DataRoomDescription, Key, PartialFileDescription, Schema,
     create_encrypted_json_object_chunk,
     create_encrypted_protobuf_object_chunk,
     CsvChunker,
@@ -268,15 +268,59 @@ class Client:
         ).json()
         return file_description
 
-
-    def delete_user_file(self, email: str, manifest_hash: str):
+    def _add_dataroom_to_user_file(
+            self,
+            email: str,
+            data_room_id: bytes,
+            table_name: str,
+            current_file: FileDescription
+    ) -> FileDescription:
         url = Endpoints.USER_FILE \
             .replace(":userId", email) \
-            .replace(":manifestHash", manifest_hash)
+            .replace(":manifestHash", current_file["manifestHash"])
+        new_data_room_ids = current_file["dataRoomIds"] + [DataRoomDescription(
+            dataRoomId=data_room_id.hex(),
+            tableName=table_name
+        )]
+        payload = PartialFileDescription(dataRoomIds=new_data_room_ids)
+        file_description: FileDescription = self.api.patch(
+            url,
+            json.dumps(payload),
+            {"Content-type": "application/json"}
+        ).json()
+        return file_description
+
+    def _remove_dataroom_from_user_file(
+            self,
+            email: str,
+            data_room_id: bytes,
+            table_name: str,
+            current_file: FileDescription
+    ) -> FileDescription:
+        url = Endpoints.USER_FILE \
+            .replace(":userId", email) \
+            .replace(":manifestHash", current_file["manifestHash"])
+        new_data_room_ids = list(filter(
+                lambda id: id["dataRoomId"] != data_room_id.hex() and id["tableName"] != table_name, current_file["dataRoomIds"]
+        ))
+        payload = PartialFileDescription(dataRoomIds=new_data_room_ids)
+        file_description: FileDescription = self.api.patch(
+            url,
+            json.dumps(payload),
+            {"Content-type": "application/json"}
+        ).json()
+        return file_description
+
+    def delete_user_file(self, email: str, manifest_hash: bytes):
+        url = Endpoints.USER_FILE \
+            .replace(":userId", email) \
+            .replace(":manifestHash", manifest_hash.hex())
         self.api.delete(url)
 
-    def get_user_file(self, email: str, manifest_hash: str) -> FileDescription:
-        url = Endpoints.USER_FILE.replace(":userId", email).replace(":manifestHash", manifest_hash)
+    def get_user_file(self, email: str, manifest_hash: bytes) -> FileDescription:
+        url = Endpoints.USER_FILE \
+            .replace(":userId", email) \
+            .replace(":manifestHash", manifest_hash.hex())
         response = self.api.get(url)
         return response.json()
 

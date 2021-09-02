@@ -12,7 +12,6 @@ from decentriq_platform.proto.data_room_pb2 import (
         DataRoom, Table,
         Query, Role,
         Permission,
-        PrivacySettings
 )
 from decentriq_platform.proto.waterfront_pb2 import (
         CreateDataRoomResponse, DataRoomValidationError
@@ -272,6 +271,7 @@ def test_get_initial_weights_containers_distrib():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
@@ -310,6 +310,7 @@ def test_get_initial_weights_containers():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
@@ -350,6 +351,7 @@ def test_get_delta_weights_containers():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
@@ -390,6 +392,7 @@ def test_get_delta_weights_containers_distrib():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
@@ -429,6 +432,7 @@ def test_get_delta_dwelltime_distrib():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
@@ -468,6 +472,7 @@ def test_get_delta_dwelltime():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
@@ -506,13 +511,14 @@ def test_event_auditlog():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "dr_events",
             encryption_key
     )
 
-    results = analyst_session.make_sql_query(
+    analyst_session.make_sql_query(
             data_room_hash,
             "dwelltime_deltas",
             polling_options = PollingOptions(interval=1000)
@@ -613,6 +619,7 @@ def test_multiple_data_providers():
             )
         # Publish dataset to data room
         session.publish_dataset_to_data_room(
+                email,
                 manifest_hash,
                 data_room_hash,
                 "dr_events",
@@ -654,6 +661,7 @@ def test_multiple_data_providers_distrib():
 
         # Publish dataset to data room
         session.publish_dataset_to_data_room(
+                email,
                 manifest_hash,
                 data_room_hash,
                 "dr_events",
@@ -724,6 +732,7 @@ def test_synthetic_user_id():
         encryption_key
     )
     provider_1_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "something",
@@ -749,6 +758,7 @@ def test_synthetic_user_id():
     )
 
     provider_2_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_3"],
             manifest_hash,
             data_room_hash,
             "something",
@@ -880,6 +890,7 @@ def test_non_default_pki():
         encryption_key
     )
     provider_1_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "something",
@@ -906,6 +917,7 @@ def test_non_default_pki():
     )
 
     provider_2_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_3"],
             manifest_hash,
             data_room_hash,
             "something",
@@ -992,6 +1004,7 @@ def test_different_root_same_user():
         encryption_key,
     )
     provider_1_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "something",
@@ -1017,6 +1030,7 @@ def test_different_root_same_user():
     )
 
     provider_2_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "something",
@@ -1157,9 +1171,7 @@ def slow_query_create_table(table_name) -> str:
         f")"
 
 def test_malformed_input_validation():
-    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
     data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])
-    enclave_identifiers = analyst_client.get_enclave_identifiers()
 
     # Upload dataset. Note the different name. This is referring to the user-specific table, and is used to
     # identify an upload for the user. The dataroom table name is shared between users.
@@ -1184,9 +1196,7 @@ def test_malformed_input_validation():
 
 
 def test_correct_input_validation():
-    analyst_client, analyst_session = create_session(os.environ["TEST_USER_ID_1"], os.environ["TEST_API_TOKEN_1"])
     data_provider_client, data_provider_session = create_session(os.environ["TEST_USER_ID_2"], os.environ["TEST_API_TOKEN_2"])
-    enclave_identifiers = analyst_client.get_enclave_identifiers()
 
     # Upload dataset. Note the different name. This is referring to the user-specific table, and is used to
     # identify an upload for the user. The dataroom table name is shared between users.
@@ -1275,6 +1285,7 @@ def test_slow_boat_to_nagasaki_distrib():
 
     # Publish dataset to data room
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "slow_table",
@@ -1350,6 +1361,7 @@ def test_fuzzy_matching():
     )
 
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "customer1",
@@ -1368,6 +1380,7 @@ def test_fuzzy_matching():
     )
 
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "customer2",
@@ -1435,6 +1448,7 @@ def test_large_result():
     )
 
     data_provider_session.publish_dataset_to_data_room(
+        os.environ["TEST_USER_ID_2"],
         manifest_hash,
         data_room_hash,
         "table",
@@ -1516,6 +1530,7 @@ def test_retrieve_provisioned_datasets():
     )
 
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "customer1",
@@ -1534,6 +1549,7 @@ def test_retrieve_provisioned_datasets():
     )
 
     data_provider_session.publish_dataset_to_data_room(
+            os.environ["TEST_USER_ID_2"],
             manifest_hash,
             data_room_hash,
             "customer2",
@@ -1545,6 +1561,7 @@ def test_retrieve_provisioned_datasets():
     assert(len(result1.publishedDatasets) == 2)
 
     data_provider_session.remove_published_dataset(
+        os.environ["TEST_USER_ID_2"],
         manifest_hash,
         data_room_hash,
         "customer2"
@@ -1668,6 +1685,7 @@ def test_min_aggregation_group_size():
     )
 
     analyst_session.publish_dataset_to_data_room(
+        os.environ["TEST_USER_ID_1"],
         manifest_hash,
         data_room_hash,
         "simple",
@@ -1677,13 +1695,14 @@ def test_min_aggregation_group_size():
     results = analyst_session.make_sql_query(
         data_room_hash,
         "aggregation_query",
-        polling_options=None,
+        polling_options = PollingOptions(interval=1000)
     )
     assert results.data == b"1,7\n"
 
     data_room.queries[1].ClearField("privacySettings")
     data_room_hash_2 = expect_create_data_room_response_hash(analyst_session.create_data_room(data_room))
     analyst_session.publish_dataset_to_data_room(
+        os.environ["TEST_USER_ID_1"],
         manifest_hash,
         data_room_hash_2,
         "simple",
@@ -1692,6 +1711,6 @@ def test_min_aggregation_group_size():
     results = analyst_session.make_sql_query(
         data_room_hash_2,
         "aggregation_query",
-        polling_options=None,
+        polling_options = PollingOptions(interval=1000)
     )
     assert results.data == b"1,7\n2,3\n"

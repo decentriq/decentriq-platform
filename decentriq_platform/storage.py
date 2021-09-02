@@ -217,10 +217,18 @@ class UploadDescription(TypedDict):
 class ChunkDescription(TypedDict):
     chunkHash: str
 
+class DataRoomDescription(TypedDict):
+    dataRoomId: str
+    tableName: str
+
+class PartialFileDescription(TypedDict):
+    dataRoomIds: List[DataRoomDescription]
+
 class FileDescription(TypedDict):
     manifestHash: str
     filename: str
     chunks: List[ChunkDescription]
+    dataRoomIds: List[DataRoomDescription]
 
 
 class CsvChunker(Iterator):
