@@ -3,9 +3,10 @@ import datetime
 import os
 import random
 from typing import Tuple, List
-from decentriq_platform import (
-        Client,
-        Schema, Key, Auth,
+from decentriq_platform import Client
+from decentriq_platform.storage import Schema, Key
+from decentriq_platform.authentication import Auth
+from decentriq_platform.session import (
         Session, SessionOptions, VerificationOptions, PollingOptions
 )
 from decentriq_platform.proto.data_room_pb2 import (

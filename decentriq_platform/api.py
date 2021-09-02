@@ -1,7 +1,7 @@
 import requests
-from requests import adapters
 import socket
 import platform
+from requests import adapters
 from enum import Enum
 from urllib3.connection import HTTPConnection
 

@@ -2,67 +2,39 @@ import json
 import io
 import queue
 import os
+from base64 import b64encode
 from concurrent import futures
-from typing_extensions import TypedDict
-from typing import List, TypeVar, Dict, Tuple
-from .session import Session, SessionOptions
+from typing import List, Dict
+from .api import API, Endpoints
+from .authentication import generate_csr, generate_key, Auth
 from .config import (
         DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS
 )
-from .api import API, Endpoints
-from .authentication import generate_csr, generate_key, Auth
-from base64 import b64encode
 from .proto.waterfront_pb2 import (
     DatasetManifest,
 )
+from .session import Session, SessionOptions
 from .storage import (
-    DataRoomDescription, Key, PartialFileDescription, Schema,
+    Key, Schema,
     create_encrypted_json_object_chunk,
     create_encrypted_protobuf_object_chunk,
     CsvChunker,
-    ChunkWrapper,
-    FileDescription,
-    UploadDescription,
-    DatasetManifestMetadata,
     StorageCipher
 )
-
-class UserResponse(TypedDict):
-    id: str
-    email: str
-
-
-class UserCsrRequest(TypedDict):
-    csrPem: str
-
-class UserCsrResponse(TypedDict):
-    certChainPem: str
-
-class EnclaveIdentifier(TypedDict):
-    enclaveIdentifier: str
-    version: str
-
-class EnclaveIdentifiersResponse(TypedDict):
-    enclaveIdentifiers: List[EnclaveIdentifier]
-
-class SystemCaResponse(TypedDict):
-    rootCertificate: str
-
-class CreateSessionRequest(TypedDict):
-    enclaveIdentifier: str
-
-class SessionJsonResponse(TypedDict):
-    sessionId: str
-    enclaveIdentifier: str
-
-class FinalizeUpload(TypedDict):
-    uploadId: str
-    manifest: str
-    name: str
-    manifestHash: str
-    chunks: List[str]
+from .types import (
+        EnclaveIdentifier, EnclaveIdentifiersResponse, FinalizeUpload,
+        UserCsrRequest, UserCsrResponse, CreateSessionRequest, SessionJsonResponse,
+        FileDescription, UploadDescription, ChunkWrapper, DataRoomDescription, PartialFileDescription
+)
 
 class Client:
+    """
+    Implementation of the decentriq platform REST API
+
+    This class provides a Python interface to all functionality provided by
+    the decentriq platform <https://platform.decentriq.com>
+    """
+
     def __init__(
             self,
             api_token: str,
@@ -71,6 +43,10 @@ class Client:
             port: int = DECENTRIQ_PORT,
             use_tls: bool = DECENTRIQ_USE_TLS,
     ):
+        """
+        Create a new client instance. The API token can be obtained in the user
+        panel of the decentriq platform <https://platform.decentriq.com/tokens>
+        """
         self.api = API(
             api_token,
             client_id,
@@ -80,16 +56,27 @@ class Client:
         )
 
     def get_ca_root_certificate(self) -> bytes:
+        """
+        Returns the decentriq root certificate used by the decentriq identity provider
+        """
         url = Endpoints.SYSTEM_CERTIFICATE_AUTHORITY
         response = self.api.get(url).json()
         return response["rootCertificate"].encode("utf-8")
 
     def get_enclave_identifiers(self) -> List[EnclaveIdentifier]:
+        """
+        Returns the list of the currently deployed enclave services for which
+        we can create a `decentriq_platform.session.Session` using `create_session`
+        """
         url = Endpoints.SYSTEM_ENCLAVE_IDENTIFIERS
         response: EnclaveIdentifiersResponse = self.api.get(url).json()
         return response["enclaveIdentifiers"]
 
     def create_auth(self, email: str, access_token: str = None) -> Auth:
+        """
+        Creates a `decentriq_platform.authentication.Auth` object which can be
+        attached to a `decentriq_platform.session.Session`
+        """
         keypair = generate_key()
         csr = generate_csr(email, keypair)
         url = Endpoints.USER_CERTIFICATE.replace(":userId", email)
@@ -105,6 +92,14 @@ class Client:
             auth: Dict[str, Auth],
             options: SessionOptions
     ) -> Session:
+        """
+        Creates a new `decentriq_platform.session.Session` instance to communicate
+        with an enclave service with the specified identifier.
+
+        `auth` is a Python dictionary of `role_identifier` `->` `decentriq_platform.authentication.Auth` objects.
+        Enclave messages sent thorugh this session will be authenticated
+        with the authentication object identifier specified during a call.
+        """
         url = Endpoints.SESSIONS
         req_body = CreateSessionRequest(enclaveIdentifier=enclave_identifier["enclaveIdentifier"])
         response: SessionJsonResponse = self.api.post(
@@ -121,20 +116,30 @@ class Client:
         )
         return session
 
-    S = TypeVar("S", bound=io.TextIOBase)
 
-    # Uploads csv_input_stream as a dataset usable by enclaves
     def upload_dataset(
             self,
             email: str,
             name: str,
-            csv_input_stream: S,
+            csv_input_stream: io.TextIOBase,
             schema: Schema,
             key: Key,
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8
     ) -> bytes:
-        uploader = ThreadPoolExecutorWithQueueSizeLimit(max_workers=parallel_uploads, maxsize=parallel_uploads * 2)
+        """
+        Uploads `csv_input_stream` as a dataset usable by enclaves and returns the
+        corresponding manifest hash
+
+        **Parameters**:
+        - `email`: owner of the file
+        - `name`: name of the file
+        - `csv_input_stream`: file content
+        - `schema`: schema of the file
+        - `key`: key used to encrypt the file
+        """
+        uploader = ThreadPoolExecutorWithQueueSizeLimit(
+                max_workers=parallel_uploads, maxsize=parallel_uploads * 2)
         column_types = [named_column.columnType for named_column in schema.proto_schema.namedColumns]
 
         # create and upload chunks
@@ -312,12 +317,18 @@ class Client:
         return file_description
 
     def delete_user_file(self, email: str, manifest_hash: bytes):
+        """
+        Deletes a user file from the decentriq platform
+        """
         url = Endpoints.USER_FILE \
             .replace(":userId", email) \
             .replace(":manifestHash", manifest_hash.hex())
         self.api.delete(url)
 
     def get_user_file(self, email: str, manifest_hash: bytes) -> FileDescription:
+        """
+        Returns informations about a user file
+        """
         url = Endpoints.USER_FILE \
             .replace(":userId", email) \
             .replace(":manifestHash", manifest_hash.hex())
@@ -325,6 +336,9 @@ class Client:
         return response.json()
 
     def get_user_files_collection(self, email: str) -> List[FileDescription]:
+        """
+        Returns the list of files uploaded by a user
+        """
         url = Endpoints.USER_FILES_COLLECTION.replace(":userId", email)
         response = self.api.get(url)
         return response.json()

@@ -1,7 +1,8 @@
 import json
 import pytest
 import os
-from decentriq_platform import Client, Key, Schema
+from decentriq_platform import Client
+from decentriq_platform.storage import Key, Schema
 from google.protobuf.json_format import MessageToJson
 
 tests_root = os.path.dirname(__file__)

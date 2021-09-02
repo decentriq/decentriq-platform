@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "decentriq"
+  },
+  "targets": {
+    "decentriq": {
+      "hosting": {
+        "main": [
+          "dq-py-docs"
+        ]
+      }
+    }
+  }
+}

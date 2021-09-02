@@ -3,29 +3,34 @@ import chily
 import argon2
 import os
 from collections.abc import Iterator
-from typing import List, Tuple, Any, Union
-from decentriq_platform.proto.column_type_pb2 import ColumnType, PrimitiveType
 from google.protobuf.message import Message
+from hashlib import sha256
+from io import TextIOBase
+from sqloxide import parse_sql # type: ignore
+from typing import List, Tuple, Any, Union, Optional
 from .proto.delta_enclave_api_pb2 import EncryptionHeader, VersionHeader, ChunkHeader
 from .proto.length_delimited import serialize_length_delimited
 from .proto.csv_table_format_pb2 import CsvTableFormat
+from .proto.column_type_pb2 import ColumnType, PrimitiveType
 from .proto.waterfront_pb2 import NamedColumn, TableSchema
-from io import TextIOBase
-from typing_extensions import TypedDict
-from hashlib import sha256
-from sqloxide import parse_sql # type: ignore
+
+__all__ = ["Key", "Schema"]
 
 MAX_CHUNK_SIZE = 8 * 1024 * 1024
 CHARSET = "utf-8"
 KEY_LEN = 32
 SALT_LEN = 16
 
-class ChunkWrapper(TypedDict):
-    hash: str
-    data: str
-
 class Key():
-    def __init__(self, material: Union[bytes, None] = None, salt: Union[bytes, None] = None):
+    """
+    This class wraps the key material and identifier that is used to encrypt the
+    datasets that are uploaded to the decentriq platform
+    """
+    def __init__(self, material: Optional[bytes] = None, salt: Optional[bytes] = None):
+        """
+        Returns a new `Key` instance, can optional specify the raw key material
+        and salt to be used
+        """
         if material == None:
             key_bytes = os.urandom(KEY_LEN)
         else:
@@ -83,6 +88,9 @@ def sql_data_type_to_column_type(column_type: Union[str, dict], options) -> Colu
 
 
 class Schema():
+    """
+    This class encodes the schema that describes the structure of a dataset
+    """
     def __init__(self, create_table_statement: str):
         statements = parse_sql(create_table_statement, dialect="generic")
         if len(statements) == 0:
@@ -113,11 +121,6 @@ class Schema():
             self.table_name: str = table_name
         else:
             raise Exception("CREATE TABLE statement expected");
-
-class DatasetManifestMetadata(TypedDict):
-    name: str
-    manifestHash: str
-    chunks: List[str]
 
 
 def create_csv_chunk_header(extra_entropy: bytes) -> bytes:
@@ -209,26 +212,6 @@ def create_encrypted_protobuf_object_chunk(
     encrypted_chunk = cipher.encrypt(chunk)
 
     return chunk_hash, encrypted_chunk
-
-
-class UploadDescription(TypedDict):
-    uploadId: str
-
-class ChunkDescription(TypedDict):
-    chunkHash: str
-
-class DataRoomDescription(TypedDict):
-    dataRoomId: str
-    tableName: str
-
-class PartialFileDescription(TypedDict):
-    dataRoomIds: List[DataRoomDescription]
-
-class FileDescription(TypedDict):
-    manifestHash: str
-    filename: str
-    chunks: List[ChunkDescription]
-    dataRoomIds: List[DataRoomDescription]
 
 
 class CsvChunker(Iterator):

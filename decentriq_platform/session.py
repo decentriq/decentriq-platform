@@ -1,29 +1,39 @@
 from __future__ import annotations
 import chily
+import hmac
 import json
 import time
-from google.protobuf.message import Message
+from base64 import b64encode, b64decode
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
-import hmac
-from typing_extensions import TypedDict
-from typing import Optional, Union, Tuple, List, overload, TYPE_CHECKING
+from google.protobuf.message import Message
+from typing import Tuple, List, TYPE_CHECKING
 from dataclasses import dataclass
-from base64 import b64encode, b64decode
+from typing import Any, TYPE_CHECKING, Dict
+from .api import Endpoints
+from .authentication import Auth, Sigma
 from .proto.data_room_pb2 import DataRoom
 from .proto.delta_enclave_api_pb2 import Request, Response, DataNoncePubkey
-from .proto.waterfront_pb2 import WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse, DataRoomStatus, SqlQueryResponse, SqlQueryFinished
+from .proto.waterfront_pb2 import (
+        WaterfrontRequest, WaterfrontResponse, CreateDataRoomResponse,
+        RetrieveDataRoomStatusResponse,
+        DataRoomStatus, SqlQueryResponse, SqlQueryFinished
+)
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
-from .verification import QuoteBody, Verification
-from .api import Endpoints
 from .storage import Key
-from .authentication import Auth, Sigma
-from typing import TYPE_CHECKING, Dict
+from .types import FatquoteResBody, B64EncodedMessage
+from .verification import QuoteBody, Verification
 if TYPE_CHECKING:
     from .client import Client
 
+__all__ = ["Session", "SessionOptions", "VerificationOptions", "PollingOptions"]
 
-def datanoncepubkey_to_message(encrypted_data: bytes, nonce: bytes, pubkey: bytes, sigma_auth: Sigma) -> bytes:
+def datanoncepubkey_to_message(
+        encrypted_data: bytes,
+        nonce: bytes,
+        pubkey: bytes,
+        sigma_auth: Sigma
+) -> bytes:
     message = DataNoncePubkey()
     message.data = encrypted_data
     message.nonce = nonce
@@ -49,37 +59,40 @@ class Fatquote():
 
 @dataclass
 class VerificationOptions():
+    """ Customize verification options """
     accept_debug: bool
+    """ Accept enclaves with `DEBUG` flag """
     accept_configuration_needed: bool
+    """ Accept enclaves with `CONFIGURATION_NEEDED` flag """
     accept_group_out_of_date: bool
+    """ Accept enclaves with `GROUP_OUT_OF_DATE` flag """
 
 
 @dataclass
 class SessionOptions():
+    """ Customize session options """
     verification_options: VerificationOptions
 
 
 @dataclass
 class PollingOptions():
+    """ Customize polling options """
     interval: int
-
-
-class SignatureResponse(TypedDict):
-    type: str
-    data: List[int]
-
-
-class B64EncodedMessage(TypedDict):
-    data: str
-
-
-class FatquoteResBody(TypedDict):
-    signature: SignatureResponse
-    response: str
-    certificate: str
+    """ Interval between requests """
 
 
 class Session():
+    """
+    This class manages the communication with an enclave
+    """
+    client: Client
+    session_id: str
+    enclave_identifier: str
+    auth: Dict[str, Auth]
+    keypair: Any
+    fatquote: Fatquote
+    quote: QuoteBody
+
     def __init__(
             self,
             client: Client,
@@ -88,6 +101,9 @@ class Session():
             auth: Dict[str, Auth],
             options: SessionOptions
     ):
+        """
+        Create a new `Session` instance using `decentriq_platform.Client.create_session`
+        """
         url = Endpoints.SESSION_FATQUOTE.replace(":sessionId", session_id)
         response: FatquoteResBody = client.api.get(url).json()
         certificate = response["certificate"].encode("utf-8")
@@ -103,22 +119,284 @@ class Session():
         )
         quote = verification.verify(certificate, message, signature)
         self.client = client
-        self.session_id: str = session_id
-        self.enclave_identifier: str = enclave_identifier
-        self.auth: Dict[str, Auth] = auth
+        self.session_id = session_id
+        self.enclave_identifier = enclave_identifier
+        self.auth = auth
         self.keypair = chily.Keypair.from_random()
-        self.fatquote: Fatquote = fatquote
-        self.quote: QuoteBody = quote
+        self.fatquote = fatquote
+        self.quote = quote
 
-    def make_sql_query(self, data_room_hash: bytes, query_name: str, polling_options: PollingOptions, role: str = None) -> SqlQueryFinished:
+    def create_data_room(
+            self,
+            data_room: DataRoom,
+            role: str = None
+    ) -> CreateDataRoomResponse:
+        """
+        Create a DataRoom with the provided protobuf `data_room` configuration object
+        """
+        req = WaterfrontRequest()
+        req.createDataRoomRequest.dataRoom.CopyFrom(data_room)
+
+        _, auth = self._get_auth_for_role(role)
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("createDataRoomResponse"):
+            raise Exception(
+                "Expected createDataRoomResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.createDataRoomResponse
+
+    def retrieve_data_room_status(
+        self,
+        data_room_hash: bytes,
+        role: str = None
+    ) -> RetrieveDataRoomStatusResponse:
+        """
+        Returns the status of the DataRoom
+        """
+        role, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.retrieveDataRoomStatusRequest.dataRoomHash = data_room_hash
+        req.retrieveDataRoomStatusRequest.auth.role = role
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.retrieveDataRoomStatusRequest.auth.passwordSha256 = access_token
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrieveDataRoomStatusResponse"):
+            raise Exception(
+                "Expected retrieveDataRoomStatusResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrieveDataRoomStatusResponse
+
+    def update_data_room_status(
+        self,
+        data_room_hash: bytes,
+        status: DataRoomStatus,
+        role: str = None
+    ):
+        """
+        Updates the status of the DataRoom
+        """
+        role, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.updateDataRoomStatusRequest.dataRoomHash = data_room_hash
+        req.updateDataRoomStatusRequest.auth.role = role
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.updateDataRoomStatusRequest.auth.passwordSha256 = access_token
+
+        req.updateDataRoomStatusRequest.status = status # type: ignore
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("updateDataRoomStatusResponse"):
+            raise Exception(
+                "Expected updateDataRoomStatusResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.updateDataRoomStatusResponse
+
+    def retrieve_data_room(self, data_room_hash: bytes, role: str = None) -> DataRoom:
+        """
+        Returns the underlying protobuf configuration object for the DataRoom
+        """
+        req = WaterfrontRequest()
+        req.retrieveDataRoomRequest.dataRoomHash = data_room_hash
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.retrieveDataRoomRequest.auth.role = role_name
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.retrieveDataRoomRequest.auth.passwordSha256 = access_token
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrieveDataRoomResponse"):
+            raise Exception(
+                "Expected retrieveDataRoomResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrieveDataRoomResponse.dataRoom
+
+    def retrieve_audit_log(self, data_room_hash: bytes, role: str = None) -> bytes:
+        """
+        Returns the audit log for the DataRoom
+        """
+        req = WaterfrontRequest()
+        req.retrieveAuditLogRequest.dataRoomHash = data_room_hash
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.retrieveAuditLogRequest.auth.role = role_name
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.retrieveAuditLogRequest.auth.passwordSha256 = access_token
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrieveAuditLogResponse"):
+            raise Exception(
+                "Expected retrieveAuditLogResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrieveAuditLogResponse.data
+
+    def publish_dataset_to_data_room(
+            self,
+            user_id: str,
+            manifest_hash: bytes,
+            data_room_hash: bytes,
+            data_room_table_name: str,
+            key: Key,
+            role: str = None
+    ):
+        """
+        Publishes a dataset to the DataRoom
+        """
+        current_file = self.client.get_user_file(user_id, manifest_hash)
+        req = WaterfrontRequest()
+        req.publishDatasetToDataRoomRequest.manifestHash = manifest_hash
+        req.publishDatasetToDataRoomRequest.dataRoomHash = data_room_hash
+        req.publishDatasetToDataRoomRequest.dataRoomTableName = data_room_table_name
+        req.publishDatasetToDataRoomRequest.encryptionKey.material = key.material
+        req.publishDatasetToDataRoomRequest.encryptionKey.salt = key.salt
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.publishDatasetToDataRoomRequest.auth.role = role_name
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.publishDatasetToDataRoomRequest.auth.passwordSha256 = access_token
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("publishDatasetToDataRoomResponse"):
+            raise Exception(
+                "Expected publishDatasetToDataRoomResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        self.client._add_dataroom_to_user_file(user_id, data_room_hash, data_room_table_name, current_file)
+
+    def retrieve_provisioned_datasests(
+        self,
+        data_room_hash: bytes,
+        role: str = None
+    ):
+        """
+        Returns the datasets published to the DataRoom
+        """
+        role, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.retrievePublishedDatasetRequest.dataRoomHash = data_room_hash
+        req.retrievePublishedDatasetRequest.auth.role = role
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.retrievePublishedDatasetRequest.auth.passwordSha256 = access_token
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("retrievePublishedDatasetResponse"):
+            raise Exception(
+                "Expected retrievePublishedDatasetRequest, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.retrievePublishedDatasetResponse
+
+    def remove_published_dataset(
+        self,
+        user_id: str,
+        manifest_hash: bytes,
+        data_room_hash: bytes,
+        data_room_table_name: str,
+        role: str = None
+    ):
+        """
+        Removes a published dataset from the DataRoom
+        """
+        current_file = self.client.get_user_file(user_id, manifest_hash)
+        req = WaterfrontRequest()
+        req.removePublishedDatasetRequest.manifestHash = manifest_hash
+        req.removePublishedDatasetRequest.dataRoomHash = data_room_hash
+        req.removePublishedDatasetRequest.dataRoomTableName = data_room_table_name
+
+        role_name, auth = self._get_auth_for_role(role)
+        req.removePublishedDatasetRequest.auth.role = role_name
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.removePublishedDatasetRequest.auth.passwordSha256 = access_token
+
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("removePublishedDatasetResponse"):
+            raise Exception(
+                "Expected removePublishedDatasetResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        self.client._add_dataroom_to_user_file(user_id, data_room_hash, data_room_table_name, current_file)
+
+    def validate_queries(
+        self,
+        data_room: DataRoom,
+        role: str = None
+    ):
+        """
+        Validates the SQL queries in the provided DataRoom protobuf configuration object
+        """
+        req = WaterfrontRequest()
+        req.validateQueriesRequest.dataRoom.CopyFrom(data_room)
+
+        _, auth = self._get_auth_for_role(role)
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("validateQueriesResponse"):
+            raise Exception(
+                "Expected validateQueriesResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.validateQueriesResponse
+
+    def validate_dataset(
+            self,
+            manifest_hash: bytes,
+            key: Key,
+            role: str = None
+    ):
+        """
+        Checks that the dataset can be processed on the enclave side
+        """
+        _, auth = self._get_auth_for_role(role)
+        req = WaterfrontRequest()
+        req.validateDatasetRequest.manifestHash = manifest_hash
+        req.validateDatasetRequest.encryptionKey.material = key.material
+        req.validateDatasetRequest.encryptionKey.salt = key.salt
+        response = self._send_and_parse_message(req, auth)
+        if not response.HasField("validateDatasetResponse"):
+            raise Exception(
+                "Expected validateDatasetResponse, got "
+                + response.WhichOneof("waterfront_response")
+            )
+        return response.validateDatasetResponse
+
+    def make_sql_query(
+            self,
+            data_room_hash: bytes,
+            query_name: str,
+            polling_options: PollingOptions,
+            role: str = None
+    ) -> SqlQueryFinished:
+        """
+        Launches a new SQL query job with the provided query name and the currently
+        provisioned datasets and waits for its completion returning the results
+        """
         req = WaterfrontRequest()
         req.sqlQueryRequest.queryName = query_name
         req.sqlQueryRequest.dataRoomHash = data_room_hash
 
         role_name, auth = self._get_auth_for_role(role)
         req.sqlQueryRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.sqlQueryRequest.auth.passwordSha256 = auth.get_access_token()
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.sqlQueryRequest.auth.passwordSha256 = access_token
 
         response = self._submit_query_request(req, auth)
         if response.HasField("finished"):
@@ -133,19 +411,10 @@ class Session():
                 return response
             time.sleep(polling_options.interval/1000)
 
-    def make_sql_query_poll(self, data_room_hash: bytes, query_name: str, role: str = None) -> SqlQueryResponse:
-        req = WaterfrontRequest()
-        req.sqlQueryRequest.queryName = query_name
-        req.sqlQueryRequest.dataRoomHash = data_room_hash
-
-        role_name, auth = self._get_auth_for_role(role)
-        req.sqlQueryRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.sqlQueryRequest.auth.passwordSha256 = auth.get_access_token()
-
-        return self._submit_query_request(req, auth)
-
-    def _concatenate_sql_query_responses(self, responses: List[WaterfrontResponse]) -> SqlQueryResponse:
+    def _concatenate_sql_query_responses(
+            self,
+            responses: List[WaterfrontResponse]
+    ) -> SqlQueryResponse:
         if len(responses) == 1:
             return responses[0].sqlQueryResponse
         contents = []
@@ -169,60 +438,41 @@ class Session():
         responses = self._send_message_many_responses(request, auth)
         return self._concatenate_sql_query_responses(responses)
 
-    def create_data_room(self, data_room: DataRoom, role: str = None) -> CreateDataRoomResponse:
+    def make_sql_query_poll(
+            self, data_room_hash: bytes,
+            query_name: str,
+            role: str = None
+    ) -> SqlQueryResponse:
+        """
+        Launches a new SQL query job with the provided query name and the currently
+        provisioned datasets
+        """
         req = WaterfrontRequest()
-        req.createDataRoomRequest.dataRoom.CopyFrom(data_room)
-
-        _, auth = self._get_auth_for_role(role)
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("createDataRoomResponse"):
-            raise Exception(
-                "Expected createDataRoomResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.createDataRoomResponse
-
-    def retrieve_data_room(self, data_room_hash: bytes, role: str = None) -> DataRoom:
-        req = WaterfrontRequest()
-        req.retrieveDataRoomRequest.dataRoomHash = data_room_hash
+        req.sqlQueryRequest.queryName = query_name
+        req.sqlQueryRequest.dataRoomHash = data_room_hash
 
         role_name, auth = self._get_auth_for_role(role)
-        req.retrieveDataRoomRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.retrieveDataRoomRequest.auth.passwordSha256 = auth.get_access_token()
+        req.sqlQueryRequest.auth.role = role_name
 
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("retrieveDataRoomResponse"):
-            raise Exception(
-                "Expected retrieveDataRoomResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.retrieveDataRoomResponse.dataRoom
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.sqlQueryRequest.auth.passwordSha256 = access_token
 
-    def retrieve_audit_log(self, data_room_hash: bytes, role: str = None) -> str:
-        req = WaterfrontRequest()
-        req.retrieveAuditLogRequest.dataRoomHash = data_room_hash
-
-        role_name, auth = self._get_auth_for_role(role)
-        req.retrieveAuditLogRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.retrieveAuditLogRequest.auth.passwordSha256 = auth.get_access_token()
-
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("retrieveAuditLogResponse"):
-            raise Exception(
-                "Expected retrieveAuditLogResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.retrieveAuditLogResponse.data
+        return self._submit_query_request(req, auth)
 
     def get_job_status(self, job_id: bytes, role: str = None) -> bool:
+        """
+        Returns the status of the provided `job_id`
+        """
         req = WaterfrontRequest()
         req.jobStatusRequest.jobId = job_id
         role_name, auth = self._get_auth_for_role(role)
         req.jobStatusRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.jobStatusRequest.auth.passwordSha256 = auth.get_access_token()
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.jobStatusRequest.auth.passwordSha256 = access_token
+
         response = self._send_and_parse_message(req, auth)
         if not response.HasField("jobStatusResponse"):
             raise Exception(
@@ -235,12 +485,18 @@ class Session():
         return response.jobStatusResponse.completed
 
     def get_job_results(self, job_id: bytes, role: str = None) -> SqlQueryFinished:
+        """
+        Returns the results of the provided `job_id`
+        """
         req = WaterfrontRequest()
         req.getResultsRequest.jobId = job_id
         role_name, auth = self._get_auth_for_role(role)
         req.getResultsRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.getResultsRequest.auth.passwordSha256 = auth.get_access_token()
+
+        access_token = auth._get_access_token()
+        if access_token is not None:
+            req.getResultsRequest.auth.passwordSha256 = access_token
+
         responses = self._send_message_many_responses(req, auth)
         final_response = self._concatenate_sql_query_responses(responses)
         if final_response.HasField("finished"):
@@ -248,158 +504,6 @@ class Session():
         else:
             raise Exception("Expected finished sql query response, got "
                             + final_response.WhichOneof("sql_query_response"))
-
-    def publish_dataset_to_data_room(
-            self,
-            user_id: str,
-            manifest_hash: bytes,
-            data_room_hash: bytes,
-            data_room_table_name: str,
-            key: Key,
-            role: str = None
-    ):
-        current_file = self.client.get_user_file(user_id, manifest_hash)
-        req = WaterfrontRequest()
-        req.publishDatasetToDataRoomRequest.manifestHash = manifest_hash
-        req.publishDatasetToDataRoomRequest.dataRoomHash = data_room_hash
-        req.publishDatasetToDataRoomRequest.dataRoomTableName = data_room_table_name
-        req.publishDatasetToDataRoomRequest.encryptionKey.material = key.material
-        req.publishDatasetToDataRoomRequest.encryptionKey.salt = key.salt
-
-        role_name, auth = self._get_auth_for_role(role)
-        req.publishDatasetToDataRoomRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.publishDatasetToDataRoomRequest.auth.passwordSha256 = auth.get_access_token()
-
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("publishDatasetToDataRoomResponse"):
-            raise Exception(
-                "Expected publishDatasetToDataRoomResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        self.client._add_dataroom_to_user_file(user_id, data_room_hash, data_room_table_name, current_file)
-
-    def validate_dataset(
-            self,
-            manifest_hash: bytes,
-            key: Key,
-            role: str = None
-    ):
-        _, auth = self._get_auth_for_role(role)
-        req = WaterfrontRequest()
-        req.validateDatasetRequest.manifestHash = manifest_hash
-        req.validateDatasetRequest.encryptionKey.material = key.material
-        req.validateDatasetRequest.encryptionKey.salt = key.salt
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("validateDatasetResponse"):
-            raise Exception(
-                "Expected validateDatasetResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.validateDatasetResponse
-
-    def retrieve_data_room_status(
-        self,
-        data_room_hash: bytes,
-        role: str = None
-    ):
-        role, auth = self._get_auth_for_role(role)
-        req = WaterfrontRequest()
-        req.retrieveDataRoomStatusRequest.dataRoomHash = data_room_hash
-        req.retrieveDataRoomStatusRequest.auth.role = role
-        if auth.get_access_token() is not None:
-            req.retrieveDataRoomStatusRequest.auth.passwordSha256 = auth.get_access_token()
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("retrieveDataRoomStatusResponse"):
-            raise Exception(
-                "Expected retrieveDataRoomStatusResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.retrieveDataRoomStatusResponse
-
-    def update_data_room_status(
-        self,
-        data_room_hash: bytes,
-        status: DataRoomStatus,
-        role: str = None
-    ):
-        role, auth = self._get_auth_for_role(role)
-        req = WaterfrontRequest()
-        req.updateDataRoomStatusRequest.dataRoomHash = data_room_hash
-        req.updateDataRoomStatusRequest.auth.role = role
-        if auth.get_access_token() is not None:
-            req.updateDataRoomStatusRequest.auth.passwordSha256 = auth.get_access_token()
-        req.updateDataRoomStatusRequest.status = status
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("updateDataRoomStatusResponse"):
-            raise Exception(
-                "Expected updateDataRoomStatusResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.updateDataRoomStatusResponse
-
-    def retrieve_provisioned_datasests(
-        self,
-        data_room_hash: bytes,
-        role: str = None
-    ):
-        role, auth = self._get_auth_for_role(role)
-        req = WaterfrontRequest()
-        req.retrievePublishedDatasetRequest.dataRoomHash = data_room_hash
-        req.retrievePublishedDatasetRequest.auth.role = role
-        if auth.get_access_token() is not None:
-            req.retrievePublishedDatasetRequest.auth.passwordSha256 = auth.get_access_token()
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("retrievePublishedDatasetResponse"):
-            raise Exception(
-                "Expected retrievePublishedDatasetRequest, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.retrievePublishedDatasetResponse
-
-    def remove_published_dataset(
-        self,
-        user_id: str,
-        manifest_hash: bytes,
-        data_room_hash: bytes,
-        data_room_table_name: str,
-        role: str = None
-    ):
-        current_file = self.client.get_user_file(user_id, manifest_hash)
-        req = WaterfrontRequest()
-        req.removePublishedDatasetRequest.manifestHash = manifest_hash
-        req.removePublishedDatasetRequest.dataRoomHash = data_room_hash
-        req.removePublishedDatasetRequest.dataRoomTableName = data_room_table_name
-
-        role_name, auth = self._get_auth_for_role(role)
-        req.removePublishedDatasetRequest.auth.role = role_name
-        if auth.get_access_token() is not None:
-            req.removePublishedDatasetRequest.auth.passwordSha256 = auth.get_access_token()
-
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("removePublishedDatasetResponse"):
-            raise Exception(
-                "Expected removePublishedDatasetResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        self.client._add_dataroom_to_user_file(user_id, data_room_hash, data_room_table_name, current_file)
-
-    def validate_queries(
-        self,
-        data_room: DataRoom,
-        role: str = None
-    ):
-        req = WaterfrontRequest()
-        req.validateQueriesRequest.dataRoom.CopyFrom(data_room)
-
-        _, auth = self._get_auth_for_role(role)
-        response = self._send_and_parse_message(req, auth)
-        if not response.HasField("validateQueriesResponse"):
-            raise Exception(
-                "Expected validateQueriesResponse, got "
-                + response.WhichOneof("waterfront_response")
-            )
-        return response.validateQueriesResponse
 
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.quote.reportdata[:32])
@@ -412,11 +516,11 @@ class Session():
         )
         enc_data = cipher.encrypt(data, nonce)
         public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
-        signature = auth.sign(public_keys)
+        signature = auth._sign(public_keys)
         shared_key = bytes(self.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes)
         hkdf = HKDF(algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b"")
         mac_key = hkdf.derive(shared_key)
-        mac_tag = hmac.digest(mac_key, auth.get_user_id().encode(), "sha512")
+        mac_tag = hmac.digest(mac_key, auth._get_user_id().encode(), "sha512")
         sigma_auth = Sigma(signature, mac_tag, auth)
         return datanoncepubkey_to_message(
             bytes(enc_data),
@@ -490,7 +594,8 @@ class Session():
             else:
                 return (list(self.auth.keys())[0], list(self.auth.values())[0])
         else:
-            if role in self.auth:
-                return (role, self.auth.get(role))
+            auth = self.auth.get(role)
+            if auth is not None:
+                return role, auth
             else:
                 raise Exception("No auth found for specififed role")

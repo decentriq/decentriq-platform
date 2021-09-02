@@ -1,5 +1,6 @@
 import os
-from decentriq_platform import Client, SessionOptions, VerificationOptions
+from decentriq_platform import Client
+from decentriq_platform.session import SessionOptions, VerificationOptions
 
 def test_session_creation():
     api_token = os.environ["TEST_API_TOKEN_1"]

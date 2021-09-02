@@ -1,27 +1,48 @@
+from typing import Optional
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 
+__all__ = ["Auth"]
+
 PKey = rsa.RSAPrivateKey;
 
 class Auth:
-    def __init__(self, certificate_chain: bytes, keypair: PKey, user_id: str, access_token: str = None):
-        self.certificate_chain: bytes = certificate_chain
-        self.kp: PKey = keypair
-        self.user_id: str = user_id
-        self.access_token: str = access_token
+    """
+    This class wraps the certificate used to identify a user and implements the
+    signing of the messages that are sent to the enclave
+    """
+    def __init__(
+            self,
+            certificate_chain: bytes,
+            keypair: PKey,
+            user_id: str,
+            access_token: Optional[str] = None
+    ):
+        """
+        Create an authentication object with the supplied certificate chain and
+        keypair. To use the identity provider of the decentriq platform use
+        `decentriq_platform.Client.create_auth`
+        """
+        self.certificate_chain = certificate_chain
+        self.kp = keypair
+        self.user_id = user_id
+        self.access_token = access_token
 
-    def get_user_id(self) -> str:
+    def _get_user_id(self) -> str:
         return self.user_id
 
-    def get_access_token(self) -> str:
+    def _get_access_token(self) -> Optional[str]:
         return self.access_token
 
     def get_certificate_chain_pem(self) -> bytes:
+        """
+        Returns the chain of certificates in PEM format
+        """
         return self.certificate_chain
 
-    def sign(self, data: bytes) -> bytes:
+    def _sign(self, data: bytes) -> bytes:
         return self.kp.sign(data, padding.PKCS1v15(), hashes.SHA512())
 
 

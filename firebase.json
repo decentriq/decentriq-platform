@@ -1,0 +1,21 @@
+{
+  "hosting": [
+    {
+      "target": "main",
+      "public": "html",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**",
+        "*.ipynb"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/decentriq_platform.html"
+        }
+      ]
+    }
+    
+  ]
+}

@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import os
-from decentriq_platform import (Client, Schema, Key)
-from decentriq_platform import VerificationOptions, SessionOptions, PollingOptions
 import random
-
+from decentriq_platform import Client
+from decentriq_platform.storage import Schema, Key
+from decentriq_platform.session import (
+        VerificationOptions, SessionOptions, PollingOptions
+)
 from decentriq_platform.proto.data_room_pb2 import (
     DataRoom, Table,
     Query, Role,

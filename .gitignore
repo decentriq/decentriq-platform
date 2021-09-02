@@ -85,3 +85,6 @@ ENV/
 env.bak/
 venv.bak/
 .idea
+
+html
+.firebase

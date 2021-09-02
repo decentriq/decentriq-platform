@@ -8,7 +8,7 @@ After cloning the repository you can install the library using pip:
 
 ### Virtual environment(optional)
 
-Before installing the library you may want to worki inside a virual environment:
+Before installing the library you may want to working inside a virtual environment:
 
 ```
 python -m venv env
