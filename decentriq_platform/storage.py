@@ -58,7 +58,7 @@ class Key():
         self.salt: bytes = salt_bytes
 
 def sql_data_type_to_column_type(column_type: Union[str, dict], options) -> ColumnType:
-    type = ColumnType()
+    proto_column_type = ColumnType()
     is_not_null = False
     for option in options:
         option_value = option["option"]
@@ -67,24 +67,24 @@ def sql_data_type_to_column_type(column_type: Union[str, dict], options) -> Colu
         else:
             raise Exception(f"Column option {option_value} not supported")
 
-    type.nullable = not is_not_null
+    proto_column_type.nullable = not is_not_null
 
     if isinstance(column_type, str):
         if column_type == "Text":
-            type.primitiveType =  PrimitiveType.STRING
+            proto_column_type.primitiveType =  PrimitiveType.STRING
         elif column_type == "Real" or column_type == "Double":
-            type.primitiveType = PrimitiveType.FLOAT64 # type: ignore
-        elif column_type == "SmallInt" or column_type == "Int" or column_type == "BigInt":
-            type.primitiveType = PrimitiveType.INT64
+            proto_column_type.primitiveType = PrimitiveType.FLOAT64 # type: ignore
     elif isinstance(column_type, dict):
         if "Char" in column_type or "Varchar" in column_type:
-            type.primitiveType =  PrimitiveType.STRING
+            proto_column_type.primitiveType =  PrimitiveType.STRING
         elif "Float" in column_type:
-            type.primitiveType = PrimitiveType.FLOAT64
+            proto_column_type.primitiveType = PrimitiveType.FLOAT64
+        elif "SmallInt" in column_type or "Int" in column_type or "BigInt" in column_type:
+            proto_column_type.primitiveType = PrimitiveType.INT64
     else:
         raise Exception(f"Unsupported data type {column_type}")
 
-    return type
+    return proto_column_type
 
 
 class Schema():

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "decentriq-platform"
-version = "0.7.0"
+version = "0.7.1"
 description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.ch>"]
 readme = 'README.md'
@@ -17,7 +17,7 @@ cryptography = "^3.4.6"
 asn1crypto = "^1.2.0"
 certvalidator = "^0.11.1"
 argon2-cffi = "^20.1.0"
-sqloxide = "^0.1.11"
+sqloxide = "=0.1.12"
 chily = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
