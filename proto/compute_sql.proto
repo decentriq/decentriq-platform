@@ -1,0 +1,47 @@
+syntax = "proto3";
+package compute_sql;
+
+message SqlWorkerConfiguration {
+    oneof configuration {
+        ValidationConfiguration validation = 1;
+        ComputationConfiguration computation = 2;
+    }
+}
+
+message ValidationConfiguration {
+    TableSchema tableSchema = 1;
+}
+
+message TableSchema {
+    repeated NamedColumn namedColumns = 1;
+}
+
+message NamedColumn {
+    optional string name = 1;
+    ColumnType columnType = 2;
+}
+
+message ColumnType {
+    PrimitiveType primitiveType = 1;
+    bool nullable = 2;
+}
+
+enum PrimitiveType {
+    INT64 = 0;
+    STRING = 1;
+    FLOAT64 = 2;
+}
+
+message ComputationConfiguration {
+    string sqlStatement = 1;
+    PrivacySettings privacySettings = 2;
+    repeated Constraint constraints = 3;
+}
+
+message PrivacySettings {
+    int64 minAggregationGroupSize = 1;
+}
+
+message Constraint {
+    string description = 1;
+}

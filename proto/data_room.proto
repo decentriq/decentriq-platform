@@ -1,0 +1,86 @@
+syntax = "proto3";
+package data_room;
+
+import "attestation.proto";
+
+message DataRoom {
+    string id = 1;
+    repeated ComputeNode computeNodes = 2;
+    repeated attestation.AttestationSpecification attestationSpecifications = 3;
+    repeated UserPermission userPermissions = 4;
+    repeated AuthenticationMethod authenticationMethods = 5;
+    string name = 6;
+    string description = 7;
+    string ownerEmail = 8;
+}
+
+message ComputeNode {
+    string nodeName = 1;
+    oneof node {
+        ComputeNodeLeaf leaf = 2;
+        ComputeNodeBranch branch = 3;
+    }
+}
+
+message ComputeNodeLeaf {
+    bool isRequired = 1;
+}
+
+enum ComputeNodeFormat {
+    RAW = 0;
+    ZIP = 1;
+}
+
+message ComputeNodeBranch {
+    bytes config = 1;
+    repeated string dependencies = 2;
+    uint32 attestationSpecificationIndex = 3;
+    ComputeNodeFormat outputFormat = 4;
+}
+
+message UserPermission {
+    string email = 1;
+    uint32 authenticationMethodIndex = 2;
+    repeated Permission permissions = 3;
+}
+
+message AuthenticationMethod {
+    optional TrustedPki trustedPki = 1;
+}
+
+message TrustedPki {
+    bytes rootCertificatePem = 1;
+}
+
+message Permission {
+    oneof permission {
+        ExecuteComputePermission executeComputePermission = 1;
+        LeafCrudPermission leafCrudPermission = 2;
+        RetrieveDataRoomPermission retrieveDataRoomPermission = 3;
+        RetrieveAuditLogPermission retrieveAuditLogPermission = 4;
+        RetrieveDataRoomStatusPermission retrieveDataRoomStatusPermission = 5;
+        UpdateDataRoomStatusPermission updateDataRoomStatusPermission = 6;
+        RetrievePublishedDatasetsPermission retrievePublishedDatasetsPermission = 7;
+        DryRunPermission dryRunPermission = 8;
+    }
+}
+
+message ExecuteComputePermission {
+    string computeNodeName = 1;
+}
+
+message LeafCrudPermission {
+    string leafNodeName = 1;
+}
+
+message RetrieveDataRoomPermission {}
+
+message RetrieveAuditLogPermission {}
+
+message RetrieveDataRoomStatusPermission {}
+
+message UpdateDataRoomStatusPermission {}
+
+message RetrievePublishedDatasetsPermission {}
+
+message DryRunPermission {}

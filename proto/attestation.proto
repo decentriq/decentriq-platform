@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package attestation;
+
+message Fatquote {
+    oneof fatquote {
+        FatquoteEpid epid = 1;
+        FatquoteDcap dcap = 2;
+        FatquoteNitro nitro = 3;
+    }
+};
+
+message FatquoteEpid {
+    bytes iasResponseBody = 1;
+    bytes iasCertificate = 2;
+    bytes iasSignature = 3;
+    bytes iasRootCaDer = 4;
+}
+
+message FatquoteDcap {
+    bytes dcapQuote = 1;
+    bytes tcbInfo = 2;
+    bytes qeIdentity = 3;
+    bytes tcbSignCert = 4;
+    bytes qeSignCert = 5;
+    bytes dcapRootCaDer = 6;
+}
+
+message FatquoteNitro {
+    bytes cose = 1;
+    bytes nitroRootCaDer = 2;
+}
+
+message AttestationSpecification {
+    oneof attestation_specification {
+        AttestationSpecificationIntelEpid intelEpid = 1;
+        AttestationSpecificationIntelDcap intelDcap = 2;
+        AttestationSpecificationAwsNitro awsNitro = 3;
+    }
+}
+
+message AttestationSpecificationIntelEpid {
+    bytes mrenclave = 1;
+    bytes iasRootCaDer = 2;
+    bool accept_debug = 3;
+    bool accept_group_out_of_date = 4;
+    bool accept_configuration_needed = 5;
+}
+
+message AttestationSpecificationIntelDcap {
+    bytes mrenclave = 1;
+    bytes dcapRootCaDer = 2;
+    bool accept_debug = 3;
+    bool accept_out_of_date = 4;
+    bool accept_configuration_needed = 5;
+    bool accept_sw_hardening_needed = 6;
+    bool accept_revoked = 7;
+}
+
+message AttestationSpecificationAwsNitro {
+    bytes nitroRootCaDer = 1;
+    repeated bytes pcrs = 2;
+}

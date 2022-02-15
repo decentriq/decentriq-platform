@@ -1,0 +1,184 @@
+syntax = "proto3";
+package gcg;
+
+import "data_room.proto";
+import "attestation.proto";
+
+message GcgRequest {
+    oneof gcg_request {
+        ExecuteComputeRequest executeComputeRequest = 2;
+        CreateDataRoomRequest createDataRoomRequest = 3;
+        PublishDatasetToDataRoomRequest publishDatasetToDataRoomRequest = 4;
+        RetrieveDataRoomRequest retrieveDataRoomRequest = 5;
+        RetrieveAuditLogRequest retrieveAuditLogRequest = 6;
+        RetrieveDataRoomStatusRequest retrieveDataRoomStatusRequest = 7;
+        UpdateDataRoomStatusRequest updateDataRoomStatusRequest = 10;
+        RetrievePublishedDatasetsRequest retrievePublishedDatasetsRequest = 11;
+        RemovePublishedDatasetRequest removePublishedDatasetRequest = 12;
+        JobStatusRequest jobStatusRequest = 13;
+        GetResultsRequest getResultsRequest = 14;
+    }
+}
+
+message GcgResponse {
+    oneof gcg_response {
+        string failure = 1;
+        ExecuteComputeResponse executeComputeResponse = 2;
+        CreateDataRoomResponse createDataRoomResponse = 3;
+        PublishDatasetToDataRoomResponse publishDatasetToDataRoomResponse = 4;
+        RetrieveDataRoomResponse retrieveDataRoomResponse = 5;
+        RetrieveAuditLogResponse retrieveAuditLogResponse = 6;
+        RetrieveDataRoomStatusResponse retrieveDataRoomStatusResponse = 7;
+        UpdateDataRoomStatusResponse updateDataRoomStatusResponse = 10;
+        RetrievePublishedDatasetsResponse retrievePublishedDatasetsResponse = 11;
+        RemovePublishedDatasetResponse removePublishedDatasetResponse = 12;
+        JobStatusResponse jobStatusResponse = 13;
+        GetResultsResponseChunk getResultsResponseChunk = 14;
+        GetResultsResponseFooter getResultsResponseFooter = 15;
+    }
+}
+
+message CreateDataRoomRequest {
+    data_room.DataRoom dataRoom = 1;
+    bytes scope = 2;
+}
+
+message CreateDataRoomResponse {
+    oneof create_data_room_response {
+        bytes dataRoomId = 1;
+        DataRoomValidationError dataRoomValidationError = 2;
+    }
+}
+
+message DataRoomValidationError {
+    string message = 1;
+    optional uint64 computeNodeIndex = 2;
+    optional uint64 columnIndex = 3;
+    optional uint64 tableIndex = 4;
+    optional uint64 userPermissionIndex = 5;
+    optional uint64 permissionIndex = 6;
+    optional uint64 attestationSpecificationIndex = 7;
+    optional uint64 authenticationMethodIndex = 8;
+}
+
+message PublishDatasetToDataRoomRequest {
+    bytes datasetHash = 1;
+    bytes dataRoomId = 2;
+    string leafName = 3;
+    bytes encryptionKey = 4;
+    bytes scope = 5;
+}
+
+message PublishDatasetToDataRoomResponse {
+}
+
+message ExecuteComputeRequest {
+    bytes dataRoomId = 1;
+    repeated string computeNodeNames = 2;
+    bool isDryRun = 3;
+    bytes scope = 4;
+}
+
+message ExecuteComputeResponse {
+    bytes jobId = 1;
+}
+
+message JobStatusRequest {
+    bytes jobId = 1;
+}
+
+message JobStatusResponse {
+    repeated string completeComputeNodeNames = 1;
+}
+
+message GetResultsRequest {
+    bytes jobId = 1;
+    string computeNodeName = 2;
+}
+
+message GetResultsResponseChunk {
+    bytes data = 1;
+}
+
+message GetResultsResponseFooter {
+}
+
+message RetrieveDataRoomRequest {
+    bytes dataRoomId = 1;
+    bytes scope = 2;
+}
+
+message RetrieveDataRoomResponse {
+    data_room.DataRoom dataRoom = 1;
+}
+
+message RetrieveAuditLogRequest {
+    bytes dataRoomId = 1;
+    bytes scope = 2;
+}
+
+message RetrieveAuditLogResponse {
+    bytes log = 1;
+}
+
+enum DataRoomStatus {
+    Active = 0;
+    Stopped = 1;
+}
+
+message RetrieveDataRoomStatusRequest {
+    bytes dataRoomId = 1;
+    bytes scope = 2;
+}
+
+message RetrieveDataRoomStatusResponse {
+    DataRoomStatus status = 1;
+}
+
+message UpdateDataRoomStatusRequest {
+    bytes dataRoomId = 1;
+    bytes scope = 2;
+    DataRoomStatus status = 3;
+}
+
+message UpdateDataRoomStatusResponse {
+}
+
+message RetrievePublishedDatasetsRequest {
+    bytes dataRoomId = 1;
+    bytes scope = 2;
+}
+
+message PublishedDataset {
+    string leafName = 1;
+    string user = 2;
+    uint64 timestamp = 3;
+    bytes datasetHash = 4;
+}
+
+message RetrievePublishedDatasetsResponse {
+    repeated PublishedDataset publishedDatasets = 1;
+}
+
+message RemovePublishedDatasetRequest {
+    reserved 1;
+    bytes dataRoomId = 2;
+    string leafName = 3;
+    bytes scope = 4;
+}
+
+message RemovePublishedDatasetResponse {}
+
+message DriverTaskConfig {
+    oneof driver_task_config {
+        NoopConfig noop = 1;
+        StaticContentConfig staticContent = 2;
+    }
+}
+
+message NoopConfig {
+}
+
+message StaticContentConfig {
+    bytes content = 1;
+}

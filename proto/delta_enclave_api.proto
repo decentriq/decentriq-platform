@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package delta_enclave_api;
+
+/* =========================================================================================================
+   CONTAINER
+ */
+
+message Request {
+    oneof request {
+        bytes deltaRequest = 1;
+        ExtensionMessage extensionMessage = 2;
+    }
+}
+
+message ExtensionMessage {
+    string name = 1;
+    bytes payload = 2;
+}
+
+message Response {
+    oneof response {
+        bytes successfulResponse = 1;
+        string unsuccessfulResponse = 2;
+    }
+}
+
+/* =========================================================================================================
+   ENCRYPTED MESSAGE FORMAT
+ */
+
+message DataNoncePubkey {
+    bytes data = 1;
+    bytes nonce = 2;
+    bytes pubkey = 3;
+    oneof auth {
+        Pki pki = 4;
+    }
+}
+
+message Pki {
+    bytes certChainPem = 1;
+    bytes signature = 2;
+    bytes idMac = 3;
+}
+
+/* =========================================================================================================
+   ENCRYPTED SEALED MESSAGED FORMAT
+ */
+
+message DataNonce {
+    bytes data = 1;
+    bytes nonce = 2;
+}
+
+message SealedEncryptedMessage {
+    DataNonce encryptedMessage = 1;
+    bytes sealingKeyParams = 2;
+}
+
+/* =========================================================================================================
+   ENCRYPTED STORAGE FORMAT
+ */
+
+// * LAYOUT
+//   Every stored file has the following layout: (EH || Enc(VH || CH || CB))
+//     EH = EncryptionHeader: specifies how the rest of the file is encrypted, including key ids.
+//     VH = VersionHeader: specifies a version number allowing for non-protobuf-supported changes in the rest of the layout.
+//     CH = ChunkHeader: specifies common integrity-checked values as well as format specification for the body.
+//     CB = ChunkBody(blob): the actual body of the file, including potential additional metadata header when needed.
+//
+// * VERSIONING
+//   Encrypted data is consumed only by enclaves, so we only need to be *read* compatible, but not *write*. Changes in
+//   the client-enclave protocol should be reflected in infrastructure versioning, e.g. if we change the result format.
+//   The following changes are anticipated:
+//     1. Protobuf-compatible encrypted format(CH || CB => CH' || CB') changes
+//          Ideally changes should conform to https://developers.google.com/protocol-buffers/docs/proto#updating. As
+//          long as we do this we don't need to write any special code or bump version numbers.
+//     2. Protobuf-incompatible encrypted format(CH || CB => X) changes
+//          If we change the data format completely (for example switch to FlatBuffer) then we still need to keep the
+//          VersionHeader definition as-is, bump the version number, and write version-specific code to handle the new
+//          data version, as well as potentially keep the old version's code around.
+//
+//          For example, say the pre-bump code reading a file looks as follows:
+//            ...
+//            let version_header: VersionHeader = prost::Message::decode(&mut buffer)?;
+//            if version_header.version != 0 {
+//              Err(format!("Cannot decode version {}", version_header.version))?;
+//            }
+//            let chunk_header: ChunkHeader = prost::Message::decode(&mut buffer)?;
+//            ...
+//
+//          The post-bump code would then look as follows:
+//            ...
+//            let version_header: VersionHeader = prost::Message::decode(&mut buffer)?;
+//            match version_header.version {
+//              0 => {
+//                let chunk_header: ChunkHeader = prost::Message::decode(&mut buffer)?;
+//                ... old code ...
+//              }
+//              1 => {
+//                let fancy_fb_chunk: FbChunk = flatbuffers::decode(&mut buffer)?;
+//                ... new code ...
+//              }
+//              _ => {
+//                Err(format!("Cannot decode version {}", version_header.version))?;
+//              }
+//            }
+//            ...
+//
+//          Note that we don't need to write special code for *writing* (can write flatbuffers directly) because we only
+//          need read-compatibility.
+//     3. Encryption (EH => EH') changes
+//          If the encryption method itself changes (change of cipher, change of key identification), then ideally a new
+//          `oneof` variant should be added to `EncryptionHeader`, and should be handled accordingly in code when
+//          reading. Note that `EncryptionHeader` is plaintext, so we must make sure attackers cannot do "re-versioning"
+//          attacks triggering unintended codepaths. Authenticated encryption is designed to prevent this, so plaintext
+//          versioning may be used in this context. Change in encryption method may also be coupled with a complete
+//          restructuring of the encrypted data format (including `VersionHeader`). This is *only* possible if the
+//          encryption method actually changes.
+//          To illustrate why, say we introduced a new EH `oneof` variant that actually encodes the same encryption
+//          method as `EncryptionHeader::ChilyKey`, but changes the internal structuring of the encoded data. Now an
+//          attacker can create an encrypted data blob with the old format but specifying the new encryption variant.
+//          Because the encryption method is the same, the data blob will pass the authenticated (de)encryption phase,
+//          which means code handling the old format will be called with newly formatted data.
+
+// Encryption header (unencrypted)
+message EncryptionHeader {
+    oneof encryptionHeader {
+        ChilyKey chilyKey = 1;
+    }
+}
+
+message ChilyKey {
+    bytes encryptionNonce = 2;
+}
+
+// Version header (encrypted)
+message VersionHeader {
+    int64 version = 1;
+}
+
+// Data format header (encrypted)
+message ChunkHeader {
+    bytes extraEntropy = 1;
+}

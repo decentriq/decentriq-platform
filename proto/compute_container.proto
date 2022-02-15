@@ -1,0 +1,20 @@
+syntax = "proto3";
+package compute_container;
+
+message ContainerWorkerConfiguration {
+    oneof configuration {
+        StaticImage static = 1;
+    }
+}
+
+message StaticImage {
+    repeated string command = 1;
+    repeated MountPoint mountPoints = 2;
+    string outputPath = 3;
+    bool includeContainerLogsOnError = 4;
+}
+
+message MountPoint {
+    string path = 1;
+    string dependency = 2;
+}

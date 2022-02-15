@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "decentriq-platform"
+version = "0.8.0.dev6"
+description = "Python client library for the Decentriq platform"
+authors = ["decentriq <opensource@decentriq.com>"]
+readme = 'README.md'
+repository = "https://github.com/decentriq/decentriq-platform"
+homepage = "https://github.com/decentriq/decentriq-platform"
+
+[tool.poetry.dependencies]
+# main package
+python = "^3.7"
+typing-extensions = "^3.10.0"
+protobuf = "^3.18.0"
+requests = "^2.26.0"
+sgx-ias-structs = "^0.1.7"
+cryptography = "^3.4.8"
+chily = "^0.5.3"
+asn1crypto = "^1.4.0"
+oscrypto = "^1.2.1"
+certvalidator = "^0.11.1"
+ecdsa = "^0.17.0"
+pem = "^21.2.0"
+# sql compute 
+sqloxide = "^0.1.11"
+
+[tool.poetry.dev-dependencies]
+mypy-protobuf = "^2.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
