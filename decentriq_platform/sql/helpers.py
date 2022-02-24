@@ -6,13 +6,14 @@ from .compute import SqlSchemaVerifier
 from .. import Permissions, Session, Key, DataRoomBuilder
 from ..compute import Noop
 from .proto import TableSchema
-from ..proto import Permission
+from ..proto import Permission, AuthenticationMethod
 from ..proto.length_delimited import parse_length_delimited
 
 
-class ValidatedDataNode:
+class TabularDataNodeBuilder:
     """
-    Helper class to construct the triplet of nodes required for data nodes with schema validation.
+    Helper class to construct the triplet of nodes consisting of a data node to
+    store tabular input data, as well as a schema validation computation.
 
     In a data clean room computations and the data they depend on are expressed in terms
     of graphs where computations are represented by *compute nodes* and input datasets are
@@ -25,18 +26,15 @@ class ValidatedDataNode:
 
     This class will add the necessary nodes to your data clean room.
 
-    After having constructed an object of this class, pass its `add_to_builder` method to
-    decentriq_platform.DataRoomBuilder.add_using_function` or pass the builder object to
-    `add_to_builder` directly.
-    When creating the data clean room, don't forget to also grant the `validation_permission`
-    permission as well as the `leaf_crud_permission`. Both permissions should usually be granted
-    at the same time.
+    After having constructed an object of this class, call its `add_to_builder` method
+    and pass it a `DataRoomBuilder` instance. This will add the necessary nodes and required
+    user permissions to the builder instance.
 
     Data should be published to the node named `input_node_name` and be read from `output_node_name`.
     The name of the validation computation can be accessed using the field `validation_computation_name`.
 
-    The helper function `upload_and_publish_dataset` will upload, publish, and validate your data
-    automatically.
+    The helper function `upload_and_publish_tabular_dataset` will upload, publish, and validate your
+    data automatically.
     """
     def __init__(
             self,
@@ -46,13 +44,13 @@ class ValidatedDataNode:
             is_required: bool = False
         ):
         """
-        Create a `ValidatedDataNode`.
+        Create a `TabularDataNodeBuilder`.
 
         **Parameters**:
         - `table_name`: What your dataset should be called. This is the name you will later use in
             your SQL queries.
         - `schema`: The list of columns. This is a list of tuples, each containing the name of the column,
-            the data type (`decentriq_compute_sql.PrimitiveType`), and whether the column is nullable (can have empty values).
+            the data type (`decentriq_platform.sql.proto.PrimitiveType`), and whether the column is nullable (can have empty values).
             The data type is an enum like object with values `PrimitiveType.STRING`, `PrimitiveType.INT64`,
             `PrimitiveType.FLOAT64`.
         - `is_required`: Whether the dataset needs to be present for computations to be triggered.
@@ -64,19 +62,44 @@ class ValidatedDataNode:
         self.validation_computation_name = f"@table/${table_name}/validation"
         """The name of the computation that will perform the data validation."""
 
-        self._verifier = SqlSchemaVerifier(schema)
+        self._verifier = SqlSchemaVerifier(
+            self._verifier_node_name,
+            input_data_node=self._leaf_node_name,
+            columns=schema,
+        )
 
-    def add_to_builder(self, builder: DataRoomBuilder):
+        self._noop = Noop(self.validation_computation_name, dependencies=[self._verifier.name])
+
+    def add_to_builder(
+            self,
+            builder: DataRoomBuilder,
+            authentication: AuthenticationMethod,
+            users: List[str]
+    ):
         """
         Configure the given `DataRoomBuilder` to build te final data clean room with the necessary
         compute and data nodes.
 
-        Remember that you still have to add the `validation_permission` and `leaf_crud_permission`
-        in order for a user to be able to upload and validate the input data.
+        **Parameters**:
+        - `builder`: The builder object to which to add the data and compute as well as
+            the permissions.
+        - `authentication`: The authentication method used to authenticate the users
+            from within the enclave.
+        - `users`: A list of email addresses that will be given permissions both for
+            the validation of the data as well as the uploading of data.
         """
         builder.add_data_node(self._leaf_node_name, is_required=self.is_required)
-        builder.add_compute_node(self._verifier_node_name, self._verifier, dependencies=[self._leaf_node_name])
-        builder.add_compute_node(self.validation_computation_name, Noop(), dependencies=[self._verifier_node_name])
+        builder.add_compute_node(self._verifier)
+        builder.add_compute_node(self._noop)
+        for email in users:
+            builder.add_user_permission(
+                email=email,
+                authentication_method=authentication,
+                permissions=[
+                    self.validation_permission,
+                    self.leaf_crud_permission
+                ]
+            )
 
     @property
     def validation_permission(self) -> Permission:
@@ -205,12 +228,12 @@ def _read_input_csv(
     return io.BytesIO('\n'.join(lines).encode())
 
 
-def upload_and_publish_dataset(
+def upload_and_publish_tabular_dataset(
         data: io.BytesIO,
         key: Key,
         data_room_id: str,
         *,
-        data_node: ValidatedDataNode,
+        data_node_builder: TabularDataNodeBuilder,
         session: Session,
         description: str,
         validate: bool = True,
@@ -232,7 +255,7 @@ def upload_and_publish_dataset(
     - `key`: A key for encrypting the data to-be-uploaded.
     - `data_room_id`: To which data room the dataset should be published. This is the id you
         get when publishing a data room.
-    - `data_node`: The data node object added to the data room builder.
+    - `data_node_builder`: The data node builder.
     - `session`: The session with which to communicate with the enclave.
     - `description`: An identifier to the dataset.
     - `validate`: Whether to perform the validation operation.
@@ -243,11 +266,11 @@ def upload_and_publish_dataset(
     manifest_hash = session.client.upload_dataset(
         data,
         key,
-        description=description,
+        description,
     )
     session.publish_dataset(
         data_room_id, manifest_hash,
-        leaf_name=data_node.input_node_name,
+        leaf_name=data_node_builder.input_node_name,
         key=key
     )
 
@@ -255,7 +278,7 @@ def upload_and_publish_dataset(
         try:
             session.run_computation_and_get_results(
                 data_room_id,
-                data_node.validation_computation_name,
+                data_node_builder.validation_computation_name,
                 **kwargs
             )
         except Exception as e:

@@ -1,4 +1,4 @@
-from .proto import AttestationSpecification
+from .proto import AttestationSpecification, ComputeNodeProtocol
 from typing import List, Dict
 from typing_extensions import TypedDict
 from enum import Enum
@@ -84,13 +84,16 @@ class DatasetDescription(TypedDict):
     """
     This class includes information about an uploaded dataset
     """
-    manifestHash: str
-    """"""
-    filename: str
-    """"""
+    datasetId: str
+    """
+    The data set id as a hex-encoded string. This id is also called the manifest hash.
+    """
+    name: str
+    """The name of this dataset"""
     description: str
+    """An optional description"""
     ownerEmail: str
-    chunks: List[ChunkDescription]
+    """The original uploader of the dataset"""
 
 
 class SignatureResponse(TypedDict):
@@ -123,6 +126,8 @@ class EnclaveSpecification(TypedDict):
     """The version of the enclave."""
     proto: AttestationSpecification
     """The Protobuf object."""
+    protocol: ComputeNodeProtocol
+    """The protocol version used by the node"""
 
 
 class CreateScopeRequest(TypedDict):

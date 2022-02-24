@@ -8,24 +8,22 @@ from .compute import SqlCompute, SqlSchemaVerifier
 from .proto.compute_sql_pb2 import (
     PrimitiveType,
 )
-from .attestation import EnclaveSpecifications
 from .helpers import (
-    ValidatedDataNode,
+    TabularDataNodeBuilder,
     read_sql_query_result_as_string,
     read_input_csv_file,
     read_input_csv_string,
-    upload_and_publish_dataset,
+    upload_and_publish_tabular_dataset,
 )
 
 
 __all__ = [
     "SqlCompute",
-    "ValidatedDataNode",
+    "TabularDataNodeBuilder",
     "PrimitiveType",
     "read_input_csv_file",
     "read_input_csv_string",
-    "upload_and_publish_dataset",
+    "upload_and_publish_tabular_dataset",
     "read_sql_query_result_as_string",
-    "EnclaveSpecifications",
     "SqlSchemaVerifier",
 ]

@@ -12,6 +12,7 @@ from .data_room_pb2 import (
     ComputeNodeLeaf, ComputeNodeBranch, DataRoom,
     TrustedPki,
     ComputeNodeFormat,
+    ComputeNodeProtocol,
 )
 from .attestation_pb2 import (
     AttestationSpecification,
@@ -19,6 +20,7 @@ from .attestation_pb2 import (
     Fatquote,
     FatquoteEpid, FatquoteDcap,
     AttestationSpecificationIntelDcap,
+    AttestationSpecificationAwsNitro,
 )
 from .gcg_pb2 import (
     DriverTaskConfig, NoopConfig, DataRoomStatus,

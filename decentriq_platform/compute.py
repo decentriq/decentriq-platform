@@ -1,3 +1,4 @@
+from typing import List
 from .proto import (
     DriverTaskConfig,
     NoopConfig,
@@ -6,40 +7,53 @@ from .proto import (
     ComputeNodeFormat,
 )
 
-class Noop():
+from .node import Node
+
+
+class Noop(Node):
     """
     Computation node which does not perform any operation and produces an empty
-    output. This is mostly used to allow users to test the execution of other computation
-    nodes without giving access to the results.
+    output. This is mostly used to allow users to test the execution of other
+    computation nodes without giving access to the results.
     """
-    config: bytes
-    """Serialized configuration to use in the compute node definition"""
 
-    enclave_type: str
-    """What type of enclave this node uses"""
+    def __init__(self, name: str, dependencies: list[str] = []) -> None:
+        config = serialize_length_delimited(
+            DriverTaskConfig(noop=NoopConfig())
+        )
+        super().__init__(
+            name,
+            config,
+            "decentriq.driver",
+            dependencies,
+            ComputeNodeFormat.RAW
+        )
 
-    def __init__(self) -> None:
-        self.config = serialize_length_delimited(DriverTaskConfig(noop=NoopConfig()))
-        self.enclave_type = "decentriq.driver"
-        self.output_format = ComputeNodeFormat.RAW
 
-
-class StaticContent():
+class StaticContent(Node):
     """
     Computation node which outputs the content specified in its configuration.
     This is mostly used to allow users to specify dependencies with a static
     content, which are part of the DCR definition.
     """
-    config: bytes
-    """Serialized configuration to use in the compute node definition"""
 
-    def __init__(self, content: bytes) -> None:
-        self.config = serialize_length_delimited(
+    def __init__(
+            self,
+            name: str,
+            content: bytes,
+            dependencies: List[str] = []
+    ) -> None:
+        config = serialize_length_delimited(
             DriverTaskConfig(
                 staticContent=StaticContentConfig(
                     content=content
                 )
             )
         )
-        self.enclave_type = "decentriq.driver"
-        self.output_format = ComputeNodeFormat.RAW
+        super().__init__(
+            name,
+            config=config,
+            enclave_type="decentriq.driver",
+            dependencies=dependencies,
+            output_format=ComputeNodeFormat.RAW
+        )

@@ -18,12 +18,13 @@ class Request(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     DELTAREQUEST_FIELD_NUMBER: builtins.int
     EXTENSIONMESSAGE_FIELD_NUMBER: builtins.int
-    deltaRequest: builtins.bytes = ...
+    @property
+    def deltaRequest(self) -> global___DataNoncePubkey: ...
     @property
     def extensionMessage(self) -> global___ExtensionMessage: ...
     def __init__(self,
         *,
-        deltaRequest : builtins.bytes = ...,
+        deltaRequest : typing.Optional[global___DataNoncePubkey] = ...,
         extensionMessage : typing.Optional[global___ExtensionMessage] = ...,
         ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal[u"deltaRequest",b"deltaRequest",u"extensionMessage",b"extensionMessage",u"request",b"request"]) -> builtins.bool: ...
@@ -108,6 +109,7 @@ global___Pki = Pki
 class DataNonce(google.protobuf.message.Message):
     """=========================================================================================================
     ENCRYPTED SEALED MESSAGED FORMAT
+
     """
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     DATA_FIELD_NUMBER: builtins.int

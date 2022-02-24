@@ -59,5 +59,8 @@ message AttestationSpecificationIntelDcap {
 
 message AttestationSpecificationAwsNitro {
     bytes nitroRootCaDer = 1;
-    repeated bytes pcrs = 2;
+    bytes pcr0 = 2;
+    bytes pcr1 = 3;
+    bytes pcr2 = 4;
+    bytes pcr8 = 5;
 }

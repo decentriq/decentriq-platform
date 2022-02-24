@@ -1,10 +1,11 @@
 from __future__ import annotations
 from typing import List, Any, Optional, Callable, Dict
 from .proto import (
-    AuthenticationMethod, ComputeNodeFormat, UserPermission, ComputeNode,
+    AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, Permission, DataRoom,
     AttestationSpecification
 )
+from .node import Node
 from .types import EnclaveSpecification
 import random
 
@@ -74,43 +75,24 @@ class DataRoomBuilder():
         )
         self.compute_nodes.append(node)
 
-    def add_using_function(self, do_with_builder: Callable[[DataRoomBuilder], None]):
-        """Apply the given function to the builder, transforming it in useful ways."""
-        do_with_builder(self)
-
-    def add_compute_node(
-            self,
-            name: str,
-            node: Any,
-            dependencies: List[str] = []
-    ):
+    def add_compute_node(self, node: Node):
         """
-        Add a new compute node. The configuration for a compute node should be
-        created using one of the compute-specific libraries.
+        Add a new compute node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
         """
-
-        required_attributes = set(["enclave_type", "config", "output_format"])
-        if not all([hasattr(node, attr) for attr in required_attributes]):
-            raise Exception(
-                "The given node object is missing a required attribute"
-                f" (required: {', '.join(required_attributes)}). "
-                "Are you sure that this is a proper node object?"
-                " Refer to the documentation of the class you're trying to pass in "
-                " to see how it should be used."
-            )
-
         if self.enclave_specs:
             if node.enclave_type in self.enclave_specs:
                 attestation_proto = self.enclave_specs[node.enclave_type]["proto"]
+                node_protocol = self.enclave_specs[node.enclave_type]["protocol"]
             else:
                 raise Exception(
                     f"This compute node requires an enclave of type '{node.enclave_type}' but no"
-                    " corresponding attestation spec was provided to this builder."
+                    " corresponding enclave spec was provided to this builder."
                 )
         else:
             raise Exception(
-                "You need to provide an attestation spec set to the builder"
-                " before calling this method."
+                "You need to provide a dictionary of enclave specifications to the"
+                " builder before calling this method."
             )
         try:
             attestation_index = self.attestation_specifications.index(attestation_proto)
@@ -118,12 +100,13 @@ class DataRoomBuilder():
             self.attestation_specifications.append(attestation_proto)
             attestation_index = len(self.attestation_specifications) - 1
         proto_node = ComputeNode(
-            nodeName=name,
+            nodeName=node.name,
             branch=ComputeNodeBranch(
                 config=node.config,
                 attestationSpecificationIndex=attestation_index,
-                dependencies=dependencies,
+                dependencies=node.dependencies,
                 outputFormat=node.output_format,
+                protocol=node_protocol,
             )
         )
         self.compute_nodes.append(proto_node)
@@ -135,8 +118,8 @@ class DataRoomBuilder():
             permissions: List[Permission],
     ):
         """
-        Add permissions for a user. The authentication is performed on the enclave side
-        based on the method supplied.
+        Add permissions for a user.
+        The authentication is performed on the enclave side based on the method supplied.
         """
         try:
             authentication_method_index = self.authentication_methods.index(authentication_method)
@@ -144,12 +127,25 @@ class DataRoomBuilder():
             self.authentication_methods.append(authentication_method)
             authentication_method_index = len(self.authentication_methods) - 1
 
-        permission = UserPermission(
-            email=email,
-            authenticationMethodIndex=authentication_method_index,
-            permissions=permissions
-        )
-        self.user_permissions.append(permission)
+        # Check whether a set of permissions has already been added in a previous
+        # call, and extend the permissions in case the authentication method matches.
+        # This is required because helper functions might add permissions
+        # to the builder before this method is called.
+        existing_permission = [
+            permission for permission in self.user_permissions
+                if email == permission.email and
+                    authentication_method_index == permission.authenticationMethodIndex
+        ]
+
+        if existing_permission:
+            existing_permission[0].permissions.extend(permissions)
+        else:
+            permission = UserPermission(
+                email=email,
+                authenticationMethodIndex=authentication_method_index,
+                permissions=permissions
+            )
+            self.user_permissions.append(permission)
 
     def set_id(self, id: str):
         """
@@ -181,9 +177,7 @@ class DataRoomBuilder():
         data_room.userPermissions.extend(self.user_permissions)
         data_room.authenticationMethods.extend(self.authentication_methods)
 
-        if not self.owner_email:
-            raise Exception("The data room requires an owner email address to bet set!")
-        else:
+        if self.owner_email:
             data_room.ownerEmail = self.owner_email
 
         if self.id:

@@ -8,7 +8,7 @@ package delta_enclave_api;
 
 message Request {
     oneof request {
-        bytes deltaRequest = 1;
+        DataNoncePubkey deltaRequest = 1;
         ExtensionMessage extensionMessage = 2;
     }
 }

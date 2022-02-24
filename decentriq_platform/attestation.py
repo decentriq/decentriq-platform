@@ -1,18 +1,65 @@
+from typing import Dict, List
 from .types import EnclaveSpecification
 from .proto import (
     AttestationSpecification,
-    AttestationSpecificationIntelEpid
+    AttestationSpecificationIntelEpid,
+    AttestationSpecificationAwsNitro,
+    ComputeNodeProtocol,
 )
-from .verification import intel_sgx_ias_root_ca
 import asn1crypto.pem
+from .certs import (
+    aws_nitro_root_ca_pem,
+    intel_sgx_ias_root_ca
+)
 
 
 intel_sgx_ias_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_ias_root_ca)[2]
+aws_nitro_root_ca_der = asn1crypto.pem.unarmor(aws_nitro_root_ca_pem)[2]
 
+
+SPECIFICATIONS = {
+    "decentriq.driver:v1": EnclaveSpecification(
+        name="decentriq.driver",
+        version="1",
+        proto=AttestationSpecification(
+            intelEpid=AttestationSpecificationIntelEpid(
+                mrenclave=bytes.fromhex(
+                    "ce2c7ff27a3efe21968dc1a54e662441a88f92bcf7c53b3cc00f7e579cca6591"
+                ),
+                iasRootCaDer=intel_sgx_ias_root_ca_der,
+            )
+        ),
+        protocol=ComputeNodeProtocol(
+            version=0
+        )
+    ),
+    "decentriq.sql-worker:v1": EnclaveSpecification(
+        name="decentriq.sql-worker",
+        version="1",
+        proto=AttestationSpecification(
+            intelEpid=AttestationSpecificationIntelEpid(
+                mrenclave=bytes.fromhex("16506a96801ca841e784eeb55f6c162c2ef141667f1a1030df23ab61f69e0873"),
+                iasRootCaDer=intel_sgx_ias_root_ca_der
+            )
+        ),
+        protocol=ComputeNodeProtocol(
+            version=0
+        )
+    ),
+    # "decentriq.python-ml-worker:v1": EnclaveSpecification(
+    #     name="decentriq.python-ml-worker",
+    #     version="1",
+    #     proto=AttestationSpecification(
+    #         awsNitro=AttestationSpecificationAwsNitro(
+    #             nitroRootCaDer=aws_nitro_root_ca_der,
+    #         )
+    #     )
+    # )
+}
 
 class EnclaveSpecifications:
     """
-    The list of available enclave specifications provided by this package.
+    Provider of the available enclave specifications provided by the Decentriq platform.
 
     Enclave specifications enable you to express which particular enclaves you trust.
     The field containing the measurement (e.g. `mrenclave` in the case of Intel SGX) identifies
@@ -31,21 +78,37 @@ class EnclaveSpecifications:
     driver enclave is controlled by choosing the additional enclave specs from the respective
     compute packages.
 
-    A list of enclave specifications, each encoding your trust in a particular enclave type, is called an
-    *enclave specification set*. Enclave specification sets are obtained by concatenating multiple such specs
-    and converting them to a dictionary that maps the enclave name to the trusted enclave spec.
+    A list of enclave specifications, each encoding your trust in a particular enclave type, can
+    be obtained by selecting a subset of the enclave specifications provided by the object
+    `decentriq_platform.enclave_specifications`. Selecting the subset of versions should be done
+    by calling its `versions` method.
     """
-    V1_SGX = [
-        EnclaveSpecification(
-            name="decentriq.driver",
-            version="1",
-            proto= AttestationSpecification(
-                intelEpid=AttestationSpecificationIntelEpid(
-                    mrenclave=bytes.fromhex(
-                        "ce2c7ff27a3efe21968dc1a54e662441a88f92bcf7c53b3cc00f7e579cca6591"
-                    ),
-                    iasRootCaDer=intel_sgx_ias_root_ca_der,
-                )
-            )
-        )
-    ]
+
+    def __init__(self, specifications: Dict[str, EnclaveSpecification]):
+        self.specifications = specifications
+
+    def versions(self, **enclave_versions: List[str]) -> Dict[str, EnclaveSpecification]:
+        """
+        Get the enclave specifications for the given versioned enclave types.
+
+        Make sure to always include the specification of a *driver enclave*, e.g.
+        `"decentriq.driver:v1"` as this is the node with which you communicate directly.
+        Add additional versioned enclaves depending on the compute module you use.
+        Refer to the main documentation page of each compute module to learn which
+        enclaves are available.
+        """
+        selected_specifcations = {}
+        for version in enclave_versions:
+            enclave_type = version.split(":")[0]
+            selected_specifcations[enclave_type] = version
+        return selected_specifcations
+
+    def merge(self, other):
+        """
+        Merge two sets of enclave specifications into a single set.
+        """
+        return EnclaveSpecifications({**self.specifications, **other.specifications})
+
+
+enclave_specifications: EnclaveSpecifications = EnclaveSpecifications(SPECIFICATIONS)
+"""The main catalogue of enclave specifications available within the Decentriq platform."""

@@ -5,9 +5,10 @@
 __docformat__ = "restructuredtext"
 
 from .compute import StaticContainerCompute
-from .attestation import EnclaveSpecification
+from .helpers import read_result_as_zipfile
+
 
 __all__ = [
     "StaticContainerCompute",
-    "EnclaveSpecification",
+    "read_result_as_zipfile",
 ]

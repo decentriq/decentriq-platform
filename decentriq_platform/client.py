@@ -9,6 +9,8 @@ from .api import API, Endpoints
 from .authentication import Auth
 from .config import (
         DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS,
+        DECENTRIQ_USE_TLS, DECENTRIQ_API_PLATFORM_HOST, DECENTRIQ_API_PLATFORM_PORT,
+        DECENTRIQ_API_PLATFORM_USE_TLS,
 )
 from .session import Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
@@ -34,7 +36,6 @@ class Client:
     upload data and retrieve computation results.
 
     Objects of this class should be created using the `create_client` function.
-    this class.
     """
 
     _api: API
@@ -56,35 +57,19 @@ class Client:
         self._api = api
         self._platform = platform
 
-    def create_enclave_spec_set(
-            self,
-            specs: List[EnclaveSpecification],
-            check_availability: bool = True
-    ) -> Dict[str, EnclaveSpecification]:
+    def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
-        Create an enclave spec set from a list of `EnclaveSpecification`s, optionally checking
-        whether corresponding enclaves are deployed at this moment.
-
-        **Parameters**:
-        - `specs`: A list of enclave specs obtained by concatenating the specs found in
-            the compute packages.
-        - `check_availability`: Whether to check if there are currently enclaves running that
-            match the chosen enclave specs. If this is not the case, an exception will be thrown.
-
-        **Returns**:
-        An enclave spec set that can be used together with `create_session` or `DataRoomBuilder`.
+        Check whether the selected enclaves are deployed at this moment.
+        If one of the enclaves is not deployed, an exception will be raised.
         """
-        if check_availability:
-            available_specs =\
-                {spec["proto"].SerializeToString() for spec in self._get_enclave_specifications()}
-            for s in specs:
-                if s["proto"].SerializeToString() not in available_specs:
-                    raise Exception(
-                        "No available enclave deployed for attestation spec '{name}' (version {version})".\
-                            format(name=s["name"], version=s["version"])
-                    )
-
-        return { spec["name"]: spec for spec in specs }
+        available_specs =\
+            {spec["proto"].SerializeToString() for spec in self._get_enclave_specifications()}
+        for s in specs:
+            if s["proto"].SerializeToString() not in available_specs:
+                raise Exception(
+                    "No available enclave deployed for attestation spec '{name}' (version {version})".\
+                        format(name=s["name"], version=s["version"])
+                )
 
     def _get_enclave_specifications(self) -> List[EnclaveSpecification]:
         url = Endpoints.SYSTEM_ATTESTATION_SPECS
@@ -113,11 +98,18 @@ class Client:
         Creates a new `decentriq_platform.session.Session` instance to communicate
         with an enclave service with the specified identifier.
 
-        Messages sent thorugh this session will be authenticated
-        with the authentication object identifier specified during a call.
+        Messages sent through this session will be authenticated
+        with the given authentication object.
         """
         url = Endpoints.SESSIONS
-        attestation_proto = enclaves["decentriq.driver"]["proto"]
+        if "decentriq.driver" in enclaves:
+            attestation_proto = enclaves["decentriq.driver"]["proto"]
+        else:
+            raise Exception(
+                "Unable to find a specification for the driver enclave" +
+                f" named 'decentriq.driver', you can get these specifications" +
+                " from the main package."
+            )
 
         attestation_specification_hash =\
             hashlib.sha256(serialize_length_delimited(attestation_proto)).hexdigest()
@@ -131,12 +123,15 @@ class Client:
                 {"Content-type": "application/json"}
         ).json()
 
+        platform_api =\
+            self.platform._platform_api if self.is_integrated_with_platform else None
+
         session = Session(
                 self,
                 response["sessionId"],
                 attestation_proto,
-                auth,
-                auth.user_id
+                auth=auth,
+                platform_api=platform_api
         )
 
         return session
@@ -184,23 +179,30 @@ class Client:
 
     def upload_dataset(
             self,
-            file_input_stream: BinaryIO,
+            data: BinaryIO,
             key: Key,
+            file_name: str,
             /, *,
-            description: str,
+            description: str = "",
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8,
             owner_email: Optional[str] = None,
     ) -> str:
         """
-        Uploads `file_input_stream` as a file usable by enclaves and returns the
+        Uploads `data` as a file usable by enclaves and returns the
         corresponding manifest hash
 
         **Parameters**:
-        - `owner_email`: owner of the file
-        - `file_input_stream`: file content
-        - `description`: file description
-        - `key`: key used to encrypt the file
+        - `data`: The data to upload as a buffered stream.
+            Such an object can be obtained by wrapping a binary string in a `io.BytesIO()`
+            object or, if reading from a file, by using `with open(path, "rb") as file`.
+        - `key`: Encryption key used to encrypt the file.
+        - `file_name`: Name of the file.
+        - `description`: An optional file description.
+        - `chunk_size`: Size of the chunks into which the stream is split in bytes.
+        - `parallel_uploads`: Whether to upload chunks in parallel.
+        - `owner_email`: Owner of the file if different from the one already specified
+            when creating the client object.
         """
         uploader = BoundedExecutor(
                 bound=parallel_uploads * 2,
@@ -208,7 +210,7 @@ class Client:
         )
         email = owner_email if owner_email else self.user_email
         # create and upload chunks
-        chunker = Chunker(file_input_stream, chunk_size=chunk_size)
+        chunker = Chunker(data, chunk_size=chunk_size)
         chunk_hashes: List[str] = []
         chunk_uploads_futures = []
         upload_description = self._create_upload(email)
@@ -247,12 +249,23 @@ class Client:
             user_id=email,
             scope_id=scope_id,
             upload_id=upload_description["uploadId"],
-            name=description,
+            name=file_name,
             manifest_hash=manifest_hash,
             manifest_encrypted=manifest_encrypted,
             chunks=chunk_hashes
         )
-        return manifest_hash.hex()
+
+        manifest_hash_hex = manifest_hash.hex()
+
+        if self.is_integrated_with_platform:
+            self.platform._platform_api.save_dataset_metadata(
+                manifest_hash_hex,
+                file_name=file_name,
+                description=description,
+                owner_email=self.user_email
+            )
+
+        return manifest_hash_hex
 
     def _encrypt_and_upload_chunk(
             self,
@@ -335,7 +348,6 @@ class Client:
 
     def get_dataset(
             self,
-            email: str,
             manifest_hash: str
     ) -> DatasetDescription:
         """
@@ -343,7 +355,7 @@ class Client:
         """
         scope_id = self._ensure_scope_with_metadata(email, {"type": ScopeTypes.USER_FILE})
         url = Endpoints.USER_FILE \
-            .replace(":userId", email) \
+            .replace(":userId", self.user_email) \
             .replace(":scopeId", scope_id) \
             .replace(":manifestHash", manifest_hash)
         response = self._api.get(url)
@@ -365,16 +377,20 @@ class Client:
 
         return data
 
-    def delete_dataset(self, email: str, manifest_hash: str):
+    def delete_dataset(self, manifest_hash: str):
         """
         Deletes a user file from the decentriq platform
         """
-        scope_id = self._ensure_scope_with_metadata(email, {"type": ScopeTypes.USER_FILE})
+        scope_id = self._ensure_scope_with_metadata(self.user_email, {"type": ScopeTypes.USER_FILE})
         url = Endpoints.USER_FILE \
-            .replace(":userId", email) \
+            .replace(":userId", self.user_email) \
             .replace(":scopeId", scope_id) \
             .replace(":manifestHash", manifest_hash)
         self._api.delete(url)
+
+        if self.is_integrated_with_platform:
+            self.platform._platform_api.delete_dataset_metadata(manifest_hash)
+            self.platform._platform_api.delete_dataset_links_for_manifest_hash(manifest_hash)
 
     @property
     def platform(self) -> ClientPlatformFeatures:
@@ -406,18 +422,29 @@ def create_client(
         client_id: str = DECENTRIQ_CLIENT_ID,
         api_core_host: str = DECENTRIQ_HOST,
         api_core_port: int = DECENTRIQ_PORT,
-        api_core_use_tls: bool = DECENTRIQ_USE_TLS
+        api_core_use_tls: bool = DECENTRIQ_USE_TLS,
+        api_platform_host: str = DECENTRIQ_API_PLATFORM_HOST,
+        api_platform_port: int = DECENTRIQ_API_PLATFORM_PORT,
+        api_platform_use_tls: bool = DECENTRIQ_API_PLATFORM_USE_TLS,
 ) -> Client:
     """
     The primary way to create a `Client` object.
 
     Client objects created using this method can optionally be integrated with the
-    Decentriq web platform (<http://platform.decentriq.ch>).
-    This needs to be set if you want to use the authentication objects that let Decentriq
-    act as the root CA that controls access to data rooms.
+    Decentriq web platform (<http://platform.decentriq.com>).
+    This means that certain additional features, such as being able to retrieve the list
+    of data rooms that you participate in, will be made available via the `Client.platform` field.
+    This flag also needs to be set if you want to use the authentication objects that let
+    Decentriq act as the root CA that controls access to data rooms.
+
+    In order to provide these features, the client will communicate directly with an API
+    that exists outside of the confidential computing environment. This setting will only
+    affect how metadata about data rooms (such as their name and id) is stored and retrieved,
+    it will not in any way compromise the security of how your data is uploaded to the
+    enclaves or how computed results are retrieved.
 
     **Parameters**:
-    - `api_token`: An API token with which to authenticate onself.
+    - `api_token`: An API token with which to authenticate oneself.
         The API token can be obtained in the user
         panel of the decentriq platform <https://platform.decentriq.com/tokens>.
     - `user_email`: The email address of the user that generated the given API token.
@@ -436,8 +463,13 @@ def create_client(
 
     if integrate_with_platform:
         platform = ClientPlatformFeatures(
+            api_token,
             user_email,
             http_api=api,
+            client_id=client_id,
+            api_host=api_platform_host,
+            api_port=api_platform_port,
+            api_use_tls=api_platform_use_tls
         )
     else:
         platform = None

@@ -1,5 +1,6 @@
 from __future__ import annotations
 import chily
+import re
 import hmac
 import json
 from base64 import b64encode, b64decode
@@ -7,9 +8,10 @@ from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional
 from time import sleep
+from .platform import PlatformApi
 from .api import Endpoints
 from .authentication import Auth, Sigma
-from .proto import DataRoom
+from .proto import DataRoom, ComputeNodeProtocol
 from .proto import (DataNoncePubkey, Request, Response)
 from .proto import (
     CreateDataRoomRequest, CreateDataRoomResponse,
@@ -19,7 +21,7 @@ from .proto import (
     RemovePublishedDatasetRequest, RemovePublishedDatasetResponse,
     RetrieveAuditLogRequest, RetrieveAuditLogResponse, RetrieveDataRoomRequest,
     RetrieveDataRoomResponse, RetrieveDataRoomStatusRequest,
-    RetrieveDataRoomStatusResponse, RetrievePublishedDatasetsRequest,
+    RetrievePublishedDatasetsRequest,
     RetrievePublishedDatasetsResponse, UpdateDataRoomStatusRequest,
     UpdateDataRoomStatusResponse, DataRoomStatus, AttestationSpecification, Fatquote
 )
@@ -27,11 +29,13 @@ from .proto.length_delimited import parse_length_delimited, serialize_length_del
 from .storage import Key
 from .types import FatquoteResBody, EnclaveMessage, ScopeTypes, JobId
 from .verification import QuoteBody, Verification
+from .platform import SessionPlatformFeatures
 from .helpers import get_data_room_id
-
-
 if TYPE_CHECKING:
     from .client import Client
+
+
+GCG_PROTOCOL_VERSION = 0
 
 
 def datanoncepubkey_to_message(
@@ -39,7 +43,7 @@ def datanoncepubkey_to_message(
         nonce: bytes,
         pubkey: bytes,
         sigma_auth: Sigma
-) -> bytes:
+) -> DataNoncePubkey:
     message = DataNoncePubkey()
     message.data = encrypted_data
     message.nonce = nonce
@@ -47,7 +51,7 @@ def datanoncepubkey_to_message(
     message.pki.certChainPem = sigma_auth.get_cert_chain()
     message.pki.signature = sigma_auth.get_signature()
     message.pki.idMac = sigma_auth.get_mac_tag()
-    return serialize_length_delimited(message)
+    return message
 
 
 def message_to_datanoncepubkey(message: bytes) -> Tuple[bytes, bytes, bytes]:
@@ -76,8 +80,8 @@ class Session():
             session_id: str,
             driver_attestation_specification: AttestationSpecification,
             auth: Auth,
-            email: str
-    ):
+            platform_api: Optional[PlatformApi] = None,
+   ):
         """
         `Session` instances should not be instantiated directly but rather
          be created using a `Client` object using  `decentriq_platform.Client.create_session`.
@@ -92,11 +96,16 @@ class Session():
         self.client = client
         self.session_id = session_id
         self.auth = auth
-        self.email = email
+        self.email = auth.user_id
         self.keypair = chily.Keypair.from_random()
         self.fatquote = fatquote
         self.report_data = report_data
         self.driver_attestation_specification = driver_attestation_specification
+
+        if platform_api:
+            self._platform = SessionPlatformFeatures(self, platform_api)
+        else:
+            self._platform = None
 
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.report_data[:32])
@@ -138,10 +147,15 @@ class Session():
         Use this method if any of the convenience methods (such as `run_computation`) don't perform
         the exact task you want.
         """
+        gcg_protocol = serialize_length_delimited(
+            ComputeNodeProtocol(
+                version=GCG_PROTOCOL_VERSION
+            )
+        )
         serialized_request = serialize_length_delimited(
             Request(
-                deltaRequest=self._encrypt_and_encode_data(
-                    serialize_length_delimited(request),
+                deltaRequest= self._encrypt_and_encode_data(
+                    gcg_protocol + serialize_length_delimited(request),
                     self.auth
                 )
             )
@@ -165,7 +179,13 @@ class Session():
                 decrypted_response = self._decode_and_decrypt_data(
                     response_container.successfulResponse
                 )
-                parse_length_delimited(decrypted_response, response)
+                response_protocol = ComputeNodeProtocol()
+                response_offset = parse_length_delimited(
+                        decrypted_response, response_protocol
+                )
+                if response_protocol.version > GCG_PROTOCOL_VERSION:
+                    raise Exception("Unsupported protocol version in response")
+                parse_length_delimited(decrypted_response[response_offset:], response)
                 if response.HasField("failure"):
                     raise Exception(response.failure)
                 responses.append(response)
@@ -178,6 +198,8 @@ class Session():
         """
         Create a DataRoom with the provided protobuf `data_room` configuration object
         """
+        if not data_room_definition.ownerEmail:
+            data_room_definition.ownerEmail = self.email
         scope_id = self.client._ensure_scope_with_metadata(self.email, {"type": ScopeTypes.DATA_ROOM_DEFINITION})
         request = CreateDataRoomRequest(
             dataRoom=data_room_definition,
@@ -197,6 +219,10 @@ class Session():
                         response.createDataRoomResponse.dataRoomValidationError.computeNodeIndex
                     )
                 )
+            else:
+                if self.is_integrated_with_platform:
+                    data_room_hash = response.createDataRoomResponse.dataRoomId
+                    self._create_data_room_in_platform(data_room_definition, data_room_hash)
         else:
             raise Exception(
                 "Expected createDataRoomResponse, got "
@@ -231,7 +257,6 @@ class Session():
 
         For the special case of stopping a data room, the method `stop_data_room` can be used.
         """
-        data_room_id_bytes = bytes.fromhex(data_room_id)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
             {
@@ -240,7 +265,7 @@ class Session():
             }
         )
         request = UpdateDataRoomStatusRequest(
-            dataRoomId=data_room_id_bytes,
+            dataRoomId=bytes.fromhex(data_room_id),
             status=status,
             scope=bytes.fromhex(scope_id)
         )
@@ -251,7 +276,8 @@ class Session():
 
         response = responses[0]
         if response.HasField("updateDataRoomStatusResponse"):
-            pass
+            if self.is_integrated_with_platform:
+                self.platform._platform_api.update_data_room_status(data_room_id, status)
         else:
             raise Exception(
                 "Expected updateDataRoomStatusResponse, got "
@@ -358,6 +384,24 @@ class Session():
         """
         Publishes a file to the DataRoom
         """
+
+        should_create_dataset_links =\
+            self.is_integrated_with_platform and \
+            self._is_web_data_room(data_room_id)
+
+        if should_create_dataset_links:
+            existing_link = self.platform._platform_api.get_dataset_link(
+                data_room_id,
+                self._convert_data_node_name_to_verifier_node(leaf_name)
+            )
+            if existing_link:
+                existing_dataset = existing_link["dataset"]["datasetId"]
+                raise Exception(
+                    "The following dataset has already been published for this node." +
+                    " Please unpublish this dataset first." +
+                    f" Dataset: '{existing_dataset}'"
+                )
+
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
             {
@@ -381,7 +425,23 @@ class Session():
                 "Expected publishDatasetToDataRoomResponse, got "
                 + str(response.WhichOneof("gcg_response"))
             )
+        else:
+            if should_create_dataset_links:
+                self.platform._platform_api.create_dataset_link(
+                    data_room_id,
+                    manifest_hash,
+                    self._convert_data_node_name_to_verifier_node(leaf_name)
+                )
+
         return response.publishDatasetToDataRoomResponse
+
+    def _convert_data_node_name_to_verifier_node(self, node_name: str) -> str:
+        pattern = re.compile(r"@table/(.*)/dataset")
+        match = pattern.match(node_name)
+        if match:
+            return match.group(1)
+        else:
+            return node_name
 
     def remove_published_dataset(
             self,
@@ -412,6 +472,16 @@ class Session():
                 "Expected removePublishedDatasetResponse, got "
                 + str(response.WhichOneof("gcg_response"))
             )
+        else:
+            if self.is_integrated_with_platform and self._is_web_data_room(data_room_id):
+                try:
+                    self.platform._platform_api.delete_dataset_link(
+                        data_room_id,
+                        self._convert_data_node_name_to_verifier_node(leaf_name)
+                    )
+                except Exception as error:
+                    print(f"Error when deleting dataset link on platform: {error}")
+
         return response.removePublishedDatasetResponse
 
     def retrieve_published_datasets(
@@ -599,3 +669,55 @@ class Session():
             interval=interval,
             timeout=timeout
         )
+
+    def _create_data_room_in_platform(
+            self,
+            data_room_definition: DataRoom,
+            data_room_hash: bytes
+    ):
+        attestation_spec_type =\
+                self.driver_attestation_specification.WhichOneof("attestation_specification")
+
+        if attestation_spec_type == "intelEpid":
+            mrenclave = self.driver_attestation_specification.intelEpid.mrenclave
+        elif attestation_spec_type == "intelDcap":
+            mrenclave = self.driver_attestation_specification.intelDcap.mrenclave
+        else:
+            raise Exception("Unknown attestation specification type")
+
+        self.platform._platform_api.publish_data_room(
+            data_room_definition,
+            data_room_hash=data_room_hash.hex(),
+            mrenclave=mrenclave.hex()
+        )
+
+    def _is_web_data_room(self, data_room_id: str) -> bool:
+        data_room = self.platform._platform_api.get_data_room_by_hash(data_room_id)
+        if data_room:
+            return data_room["source"] == "WEB"
+        else:
+            raise Exception(f"Unable to find data room with id '{data_room_id}'")
+
+    @property
+    def platform(self) -> SessionPlatformFeatures:
+        """
+        Provider of a list of convenience methods to interact with the
+        Decentriq platform.
+
+        This field exposes an object that provides a set of convenience features
+        known from the Decentriq web platform. These include, for example,
+        getting the list of data sets that are also visible in the browser-based
+        platform UI.
+        """
+        if self._platform:
+            return self._platform
+        else:
+            raise Exception(
+                "This field is not set as the client from wich this session has"
+                " been derived has not been configured with integration to the web"
+                " platform."
+            )
+
+    @property
+    def is_integrated_with_platform(self):
+        return self._platform is not None

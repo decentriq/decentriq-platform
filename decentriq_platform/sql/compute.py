@@ -6,6 +6,7 @@ from .proto import (
     ValidationConfiguration, Constraint, NamedColumn, ColumnType, SqlWorkerConfiguration,
 )
 from ..proto import serialize_length_delimited, ComputeNodeFormat
+from ..node import Node
 
 
 def parse_statement(sql_statement: str):
@@ -70,23 +71,22 @@ def find_referenced_tables(sql_query) -> Set[str]:
     return all_tables.difference(cte_tables)
 
 
-class SqlCompute():
+class SqlCompute(Node):
     """
-    Computation node to execute an SQL query
+    Computation node to execute an SQL query.
     """
-    config: bytes
-    """Serialized configuration to use in the compute node definition"""
-    dependencies: List[str]
-    """Dependencies automatically extracted from the SQL query"""
 
     def __init__(
             self,
+            name: str,
             sql_statement: str,
+            *,
             privacy_settings: Optional[PrivacySettings] = None,
             constraints: Optional[List[Constraint]] = None,
+            dependencies: List[str] = []
     ) -> None:
         statement_ast = parse_statement(sql_statement)
-        self.dependencies = list(find_referenced_tables(statement_ast))
+        dependencies = list(find_referenced_tables(statement_ast))
 
         sql_worker_configuration = SqlWorkerConfiguration(
             computation=ComputationConfiguration(
@@ -96,22 +96,27 @@ class SqlCompute():
 
             )
         )
-        self.config = serialize_length_delimited(sql_worker_configuration)
-        self.enclave_type = "decentriq.sql-worker"
-        self.output_format = ComputeNodeFormat.ZIP
+        config = serialize_length_delimited(sql_worker_configuration)
+
+        super().__init__(
+            name,
+            config=config,
+            enclave_type="decentriq.sql-worker",
+            dependencies=dependencies,
+            output_format=ComputeNodeFormat.ZIP
+        )
 
 
-class SqlSchemaVerifier():
+class SqlSchemaVerifier(Node):
     """
-    Computation node to validate an input and provide the necessary types
+    Computation node to validate an input and provide the necessary types.
     """
-    config: bytes
-    """Serialized configuration to use in the compute node definition"""
-    config: bytes
 
     def __init__(
         self,
-        columns # type: List[Tuple[str, PrimitiveType.V, bool]]
+        name: str,
+        input_data_node: str,
+        columns, # type: List[Tuple[str, PrimitiveType.V, bool]]
     ) -> None:
         named_columns = map(lambda c: NamedColumn(
             name=c[0],
@@ -127,6 +132,12 @@ class SqlSchemaVerifier():
                 tableSchema=TableSchema(namedColumns=named_columns)
             )
         )
-        self.config = serialize_length_delimited(sql_worker_configuration)
-        self.enclave_type = "decentriq.sql-worker"
-        self.output_format = ComputeNodeFormat.ZIP
+        config = serialize_length_delimited(sql_worker_configuration)
+
+        super().__init__(
+            name,
+            config=config,
+            enclave_type="decentriq.sql-worker",
+            dependencies=[input_data_node],
+            output_format=ComputeNodeFormat.ZIP
+        )

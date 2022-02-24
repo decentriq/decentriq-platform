@@ -4,7 +4,6 @@ isort:skip_file
 """
 import builtins
 import google.protobuf.descriptor
-import google.protobuf.internal.containers
 import google.protobuf.message
 import typing
 import typing_extensions
@@ -170,14 +169,22 @@ global___AttestationSpecificationIntelDcap = AttestationSpecificationIntelDcap
 class AttestationSpecificationAwsNitro(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     NITROROOTCADER_FIELD_NUMBER: builtins.int
-    PCRS_FIELD_NUMBER: builtins.int
+    PCR0_FIELD_NUMBER: builtins.int
+    PCR1_FIELD_NUMBER: builtins.int
+    PCR2_FIELD_NUMBER: builtins.int
+    PCR8_FIELD_NUMBER: builtins.int
     nitroRootCaDer: builtins.bytes = ...
-    @property
-    def pcrs(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.bytes]: ...
+    pcr0: builtins.bytes = ...
+    pcr1: builtins.bytes = ...
+    pcr2: builtins.bytes = ...
+    pcr8: builtins.bytes = ...
     def __init__(self,
         *,
         nitroRootCaDer : builtins.bytes = ...,
-        pcrs : typing.Optional[typing.Iterable[builtins.bytes]] = ...,
+        pcr0 : builtins.bytes = ...,
+        pcr1 : builtins.bytes = ...,
+        pcr2 : builtins.bytes = ...,
+        pcr8 : builtins.bytes = ...,
         ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"nitroRootCaDer",b"nitroRootCaDer",u"pcrs",b"pcrs"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"nitroRootCaDer",b"nitroRootCaDer",u"pcr0",b"pcr0",u"pcr1",b"pcr1",u"pcr2",b"pcr2",u"pcr8",b"pcr8"]) -> None: ...
 global___AttestationSpecificationAwsNitro = AttestationSpecificationAwsNitro

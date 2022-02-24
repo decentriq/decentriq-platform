@@ -11,7 +11,7 @@ from .builders import DataRoomBuilder
 from .compute import Noop, StaticContent
 from .permission import Permissions
 from .storage import Key
-from .attestation import EnclaveSpecifications
+from .attestation import enclave_specifications, EnclaveSpecifications
 
 
 __all__ = [
@@ -21,8 +21,10 @@ __all__ = [
     "ClientPlatformFeatures",
     "DataRoomBuilder",
     "Permissions",
+    "enclave_specifications",
     "EnclaveSpecifications",
     "Key",
+    "StaticContent",
     "Noop",
     "JobId",
     "sql",

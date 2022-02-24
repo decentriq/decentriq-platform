@@ -16,7 +16,7 @@ _sym_db = _symbol_database.Default()
 from . import attestation_pb2 as attestation__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\x1a\x11\x61ttestation.proto\"\xb9\x02\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x01(\t\x12,\n\x0c\x63omputeNodes\x18\x02 \x03(\x0b\x32\x16.data_room.ComputeNode\x12H\n\x19\x61ttestationSpecifications\x18\x03 \x03(\x0b\x32%.attestation.AttestationSpecification\x12\x32\n\x0fuserPermissions\x18\x04 \x03(\x0b\x32\x19.data_room.UserPermission\x12>\n\x15\x61uthenticationMethods\x18\x05 \x03(\x0b\x32\x1f.data_room.AuthenticationMethod\x12\x0c\n\x04name\x18\x06 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x07 \x01(\t\x12\x12\n\nownerEmail\x18\x08 \x01(\t\"\x83\x01\n\x0b\x43omputeNode\x12\x10\n\x08nodeName\x18\x01 \x01(\t\x12*\n\x04leaf\x18\x02 \x01(\x0b\x32\x1a.data_room.ComputeNodeLeafH\x00\x12.\n\x06\x62ranch\x18\x03 \x01(\x0b\x32\x1c.data_room.ComputeNodeBranchH\x00\x42\x06\n\x04node\"%\n\x0f\x43omputeNodeLeaf\x12\x12\n\nisRequired\x18\x01 \x01(\x08\"\x94\x01\n\x11\x43omputeNodeBranch\x12\x0e\n\x06\x63onfig\x18\x01 \x01(\x0c\x12\x14\n\x0c\x64\x65pendencies\x18\x02 \x03(\t\x12%\n\x1d\x61ttestationSpecificationIndex\x18\x03 \x01(\r\x12\x32\n\x0coutputFormat\x18\x04 \x01(\x0e\x32\x1c.data_room.ComputeNodeFormat\"n\n\x0eUserPermission\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12!\n\x19\x61uthenticationMethodIndex\x18\x02 \x01(\r\x12*\n\x0bpermissions\x18\x03 \x03(\x0b\x32\x15.data_room.Permission\"U\n\x14\x41uthenticationMethod\x12.\n\ntrustedPki\x18\x01 \x01(\x0b\x32\x15.data_room.TrustedPkiH\x00\x88\x01\x01\x42\r\n\x0b_trustedPki\"(\n\nTrustedPki\x12\x1a\n\x12rootCertificatePem\x18\x01 \x01(\x0c\"\x80\x05\n\nPermission\x12G\n\x18\x65xecuteComputePermission\x18\x01 \x01(\x0b\x32#.data_room.ExecuteComputePermissionH\x00\x12;\n\x12leafCrudPermission\x18\x02 \x01(\x0b\x32\x1d.data_room.LeafCrudPermissionH\x00\x12K\n\x1aretrieveDataRoomPermission\x18\x03 \x01(\x0b\x32%.data_room.RetrieveDataRoomPermissionH\x00\x12K\n\x1aretrieveAuditLogPermission\x18\x04 \x01(\x0b\x32%.data_room.RetrieveAuditLogPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x12]\n#retrievePublishedDatasetsPermission\x18\x07 \x01(\x0b\x32..data_room.RetrievePublishedDatasetsPermissionH\x00\x12\x37\n\x10\x64ryRunPermission\x18\x08 \x01(\x0b\x32\x1b.data_room.DryRunPermissionH\x00\x42\x0c\n\npermission\"3\n\x18\x45xecuteComputePermission\x12\x17\n\x0f\x63omputeNodeName\x18\x01 \x01(\t\"*\n\x12LeafCrudPermission\x12\x14\n\x0cleafNodeName\x18\x01 \x01(\t\"\x1c\n\x1aRetrieveDataRoomPermission\"\x1c\n\x1aRetrieveAuditLogPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"%\n#RetrievePublishedDatasetsPermission\"\x12\n\x10\x44ryRunPermission*%\n\x11\x43omputeNodeFormat\x12\x07\n\x03RAW\x10\x00\x12\x07\n\x03ZIP\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\x1a\x11\x61ttestation.proto\"\xb9\x02\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x01(\t\x12,\n\x0c\x63omputeNodes\x18\x02 \x03(\x0b\x32\x16.data_room.ComputeNode\x12H\n\x19\x61ttestationSpecifications\x18\x03 \x03(\x0b\x32%.attestation.AttestationSpecification\x12\x32\n\x0fuserPermissions\x18\x04 \x03(\x0b\x32\x19.data_room.UserPermission\x12>\n\x15\x61uthenticationMethods\x18\x05 \x03(\x0b\x32\x1f.data_room.AuthenticationMethod\x12\x0c\n\x04name\x18\x06 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x07 \x01(\t\x12\x12\n\nownerEmail\x18\x08 \x01(\t\"\x83\x01\n\x0b\x43omputeNode\x12\x10\n\x08nodeName\x18\x01 \x01(\t\x12*\n\x04leaf\x18\x02 \x01(\x0b\x32\x1a.data_room.ComputeNodeLeafH\x00\x12.\n\x06\x62ranch\x18\x03 \x01(\x0b\x32\x1c.data_room.ComputeNodeBranchH\x00\x42\x06\n\x04node\"%\n\x0f\x43omputeNodeLeaf\x12\x12\n\nisRequired\x18\x01 \x01(\x08\"&\n\x13\x43omputeNodeProtocol\x12\x0f\n\x07version\x18\x01 \x01(\r\"\xc6\x01\n\x11\x43omputeNodeBranch\x12\x0e\n\x06\x63onfig\x18\x01 \x01(\x0c\x12\x14\n\x0c\x64\x65pendencies\x18\x02 \x03(\t\x12%\n\x1d\x61ttestationSpecificationIndex\x18\x03 \x01(\r\x12\x32\n\x0coutputFormat\x18\x04 \x01(\x0e\x32\x1c.data_room.ComputeNodeFormat\x12\x30\n\x08protocol\x18\x05 \x01(\x0b\x32\x1e.data_room.ComputeNodeProtocol\"n\n\x0eUserPermission\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12!\n\x19\x61uthenticationMethodIndex\x18\x02 \x01(\r\x12*\n\x0bpermissions\x18\x03 \x03(\x0b\x32\x15.data_room.Permission\"U\n\x14\x41uthenticationMethod\x12.\n\ntrustedPki\x18\x01 \x01(\x0b\x32\x15.data_room.TrustedPkiH\x00\x88\x01\x01\x42\r\n\x0b_trustedPki\"(\n\nTrustedPki\x12\x1a\n\x12rootCertificatePem\x18\x01 \x01(\x0c\"\x80\x05\n\nPermission\x12G\n\x18\x65xecuteComputePermission\x18\x01 \x01(\x0b\x32#.data_room.ExecuteComputePermissionH\x00\x12;\n\x12leafCrudPermission\x18\x02 \x01(\x0b\x32\x1d.data_room.LeafCrudPermissionH\x00\x12K\n\x1aretrieveDataRoomPermission\x18\x03 \x01(\x0b\x32%.data_room.RetrieveDataRoomPermissionH\x00\x12K\n\x1aretrieveAuditLogPermission\x18\x04 \x01(\x0b\x32%.data_room.RetrieveAuditLogPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x12]\n#retrievePublishedDatasetsPermission\x18\x07 \x01(\x0b\x32..data_room.RetrievePublishedDatasetsPermissionH\x00\x12\x37\n\x10\x64ryRunPermission\x18\x08 \x01(\x0b\x32\x1b.data_room.DryRunPermissionH\x00\x42\x0c\n\npermission\"3\n\x18\x45xecuteComputePermission\x12\x17\n\x0f\x63omputeNodeName\x18\x01 \x01(\t\"*\n\x12LeafCrudPermission\x12\x14\n\x0cleafNodeName\x18\x01 \x01(\t\"\x1c\n\x1aRetrieveDataRoomPermission\"\x1c\n\x1aRetrieveAuditLogPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"%\n#RetrievePublishedDatasetsPermission\"\x12\n\x10\x44ryRunPermission*%\n\x11\x43omputeNodeFormat\x12\x07\n\x03RAW\x10\x00\x12\x07\n\x03ZIP\x10\x01\x62\x06proto3')
 
 _COMPUTENODEFORMAT = DESCRIPTOR.enum_types_by_name['ComputeNodeFormat']
 ComputeNodeFormat = enum_type_wrapper.EnumTypeWrapper(_COMPUTENODEFORMAT)
@@ -27,6 +27,7 @@ ZIP = 1
 _DATAROOM = DESCRIPTOR.message_types_by_name['DataRoom']
 _COMPUTENODE = DESCRIPTOR.message_types_by_name['ComputeNode']
 _COMPUTENODELEAF = DESCRIPTOR.message_types_by_name['ComputeNodeLeaf']
+_COMPUTENODEPROTOCOL = DESCRIPTOR.message_types_by_name['ComputeNodeProtocol']
 _COMPUTENODEBRANCH = DESCRIPTOR.message_types_by_name['ComputeNodeBranch']
 _USERPERMISSION = DESCRIPTOR.message_types_by_name['UserPermission']
 _AUTHENTICATIONMETHOD = DESCRIPTOR.message_types_by_name['AuthenticationMethod']
@@ -60,6 +61,13 @@ ComputeNodeLeaf = _reflection.GeneratedProtocolMessageType('ComputeNodeLeaf', (_
   # @@protoc_insertion_point(class_scope:data_room.ComputeNodeLeaf)
   })
 _sym_db.RegisterMessage(ComputeNodeLeaf)
+
+ComputeNodeProtocol = _reflection.GeneratedProtocolMessageType('ComputeNodeProtocol', (_message.Message,), {
+  'DESCRIPTOR' : _COMPUTENODEPROTOCOL,
+  '__module__' : 'data_room_pb2'
+  # @@protoc_insertion_point(class_scope:data_room.ComputeNodeProtocol)
+  })
+_sym_db.RegisterMessage(ComputeNodeProtocol)
 
 ComputeNodeBranch = _reflection.GeneratedProtocolMessageType('ComputeNodeBranch', (_message.Message,), {
   'DESCRIPTOR' : _COMPUTENODEBRANCH,
@@ -155,38 +163,40 @@ _sym_db.RegisterMessage(DryRunPermission)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _COMPUTENODEFORMAT._serialized_start=1859
-  _COMPUTENODEFORMAT._serialized_end=1896
+  _COMPUTENODEFORMAT._serialized_start=1949
+  _COMPUTENODEFORMAT._serialized_end=1986
   _DATAROOM._serialized_start=50
   _DATAROOM._serialized_end=363
   _COMPUTENODE._serialized_start=366
   _COMPUTENODE._serialized_end=497
   _COMPUTENODELEAF._serialized_start=499
   _COMPUTENODELEAF._serialized_end=536
-  _COMPUTENODEBRANCH._serialized_start=539
-  _COMPUTENODEBRANCH._serialized_end=687
-  _USERPERMISSION._serialized_start=689
-  _USERPERMISSION._serialized_end=799
-  _AUTHENTICATIONMETHOD._serialized_start=801
-  _AUTHENTICATIONMETHOD._serialized_end=886
-  _TRUSTEDPKI._serialized_start=888
-  _TRUSTEDPKI._serialized_end=928
-  _PERMISSION._serialized_start=931
-  _PERMISSION._serialized_end=1571
-  _EXECUTECOMPUTEPERMISSION._serialized_start=1573
-  _EXECUTECOMPUTEPERMISSION._serialized_end=1624
-  _LEAFCRUDPERMISSION._serialized_start=1626
-  _LEAFCRUDPERMISSION._serialized_end=1668
-  _RETRIEVEDATAROOMPERMISSION._serialized_start=1670
-  _RETRIEVEDATAROOMPERMISSION._serialized_end=1698
-  _RETRIEVEAUDITLOGPERMISSION._serialized_start=1700
-  _RETRIEVEAUDITLOGPERMISSION._serialized_end=1728
-  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_start=1730
-  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_end=1764
-  _UPDATEDATAROOMSTATUSPERMISSION._serialized_start=1766
-  _UPDATEDATAROOMSTATUSPERMISSION._serialized_end=1798
-  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_start=1800
-  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_end=1837
-  _DRYRUNPERMISSION._serialized_start=1839
-  _DRYRUNPERMISSION._serialized_end=1857
+  _COMPUTENODEPROTOCOL._serialized_start=538
+  _COMPUTENODEPROTOCOL._serialized_end=576
+  _COMPUTENODEBRANCH._serialized_start=579
+  _COMPUTENODEBRANCH._serialized_end=777
+  _USERPERMISSION._serialized_start=779
+  _USERPERMISSION._serialized_end=889
+  _AUTHENTICATIONMETHOD._serialized_start=891
+  _AUTHENTICATIONMETHOD._serialized_end=976
+  _TRUSTEDPKI._serialized_start=978
+  _TRUSTEDPKI._serialized_end=1018
+  _PERMISSION._serialized_start=1021
+  _PERMISSION._serialized_end=1661
+  _EXECUTECOMPUTEPERMISSION._serialized_start=1663
+  _EXECUTECOMPUTEPERMISSION._serialized_end=1714
+  _LEAFCRUDPERMISSION._serialized_start=1716
+  _LEAFCRUDPERMISSION._serialized_end=1758
+  _RETRIEVEDATAROOMPERMISSION._serialized_start=1760
+  _RETRIEVEDATAROOMPERMISSION._serialized_end=1788
+  _RETRIEVEAUDITLOGPERMISSION._serialized_start=1790
+  _RETRIEVEAUDITLOGPERMISSION._serialized_end=1818
+  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_start=1820
+  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_end=1854
+  _UPDATEDATAROOMSTATUSPERMISSION._serialized_start=1856
+  _UPDATEDATAROOMSTATUSPERMISSION._serialized_end=1888
+  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_start=1890
+  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_end=1927
+  _DRYRUNPERMISSION._serialized_start=1929
+  _DRYRUNPERMISSION._serialized_end=1947
 # @@protoc_insertion_point(module_scope)

@@ -31,11 +31,16 @@ enum ComputeNodeFormat {
     ZIP = 1;
 }
 
+message ComputeNodeProtocol {
+    uint32 version = 1;
+}
+
 message ComputeNodeBranch {
     bytes config = 1;
     repeated string dependencies = 2;
     uint32 attestationSpecificationIndex = 3;
     ComputeNodeFormat outputFormat = 4;
+    ComputeNodeProtocol protocol = 5;
 }
 
 message UserPermission {
