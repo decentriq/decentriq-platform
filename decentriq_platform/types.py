@@ -166,6 +166,7 @@ class Tcb(TypedDict):
     sgxtcbcomp14svn: int
     sgxtcbcomp15svn: int
     sgxtcbcomp16svn: int
+    pcesvn: int
 
 
 class TcbLevel(TypedDict):

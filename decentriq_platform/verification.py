@@ -1,4 +1,5 @@
 import json
+import struct
 
 import asn1crypto.x509
 import asn1crypto.pem
@@ -212,18 +213,21 @@ class Verification:
     def _dcap_find_tcb_level(
             self,
             tcb_levels: List[TcbLevel],
-            cpusvn: List[int]
+            cpusvn: List[int],
+            pcesvn: int
     ) -> Optional[TcbLevel]:
         for level in tcb_levels:
             tcb_cpusvn = self._get_cpusvn(level["tcb"])
             if all([a >= b for a, b in zip(cpusvn, tcb_cpusvn)]):
-                return level
+                if pcesvn >= level["tcb"]["pcesvn"]:
+                    return level
         return None
 
     def _verify_dcap(self, dcap: FatquoteDcap) -> bytes:
         if self.attestation_specification.WhichOneof("attestation_specification") != "intelDcap":
             raise Exception(f'Incompatible attestation specification, expected DCAP')
         spec_dcap = self.attestation_specification.intelDcap
+        # https://github.com/intel/SGXDataCenterAttestationPrimitives/blob/b6d6145c21e7a452f05838af24b09965ae9b6f10/QuoteGeneration/quote_wrapper/common/inc/sgx_quote_3.h#L177
         quote = dcap.dcapQuote
         certificate = self._dcap_get_cert(quote)
         pck_certs = Pem.parse(certificate)
@@ -273,7 +277,8 @@ class Verification:
 
         # Checking the tcbStatus is supported
         cpusvn = [x for x in quote[48:64]]
-        tcb_level = self._dcap_find_tcb_level(tcb_info_dic["tcbInfo"]["tcbLevels"], cpusvn)
+        pcesvn = struct.unpack("<H", quote[10:12])[0]
+        tcb_level = self._dcap_find_tcb_level(tcb_info_dic["tcbInfo"]["tcbLevels"], cpusvn, pcesvn)
         if tcb_level is None:
             raise Exception("TCB level not supported")
         self._dcap_check_status(spec_dcap, tcb_level["tcbStatus"])
