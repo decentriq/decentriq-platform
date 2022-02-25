@@ -56,6 +56,7 @@ class FinalizeUpload(TypedDict):
     name: str
     manifestHash: str
     chunks: List[str]
+    scopeId: str
 
 
 class ChunkWrapper(TypedDict):

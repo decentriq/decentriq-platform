@@ -244,7 +244,7 @@ class Client:
                 os.urandom(16),
                 json.dumps(chunk_hashes).encode("utf-8")
         )
-        scope_id = self._ensure_scope_with_metadata(email, {"type": ScopeTypes.USER_FILE})
+        scope_id = self._ensure_scope_with_metadata(email, {"type": ScopeTypes.USER_FILE, "manifest_hash": manifest_hash.hex() })
         self._finalize_upload(
             user_id=email,
             scope_id=scope_id,
@@ -329,15 +329,15 @@ class Client:
             manifest_encrypted: bytes,
             chunks: List[str]
     ) -> DatasetDescription:
-        url = Endpoints.USER_FILES_COLLECTION \
-            .replace(":userId", user_id) \
-            .replace(":scopeId", scope_id)
+        url = Endpoints.USER_FILES \
+            .replace(":userId", user_id)
         payload = FinalizeUpload(
             uploadId=upload_id,
             manifest=b64encode(manifest_encrypted).decode("ascii"),
             manifestHash=manifest_hash.hex(),
             name=name,
-            chunks=chunks
+            chunks=chunks,
+            scopeId=scope_id
         )
         dataset_description: DatasetDescription = self._api.post(
             url,
@@ -353,10 +353,8 @@ class Client:
         """
         Returns informations about a user file
         """
-        scope_id = self._ensure_scope_with_metadata(email, {"type": ScopeTypes.USER_FILE})
         url = Endpoints.USER_FILE \
             .replace(":userId", self.user_email) \
-            .replace(":scopeId", scope_id) \
             .replace(":manifestHash", manifest_hash)
         response = self._api.get(url)
         return response.json()
@@ -368,10 +366,8 @@ class Client:
         """
         Returns the list of files uploaded by a user
         """
-        scope_id = self._ensure_scope_with_metadata(email, {"type": ScopeTypes.USER_FILE})
-        url = Endpoints.USER_FILES_COLLECTION \
-            .replace(":userId", email) \
-            .replace(":scopeId", scope_id)
+        url = Endpoints.USER_FILES \
+            .replace(":userId", email)
         response = self._api.get(url)
         data = response.json()
 
@@ -381,10 +377,8 @@ class Client:
         """
         Deletes a user file from the decentriq platform
         """
-        scope_id = self._ensure_scope_with_metadata(self.user_email, {"type": ScopeTypes.USER_FILE})
         url = Endpoints.USER_FILE \
             .replace(":userId", self.user_email) \
-            .replace(":scopeId", scope_id) \
             .replace(":manifestHash", manifest_hash)
         self._api.delete(url)
 

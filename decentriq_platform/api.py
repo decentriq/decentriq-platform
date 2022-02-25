@@ -25,8 +25,8 @@ class Endpoints(str, Enum):
     USER_CERTIFICATE = "/user/:userId/certificate",
     USER_SCOPES_COLLECTION = "/user/:userId/scopes",
     USER_SCOPE = "/user/:userId/scopes/:scopeId",
-    USER_FILES_COLLECTION = "/user/:userId/scope/:scopeId/files",
-    USER_FILE = "/user/:userId/scope/:scopeId/file/:manifestHash",
+    USER_FILES = "/user/:userId/files",
+    USER_FILE = "/user/:userId/file/:manifestHash",
 
 
 class APIError(Exception):
