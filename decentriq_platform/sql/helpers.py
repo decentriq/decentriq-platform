@@ -10,6 +10,14 @@ from ..proto import Permission, AuthenticationMethod
 from ..proto.length_delimited import parse_length_delimited
 
 
+def _data_node_name(node: str):
+    return f"@table/${node}/dataset"
+
+
+def _noop_node_name(node: str):
+    return f"@table/${node}/validation"
+
+
 class TabularDataNodeBuilder:
     """
     Helper class to construct the triplet of nodes consisting of a data node to
@@ -55,11 +63,12 @@ class TabularDataNodeBuilder:
             `PrimitiveType.FLOAT64`.
         - `is_required`: Whether the dataset needs to be present for computations to be triggered.
         """
+        self.table_name = table_name
         self.is_required = is_required
-        self._leaf_node_name = f"@table/${table_name}/dataset"
+        self._leaf_node_name = _data_node_name(table_name)
         self._verifier_node_name = table_name
 
-        self.validation_computation_name = f"@table/${table_name}/validation"
+        self.validation_computation_name = _noop_node_name(table_name)
         """The name of the computation that will perform the data validation."""
 
         self._verifier = SqlSchemaVerifier(
@@ -77,8 +86,16 @@ class TabularDataNodeBuilder:
             users: List[str]
     ):
         """
-        Configure the given `DataRoomBuilder` to build te final data clean room with the necessary
-        compute and data nodes.
+        Configure the given `DataRoomBuilder` to build te final data clean room with the
+        necessary compute and data nodes.
+        This call will also add the necessary permissions to the data room
+        builder that let each user in the list of users perform the following
+        tasks:
+
+        1. Upload data to the data node.
+        2. Use the data in downstream computations while making sure
+           the schema is valid.
+        3. Trigger the schema validation step separately as its own computation.
 
         **Parameters**:
         - `builder`: The builder object to which to add the data and compute as well as
@@ -233,9 +250,9 @@ def upload_and_publish_tabular_dataset(
         key: Key,
         data_room_id: str,
         *,
-        data_node_builder: TabularDataNodeBuilder,
+        table: str,
         session: Session,
-        description: str,
+        description: str = "",
         validate: bool = True,
         **kwargs
 ) -> str:
@@ -255,9 +272,9 @@ def upload_and_publish_tabular_dataset(
     - `key`: A key for encrypting the data to-be-uploaded.
     - `data_room_id`: To which data room the dataset should be published. This is the id you
         get when publishing a data room.
-    - `data_node_builder`: The data node builder.
+    - `table`: The name of the data node builder.
     - `session`: The session with which to communicate with the enclave.
-    - `description`: An identifier to the dataset.
+    - `description`: An optional description of the dataset.
     - `validate`: Whether to perform the validation operation.
 
     **Returns**:
@@ -266,11 +283,11 @@ def upload_and_publish_tabular_dataset(
     manifest_hash = session.client.upload_dataset(
         data,
         key,
-        description,
+        table,
     )
     session.publish_dataset(
         data_room_id, manifest_hash,
-        leaf_name=data_node_builder.input_node_name,
+        leaf_name=_data_node_name(table),
         key=key
     )
 
@@ -278,7 +295,7 @@ def upload_and_publish_tabular_dataset(
         try:
             session.run_computation_and_get_results(
                 data_room_id,
-                data_node_builder.validation_computation_name,
+                _noop_node_name(table),
                 **kwargs
             )
         except Exception as e:

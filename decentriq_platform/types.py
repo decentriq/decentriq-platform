@@ -78,6 +78,7 @@ class DataRoomDescription(TypedDict):
     description: str
     mrenclave: str
     ownerEmail: str
+    creationDate: str
     status: str
 
 
@@ -95,6 +96,7 @@ class DatasetDescription(TypedDict):
     """An optional description"""
     ownerEmail: str
     """The original uploader of the dataset"""
+    creationDate: str
 
 
 class SignatureResponse(TypedDict):

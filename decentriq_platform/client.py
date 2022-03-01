@@ -23,6 +23,7 @@ from .types import (
 )
 from .proto import AttestationSpecification, parse_length_delimited, serialize_length_delimited
 from .platform import ClientPlatformFeatures
+from .api import ServerError
 import base64
 
 
@@ -45,7 +46,8 @@ class Client:
             self,
             user_email: str,
             api: API,
-            platform: Optional[ClientPlatformFeatures] = None
+            platform: Optional[ClientPlatformFeatures] = None,
+            request_timeout: int = None
     ):
         """
         Create a client instance.
@@ -56,6 +58,7 @@ class Client:
         self.user_email = user_email
         self._api = api
         self._platform = platform
+        self.request_timeout = request_timeout
 
     def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
@@ -131,7 +134,7 @@ class Client:
                 response["sessionId"],
                 attestation_proto,
                 auth=auth,
-                platform_api=platform_api
+                platform_api=platform_api,
         )
 
         return session
@@ -349,42 +352,82 @@ class Client:
     def get_dataset(
             self,
             manifest_hash: str
-    ) -> DatasetDescription:
+    ) -> Optional[DatasetDescription]:
         """
         Returns informations about a user file
         """
         url = Endpoints.USER_FILE \
             .replace(":userId", self.user_email) \
             .replace(":manifestHash", manifest_hash)
-        response = self._api.get(url)
-        return response.json()
+        try:
+            response = self._api.get(url).json()
+            return DatasetDescription(
+                datasetId=response["manifestHash"],
+                name=response["filename"],
+                creationDate=response["creationDate"],
+            )
+        except ServerError:
+            return None
 
-    def get_all_datasets(
-            self,
-            email: str,
-    ) -> List[DatasetDescription]:
+    def get_all_datasets(self) -> List[DatasetDescription]:
         """
         Returns the list of files uploaded by a user
         """
         url = Endpoints.USER_FILES \
-            .replace(":userId", email)
+            .replace(":userId", self.user_email)
         response = self._api.get(url)
         data = response.json()
+        result = []
+        for dataset in data:
+            result.append(
+                DatasetDescription(
+                    datasetId=dataset["manifestHash"],
+                    name=dataset["filename"],
+                    creationDate=dataset["creationDate"],
+                )
+            )
+        return result
 
-        return data
+    def delete_dataset(self, manifest_hash: str, force: bool = False):
+        """
+        Deletes the dataset with the given id from the Decentriq platform.
 
-    def delete_dataset(self, manifest_hash: str):
+        In case the dataset is still published to one or more data rooms,
+        an exception will be thrown and the data set will need to be
+        unpublished manually from the respective data rooms using
+        `Session.remove_published_dataset`.
+        This behavior can be circumvented by using the `force` flag.
+        Note, however, that this might put some data rooms in a broken
+        state as they might try to read data that does not exist anymore.
         """
-        Deletes a user file from the decentriq platform
-        """
+        if self.is_integrated_with_platform:
+            data_room_ids = self.platform._platform_api.\
+                get_data_rooms_with_published_dataset(manifest_hash)
+            if data_room_ids:
+                list_of_ids = "\n".join([f"- {dcr_id}" for dcr_id in data_room_ids])
+                if force:
+                    print(
+                        "This dataset is published to the following data rooms."
+                        " These data rooms might be in a broken state now:"
+                        f"\n{list_of_ids}"
+                    )
+                else:
+                    raise Exception(
+                        "This dataset is published to the following data rooms"
+                        " and needs to be unpublished before it can be deleted!"
+                        f"\n{list_of_ids}"
+                    )
+
         url = Endpoints.USER_FILE \
             .replace(":userId", self.user_email) \
             .replace(":manifestHash", manifest_hash)
         self._api.delete(url)
 
         if self.is_integrated_with_platform:
-            self.platform._platform_api.delete_dataset_metadata(manifest_hash)
-            self.platform._platform_api.delete_dataset_links_for_manifest_hash(manifest_hash)
+            try:
+                self.platform._platform_api.delete_dataset_metadata(manifest_hash)
+            except Exception as e:
+                print(f"Error when deleting dataset: {e}")
 
     @property
     def platform(self) -> ClientPlatformFeatures:
@@ -420,6 +463,7 @@ def create_client(
         api_platform_host: str = DECENTRIQ_API_PLATFORM_HOST,
         api_platform_port: int = DECENTRIQ_API_PLATFORM_PORT,
         api_platform_use_tls: bool = DECENTRIQ_API_PLATFORM_USE_TLS,
+        request_timeout: int = None
 ) -> Client:
     """
     The primary way to create a `Client` object.
@@ -452,7 +496,8 @@ def create_client(
         api_core_host,
         api_core_port,
         api_prefix="/api/core",
-        use_tls=api_core_use_tls
+        use_tls=api_core_use_tls,
+        timeout=request_timeout
     )
 
     if integrate_with_platform:
@@ -468,7 +513,9 @@ def create_client(
     else:
         platform = None
 
-    return Client(user_email, api, platform)
+    return Client(
+        user_email, api, platform, request_timeout=request_timeout
+    )
 
 
 class BoundedExecutor:

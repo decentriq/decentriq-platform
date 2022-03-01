@@ -102,6 +102,7 @@ class API:
         use_tls,
         api_prefix,
         additional_auth_headers={},
+        timeout=None,
     ):
         adapter = HTTPAdapterWithTCPKeepalive()
         session = requests.Session()
@@ -120,6 +121,7 @@ class API:
         auth_headers.update(additional_auth_headers)
         session.headers.update(auth_headers)
         self.session = session
+        self.timeout = timeout
 
     @staticmethod
     def __check_response_status_code(response):
@@ -138,42 +140,56 @@ class API:
 
     def post(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
-        response = self.session.post(url, data=req_body, headers={**headers})
+        response = self.session.post(
+            url, data=req_body, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response
 
     def post_multipart(self, endpoint, parts=None, headers={}):
         url = self.base_url + endpoint
-        response = self.session.post(url, files=parts, headers={**headers})
+        response = self.session.post(
+            url, files=parts, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response
 
     def put(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
-        response = self.session.put(url, data=req_body, headers={**headers})
+        response = self.session.put(
+            url, data=req_body, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response
 
     def patch(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
-        response = self.session.patch(url, data=req_body, headers={**headers})
+        response = self.session.patch(
+            url, data=req_body, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response
 
     def get(self, endpoint, params={}, headers={}):
         url = self.base_url + endpoint
-        response = self.session.get(url, params={**params}, headers={**headers})
+        response = self.session.get(
+            url, params={**params}, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response
 
     def head(self, endpoint, headers={}):
         url = self.base_url + endpoint
-        response = self.session.head(url, headers={**headers})
+        response = self.session.head(
+            url, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response
 
     def delete(self, endpoint, headers={}):
         url = self.base_url + endpoint
-        response = self.session.delete(url, headers={**headers})
+        response = self.session.delete(
+            url, headers={**headers}, timeout=self.timeout
+        )
         API.__check_response_status_code(response)
         return response

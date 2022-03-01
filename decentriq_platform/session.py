@@ -380,10 +380,18 @@ class Session():
             manifest_hash: str,
             leaf_name: str,
             key: Key,
+            *,
+            force: bool = False
     ) -> PublishDatasetToDataRoomResponse:
         """
         Publishes a file to the DataRoom
         """
+
+        dataset = self.client.get_dataset(manifest_hash)
+        if not dataset and not force:
+            raise Exception(
+                "The dataset you are trying to publish does not exist"
+            )
 
         should_create_dataset_links =\
             self.is_integrated_with_platform and \

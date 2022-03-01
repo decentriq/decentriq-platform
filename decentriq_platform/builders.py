@@ -6,6 +6,7 @@ from .proto import (
     AttestationSpecification
 )
 from .node import Node
+from .permission import Permissions
 from .types import EnclaveSpecification
 import random
 
@@ -29,9 +30,28 @@ class DataRoomBuilder():
             name: str,
             enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
             *,
+            add_basic_user_permissions: bool = True,
             description: str = None,
             owner_email: str = None,
         ) -> None:
+        """
+        Create a data room builder object.
+
+        **Parameters**:
+        - `name`: The name of the data room to be created.
+        - `enclave_specs`: The enclave specification set in which to lookup
+            enclave specs for enclaves responsible for executing compute nodes.
+            These specs are provided by the `decentriq_platform.enclave_specifications`
+            catalogue.
+        - `add_basic_user_permissions`: Whether to add basic user permissions
+            for each participant. These are:
+            1. Permission to retrieve the data room definition
+            2. Permission to retrieve the status of the data room
+            3. Permission to retrieve the audit log
+        - `description`: Description of the data room.
+        - `owner_email`: A custom owner of the data room. By default this will
+            be set to the owner of the session publishing the data room.
+        """
         assert name, "The DCR must have a non-empty name"
 
         self.name = name
@@ -43,6 +63,7 @@ class DataRoomBuilder():
         self.description = description
         self.id = None
         self.enclave_specs = enclave_specs
+        self.add_basic_user_permissions = add_basic_user_permissions
 
         if description:
             self.add_description(description)
@@ -61,7 +82,7 @@ class DataRoomBuilder():
         self.description = description
 
     def add_owner_email(self, email: str):
-        """Specify the owner of the data room."""
+        """Specify a specific owner of the data room."""
         self.owner_email = email
 
     def add_data_node(self, name: str, is_required=False):
@@ -126,6 +147,13 @@ class DataRoomBuilder():
         except ValueError:
             self.authentication_methods.append(authentication_method)
             authentication_method_index = len(self.authentication_methods) - 1
+
+        if self.add_basic_user_permissions:
+            permissions.extend([
+                Permissions.retrieve_data_room_status(),
+                Permissions.retrieve_audit_log(),
+                Permissions.retrieve_data_room(),
+            ])
 
         # Check whether a set of permissions has already been added in a previous
         # call, and extend the permissions in case the authentication method matches.

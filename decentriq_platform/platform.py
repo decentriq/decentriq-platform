@@ -39,6 +39,29 @@ def platform_hash_to_str(bs: bytes) -> str:
     return base64.b64encode(','.join([str(b) for b in bs]).encode('ascii')).decode('ascii')
 
 
+_GET_DATASET_LINKS_QUERY = """
+query getDatasetLinks($filter: DatasetLinkFilter!) {
+    datasetLinks(filter: $filter) {
+        nodes {
+            datasetLinkUuid: datasetLinkId
+            computeNode {
+                computeNodeUuid: computeNodeId
+                nodeName
+                dataRoom {
+                    dataRoomUuid: dataRoomId
+                    dataRoomId: dataRoomHashEncoded
+                }
+            }
+            dataset {
+                name
+                datasetId: datasetHashEncoded
+            }
+        }
+    }
+}
+"""
+
+
 class PlatformApi:
     """
     Class to interact with the GraphQL endpoint of the Decentriq platform.
@@ -65,6 +88,7 @@ class PlatformApi:
                         description
                         mrenclave
                         ownerEmail
+                        creationDate: createdAt
                         state {
                             status
                         }
@@ -133,48 +157,26 @@ class PlatformApi:
             self,
             manifest_hash: str,
     ) -> Optional[List[str]]:
+        links = self._get_dataset_links_for_manifest_hash(manifest_hash)
+        return [link["datasetLinkUuid"] for link in links]
+
+    def _get_dataset_links_for_manifest_hash(
+            self,
+            manifest_hash: str,
+    ) -> List[dict]:
         data = self._post_graphql(
-            """
-            query getDatasetLinks($filter: DatasetLinkFilter!) {
-                datasetLinks(filter: $filter) {
-                    nodes {
-                        datasetLinkUuid: datasetLinkId
-                    }
-                }
-            }
-            """,
+            _GET_DATASET_LINKS_QUERY,
             {
                 "filter": {
                     "datasetHashEncoded": {"equalTo": manifest_hash},
                 }
             }
         )
-
-        nodes = data["datasetLinks"]["nodes"]
-        if nodes:
-            return [node["datasetLinkUuid"] for node in nodes]
-        else:
-            return None
+        return data["datasetLinks"]["nodes"]
 
     def _get_dataset_link(self, compute_node_uuid: str) -> Optional[dict]:
         data = self._post_graphql(
-            """
-            query getDatasetLinks($filter: DatasetLinkFilter!) {
-                datasetLinks(filter: $filter) {
-                    nodes {
-                        datasetLinkUuid: datasetLinkId
-                        computeNode {
-                            computeNodeUuid: computeNodeId
-                            nodeName
-                        }
-                        dataset {
-                            name
-                            datasetId: datasetHashEncoded
-                        }
-                    }
-                }
-            }
-            """,
+            _GET_DATASET_LINKS_QUERY,
             {
                 "filter": {
                     "computeNode": {
@@ -190,6 +192,16 @@ class PlatformApi:
         else:
             return None
 
+    def get_data_rooms_with_published_dataset(self, manifest_hash) -> List[str]:
+        links = self._get_dataset_links_for_manifest_hash(manifest_hash)
+        data_room_ids = []
+        for link in links:
+            if "computeNode" in link and "dataRoom" in link["computeNode"]:
+                data_room_id = link["computeNode"]["dataRoom"].get("dataRoomId")
+                if data_room_id:
+                    data_room_ids.append(data_room_id)
+        return data_room_ids
+
     def delete_dataset_link(
             self,
             data_room_id: str,
@@ -198,8 +210,8 @@ class PlatformApi:
         dataset_link = self.get_dataset_link(data_room_id, leaf_name)
         if not dataset_link:
             raise Exception(
-                f"Unable to find a dataset link for data room '{data_room_id}' " +
-                f" and data node {leaf_name}"
+                f"Unable to find a dataset link for data room '{data_room_id}'" +
+                f" and data node '{leaf_name}'"
             )
         else:
             self._post_graphql(
@@ -338,14 +350,18 @@ class PlatformApi:
             # A DCR without a state should be displayed as a DCR with "Active" status
             # Uppercase status such as "STOPPED" should be displayed as "Stopped" to match
             # the proto version.
-            status = d["state"]["status"].capitalize() if d["state"] else "Active"
+            if d.get("state") and d["state"].get("status"):
+                status = d["state"]["status"].capitalize()
+            else:
+                status = "Active"
             d_cleaned = {k: v for k, v in d.items() if k not in remove_keys}
             return DataRoomDescription(status=status, **d_cleaned)
 
         dcr_dicts = data.get("dataRooms", {}).get("nodes", [])
         dcr_descriptions = [payload_to_dcr_description(d) for d in dcr_dicts]
 
-        return dcr_descriptions
+        # Remove non-published DCRs from list
+        return [desc for desc in dcr_descriptions if desc["dataRoomId"]]
 
     def get_data_room_by_hash(self, data_room_hash: str) -> Optional[dict]:
         data = self._post_graphql(
@@ -374,19 +390,39 @@ class PlatformApi:
         data = self._post_graphql(
             """
             query getDatasets {
-                datasetMetas {
+                datasets {
                     nodes {
                         datasetId: datasetHashEncoded
                         name
                         description
                         ownerEmail
+                        creationDate: createdAt
+                        datasetMeta {
+                            description
+                        }
                     }
                 }
             }
             """
         )
-        nodes = data.get("datasetMetas", {}).get("nodes", [])
-        return [DatasetDescription(**node) for node in nodes]
+        nodes = data.get("datasets", {}).get("nodes", [])
+        datasets = []
+        for node in nodes:
+            meta_info = node.get("datasetMeta")
+            if meta_info:
+                description = meta_info.get("description")
+            else:
+                description = None
+            datasets.append(
+                DatasetDescription(
+                    datasetId=node["datasetId"],
+                    name=node["name"],
+                    description=description,
+                    ownerEmail=node["ownerEmail"],
+                    creationDate=node["creationDate"]
+                )
+            )
+        return datasets
 
     def save_dataset_metadata(
             self,
@@ -508,6 +544,7 @@ class PlatformApi:
                         name
                         description
                         ownerEmail
+                        creationDate: createdAt
                     }
                 }
             }
