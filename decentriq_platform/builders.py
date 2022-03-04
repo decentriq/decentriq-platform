@@ -13,7 +13,7 @@ import random
 
 class DataRoomBuilder():
     """
-    An helper class to ease the building process of a data clean room
+    A helper class to ease the building process of a data clean room.
     """
     attestation_specifications: List[AttestationSpecification]
     authentication_methods: List[AuthenticationMethod]
@@ -48,6 +48,7 @@ class DataRoomBuilder():
             1. Permission to retrieve the data room definition
             2. Permission to retrieve the status of the data room
             3. Permission to retrieve the audit log
+            4. Permission to retrieve the list of datasets that have been published to the data room
         - `description`: Description of the data room.
         - `owner_email`: A custom owner of the data room. By default this will
             be set to the owner of the session publishing the data room.
@@ -82,13 +83,17 @@ class DataRoomBuilder():
         self.description = description
 
     def add_owner_email(self, email: str):
-        """Specify a specific owner of the data room."""
+        """
+        Specify a specific owner of the data room.
+        By default, the current user will be used.
+        """
         self.owner_email = email
 
     def add_data_node(self, name: str, is_required=False):
         """
         Add a new data node. If the node is marked as required, any computation
-        which includes it as a dependency will not progress.
+        which includes it as a dependency will not start in case no data has
+        been provided yet.
         """
         node = ComputeNode(
             nodeName=name,
@@ -153,6 +158,7 @@ class DataRoomBuilder():
                 Permissions.retrieve_data_room_status(),
                 Permissions.retrieve_audit_log(),
                 Permissions.retrieve_data_room(),
+                Permissions.retrieve_published_datasets(),
             ])
 
         # Check whether a set of permissions has already been added in a previous
@@ -182,12 +188,12 @@ class DataRoomBuilder():
         **This is not used for addressing the data room**.
         When publishing the data room, you will recieve the data room hash that can be used
         to interact with the data room.
-        By default this internal id will be automatically randomly generated and therefore calling
+        By default, this internal id will be automatically randomly generated and therefore calling
         this method is very likely not necessary.
 
-        This values main purpose is to give additional entropy to the dataroom definition so that
+        The main purpose of this field is to give additional entropy to the dataroom definition so that
         otherwise equivalent dataroom definitions may be differentiated.
-        It may also be used for retries to ensure exactly-once creation of the dataroom.
+        It may also be used for retries to ensure exactly-once creation of the data room.
         """
         self.id = id
 

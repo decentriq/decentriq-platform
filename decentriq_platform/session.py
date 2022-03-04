@@ -35,6 +35,9 @@ if TYPE_CHECKING:
     from .client import Client
 
 
+__all__ = [ "Session" ]
+
+
 GCG_PROTOCOL_VERSION = 0
 
 
@@ -291,7 +294,7 @@ class Session():
             data_room_id: str
     ) -> str:
         """
-        Returns the status of the DataRoom. Valid values are `"Active"` or `"Stopped"`.
+        Returns the status of the data room. Valid values are `"Active"` or `"Stopped"`.
         """
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -321,7 +324,7 @@ class Session():
             data_room_id: str
     ) -> RetrieveDataRoomResponse:
         """
-        Returns the underlying protobuf configuration object for the DataRoom
+        Returns the underlying protobuf configuration object for the data room.
         """
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -350,7 +353,7 @@ class Session():
             data_room_id: str
     ) -> RetrieveAuditLogResponse:
         """
-        Returns the audit log for the DataRoom
+        Returns the audit log for the data room.
         """
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -384,7 +387,19 @@ class Session():
             force: bool = False
     ) -> PublishDatasetToDataRoomResponse:
         """
-        Publishes a file to the DataRoom
+        Publishes a file and its encryption key to a data room.
+        Neither the file or the encryption key will ever be stored in
+        unencrypted form.
+
+        This method will check whether the to-be-published file exists.
+        If this is not the case, an exception will be raised.
+        This behavior can be disabled by setting the `force` flag.
+
+        In case the original client was created with platform integration
+        enabled, the method will further check whether there already
+        is a dataset published for the given data room.
+        In this case, an exception will be thrown and the dataset
+        will need to be unpublished first.
         """
 
         dataset = self.client.get_dataset(manifest_hash)
@@ -457,7 +472,7 @@ class Session():
             leaf_name: str,
     ) -> RemovePublishedDatasetResponse:
         """
-        Removes a published file from the DataRoom
+        Removes a published dataset from the data room.
         """
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -497,7 +512,7 @@ class Session():
             data_room_id: str,
     ) -> RetrievePublishedDatasetsResponse:
         """
-        Returns the files published to the DataRoom
+        Returns the datasets published to the given data room.
         """
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,

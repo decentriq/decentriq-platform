@@ -1,10 +1,5 @@
 import requests
-import socket
-import platform
-from requests import adapters
 from enum import Enum
-from urllib3.connection import HTTPConnection
-
 
 class Endpoints(str, Enum):
     # System
@@ -62,36 +57,6 @@ class UnknownError(APIError):
 
     pass
 
-class HTTPAdapterWithSocketOptions(adapters.HTTPAdapter):
-    def __init__(self, *args, **kwargs):
-        self.socket_options = kwargs.pop("socket_options", None)
-        super(HTTPAdapterWithSocketOptions, self).__init__(*args, **kwargs)
-
-    def init_poolmanager(self, *args, **kwargs):
-        if self.socket_options is not None:
-            kwargs["socket_options"] = self.socket_options
-        super(HTTPAdapterWithSocketOptions, self).init_poolmanager(*args, **kwargs)
-
-class HTTPAdapterWithTCPKeepalive(HTTPAdapterWithSocketOptions):
-    def __init__(self, *args, **kwargs):
-        platform_socket_options = [
-            (socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 60),
-            (socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5),
-        ]
-        if platform.system()=="Linux":
-            platform_socket_options += [
-                (socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60),
-            ]
-        elif platform.system()=="Darwin":
-            TCP_KEEPALIVE = getattr(socket, 'TCP_KEEPALIVE', 0x10)
-            platform_socket_options += [
-                (socket.IPPROTO_TCP, TCP_KEEPALIVE, 60)
-            ]
-        self.socket_options = HTTPConnection.default_socket_options + \
-                [(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)] + \
-                platform_socket_options
-        super(HTTPAdapterWithTCPKeepalive, self).__init__(*args, **kwargs)
-
 class API:
     def __init__(
         self,
@@ -104,10 +69,7 @@ class API:
         additional_auth_headers={},
         timeout=None,
     ):
-        adapter = HTTPAdapterWithTCPKeepalive()
         session = requests.Session()
-        session.mount("http://", adapter)
-        session.mount("https://", adapter)
         if use_tls:
             protocol = "https"
         else:

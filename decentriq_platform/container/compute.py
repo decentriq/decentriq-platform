@@ -8,8 +8,8 @@ from ..node import Node
 
 class StaticContainerCompute(Node):
     """
-    Computation node which allows execution of programs inside a fixed
-    container image
+    Compute node which allows the execution of programs inside a fixed
+    container image.
     """
 
     def __init__(

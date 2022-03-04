@@ -19,6 +19,10 @@ from .config import (
     DECENTRIQ_API_PLATFORM_HOST, DECENTRIQ_API_PLATFORM_PORT, DECENTRIQ_API_PLATFORM_USE_TLS
 )
 
+__all__ = [
+    "ClientPlatformFeatures", "SessionPlatformFeatures"
+]
+
 
 def platform_hash_from_str(s: str) -> bytes:
     """
@@ -661,7 +665,7 @@ class ClientPlatformFeatures:
     def decentriq_ca_root_certificate(self) -> bytes:
         """
         Returns the root certificate used by the Decentriq identity provider.
-        Note that when using this certificate in any authentication scheme you trust Decentriq as an identity provider!
+        Note that when using this certificate in any authentication scheme, you trust Decentriq as an identity provider!
         """
         url = Endpoints.SYSTEM_CERTIFICATE_AUTHORITY
         response = self._http_api.get(url).json()
@@ -681,7 +685,7 @@ class ClientPlatformFeatures:
         You can also create an `AuthenticationMethod` object directly and supply your own root certificate,
         with which to authenticate users connecting to your data room.
         In this case you will also need to issue corresponding user certificates and create your
-        own custom `Auth` objects.
+        own custom `decentriq_platform.authentication.Auth` objects.
         """
         root_pki = self.decentriq_ca_root_certificate
         return AuthenticationMethod(

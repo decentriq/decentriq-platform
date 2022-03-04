@@ -17,7 +17,7 @@ class Noop(Node):
     computation nodes without giving access to the results.
     """
 
-    def __init__(self, name: str, dependencies: list[str] = []) -> None:
+    def __init__(self, name: str, dependencies: List[str] = []) -> None:
         config = serialize_length_delimited(
             DriverTaskConfig(noop=NoopConfig())
         )

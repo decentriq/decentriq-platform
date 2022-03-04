@@ -1,5 +1,6 @@
 from typing import List, Any
 
+__all__ = [ "Node" ]
 
 class Node:
     name: str

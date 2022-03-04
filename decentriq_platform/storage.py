@@ -13,13 +13,13 @@ KEY_LEN = 32
 class Key():
     """
     This class wraps the key material that is used to encrypt the
-    files that are uploaded to the decentriq platform
+    files that are uploaded to the decentriq platform.
     """
     material: bytes
 
     def __init__(self, material: Optional[bytes] = None):
         """
-        Returns a new `Key` instance, can optional specify the raw key material
+        Returns a new `Key` instance, can optional specify the raw key material.
         """
         if material == None:
             key_bytes = os.urandom(KEY_LEN)

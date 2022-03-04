@@ -19,29 +19,22 @@ intel_sgx_dcap_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_dcap_root_ca)[2]
 intel_sgx_ias_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_ias_root_ca)[2]
 aws_nitro_root_ca_der = asn1crypto.pem.unarmor(aws_nitro_root_ca_pem)[2]
 
+
 SPECIFICATIONS = {
     "decentriq.driver:v2": EnclaveSpecification(
         name="decentriq.driver",
         version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
-                mrenclave=bytes.fromhex("ac492b8e6b0145ce3debb76fe5444a62377fbba3a2479efbc202f8e68304309f"),
-                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-            )
-        ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
-    ),
-    "decentriq.driver:v1": EnclaveSpecification(
-        name="decentriq.driver",
-        version="1",
-        proto=AttestationSpecification(
-            intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
-                    "ce2c7ff27a3efe21968dc1a54e662441a88f92bcf7c53b3cc00f7e579cca6591"
+                    "a88ec2195974edf693e45b2ccdf39cf53c9382bb5309ba3863b5d0f2591542f1"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_sw_hardening_needed=False,
+                accept_revoked=False,
             )
         ),
         protocol=ComputeNodeProtocol(
@@ -54,24 +47,14 @@ SPECIFICATIONS = {
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
-                    "1675a93fd14c61f9294f41e0a7e8b48b8c15e06c62514e0303daf6e6e8cea3c5"
+                    "c04e429edd5fc767e00ec4839b1f8c57375fda178905866ac6d4debee4fbe7d1"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-            )
-        ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
-    ),
-    "decentriq.sql-worker:v1": EnclaveSpecification(
-        name="decentriq.sql-worker",
-        version="1",
-        proto=AttestationSpecification(
-            intelDcap=AttestationSpecificationIntelDcap(
-                mrenclave=bytes.fromhex(
-                    "16506a96801ca841e784eeb55f6c162c2ef141667f1a1030df23ab61f69e0873"
-                ),
-                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_sw_hardening_needed=False,
+                accept_revoked=False,
             )
         ),
         protocol=ComputeNodeProtocol(
@@ -84,10 +67,10 @@ SPECIFICATIONS = {
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
-                pcr0=bytes.fromhex(""),
-                pcr1=bytes.fromhex(""),
-                pcr2=bytes.fromhex(""),
-                pcr8=bytes.fromhex("")
+                pcr0=bytes.fromhex("9103b7019cd97a2837b1631648bc683b3470b402b3c0638d8ff16178c7fd031407c06aeff8f96517a320fb573d7d281f"),
+                pcr1=bytes.fromhex("9103b7019cd97a2837b1631648bc683b3470b402b3c0638d8ff16178c7fd031407c06aeff8f96517a320fb573d7d281f"),
+                pcr2=bytes.fromhex("21b9efbc184807662e966d34f390821309eeac6802309798826296bf3e8bec7c10edb30948c90ba67310f7b964fc500a"),
+                pcr8=bytes.fromhex("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
             )
         ),
         protocol=ComputeNodeProtocol(
@@ -127,7 +110,7 @@ class EnclaveSpecifications:
     def __init__(self, specifications: Dict[str, EnclaveSpecification]):
         self.specifications = specifications
 
-    def versions(self, **enclave_versions: List[str]) -> Dict[str, EnclaveSpecification]:
+    def versions(self, enclave_versions: List[str]) -> Dict[str, EnclaveSpecification]:
         """
         Get the enclave specifications for the given versioned enclave types.
 
@@ -140,7 +123,7 @@ class EnclaveSpecifications:
         selected_specifcations = {}
         for version in enclave_versions:
             enclave_type = version.split(":")[0]
-            selected_specifcations[enclave_type] = version
+            selected_specifcations[enclave_type] = self.specifications[version]
         return selected_specifcations
 
     def merge(self, other):

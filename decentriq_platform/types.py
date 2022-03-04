@@ -4,6 +4,14 @@ from typing_extensions import TypedDict
 from enum import Enum
 
 
+__all__ = [
+    "EnclaveSpecification",
+    "JobId",
+    "DataRoomDescription",
+    "DatasetDescription",
+]
+
+
 class JobId:
     """
     Class for identifying running or already run jobs.
@@ -121,7 +129,7 @@ class DatasetManifestMetadata(TypedDict):
 class EnclaveSpecification(TypedDict):
     """
     This class includes information about an enclave deployed in the platform.
-    Please refer to `decentriq_platform.EnclaveSpecifications` for a detailed explaination.
+    Please refer to `decentriq_platform.EnclaveSpecifications` for a detailed explanation.
     """
     name: str
     """The name of the enclave."""

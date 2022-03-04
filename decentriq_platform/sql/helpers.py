@@ -11,11 +11,11 @@ from ..proto.length_delimited import parse_length_delimited
 
 
 def _data_node_name(node: str):
-    return f"@table/${node}/dataset"
+    return f"@table/{node}/dataset"
 
 
 def _noop_node_name(node: str):
-    return f"@table/${node}/validation"
+    return f"@table/{node}/validation"
 
 
 class TabularDataNodeBuilder:
@@ -41,8 +41,17 @@ class TabularDataNodeBuilder:
     Data should be published to the node named `input_node_name` and be read from `output_node_name`.
     The name of the validation computation can be accessed using the field `validation_computation_name`.
 
+    This class uses a special naming convention to name the nodes added to the data room based on
+    the table name given to the builder. Assuming you use `"my_table"` as the `table_name` when
+    instantiating the `TabularDataNodeBuilder`, then the following three nodes will be added:
+
+    1. `@table/my_table/dataset` - the data node to which you can upload data.
+    2. `my_table` - the name of the compute node that verifies the schema of the data.
+        Subsequent SQL compute nodes should read data from this node.
+    3. `@table/my_table/validation` - the name of a special trigger node that can be used to trigger the validation computation.
+
     The helper function `upload_and_publish_tabular_dataset` will upload, publish, and validate your
-    data automatically.
+    data automatically, without you having to worry about internal naming.
     """
     def __init__(
             self,

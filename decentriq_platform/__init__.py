@@ -4,9 +4,8 @@
 """
 __docformat__ = "restructuredtext"
 
-from .types import JobId
 from .client import Client, create_client, Session
-from .platform import ClientPlatformFeatures
+from .platform import ClientPlatformFeatures, SessionPlatformFeatures
 from .builders import DataRoomBuilder
 from .compute import Noop, StaticContent
 from .permission import Permissions
@@ -18,7 +17,6 @@ __all__ = [
     "create_client",
     "Client",
     "Session",
-    "ClientPlatformFeatures",
     "DataRoomBuilder",
     "Permissions",
     "enclave_specifications",
@@ -26,7 +24,13 @@ __all__ = [
     "Key",
     "StaticContent",
     "Noop",
-    "JobId",
     "sql",
     "container",
+    "storage",
+    "attestation",
+    "types",
+    "authentication",
+    "platform",
+    "session",
+    "node",
 ]

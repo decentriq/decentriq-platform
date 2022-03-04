@@ -99,7 +99,9 @@ class Client:
     ) -> Session:
         """
         Creates a new `decentriq_platform.session.Session` instance to communicate
-        with an enclave service with the specified identifier.
+        with a driver enclave.
+        The passed set of enclave specifications must include a specification for
+        a driver enclave.
 
         Messages sent through this session will be authenticated
         with the given authentication object.
@@ -193,7 +195,7 @@ class Client:
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
-        corresponding manifest hash
+        corresponding manifest hash.
 
         **Parameters**:
         - `data`: The data to upload as a buffered stream.
@@ -354,7 +356,7 @@ class Client:
             manifest_hash: str
     ) -> Optional[DatasetDescription]:
         """
-        Returns informations about a user file
+        Returns information about a user file given a dataset id.
         """
         url = Endpoints.USER_FILE \
             .replace(":userId", self.user_email) \
@@ -371,7 +373,7 @@ class Client:
 
     def get_all_datasets(self) -> List[DatasetDescription]:
         """
-        Returns the list of files uploaded by a user
+        Returns the list of files uploaded by the user.
         """
         url = Endpoints.USER_FILES \
             .replace(":userId", self.user_email)
@@ -393,7 +395,7 @@ class Client:
         Deletes the dataset with the given id from the Decentriq platform.
 
         In case the dataset is still published to one or more data rooms,
-        an exception will be thrown and the data set will need to be
+        an exception will be thrown and the dataset will need to be
         unpublished manually from the respective data rooms using
         `Session.remove_published_dataset`.
         This behavior can be circumvented by using the `force` flag.
@@ -447,7 +449,7 @@ class Client:
 
     @property
     def is_integrated_with_platform(self) -> bool:
-        """Whether this client has been created with platform integration"""
+        """Whether this client has been created with platform integration."""
         return self._platform is not None
 
 
