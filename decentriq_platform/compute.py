@@ -43,6 +43,20 @@ class StaticContent(Node):
             content: bytes,
             dependencies: List[str] = []
     ) -> None:
+        """
+        Create a node with the given name and content.
+
+        In case the source of the content is a file on your local machine,
+        you can open the file in binary mode before reading it:
+
+        ```
+        # Note the "rb" argument
+        with open("my_script.py", "rb") as data:
+            my_script_content = data.read()
+
+        # my_script_content can now be passed to the StaticContent constructor
+        ```
+        """
         config = serialize_length_delimited(
             DriverTaskConfig(
                 staticContent=StaticContentConfig(

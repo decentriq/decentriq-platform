@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from .types import EnclaveSpecification
 from .proto import (
     AttestationSpecification,
@@ -109,6 +109,10 @@ class EnclaveSpecifications:
 
     def __init__(self, specifications: Dict[str, EnclaveSpecification]):
         self.specifications = specifications
+
+    def list(self) -> List[str]:
+        """Get a list of all available enclave identifiers."""
+        return sorted(self.specifications.keys())
 
     def versions(self, enclave_versions: List[str]) -> Dict[str, EnclaveSpecification]:
         """
