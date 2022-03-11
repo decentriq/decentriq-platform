@@ -151,14 +151,14 @@ class Client:
         ).json()
         return response["scopeId"]
 
-    def _get_scope(self, email: str, scope_id: str) -> ScopeJson:
+    def get_scope(self, email: str, scope_id: str) -> ScopeJson:
         url = Endpoints.USER_SCOPE \
                 .replace(":userId", email) \
                 .replace(":scopeId", scope_id)
         response: ScopeJson = self._api.get(url).json()
         return response
 
-    def _get_scope_by_metadata(self, email: str, metadata: Dict[str, str]) -> Optional[str]:
+    def get_scope_by_metadata(self, email: str, metadata: Dict[str, str]) -> Optional[str]:
         url = Endpoints.USER_SCOPES_COLLECTION.replace(":userId", email)
         response: List[ScopeJson] = self._api.get(
                 url,
@@ -171,12 +171,12 @@ class Client:
             return scope["scopeId"]
 
     def _ensure_scope_with_metadata(self, email: str, metadata: Dict[str, str]) -> str:
-        scope = self._get_scope_by_metadata(email, metadata)
+        scope = self.get_scope_by_metadata(email, metadata)
         if scope is None:
             scope = self._create_scope(email, metadata)
         return scope
 
-    def _delete_scope(self, email: str, scope_id: str):
+    def delete_scope(self, email: str, scope_id: str):
         url = Endpoints.USER_SCOPE \
             .replace(":userId", email) \
             .replace(":scopeId", scope_id)

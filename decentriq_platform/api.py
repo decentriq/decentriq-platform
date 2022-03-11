@@ -19,7 +19,7 @@ class Endpoints(str, Enum):
     USER_UPLOAD_CHUNKS = "/user/:userId/upload/:uploadId/chunks",
     USER_CERTIFICATE = "/user/:userId/certificate",
     USER_SCOPES_COLLECTION = "/user/:userId/scopes",
-    USER_SCOPE = "/user/:userId/scopes/:scopeId",
+    USER_SCOPE = "/user/:userId/scope/:scopeId",
     USER_FILES = "/user/:userId/files",
     USER_FILE = "/user/:userId/file/:manifestHash",
 
