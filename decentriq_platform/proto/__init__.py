@@ -41,4 +41,8 @@ from .delta_enclave_api_pb2 import (
     ChunkHeader, EncryptionHeader, VersionHeader,
     DataNoncePubkey, Request, Response
 )
-
+from .synth_data_pb2 import (
+    SyntheticDataConf,
+    Mask,
+    Column,
+)

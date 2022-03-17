@@ -1,0 +1,35 @@
+syntax = "proto3";
+package synth_data;
+
+import "compute_sql.proto";
+
+
+message SyntheticDataConf {
+    repeated Column columns = 1;
+    bool outputOriginalDataStats = 2;
+    float epsilon = 3;
+}
+
+message Mask {
+    enum MaskFormat {
+       GENERIC_STRING = 0;
+       GENERIC_NUMBER = 1;
+       NAME = 2;
+       ADDRESS = 3;
+       POSTCODE = 4;
+       PHONE_NUMBER = 5;
+       SOCIAL_SECURITY_NUMBER = 6;
+       EMAIL = 7;
+       DATE = 8;
+       TIMESTAMP = 9;
+       IBAN = 10;
+    }
+    MaskFormat format = 1;
+}
+
+message Column {
+     int32 index = 1;
+     compute_sql.ColumnType type = 2;
+     Mask mask = 3;
+}
+
