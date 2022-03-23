@@ -178,7 +178,6 @@ def read_input_csv_file(
     **Returns**:
     A BytesIO object that can be passed to the methods resposible for uploading data.
     """
-    lines = []
     with open(path, 'r', encoding=encoding) as csvfile:
         return _read_input_csv(
             csvfile,
@@ -231,7 +230,6 @@ def _read_input_csv(
         check_header: bool = True,
         **kwargs
 ) -> io.BytesIO:
-    lines = []
     if check_header:
         sample = '\n'.join(data.readline() for _ in range(20))
         file_has_header = csv.Sniffer().has_header(sample)
@@ -247,11 +245,23 @@ def _read_input_csv(
             )
         data.seek(0)
     reader = csv.reader(data, **kwargs)
+    output = io.StringIO(newline="")
+    writer = csv.writer(
+        output,
+        delimiter=",",
+        quotechar='"',
+        quoting=csv.QUOTE_MINIMAL,
+        dialect="unix"
+    )
     if has_header:
         next(reader)
+    # This will write the full file into memory and encode it in bulk.
+    # Could be wrapped in a IO buffer-style class that would perform the
+    # read/write csv lines operation in a streaming fashion.
     for row in reader:
-        lines.append(','.join(row))
-    return io.BytesIO('\n'.join(lines).encode())
+        writer.writerow(row)
+    output.seek(0)
+    return io.BytesIO(output.read().encode("utf-8"))
 
 
 def upload_and_publish_tabular_dataset(
@@ -293,6 +303,7 @@ def upload_and_publish_tabular_dataset(
         data,
         key,
         table,
+        description=description
     )
     session.publish_dataset(
         data_room_id, manifest_hash,
