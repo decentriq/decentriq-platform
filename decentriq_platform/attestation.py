@@ -76,6 +76,38 @@ SPECIFICATIONS = {
         protocol=ComputeNodeProtocol(
             version=0
         )
+    ),
+    "decentriq.python-synth-data-worker:v1": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker",
+        version="1",
+        proto=AttestationSpecification(
+            awsNitro=AttestationSpecificationAwsNitro(
+                nitroRootCaDer=aws_nitro_root_ca_der,
+                pcr0=bytes.fromhex("b1eeccf3396b7d2163b7ff90017dfea71911b282e7ac683574237b0f6011d1617cb42322342e43d8721ccb9aefb918f4"),
+                pcr1=bytes.fromhex("b1eeccf3396b7d2163b7ff90017dfea71911b282e7ac683574237b0f6011d1617cb42322342e43d8721ccb9aefb918f4"),
+                pcr2=bytes.fromhex("21b9efbc184807662e966d34f390821309eeac6802309798826296bf3e8bec7c10edb30948c90ba67310f7b964fc500a"),
+                pcr8=bytes.fromhex("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+            )
+        ),
+        protocol=ComputeNodeProtocol(
+            version=0
+        )
+    ),
+    "decentriq.r-latex-worker:v1": EnclaveSpecification(
+        name="decentriq.r-latex-worker",
+        version="1",
+        proto=AttestationSpecification(
+            awsNitro=AttestationSpecificationAwsNitro(
+                nitroRootCaDer=aws_nitro_root_ca_der,
+                pcr0=bytes.fromhex("7e78d613db8801fe051abc1325eb1dfd12a42b3c8cd9ba6925c35d2bc91549c79b62577c1fd799bedc8ed8a3f85422e6"),
+                pcr1=bytes.fromhex("7e78d613db8801fe051abc1325eb1dfd12a42b3c8cd9ba6925c35d2bc91549c79b62577c1fd799bedc8ed8a3f85422e6"),
+                pcr2=bytes.fromhex("21b9efbc184807662e966d34f390821309eeac6802309798826296bf3e8bec7c10edb30948c90ba67310f7b964fc500a"),
+                pcr8=bytes.fromhex("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+            )
+        ),
+        protocol=ComputeNodeProtocol(
+            version=0
+        )
     )
 }
 
