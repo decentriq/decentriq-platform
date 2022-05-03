@@ -105,7 +105,7 @@ class StorageCipher():
 
     def encrypt(self, data: bytes) -> bytes:
         nonce = chily.Nonce.from_random()
-        encrypted_data = self.cipher.encrypt("storage cipher", data, nonce)
+        encrypted_data = self.cipher.encrypt(data, nonce)
 
         encryption_header = EncryptionHeader()
         encryption_header.chilyKey.encryptionNonce = bytes(nonce.bytes)

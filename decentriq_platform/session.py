@@ -119,7 +119,7 @@ class Session():
         cipher = chily.Cipher(
             self.keypair.secret, self._get_enclave_pubkey()
         )
-        enc_data = cipher.encrypt("client sent session data", data, nonce)
+        enc_data = cipher.encrypt(data, nonce)
         public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
         signature = auth._sign(public_keys)
         shared_key = bytes(self.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes)
@@ -139,7 +139,7 @@ class Session():
         cipher = chily.Cipher(
             self.keypair.secret, self._get_enclave_pubkey()
         )
-        return cipher.decrypt("client received session data", dec_data, chily.Nonce.from_bytes(nonceB))
+        return cipher.decrypt(dec_data, chily.Nonce.from_bytes(nonceB))
 
     def send_request(
             self,
