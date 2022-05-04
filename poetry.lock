@@ -50,7 +50,7 @@ unicode_backport = ["unicodedata2"]
 
 [[package]]
 name = "chily"
-version = "0.5.4"
+version = "0.6.0"
 description = "Crypto wrapper library for the Decentriq platform."
 category = "main"
 optional = false
@@ -224,7 +224,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "a476e5cec9788561744f8ae08ce6023d4c3cc75b863c42d17859928dd6818653"
+content-hash = "c24da4abef03a1abb5e6e2cb2765aeb4960aa950f933b7044d1a9a917cb2bf57"
 
 [metadata.files]
 asn1crypto = [
@@ -296,20 +296,20 @@ charset-normalizer = [
     {file = "charset_normalizer-2.0.12-py3-none-any.whl", hash = "sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df"},
 ]
 chily = [
-    {file = "chily-0.5.4-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:03c33b2e25ed44c90e4fc2ec7b9719ae07fc9a20e8b94791ddf812ff8f32d5be"},
-    {file = "chily-0.5.4-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:55e6d5a6e524ab27125786f7c54a55c75c2c0e474768e095770598bd36de5fa4"},
-    {file = "chily-0.5.4-cp310-none-win_amd64.whl", hash = "sha256:9705e76cc2cfbc88a45f1725dd92828b3ff739d49ded357bf923847b3ef7ce7d"},
-    {file = "chily-0.5.4-cp36-cp36m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:b779cf7e1d050d0b4da50ac6badf1d13a54768be6fd61120891685c0f15caf21"},
-    {file = "chily-0.5.4-cp37-cp37m-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:0d25954483e8940acb097711e06f6772fa8928c48686472368c1983de3e52434"},
-    {file = "chily-0.5.4-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:5b1bdf3ca58f10d63b6a99fb4dce2c9217d3eb3e8b5d036ad183bdb2a8de2de3"},
-    {file = "chily-0.5.4-cp37-none-win_amd64.whl", hash = "sha256:a7e7c4b97dcbb92f3658c024bfd5e410bca31ca55ad390db91631cb23da53bc8"},
-    {file = "chily-0.5.4-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:edf27fde1b8593641befdd859b9291dd69febce2a35cca9601897c5e07a1e492"},
-    {file = "chily-0.5.4-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:9b3e8d6d008df36e641664f5988b91901a1d4370c63f5c8cdaf133f4074a7e54"},
-    {file = "chily-0.5.4-cp38-none-win_amd64.whl", hash = "sha256:e3f531fd0fe32f2b19a0686688cb41fce3ce636906493219c72c1acf49081e8d"},
-    {file = "chily-0.5.4-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:8f3af8bfdf145a91e8030a09545d704fda4ad50c7eb1b3c3840124818ccedc56"},
-    {file = "chily-0.5.4-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:564038f39b93f7c3366a19dc4b1c3ddaad294236236b06cb9c814d9553a28414"},
-    {file = "chily-0.5.4-cp39-none-win_amd64.whl", hash = "sha256:c11c4cb48234a907675eb85a26f4252e31e151ec7255c7bc32fecee05be831b8"},
-    {file = "chily-0.5.4-pp37-pypy37_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:669aafe465b2f143269970a65fea7a753fc73a016bc75e722bc6306b3ff0bfa2"},
+    {file = "chily-0.6.0-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:641ca3cc400798a6086a8a966d92ce4e3ac6f3e8afc2d31c8a1220fa69cd0c5c"},
+    {file = "chily-0.6.0-cp310-cp310-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:35f4e8138fdef13eac0828e54eba0ad5acb39b44f9aea5935a485709454ccbc0"},
+    {file = "chily-0.6.0-cp310-none-win_amd64.whl", hash = "sha256:9ac3f2e95f7641811ed76101ac21331ef5761653901ec846d1bec157ea356230"},
+    {file = "chily-0.6.0-cp36-cp36m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:8ca1ac8fa66a48a8b731aab8ed046434cfe8ccefc8bbf3464197d920a8085c95"},
+    {file = "chily-0.6.0-cp37-cp37m-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:0b561893a49bdb6b18462136d0ef00468c6bc5d04c9040a79d3f4977299d3cc6"},
+    {file = "chily-0.6.0-cp37-cp37m-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:42eaeb7f57347c5e830903b2e403c40b8d2a939419538e2ef1dc2ebea60c9c6e"},
+    {file = "chily-0.6.0-cp37-none-win_amd64.whl", hash = "sha256:eb0b878eb7027bef4feb9d3a6842fecf2d0e9c6aee36db888b70c6fab2d1a5c4"},
+    {file = "chily-0.6.0-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:6e2f5068a68b5166fc9f02a34ddd78f81bd997a48b1d44d32ecf7323f2098b84"},
+    {file = "chily-0.6.0-cp38-cp38-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:fd41cc39effb5dcea65d51083b0dc67728ddad97233c3947424be586f8c965c9"},
+    {file = "chily-0.6.0-cp38-none-win_amd64.whl", hash = "sha256:35f0e2e6992c47dd1bfe132449ed5788bafb7a4559b5d37ee68361103a337f8d"},
+    {file = "chily-0.6.0-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:734c3d8d0960175bcbb4d40b374882265b4d2033f7fc5139d2bdbf585eb63f8e"},
+    {file = "chily-0.6.0-cp39-cp39-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:67a18bda9e31e205219247e6e7aa85968275a8ddad472a5753da2a54de6e0843"},
+    {file = "chily-0.6.0-cp39-none-win_amd64.whl", hash = "sha256:8a5c12d9c6e2f52eebb687a029fa73a193e7377134f5e11c46c16736f425b9f4"},
+    {file = "chily-0.6.0-pp37-pypy37_pp73-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:3af265dd7a4ec9743a741e941874cf36db059d92207eef6eafd3b199e1106f4e"},
 ]
 cryptography = [
     {file = "cryptography-3.4.8-cp36-abi3-macosx_10_10_x86_64.whl", hash = "sha256:a00cf305f07b26c351d8d4e1af84ad7501eca8a342dedf24a7acb0e7b7406e14"},
