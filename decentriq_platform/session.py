@@ -165,16 +165,15 @@ class Session():
         )
         url = Endpoints.SESSION_MESSAGES.replace(":sessionId", self.session_id)
         enclave_request = EnclaveMessage(data=b64encode(serialized_request).decode("ascii"))
-        enclave_response: EnclaveMessage = self.client._api.post(
-            url, json.dumps(enclave_request), {"Content-type": "application/json"}
-        ).json()
-        enclave_response_bytes = b64decode(enclave_response["data"])
+        enclave_response: bytes = self.client._api.post(
+            url, json.dumps(enclave_request), {"Content-type": "application/json", "Accept-Version": "2"}
+        ).content
 
         responses: List[GcgResponse] = []
         offset = 0
-        while offset < len(enclave_response_bytes):
+        while offset < len(enclave_response):
             response_container = Response()
-            offset += parse_length_delimited(enclave_response_bytes[offset:], response_container)
+            offset += parse_length_delimited(enclave_response[offset:], response_container)
             if response_container.HasField("unsuccessfulResponse"):
                 raise Exception(response_container.unsuccessfulResponse)
             else:
