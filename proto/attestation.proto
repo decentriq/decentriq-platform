@@ -82,5 +82,5 @@ message AttestationSpecificationAmdSnp {
     bytes amdArkDer = 1;
     bytes measurement = 2;
     bytes roughtimePubKey = 3;
-    repeated bytes authorized_chip_ids = 4;
+    repeated bytes authorizedChipIds = 4;
 }
