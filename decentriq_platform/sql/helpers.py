@@ -3,7 +3,10 @@ import io
 import csv
 from typing import List, Tuple, Any
 from .compute import SqlSchemaVerifier
-from .. import Permissions, Session, Key, DataRoomBuilder
+from ..permission import Permissions
+from ..session import Session
+from ..storage import Key
+from ..builders import DataRoomBuilder
 from ..compute import Noop
 from .proto import TableSchema
 from ..proto import Permission, AuthenticationMethod
@@ -114,9 +117,16 @@ class TabularDataNodeBuilder:
         - `users`: A list of email addresses that will be given permissions both for
             the validation of the data as well as the uploading of data.
         """
-        builder.add_data_node(self._leaf_node_name, is_required=self.is_required)
-        builder.add_compute_node(self._verifier)
-        builder.add_compute_node(self._noop)
+        builder.add_data_node(
+            self._leaf_node_name,
+            is_required=self.is_required,
+            node_id=self._leaf_node_name
+        )
+        builder.add_compute_node(self._verifier, node_id=self._verifier_node_name)
+        builder.add_compute_node(
+            self._noop,
+            node_id=self.validation_computation_name
+        )
         for email in users:
             builder.add_user_permission(
                 email=email,

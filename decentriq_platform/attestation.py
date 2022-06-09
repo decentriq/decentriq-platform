@@ -1,11 +1,13 @@
 from typing import Dict, List, Tuple
 from .types import EnclaveSpecification
+from .compute import GcgDriverDecoder
+from .sql.compute import SqlWorkerDecoder
+from .container.compute import ContainerWorkerDecoder
 from .proto import (
     AttestationSpecification,
     AttestationSpecificationIntelEpid,
     AttestationSpecificationIntelDcap,
     AttestationSpecificationAwsNitro,
-    ComputeNodeProtocol,
 )
 import asn1crypto.pem
 from .certs import (
@@ -37,9 +39,9 @@ SPECIFICATIONS = {
                 accept_revoked=False,
             )
         ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
+        workerProtocols=[0],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[0],
     ),
     "decentriq.sql-worker:v2": EnclaveSpecification(
         name="decentriq.sql-worker",
@@ -57,9 +59,8 @@ SPECIFICATIONS = {
                 accept_revoked=False,
             )
         ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
+        workerProtocols=[0],
+        decoder=SqlWorkerDecoder()
     ),
     "decentriq.python-ml-worker:v1": EnclaveSpecification(
         name="decentriq.python-ml-worker",
@@ -73,9 +74,8 @@ SPECIFICATIONS = {
                 pcr8=bytes.fromhex("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
             )
         ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
+        workerProtocols=[0],
+        decoder=ContainerWorkerDecoder()
     ),
     "decentriq.python-synth-data-worker:v1": EnclaveSpecification(
         name="decentriq.python-synth-data-worker",
@@ -89,9 +89,8 @@ SPECIFICATIONS = {
                 pcr8=bytes.fromhex("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
             )
         ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
+        workerProtocols=[0],
+        decoder=ContainerWorkerDecoder()
     ),
     "decentriq.r-latex-worker:v1": EnclaveSpecification(
         name="decentriq.r-latex-worker",
@@ -105,9 +104,8 @@ SPECIFICATIONS = {
                 pcr8=bytes.fromhex("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
             )
         ),
-        protocol=ComputeNodeProtocol(
-            version=0
-        )
+        workerProtocols=[0],
+        decoder=ContainerWorkerDecoder()
     )
 }
 
@@ -161,6 +159,10 @@ class EnclaveSpecifications:
             enclave_type = version.split(":")[0]
             selected_specifcations[enclave_type] = self.specifications[version]
         return selected_specifcations
+
+    def all(self) -> List[EnclaveSpecification]:
+        """Get a list of all available enclave specifications."""
+        return list(self.specifications.values())
 
     def merge(self, other):
         """

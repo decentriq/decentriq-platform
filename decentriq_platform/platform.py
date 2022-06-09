@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import datetime
 import base64
 import json
@@ -12,7 +12,7 @@ from .types import (
 )
 from .api import API, Endpoints
 from .proto import (
-    AuthenticationMethod, TrustedPki, DataRoom, DataRoomStatus
+    AuthenticationMethod, TrustedPki, DataRoom, DataRoomStatus, ConfigurationModification
 )
 from .config import (
     DECENTRIQ_CLIENT_ID,
@@ -287,13 +287,20 @@ class PlatformApi:
 
     def publish_data_room(
             self,
-            data_room_definition: DataRoom,
+            data_room_definition: Tuple[DataRoom, List[ConfigurationModification]],
             data_room_hash: str,
-            mrenclave: str,
+            attestation_specification_hash: str,
             additional_fields: dict = {},
     ):
-        owner_email = data_room_definition.ownerEmail
-        participant_emails = set([p.email for p in data_room_definition.userPermissions])
+        data_room, conf_modifications = data_room_definition
+        owner_email = data_room.ownerEmail
+
+        participant_emails = [
+            op.add.element.userPermission.email
+            for op in conf_modifications
+            if op.HasField("add") and op.add.element.HasField("userPermission")
+        ]
+
         if owner_email in participant_emails:
             participant_emails.remove(owner_email)
 
@@ -323,11 +330,11 @@ class PlatformApi:
                     "dataRoom": {
                         "dataRoomHash": platform_hash_to_str(bytes.fromhex(data_room_hash)),
                         "dataRoomHashEncoded": data_room_hash,
-                        "name": data_room_definition.name,
-                        "description": data_room_definition.description,
-                        "mrenclave": mrenclave,
+                        "name": data_room.name,
+                        "description": data_room.description,
+                        "mrenclave": attestation_specification_hash,
                         "source": "PYTHON",
-                        "ownerEmail": data_room_definition.ownerEmail,
+                        "ownerEmail": data_room.ownerEmail,
                         "userPermissions": {
                             "create": user_permissions_input
                         },

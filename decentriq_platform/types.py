@@ -1,7 +1,11 @@
-from .proto import AttestationSpecification, ComputeNodeProtocol
-from typing import List, Dict
+from google.protobuf.json_format import MessageToDict
+from .proto import AttestationSpecification, ComputeNodeProtocol, DriverTaskConfig
+from typing import List, Dict, Optional, Any
 from typing_extensions import TypedDict
 from enum import Enum
+from .proto.length_delimited import parse_length_delimited
+from .proto.compute_sql_pb2 import SqlWorkerConfiguration
+from .container.proto.compute_container_pb2 import ContainerWorkerConfiguration
 
 
 __all__ = [
@@ -18,18 +22,18 @@ class JobId:
 
     Objects of this class can be used to retrieve results for processed computations.
     """
-    def __init__(self, job_id: str, compute_node_name: str):
+    def __init__(self, job_id: str, compute_node_id: str):
         self.id = job_id
         """The identifier of the job that processed a particular computation."""
 
-        self.compute_node_name = compute_node_name
-        """The name of the computation that was processed."""
+        self.compute_node_id = compute_node_id
+        """The id of the computation that was processed."""
 
 
 class ScopeTypes(str, Enum):
     USER_FILE = "user_file",
-    DATA_ROOM_DEFINITION = "dataroom_definition",
     DATA_ROOM_INTERMEDIATE_DATA = "dataroom_intermediate_data"
+    DATA_ROOM_COMMITS_DATA = "dataroom_commits_data"
 
 
 class UserResponse(TypedDict):
@@ -137,8 +141,15 @@ class EnclaveSpecification(TypedDict):
     """The version of the enclave."""
     proto: AttestationSpecification
     """The Protobuf object."""
-    protocol: ComputeNodeProtocol
-    """The protocol version used by the node"""
+    workerProtocols: List[int]
+    """The worker protocol versions supported by the node"""
+    decoder: Optional[Any]
+    """
+    Decoder object that can be used to decode the binary configs belonging
+    to enclaves of this type.
+    """
+    clientProtocols: Optional[List[int]]
+    """The client protocol versions supported by the node"""
 
 
 class CreateScopeRequest(TypedDict):

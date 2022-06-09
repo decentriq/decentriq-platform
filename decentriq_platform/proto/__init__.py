@@ -5,14 +5,26 @@ from .data_room_pb2 import (
     ExecuteComputePermission,
     RetrieveDataRoomPermission,
     RetrieveDataRoomStatusPermission,
+    GenerateMergeSignaturePermission,
     UpdateDataRoomStatusPermission,
     RetrievePublishedDatasetsPermission,
+    ExecuteDevelopmentComputePermission,
+    MergeConfigurationCommitPermission,
     DryRunPermission,
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, DataRoom,
     TrustedPki,
     ComputeNodeFormat,
     ComputeNodeProtocol,
+    ConfigurationModification,
+    AddModification,
+    ChangeModification,
+    ConfigurationElement,
+    GovernanceProtocol,
+    StaticDataRoomPolicy,
+    AffectedDataOwnersApprovePolicy,
+    ConfigurationCommit,
+    DataRoomConfiguration
 )
 from .attestation_pb2 import (
     AttestationSpecification,
@@ -33,8 +45,13 @@ from .gcg_pb2 import (
     RetrieveDataRoomResponse, RetrieveDataRoomStatusRequest,
     RetrieveDataRoomStatusResponse, RetrievePublishedDatasetsRequest,
     RetrievePublishedDatasetsResponse, UpdateDataRoomStatusRequest,
-    UpdateDataRoomStatusResponse,
-    StaticContentConfig,
+    ExecuteDevelopmentComputeRequest, CreateConfigurationCommitRequest,
+    GenerateMergeApprovalSignatureRequest, MergeConfigurationCommitRequest,
+    CreateConfigurationCommitResponse, GenerateMergeApprovalSignatureResponse,
+    MergeConfigurationCommitResponse, UpdateDataRoomStatusResponse,
+    RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
+    RetrieveConfigurationCommitRequest, StaticContentConfig,
+    CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest
 )
 from .length_delimited import parse_length_delimited, serialize_length_delimited
 from .delta_enclave_api_pb2 import (

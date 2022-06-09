@@ -32,10 +32,18 @@ enum PrimitiveType {
     FLOAT64 = 2;
 }
 
+message TableDependencyMapping {
+    // Name of the table as it appears in the SQL query string
+    string table = 1;
+    // ID of the compute/data node that provides data for this table
+    string dependency = 2;
+}
+
 message ComputationConfiguration {
     string sqlStatement = 1;
     PrivacySettings privacySettings = 2;
     repeated Constraint constraints = 3;
+    repeated TableDependencyMapping tableDependencyMappings = 4;
 }
 
 message PrivacySettings {

@@ -1,11 +1,13 @@
 from __future__ import annotations
 import sqloxide
+from google.protobuf.json_format import MessageToDict
 from typing import List, Optional, Set, Tuple
 from .proto import (
     PrimitiveType, PrivacySettings, ComputationConfiguration, TableSchema,
     ValidationConfiguration, Constraint, NamedColumn, ColumnType, SqlWorkerConfiguration,
+    TableDependencyMapping
 )
-from ..proto import serialize_length_delimited, ComputeNodeFormat
+from ..proto import serialize_length_delimited, ComputeNodeFormat, parse_length_delimited
 from ..node import Node
 
 
@@ -80,20 +82,20 @@ class SqlCompute(Node):
             self,
             name: str,
             sql_statement: str,
+            dependencies: List[(str, str)],
             *,
             privacy_settings: Optional[PrivacySettings] = None,
             constraints: Optional[List[Constraint]] = None,
-            dependencies: List[str] = []
     ) -> None:
-        statement_ast = parse_statement(sql_statement)
-        dependencies = list(find_referenced_tables(statement_ast))
-
         sql_worker_configuration = SqlWorkerConfiguration(
             computation=ComputationConfiguration(
                 sqlStatement=sql_statement,
                 privacySettings=privacy_settings,
-                constraints=constraints
-
+                constraints=constraints,
+                tableDependencyMappings=[
+                    TableDependencyMapping(table=table, dependency=node_id)
+                    for table, node_id in dependencies
+                ]
             )
         )
         config = serialize_length_delimited(sql_worker_configuration)
@@ -102,7 +104,7 @@ class SqlCompute(Node):
             name,
             config=config,
             enclave_type="decentriq.sql-worker",
-            dependencies=dependencies,
+            dependencies=[node_id for _, node_id in dependencies],
             output_format=ComputeNodeFormat.ZIP
         )
 
@@ -141,3 +143,10 @@ class SqlSchemaVerifier(Node):
             dependencies=[input_data_node],
             output_format=ComputeNodeFormat.ZIP
         )
+
+
+class SqlWorkerDecoder:
+    def decode(self, config: bytes):
+        config_decoded = SqlWorkerConfiguration()
+        parse_length_delimited(config, config_decoded)
+        return MessageToDict(config_decoded)

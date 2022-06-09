@@ -1,7 +1,7 @@
 from typing import List
-
+from google.protobuf.json_format import MessageToDict
 from .proto.compute_container_pb2 import ContainerWorkerConfiguration, MountPoint
-from ..proto.length_delimited import serialize_length_delimited
+from ..proto.length_delimited import serialize_length_delimited, parse_length_delimited
 from ..proto import ComputeNodeFormat
 from ..node import Node
 
@@ -19,7 +19,8 @@ class StaticContainerCompute(Node):
             mount_points: List[MountPoint],
             output_path: str,
             enclave_type: str,
-            include_container_logs_on_error: bool = False
+            include_container_logs_on_error: bool = False,
+            include_container_logs_on_success: bool = False
     ) -> None:
         """
         Create a container compute node.
@@ -45,12 +46,17 @@ class StaticContainerCompute(Node):
             container logs to the outside in case of an error. These logs
             could contain sensitive data and therefore this setting should
             only be used for debugging.
+        - `include_container_logs_on_success`: Whether to report the internal
+            container logs as part of the result zip file.
+            Note that these logs could contain sensitive data and therefore this
+            setting should only be used for debugging.
         """
         configuration = ContainerWorkerConfiguration()
         configuration.static.command.extend(command)
         configuration.static.mountPoints.extend(mount_points)
         configuration.static.outputPath = output_path
         configuration.static.includeContainerLogsOnError = include_container_logs_on_error
+        configuration.static.includeContainerLogsOnSuccess = include_container_logs_on_success
         config = serialize_length_delimited(configuration)
         dependencies = list(map(lambda a: a.dependency, mount_points))
 
@@ -62,3 +68,9 @@ class StaticContainerCompute(Node):
             output_format=ComputeNodeFormat.ZIP
         )
 
+
+class ContainerWorkerDecoder:
+    def decode(self, config: bytes):
+        config_decoded = ContainerWorkerConfiguration()
+        parse_length_delimited(config, config_decoded)
+        return MessageToDict(config_decoded)

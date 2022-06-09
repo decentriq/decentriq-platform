@@ -1,10 +1,12 @@
 from typing import List
+from google.protobuf.json_format import MessageToDict
 from .proto import (
     DriverTaskConfig,
     NoopConfig,
     serialize_length_delimited,
     StaticContentConfig,
     ComputeNodeFormat,
+    parse_length_delimited
 )
 
 from .node import Node
@@ -71,3 +73,15 @@ class StaticContent(Node):
             dependencies=dependencies,
             output_format=ComputeNodeFormat.RAW
         )
+
+
+class GcgDriverDecoder:
+    def decode(self, config: bytes):
+        config_decoded = DriverTaskConfig()
+        parse_length_delimited(config, config_decoded)
+        config_decoded_json = MessageToDict(config_decoded)
+        if config_decoded.HasField("staticContent"):
+            content = config_decoded.staticContent.content.decode("utf-8")
+            config_decoded_json["staticContent"]["content"] = content
+        return config_decoded_json
+

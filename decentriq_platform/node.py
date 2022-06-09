@@ -1,10 +1,13 @@
-from typing import List, Any
+from typing import List, Any, Optional
+import uuid
+
 
 __all__ = [ "Node" ]
 
+
 class Node:
     name: str
-    """The identifier of the node."""
+    """The name of the node."""
 
     config: bytes
     """Serialized configuration to use in the compute node definition."""

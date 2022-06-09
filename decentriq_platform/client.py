@@ -8,9 +8,14 @@ from typing import BinaryIO, List, Dict, Optional
 from .api import API, Endpoints
 from .authentication import Auth
 from .config import (
-        DECENTRIQ_CLIENT_ID, DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS,
-        DECENTRIQ_USE_TLS, DECENTRIQ_API_PLATFORM_HOST, DECENTRIQ_API_PLATFORM_PORT,
+        DECENTRIQ_CLIENT_ID,
+        DECENTRIQ_HOST, DECENTRIQ_PORT, DECENTRIQ_USE_TLS,
+        DECENTRIQ_API_PLATFORM_HOST,
+        DECENTRIQ_API_PLATFORM_PORT,
         DECENTRIQ_API_PLATFORM_USE_TLS,
+        DECENTRIQ_API_CORE_HOST,
+        DECENTRIQ_API_CORE_PORT,
+        DECENTRIQ_API_CORE_USE_TLS,
 )
 from .session import Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
@@ -19,7 +24,7 @@ from .types import (
     DatasetDescription, FinalizeUpload,
     CreateSessionRequest, SessionJsonResponse,
     UploadDescription, ChunkWrapper,
-    CreateScopeRequest, ScopeJson, ScopeTypes,
+    CreateScopeRequest, ScopeJson, ScopeTypes
 )
 from .proto import AttestationSpecification, parse_length_delimited, serialize_length_delimited
 from .platform import ClientPlatformFeatures
@@ -86,7 +91,9 @@ class Client:
             enclave_spec = EnclaveSpecification(
                 name=spec_json["name"],
                 version=spec_json["version"],
-                proto=attestation_specification
+                proto=attestation_specification,
+                decoder=None,
+                workerProtocols=[0],
             )
             enclave_specs.append(enclave_spec)
 
@@ -107,14 +114,20 @@ class Client:
         with the given authentication object.
         """
         url = Endpoints.SESSIONS
-        if "decentriq.driver" in enclaves:
-            attestation_proto = enclaves["decentriq.driver"]["proto"]
-        else:
+        if "decentriq.driver" not in enclaves:
             raise Exception(
                 "Unable to find a specification for the driver enclave" +
                 f" named 'decentriq.driver', you can get these specifications" +
                 " from the main package."
             )
+        driver_spec = enclaves["decentriq.driver"]
+
+        if "clientProtocols" not in driver_spec:
+            raise Exception(
+                "Missing client supported protocol versions"
+            )
+        attestation_proto = driver_spec["proto"]
+        client_protocols = driver_spec["clientProtocols"]
 
         attestation_specification_hash =\
             hashlib.sha256(serialize_length_delimited(attestation_proto)).hexdigest()
@@ -135,6 +148,7 @@ class Client:
                 self,
                 response["sessionId"],
                 attestation_proto,
+                client_protocols,
                 auth=auth,
                 platform_api=platform_api,
         )
@@ -459,13 +473,16 @@ def create_client(
         *,
         integrate_with_platform: bool,
         client_id: str = DECENTRIQ_CLIENT_ID,
-        api_core_host: str = DECENTRIQ_HOST,
-        api_core_port: int = DECENTRIQ_PORT,
-        api_core_use_tls: bool = DECENTRIQ_USE_TLS,
-        api_platform_host: str = DECENTRIQ_API_PLATFORM_HOST,
-        api_platform_port: int = DECENTRIQ_API_PLATFORM_PORT,
-        api_platform_use_tls: bool = DECENTRIQ_API_PLATFORM_USE_TLS,
-        request_timeout: int = None
+        api_host: str = DECENTRIQ_HOST,
+        api_port: int = DECENTRIQ_PORT,
+        api_use_tls: bool = DECENTRIQ_USE_TLS,
+        api_core_host: Optional[str] = DECENTRIQ_API_CORE_HOST,
+        api_core_port: Optional[int] = DECENTRIQ_API_CORE_PORT,
+        api_core_use_tls: Optional[bool] = DECENTRIQ_API_CORE_USE_TLS,
+        api_platform_host: Optional[str] = DECENTRIQ_API_PLATFORM_HOST,
+        api_platform_port: Optional[int] = DECENTRIQ_API_PLATFORM_PORT,
+        api_platform_use_tls: Optional[bool] = DECENTRIQ_API_PLATFORM_USE_TLS,
+        request_timeout: Optional[int] = None
 ) -> Client:
     """
     The primary way to create a `Client` object.
@@ -495,10 +512,10 @@ def create_client(
     api = API(
         api_token,
         client_id,
-        api_core_host,
-        api_core_port,
+        api_core_host if api_core_host is not None else api_host,
+        api_core_port if api_core_port is not None else api_port,
         api_prefix="/api/core",
-        use_tls=api_core_use_tls,
+        use_tls=api_core_use_tls if api_core_use_tls is not None else api_use_tls,
         timeout=request_timeout
     )
 
@@ -508,9 +525,9 @@ def create_client(
             user_email,
             http_api=api,
             client_id=client_id,
-            api_host=api_platform_host,
-            api_port=api_platform_port,
-            api_use_tls=api_platform_use_tls
+            api_host=api_platform_host if api_platform_host is not None else api_host,
+            api_port=api_platform_port if api_platform_port is not None else api_port,
+            api_use_tls=api_platform_use_tls if api_platform_use_tls is not None else api_use_tls
         )
     else:
         platform = None

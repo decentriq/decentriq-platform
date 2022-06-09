@@ -1,19 +1,19 @@
 from __future__ import annotations
 import chily
 import re
+import hashlib
 import hmac
 import json
 from base64 import b64encode, b64decode
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
-from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional
+from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional, Dict
 from time import sleep
 from .platform import PlatformApi
 from .api import Endpoints
 from .authentication import Auth, Sigma
-from .proto import DataRoom, ComputeNodeProtocol
-from .proto import (DataNoncePubkey, Request, Response)
 from .proto import (
+    DataRoom, ComputeNodeProtocol, DataNoncePubkey, Request, Response,
     CreateDataRoomRequest, CreateDataRoomResponse,
     ExecuteComputeRequest, ExecuteComputeResponse, GcgRequest, GcgResponse, GetResultsRequest,
     GetResultsResponseChunk, JobStatusRequest, JobStatusResponse,
@@ -23,22 +23,42 @@ from .proto import (
     RetrieveDataRoomResponse, RetrieveDataRoomStatusRequest,
     RetrievePublishedDatasetsRequest,
     RetrievePublishedDatasetsResponse, UpdateDataRoomStatusRequest,
-    UpdateDataRoomStatusResponse, DataRoomStatus, AttestationSpecification, Fatquote
+    ExecuteDevelopmentComputeRequest, CreateConfigurationCommitRequest,
+    GenerateMergeApprovalSignatureRequest, MergeConfigurationCommitRequest,
+    RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
+    UpdateDataRoomStatusResponse, DataRoomStatus, AttestationSpecification, Fatquote,
+    CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
+    RetrieveConfigurationCommitRequest
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
 from .types import FatquoteResBody, EnclaveMessage, ScopeTypes, JobId
 from .verification import QuoteBody, Verification
 from .platform import SessionPlatformFeatures
-from .helpers import get_data_room_id
 if TYPE_CHECKING:
     from .client import Client
 
 
-__all__ = [ "Session" ]
+__all__ = [ "Session", "LATEST_GCG_PROTOCOL_VERSION", "LATEST_WORKER_PROTOCOL_VERSION" ]
 
 
-GCG_PROTOCOL_VERSION = 0
+LATEST_GCG_PROTOCOL_VERSION = 1
+LATEST_WORKER_PROTOCOL_VERSION = 0
+
+
+def _get_data_room_id(create_data_room_response: CreateDataRoomResponse) -> bytes:
+    response_type = create_data_room_response.WhichOneof("create_data_room_response")
+    if response_type is None:
+        raise Exception("Empty CreateDataRoomResponse")
+    elif response_type == "dataRoomId":
+        return create_data_room_response.dataRoomId
+    elif response_type == "dataRoomValidationError":
+        raise Exception(
+            "DataRoom creation failed",
+            create_data_room_response.dataRoomValidationError
+        )
+    else:
+        raise Exception("Unknown response type for CreateDataRoomResponse", response_type)
 
 
 def datanoncepubkey_to_message(
@@ -76,12 +96,14 @@ class Session():
     fatquote: Fatquote
     quote: QuoteBody
     driver_attestation_specification: AttestationSpecification
+    client_protocols: List[int]
 
     def __init__(
             self,
             client: Client,
             session_id: str,
             driver_attestation_specification: AttestationSpecification,
+            client_protocols: List[int],
             auth: Auth,
             platform_api: Optional[PlatformApi] = None,
    ):
@@ -104,11 +126,29 @@ class Session():
         self.fatquote = fatquote
         self.report_data = report_data
         self.driver_attestation_specification = driver_attestation_specification
+        self.client_protocols = client_protocols
 
         if platform_api:
             self._platform = SessionPlatformFeatures(self, platform_api)
         else:
             self._platform = None
+
+    def _get_client_protocol(self, endpoint_protocols: List[int]) -> int:
+        try:
+            protocol = max(set(self.client_protocols) & set(endpoint_protocols))
+            return protocol
+        except ValueError:
+            min_enclave_version = min(self.client_protocols)
+            max_endpoint_version = min(endpoint_protocols)
+            exception_message = "Endpoint is only available with protocol versions {} but the enclave only supports {}\n".format(
+                endpoint_protocols,
+                self.client_protocols
+            )
+            if min_enclave_version > max_endpoint_version:
+                exception_message += "Try upgrading to a newer version of the SDK"
+            else:
+                exception_message += "Try using an older version of the SDK"
+            raise Exception(exception_message)
 
     def _get_enclave_pubkey(self):
         pub_keyB = bytearray(self.report_data[:32])
@@ -144,6 +184,7 @@ class Session():
     def send_request(
             self,
             request: GcgRequest,
+            protocol: int,
     ) -> List[GcgResponse]:
         """
         Low-level method for sending a raw `GcgRequest` to the enclave.
@@ -152,7 +193,7 @@ class Session():
         """
         gcg_protocol = serialize_length_delimited(
             ComputeNodeProtocol(
-                version=GCG_PROTOCOL_VERSION
+                version=protocol
             )
         )
         serialized_request = serialize_length_delimited(
@@ -185,8 +226,8 @@ class Session():
                 response_offset = parse_length_delimited(
                         decrypted_response, response_protocol
                 )
-                if response_protocol.version > GCG_PROTOCOL_VERSION:
-                    raise Exception("Unsupported protocol version in response")
+                if response_protocol.version != protocol:
+                    raise Exception("Different response protocol version than requested")
                 parse_length_delimited(decrypted_response[response_offset:], response)
                 if response.HasField("failure"):
                     raise Exception(response.failure)
@@ -195,19 +236,18 @@ class Session():
 
     def _publish_data_room(
             self,
-            data_room_definition: DataRoom
+            data_room_definition: Tuple[DataRoom, List[ConfigurationModification]],
     ) -> CreateDataRoomResponse:
-        """
-        Create a DataRoom with the provided protobuf `data_room` configuration object
-        """
-        if not data_room_definition.ownerEmail:
-            data_room_definition.ownerEmail = self.email
-        scope_id = self.client._ensure_scope_with_metadata(self.email, {"type": ScopeTypes.DATA_ROOM_DEFINITION})
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        data_room, conf_modifications = data_room_definition
+        if not data_room.ownerEmail:
+            data_room.ownerEmail = self.email
         request = CreateDataRoomRequest(
-            dataRoom=data_room_definition,
-            scope=bytes.fromhex(scope_id)
+            dataRoom=data_room,
+            initialConfiguration=conf_modifications,
         )
-        responses = self.send_request(GcgRequest(createDataRoomRequest=request))
+        responses = self.send_request(GcgRequest(createDataRoomRequest=request), protocol)
         if len(responses) != 1:
             raise Exception("Malformed response")
 
@@ -216,9 +256,9 @@ class Session():
         if response.HasField("createDataRoomResponse"):
             if response.createDataRoomResponse.HasField("dataRoomValidationError"):
                 raise Exception(
-                    "Error when validating data room: {} (compute node index {})".format(
+                    "Error when validating data room: {} (compute node id '{}')".format(
                         response.createDataRoomResponse.dataRoomValidationError.message,
-                        response.createDataRoomResponse.dataRoomValidationError.computeNodeIndex
+                        response.createDataRoomResponse.dataRoomValidationError.computeNodeId
                     )
                 )
             else:
@@ -233,19 +273,275 @@ class Session():
 
         return response.createDataRoomResponse
 
-    def publish_data_room(self, data_room_definition: DataRoom) -> str:
+    def publish_data_room(
+            self,
+            data_room_definition: Tuple[DataRoom, List[ConfigurationModification]]
+    ) -> str:
         """
-        Publish the given data room making it immutable.
+        Create a data room with the provided protobuf configuration object
+        and have the enclave apply the given list of modifications to the data
+        room configuration.
 
         The id returned from this method will be used when interacting with the
-        published data room (for example when running computations or publishing datasets).
+        published data room (for example when running computations or publishing
+        datasets).
         """
         response = self._publish_data_room(data_room_definition)
-        return get_data_room_id(response).hex()
+        return _get_data_room_id(response).hex()
+
+    def publish_data_room_configuration_commit(
+            self,
+            configuration_commit: ConfigurationCommit
+    ) -> str:
+        """
+        Publish the given data room configuration commit.
+
+        Configuration commits can be built using a `DataRoomCommitBuilder` object.
+
+        The id returned from this method will be used when running development
+        computations or when trying to merge this commit into the main
+        data room configuration.
+        """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
+                "data_room_id": configuration_commit.dataRoomId.hex(),
+            }
+        )
+        request = CreateConfigurationCommitRequest(
+            commit=configuration_commit,
+            scope=bytes.fromhex(scope_id)
+        )
+        responses = self.send_request(
+            GcgRequest(createConfigurationCommitRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+        if not response.HasField("createConfigurationCommitResponse"):
+            raise Exception(
+                "Expected createConfigurationCommitResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.createConfigurationCommitResponse.commitId.hex()
+
+    def retrieve_configuration_commit(
+        self,
+        configuration_commit_id: str,
+    ) -> ConfigurationCommit:
+        """
+        Retrieve the content of given configuration commit id.
+
+        **Returns**:
+        A `ConfigurationCommit`.
+        """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+            }
+        )
+        request = RetrieveConfigurationCommitRequest(
+            commitId=bytes.fromhex(configuration_commit_id),
+            scope=bytes.fromhex(scope_id),
+        )
+        responses = self.send_request(
+            GcgRequest(retrieveConfigurationCommitRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+        if not response.HasField("retrieveConfigurationCommitResponse"):
+            raise Exception(
+                "Expected retrieveConfigurationCommitResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.retrieveConfigurationCommitResponse.commit
+
+    def retrieve_configuration_commit_approvers(
+        self,
+        configuration_commit_id: str,
+    ) -> List[str]:
+        """
+        Retrieve the list of users who need to approve the merger of a given
+        configuration commit.
+
+        **Returns**:
+        A list of ids belonging to the users that need to approve the
+        configuration commit.
+        """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+            }
+        )
+        request = RetrieveConfigurationCommitApproversRequest(
+            commitId=bytes.fromhex(configuration_commit_id),
+            scope=bytes.fromhex(scope_id),
+        )
+        responses = self.send_request(
+            GcgRequest(retrieveConfigurationCommitApproversRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+        if not response.HasField("retrieveConfigurationCommitApproversResponse"):
+            raise Exception(
+                "Expected retrieveConfigurationCommitApproversResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.retrieveConfigurationCommitApproversResponse.approvers
+
+
+    def generate_merge_approval_signature(
+            self,
+            configuration_commit_id: str
+    ) -> bytes:
+        """
+        Generate an approval signature required for merging a configuration
+        commit.
+
+        To merge a specific configuration commit, each user referenced in the list
+        of ids returned by `retrieveConfigurationCommitApprovers` needs to
+        generate an approval signature using this method.
+        """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+            }
+        )
+        request = GenerateMergeApprovalSignatureRequest(
+            commitId=bytes.fromhex(configuration_commit_id),
+            scope=bytes.fromhex(scope_id),
+        )
+        responses = self.send_request(
+            GcgRequest(generateMergeApprovalSignatureRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+        if not response.HasField("generateMergeApprovalSignatureResponse"):
+            raise Exception(
+                "Expected generateMergeApprovalSignatureResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.generateMergeApprovalSignatureResponse.signature
+
+    def merge_configuration_commit(
+        self,
+        configuration_commit_id: str,
+        approval_signatures: Dict[str, bytes],
+    ) -> MergeConfigurationCommitResponse:
+        """
+        Request the enclave to merge the given configuration commit into the
+        main data room configuration.
+
+        **Parameters**:
+        - `configuration_commit_id`: The id of the commit to be merged.
+        - `approval_signatures`: A dictionary containing the approval signature for
+            each of the required approvers, e.g. `{ "some@email.com": signature }`.
+        """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+            }
+        )
+        request = MergeConfigurationCommitRequest(
+            scope=bytes.fromhex(scope_id),
+            commitId=bytes.fromhex(configuration_commit_id),
+            approvalSignatures=approval_signatures,
+        )
+        responses = self.send_request(
+            GcgRequest(mergeConfigurationCommitRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+        if not response.HasField("mergeConfigurationCommitResponse"):
+            raise Exception(
+                "Expected mergeConfigurationCommitResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.mergeConfigurationCommitResponse
+
+    def retrieve_data_room_configuration_history(
+        self,
+        data_room_id: str
+    ) -> RetrieveDataRoomConfigurationHistoryResponse:
+        """
+        Retrieve the current merged data room configuration, as well as the
+        history of configuration commits that have already been merged.
+        """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        request = RetrieveDataRoomConfigurationHistoryRequest(
+            dataRoomId=bytes.fromhex(data_room_id),
+        )
+        responses = self.send_request(
+            GcgRequest(retrieveDataRoomConfigurationHistoryRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+        response = responses[0]
+        if not response.HasField("retrieveDataRoomConfigurationHistoryResponse"):
+            raise Exception(
+                "Expected retrieveDataRoomConfigurationHistoryResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.retrieveDataRoomConfigurationHistoryResponse
+
+    def retrieve_current_data_room_configuration(
+            self,
+            data_room_id: str
+    ) -> Tuple[DataRoomConfiguration, str]:
+        """
+        Retrieve the current data room confguration, as well as the current "history pin".
+
+        A history pin is the hash of all the ids of configuration commits that
+        make up the structure of a data room. This pin therefore uniquely identifies
+        a data room's structure at a certain point in time.
+        A data room configuration, as well as its associated history pin, can be used
+        to extend an existing data room (for example by adding new compute nodes).
+        Extending an existing data room is done using the `DataRoomCommitBuilder` class.
+        """
+        response = self.retrieve_data_room_configuration_history(data_room_id)
+        return (response.currentConfiguration, response.pin.hex())
 
     def stop_data_room(self, data_room_id: str):
         """
-        Stop the data room with the given id, making it impossible to run new computations.
+        Stop the data room with the given id, making it impossible to run new
+        computations.
         """
         self._update_data_room_status(data_room_id, DataRoomStatus.Value("Stopped"))
 
@@ -257,21 +553,19 @@ class Session():
         """
         Update the status of the data room.
 
-        For the special case of stopping a data room, the method `stop_data_room` can be used.
+        For the special case of stopping a data room, the method
+        `stop_data_room` can be used.
         """
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id
-            }
-        )
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = UpdateDataRoomStatusRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             status=status,
-            scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(updateDataRoomStatusRequest=request))
+        responses = self.send_request(
+            GcgRequest(updateDataRoomStatusRequest=request),
+            protocol
+        )
 
         if len(responses) != 1:
             raise Exception("Malformed response")
@@ -295,18 +589,15 @@ class Session():
         """
         Returns the status of the data room. Valid values are `"Active"` or `"Stopped"`.
         """
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomStatusRequest(
             dataRoomId=bytes.fromhex(data_room_id),
-            scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(retrieveDataRoomStatusRequest=request))
+        responses = self.send_request(
+            GcgRequest(retrieveDataRoomStatusRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -323,20 +614,17 @@ class Session():
             data_room_id: str
     ) -> RetrieveDataRoomResponse:
         """
-        Returns the underlying protobuf configuration object for the data room.
+        Returns the underlying protobuf object for the data room.
         """
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id
-            }
-        )
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
-            scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(retrieveDataRoomRequest=request))
+        responses = self.send_request(
+            GcgRequest(retrieveDataRoomRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -354,18 +642,15 @@ class Session():
         """
         Returns the audit log for the data room.
         """
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveAuditLogRequest(
             dataRoomId=bytes.fromhex(data_room_id),
-            scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(retrieveAuditLogRequest=request))
+        responses = self.send_request(
+            GcgRequest(retrieveAuditLogRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -401,6 +686,8 @@ class Session():
         will need to be unpublished first.
         """
 
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         dataset = self.client.get_dataset(manifest_hash)
         if not dataset and not force:
             raise Exception(
@@ -438,7 +725,10 @@ class Session():
             encryptionKey=key.material,
             scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(publishDatasetToDataRoomRequest=request))
+        responses = self.send_request(
+            GcgRequest(publishDatasetToDataRoomRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -473,19 +763,16 @@ class Session():
         """
         Removes a published dataset from the data room.
         """
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = RemovePublishedDatasetRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             leafName=leaf_name,
-            scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(removePublishedDatasetRequest=request))
+        responses = self.send_request(
+            GcgRequest(removePublishedDatasetRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -513,18 +800,15 @@ class Session():
         """
         Returns the datasets published to the given data room.
         """
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrievePublishedDatasetsRequest(
             dataRoomId=bytes.fromhex(data_room_id),
-            scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(retrievePublishedDatasetsRequest=request))
+        responses = self.send_request(
+            GcgRequest(retrievePublishedDatasetsRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -535,10 +819,10 @@ class Session():
             )
         return response.retrievePublishedDatasetsResponse
 
-    def _submit_compute(
+    def _submit_dev_compute(
             self,
-            data_room_id: str,
-            goal_nodes: List[str],
+            configuration_commit_id: str,
+            compute_node_ids: List[str],
             /, *,
             dry_run: bool = False,
     ) -> ExecuteComputeResponse:
@@ -546,6 +830,47 @@ class Session():
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
+        endpoint_protocols = [1]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+            }
+        )
+        request = ExecuteDevelopmentComputeRequest(
+            configurationCommitId=bytes.fromhex(configuration_commit_id),
+            computeNodeNames=compute_node_ids,
+            isDryRun=dry_run,
+            scope=bytes.fromhex(scope_id)
+        )
+        responses = self.send_request(
+            GcgRequest(executeDevelopmentComputeRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+        response = responses[0]
+        if not response.HasField("executeComputeResponse"):
+            raise Exception(
+                "Expected executeComputeResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.executeComputeResponse
+
+    def _submit_compute(
+            self,
+            data_room_id: str,
+            compute_node_ids: List[str],
+            /, *,
+            dry_run: bool = False,
+    ) -> ExecuteComputeResponse:
+        """
+        Submits a computation request which will generate an execution plan to
+        perform the computation of the goal nodes
+        """
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
             {
@@ -555,11 +880,14 @@ class Session():
         )
         request = ExecuteComputeRequest(
             dataRoomId=bytes.fromhex(data_room_id),
-            computeNodeNames=goal_nodes,
+            computeNodeNames=compute_node_ids,
             isDryRun=dry_run,
             scope=bytes.fromhex(scope_id)
         )
-        responses = self.send_request(GcgRequest(executeComputeRequest=request))
+        responses = self.send_request(
+            GcgRequest(executeComputeRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -575,10 +903,15 @@ class Session():
         Returns the status of the provided `job_id` which will include the names
         of the nodes that completed their execution
         """
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = JobStatusRequest(
             jobId=bytes.fromhex(job_id),
         )
-        responses = self.send_request(GcgRequest(jobStatusRequest=request))
+        responses = self.send_request(
+            GcgRequest(jobStatusRequest=request),
+            protocol
+        )
         if len(responses) != 1:
             raise Exception("Malformed response")
         response = responses[0]
@@ -592,16 +925,21 @@ class Session():
     def _stream_job_results(
             self,
             job_id: bytes,
-            compute_node_name: str,
+            compute_node_id: str,
     ) -> Iterator[GetResultsResponseChunk]:
         """
         Streams the results of the provided `job_id`
         """
+        endpoint_protocols = [0, 1]
+        protocol = self._get_client_protocol(endpoint_protocols)
         request = GetResultsRequest(
             jobId=job_id,
-            computeNodeName=compute_node_name,
+            computeNodeName=compute_node_id,
         )
-        responses = self.send_request(GcgRequest(getResultsRequest=request))
+        responses = self.send_request(
+            GcgRequest(getResultsRequest=request),
+            protocol
+        )
         for response in responses:
             if response.HasField("getResultsResponseChunk"):
                 yield response.getResultsResponseChunk
@@ -617,17 +955,17 @@ class Session():
     def _get_job_results(
             self,
             job_id: bytes,
-            compute_node_name: str,
+            compute_node_id: str,
     ) -> bytes:
         """
         Returns the results of the provided `job_id`
         """
-        return b"".join(list(map(lambda chunk: chunk.data, self._stream_job_results(job_id, compute_node_name))))
+        return b"".join(list(map(lambda chunk: chunk.data, self._stream_job_results(job_id, compute_node_id))))
 
     def run_computation(
             self,
             data_room_id: str,
-            compute_node_name: str,
+            compute_node_id: str,
             /, *,
             dry_run: bool = False,
     ) -> JobId:
@@ -637,8 +975,27 @@ class Session():
         The result will be an identifier object of the job executing the computation.
         This object is required for checking a job's status and retrieving its results.
         """
-        response = self._submit_compute(data_room_id, [compute_node_name], dry_run=dry_run)
-        return JobId(response.jobId.hex(), compute_node_name)
+        response = self._submit_compute(data_room_id, [compute_node_id], dry_run=dry_run)
+        return JobId(response.jobId.hex(), compute_node_id)
+
+    def run_dev_computation(
+            self,
+            configuration_commit_id: str,
+            compute_node_id: str,
+            /, *,
+            dry_run: bool = False,
+    ) -> JobId:
+        """
+        Run a specific computation within the context of the data room configuration
+        defined by the given commit id.
+        Such "development" computations can also be run for configuration commits
+        that have not yet been merged.
+
+        The result will be an identifier object of the job executing the computation.
+        This object is required for checking a job's status and retrieving its results.
+        """
+        response = self._submit_dev_compute(configuration_commit_id, [compute_node_id], dry_run=dry_run)
+        return JobId(response.jobId.hex(), compute_node_id)
 
     def get_computation_result(
             self,
@@ -662,10 +1019,10 @@ class Session():
         while True:
             if timeout is not None and elapsed > timeout:
                 raise Exception(
-                    f"Timeout when trying to get result for job {job_id.id} of {job_id.compute_node_name} (waited {timeout} seconds)"
+                    f"Timeout when trying to get result for job {job_id.id} of {job_id.compute_node_id} (waited {timeout} seconds)"
                 )
-            elif job_id.compute_node_name in self.get_computation_status(job_id.id).completeComputeNodeNames:
-                results = self._get_job_results(job_id_bytes, job_id.compute_node_name)
+            elif job_id.compute_node_id in self.get_computation_status(job_id.id).completeComputeNodeNames:
+                results = self._get_job_results(job_id_bytes, job_id.compute_node_id)
                 return results
             else:
                 sleep(interval)
@@ -674,7 +1031,7 @@ class Session():
     def run_computation_and_get_results(
             self,
             data_room_id: str,
-            compute_node_name: str,
+            compute_node_id: str,
             /, *,
             interval: int = 5,
             timeout: int = None
@@ -685,7 +1042,7 @@ class Session():
         This method is simply a wrapper for running `run_computation` and `get_computation_result`
         directly after each other
         """
-        job_id = self.run_computation(data_room_id, compute_node_name)
+        job_id = self.run_computation(data_room_id, compute_node_id)
         return self.get_computation_result(
             job_id,
             interval=interval,
@@ -707,10 +1064,16 @@ class Session():
         else:
             raise Exception("Unknown attestation specification type")
 
+        attestation_specification_hash = hashlib.sha256(
+            serialize_length_delimited(
+                self.driver_attestation_specification
+            )
+        ).hexdigest()
+
         self.platform._platform_api.publish_data_room(
             data_room_definition,
             data_room_hash=data_room_hash.hex(),
-            mrenclave=mrenclave.hex()
+            attestation_specification_hash=attestation_specification_hash
         )
 
     def _is_web_data_room(self, data_room_id: str) -> bool:

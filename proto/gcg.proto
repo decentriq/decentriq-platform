@@ -17,6 +17,13 @@ message GcgRequest {
         RemovePublishedDatasetRequest removePublishedDatasetRequest = 12;
         JobStatusRequest jobStatusRequest = 13;
         GetResultsRequest getResultsRequest = 14;
+	CreateConfigurationCommitRequest createConfigurationCommitRequest = 15;
+        ExecuteDevelopmentComputeRequest executeDevelopmentComputeRequest = 16;
+	GenerateMergeApprovalSignatureRequest generateMergeApprovalSignatureRequest = 17;
+        MergeConfigurationCommitRequest mergeConfigurationCommitRequest = 18;
+	RetrieveDataRoomConfigurationHistoryRequest retrieveDataRoomConfigurationHistoryRequest = 19;
+	RetrieveConfigurationCommitApproversRequest retrieveConfigurationCommitApproversRequest = 20;
+	RetrieveConfigurationCommitRequest retrieveConfigurationCommitRequest = 21;
     }
 }
 
@@ -35,12 +42,19 @@ message GcgResponse {
         JobStatusResponse jobStatusResponse = 13;
         GetResultsResponseChunk getResultsResponseChunk = 14;
         GetResultsResponseFooter getResultsResponseFooter = 15;
+	CreateConfigurationCommitResponse createConfigurationCommitResponse = 16;
+	GenerateMergeApprovalSignatureResponse generateMergeApprovalSignatureResponse = 17;
+        MergeConfigurationCommitResponse mergeConfigurationCommitResponse = 18;
+	RetrieveDataRoomConfigurationHistoryResponse retrieveDataRoomConfigurationHistoryResponse = 19;
+	RetrieveConfigurationCommitApproversResponse retrieveConfigurationCommitApproversResponse = 20;
+	RetrieveConfigurationCommitResponse retrieveConfigurationCommitResponse = 21;
     }
 }
 
 message CreateDataRoomRequest {
     data_room.DataRoom dataRoom = 1;
-    bytes scope = 2;
+    reserved 2;
+    repeated data_room.ConfigurationModification initialConfiguration = 3;
 }
 
 message CreateDataRoomResponse {
@@ -52,13 +66,13 @@ message CreateDataRoomResponse {
 
 message DataRoomValidationError {
     string message = 1;
-    optional uint64 computeNodeIndex = 2;
-    optional uint64 columnIndex = 3;
-    optional uint64 tableIndex = 4;
-    optional uint64 userPermissionIndex = 5;
+    reserved 2 to 5;
     optional uint64 permissionIndex = 6;
-    optional uint64 attestationSpecificationIndex = 7;
-    optional uint64 authenticationMethodIndex = 8;
+    reserved 7 to 8;
+    optional string computeNodeId = 9;
+    optional string userPermissionId = 10;
+    optional string attestationSpecificationId = 11;
+    optional string authenticationMethodId = 12;
 }
 
 message PublishDatasetToDataRoomRequest {
@@ -74,6 +88,13 @@ message PublishDatasetToDataRoomResponse {
 
 message ExecuteComputeRequest {
     bytes dataRoomId = 1;
+    repeated string computeNodeNames = 2;
+    bool isDryRun = 3;
+    bytes scope = 4;
+}
+
+message ExecuteDevelopmentComputeRequest {
+    bytes configurationCommitId = 1;
     repeated string computeNodeNames = 2;
     bool isDryRun = 3;
     bytes scope = 4;
@@ -105,7 +126,7 @@ message GetResultsResponseFooter {
 
 message RetrieveDataRoomRequest {
     bytes dataRoomId = 1;
-    bytes scope = 2;
+    reserved 2;
 }
 
 message RetrieveDataRoomResponse {
@@ -114,7 +135,7 @@ message RetrieveDataRoomResponse {
 
 message RetrieveAuditLogRequest {
     bytes dataRoomId = 1;
-    bytes scope = 2;
+    reserved 2;
 }
 
 message RetrieveAuditLogResponse {
@@ -128,7 +149,6 @@ enum DataRoomStatus {
 
 message RetrieveDataRoomStatusRequest {
     bytes dataRoomId = 1;
-    bytes scope = 2;
 }
 
 message RetrieveDataRoomStatusResponse {
@@ -137,7 +157,7 @@ message RetrieveDataRoomStatusResponse {
 
 message UpdateDataRoomStatusRequest {
     bytes dataRoomId = 1;
-    bytes scope = 2;
+    reserved 2;
     DataRoomStatus status = 3;
 }
 
@@ -146,7 +166,7 @@ message UpdateDataRoomStatusResponse {
 
 message RetrievePublishedDatasetsRequest {
     bytes dataRoomId = 1;
-    bytes scope = 2;
+    reserved 2;
 }
 
 message PublishedDataset {
@@ -164,10 +184,64 @@ message RemovePublishedDatasetRequest {
     reserved 1;
     bytes dataRoomId = 2;
     string leafName = 3;
-    bytes scope = 4;
+    reserved 4;
 }
 
 message RemovePublishedDatasetResponse {}
+
+message CreateConfigurationCommitRequest {
+    data_room.ConfigurationCommit commit = 1;
+    bytes scope = 2;
+}
+
+message CreateConfigurationCommitResponse {
+    bytes commitId = 1;
+}
+
+message GenerateMergeApprovalSignatureRequest {
+    bytes commitId = 1;
+    bytes scope = 2;
+}
+
+message GenerateMergeApprovalSignatureResponse {
+    bytes signature = 1;
+}
+
+message MergeConfigurationCommitRequest {
+    bytes commitId = 1;
+    map<string, bytes> approvalSignatures = 2;
+    bytes scope = 3;
+}
+
+message RetrieveDataRoomConfigurationHistoryRequest {
+    bytes dataRoomId = 1;
+}
+
+message RetrieveDataRoomConfigurationHistoryResponse {
+    data_room.DataRoomConfiguration currentConfiguration = 1;
+    repeated bytes configurationsHistory = 2;
+    bytes pin = 3;
+}
+
+message RetrieveConfigurationCommitApproversRequest {
+    bytes commitId = 1;
+    bytes scope = 2;
+}
+
+message RetrieveConfigurationCommitApproversResponse {
+    repeated string approvers = 1;
+}
+
+message RetrieveConfigurationCommitRequest {
+    bytes commitId = 1;
+    bytes scope = 2;
+}
+
+message RetrieveConfigurationCommitResponse {
+    data_room.ConfigurationCommit commit = 1;
+}
+
+message MergeConfigurationCommitResponse {}
 
 message DriverTaskConfig {
     oneof driver_task_config {

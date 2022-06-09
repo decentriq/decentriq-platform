@@ -8,6 +8,9 @@ from .proto import (
     UpdateDataRoomStatusPermission,
     RetrievePublishedDatasetsPermission,
     DryRunPermission,
+    GenerateMergeSignaturePermission,
+    ExecuteDevelopmentComputePermission,
+    MergeConfigurationCommitPermission,
 )
 
 class Permissions:
@@ -69,3 +72,27 @@ class Permissions:
     def dry_run() -> Permission:
         """Permission for triggering a dry run on the data room."""
         return Permission(dryRunPermission=DryRunPermission())
+
+    @staticmethod
+    def generate_merge_signature() -> Permission:
+        """Permission for generating signatures required for merge approvals."""
+        return Permission(
+            generateMergeSignaturePermission=GenerateMergeSignaturePermission()
+        )
+
+    @staticmethod
+    def execute_development_compute() -> Permission:
+        """Permission for executing computations in development mode."""
+        return Permission(
+            executeDevelopmentComputePermission=ExecuteDevelopmentComputePermission()
+        )
+
+    @staticmethod
+    def merge_configuration_commit() -> Permission:
+        """
+        Permission for merging configuration commits into the current data
+        room configuration.
+        """
+        return Permission(
+            mergeConfigurationCommitPermission=MergeConfigurationCommitPermission()
+        )
