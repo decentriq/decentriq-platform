@@ -558,7 +558,15 @@ class Session():
         """
         endpoint_protocols = [0, 1]
         protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
+                "data_room_id": data_room_id,
+            }
+        )
         request = UpdateDataRoomStatusRequest(
+            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
             status=status,
         )
@@ -591,7 +599,15 @@ class Session():
         """
         endpoint_protocols = [0, 1]
         protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
+                "data_room_id": data_room_id,
+            }
+        )
         request = RetrieveDataRoomStatusRequest(
+            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
         )
         responses = self.send_request(
@@ -644,7 +660,15 @@ class Session():
         """
         endpoint_protocols = [0, 1]
         protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
+                "data_room_id": data_room_id,
+            }
+        )
         request = RetrieveAuditLogRequest(
+            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
         )
         responses = self.send_request(
@@ -765,7 +789,15 @@ class Session():
         """
         endpoint_protocols = [0, 1]
         protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
+                "data_room_id": data_room_id,
+            }
+        )
         request = RemovePublishedDatasetRequest(
+            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
             leafName=leaf_name,
         )
@@ -802,7 +834,15 @@ class Session():
         """
         endpoint_protocols = [0, 1]
         protocol = self._get_client_protocol(endpoint_protocols)
+        scope_id = self.client._ensure_scope_with_metadata(
+            self.email,
+            {
+                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
+                "data_room_id": data_room_id,
+            }
+        )
         request = RetrievePublishedDatasetsRequest(
+            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
         )
         responses = self.send_request(

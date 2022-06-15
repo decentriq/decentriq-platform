@@ -135,7 +135,7 @@ message RetrieveDataRoomResponse {
 
 message RetrieveAuditLogRequest {
     bytes dataRoomId = 1;
-    reserved 2;
+    bytes scope = 2;
 }
 
 message RetrieveAuditLogResponse {
@@ -149,6 +149,7 @@ enum DataRoomStatus {
 
 message RetrieveDataRoomStatusRequest {
     bytes dataRoomId = 1;
+    bytes scope = 2;
 }
 
 message RetrieveDataRoomStatusResponse {
@@ -157,7 +158,7 @@ message RetrieveDataRoomStatusResponse {
 
 message UpdateDataRoomStatusRequest {
     bytes dataRoomId = 1;
-    reserved 2;
+    bytes scope = 2;
     DataRoomStatus status = 3;
 }
 
@@ -166,7 +167,7 @@ message UpdateDataRoomStatusResponse {
 
 message RetrievePublishedDatasetsRequest {
     bytes dataRoomId = 1;
-    reserved 2;
+    bytes scope = 2;
 }
 
 message PublishedDataset {
@@ -184,7 +185,7 @@ message RemovePublishedDatasetRequest {
     reserved 1;
     bytes dataRoomId = 2;
     string leafName = 3;
-    reserved 4;
+    bytes scope = 4;
 }
 
 message RemovePublishedDatasetResponse {}
