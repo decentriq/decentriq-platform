@@ -13,11 +13,11 @@ from ..proto import Permission, AuthenticationMethod
 from ..proto.length_delimited import parse_length_delimited
 
 
-def _data_node_name(node: str):
+def _data_node_id(node: str):
     return f"@table/{node}/dataset"
 
 
-def _noop_node_name(node: str):
+def _noop_node_id(node: str):
     return f"@table/{node}/validation"
 
 
@@ -41,17 +41,17 @@ class TabularDataNodeBuilder:
     and pass it a `DataRoomBuilder` instance. This will add the necessary nodes and required
     user permissions to the builder instance.
 
-    Data should be published to the node named `input_node_name` and be read from `output_node_name`.
-    The name of the validation computation can be accessed using the field `validation_computation_name`.
+    Data should be published to the node with id `input_node_id` and be read from `output_node_id`.
+    The id of the validation computation can be accessed using the field `validation_computation_id`.
 
-    This class uses a special naming convention to name the nodes added to the data room based on
+    This class uses a special convention for the ids of the nodes added to the data room based on
     the table name given to the builder. Assuming you use `"my_table"` as the `table_name` when
     instantiating the `TabularDataNodeBuilder`, then the following three nodes will be added:
 
     1. `@table/my_table/dataset` - the data node to which you can upload data.
-    2. `my_table` - the name of the compute node that verifies the schema of the data.
+    2. `my_table` - the id of the compute node that verifies the schema of the data.
         Subsequent SQL compute nodes should read data from this node.
-    3. `@table/my_table/validation` - the name of a special trigger node that can be used to trigger the validation computation.
+    3. `@table/my_table/validation` - the id of a special trigger node that can be used to trigger the validation computation.
 
     The helper function `upload_and_publish_tabular_dataset` will upload, publish, and validate your
     data automatically, without you having to worry about internal naming.
@@ -77,28 +77,28 @@ class TabularDataNodeBuilder:
         """
         self.table_name = table_name
         self.is_required = is_required
-        self._leaf_node_name = _data_node_name(table_name)
-        self._verifier_node_name = table_name
+        self._leaf_node_id = _data_node_id(table_name)
+        self._verifier_node_id = table_name
 
-        self.validation_computation_name = _noop_node_name(table_name)
-        """The name of the computation that will perform the data validation."""
+        self.validation_computation_id = _noop_node_id(table_name)
+        """The id of the computation that will perform the data validation."""
 
         self._verifier = SqlSchemaVerifier(
-            self._verifier_node_name,
-            input_data_node=self._leaf_node_name,
+            self._verifier_node_id,
+            input_data_node=self._leaf_node_id,
             columns=schema,
         )
 
-        self._noop = Noop(self.validation_computation_name, dependencies=[self._verifier.name])
+        self._noop = Noop(self.validation_computation_id, dependencies=[self._verifier_node_id])
 
     def add_to_builder(
             self,
             builder: DataRoomBuilder,
             authentication: AuthenticationMethod,
             users: List[str]
-    ):
+    ) -> Tuple[str, str]:
         """
-        Configure the given `DataRoomBuilder` to build te final data clean room with the
+        Configure the given `DataRoomBuilder` to build the final data clean room with the
         necessary compute and data nodes.
         This call will also add the necessary permissions to the data room
         builder that let each user in the list of users perform the following
@@ -116,16 +116,23 @@ class TabularDataNodeBuilder:
             from within the enclave.
         - `users`: A list of email addresses that will be given permissions both for
             the validation of the data as well as the uploading of data.
+
+        **Returns**:
+        A tuple containing, as the first element, the id of the data node, and,
+        as a second element, the id of the verification computation.
+        The data node id must be used when publishing data to the data node.
+        The id of the verification computation must be used when depending on
+        this dataset from downstream computations (e.g. SQL queries).
         """
         builder.add_data_node(
-            self._leaf_node_name,
+            self._leaf_node_id,
             is_required=self.is_required,
-            node_id=self._leaf_node_name
+            node_id=self._leaf_node_id
         )
-        builder.add_compute_node(self._verifier, node_id=self._verifier_node_name)
+        builder.add_compute_node(self._verifier, node_id=self._verifier_node_id)
         builder.add_compute_node(
             self._noop,
-            node_id=self.validation_computation_name
+            node_id=self.validation_computation_id
         )
         for email in users:
             builder.add_user_permission(
@@ -136,26 +143,31 @@ class TabularDataNodeBuilder:
                     self.leaf_crud_permission
                 ]
             )
+        return (self._leaf_node_id, self._verifier_node_id)
 
     @property
     def validation_permission(self) -> Permission:
         """The permission required to trigger the data validation."""
-        return Permissions.execute_compute(self.validation_computation_name)
+        return Permissions.execute_compute(self.validation_computation_id)
 
     @property
     def leaf_crud_permission(self) -> Permission:
         """The permission required to upload the raw, non-validated data."""
-        return Permissions.leaf_crud(self._leaf_node_name)
+        return Permissions.leaf_crud(self._leaf_node_id)
 
     @property
-    def input_node_name(self) -> str:
-        """The node name to which data should be uploaded."""
-        return self._leaf_node_name
+    def input_node_id(self) -> str:
+        """The node id to which data should be uploaded."""
+        return self._leaf_node_id
 
     @property
-    def output_node_name(self) -> str:
-        """The node name from which data can be read, e.g. the name to use in any downstream SQL queries."""
-        return self._verifier_node_name
+    def output_node_id(self) -> str:
+        """
+        The id of the node from which the validated data can be read.
+        This id needs to be specified in the list of dependencies of any
+        downstream computations (such as SQL queries).
+        """
+        return self._verifier_node_id
 
 
 def read_input_csv_file(
@@ -317,17 +329,17 @@ def upload_and_publish_tabular_dataset(
     )
     session.publish_dataset(
         data_room_id, manifest_hash,
-        leaf_name=_data_node_name(table),
+        leaf_id=_data_node_id(table),
         key=key
     )
 
     if validate:
         try:
-            session.run_computation_and_get_results(
+            job_id = session.run_computation(
                 data_room_id,
-                _noop_node_name(table),
-                **kwargs
+                _noop_node_id(table)
             )
+            session.wait_until_computation_has_finished(job_id, **kwargs)
         except Exception as e:
             raise Exception("Validation of dataset failed! Reason: {}".format(e))
 

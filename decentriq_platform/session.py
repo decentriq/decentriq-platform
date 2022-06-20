@@ -689,7 +689,7 @@ class Session():
             self,
             data_room_id: str,
             manifest_hash: str,
-            leaf_name: str,
+            leaf_id: str,
             key: Key,
             *,
             force: bool = False
@@ -725,7 +725,7 @@ class Session():
         if should_create_dataset_links:
             existing_link = self.platform._platform_api.get_dataset_link(
                 data_room_id,
-                self._convert_data_node_name_to_verifier_node(leaf_name)
+                self._convert_data_node_name_to_verifier_node(leaf_id)
             )
             if existing_link:
                 existing_dataset = existing_link["dataset"]["datasetId"]
@@ -745,7 +745,7 @@ class Session():
         request = PublishDatasetToDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             datasetHash=bytes.fromhex(manifest_hash),
-            leafName=leaf_name,
+            leafName=leaf_id,
             encryptionKey=key.material,
             scope=bytes.fromhex(scope_id)
         )
@@ -766,7 +766,7 @@ class Session():
                 self.platform._platform_api.create_dataset_link(
                     data_room_id,
                     manifest_hash,
-                    self._convert_data_node_name_to_verifier_node(leaf_name)
+                    self._convert_data_node_name_to_verifier_node(leaf_id)
                 )
 
         return response.publishDatasetToDataRoomResponse
@@ -782,7 +782,7 @@ class Session():
     def remove_published_dataset(
             self,
             data_room_id: str,
-            leaf_name: str,
+            leaf_id: str,
     ) -> RemovePublishedDatasetResponse:
         """
         Removes a published dataset from the data room.
@@ -799,7 +799,7 @@ class Session():
         request = RemovePublishedDatasetRequest(
             scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
-            leafName=leaf_name,
+            leafName=leaf_id,
         )
         responses = self.send_request(
             GcgRequest(removePublishedDatasetRequest=request),
@@ -818,7 +818,7 @@ class Session():
                 try:
                     self.platform._platform_api.delete_dataset_link(
                         data_room_id,
-                        self._convert_data_node_name_to_verifier_node(leaf_name)
+                        self._convert_data_node_name_to_verifier_node(leaf_id)
                     )
                 except Exception as error:
                     print(f"Error when deleting dataset link on platform: {error}")
@@ -1018,6 +1018,32 @@ class Session():
         response = self._submit_compute(data_room_id, [compute_node_id], dry_run=dry_run)
         return JobId(response.jobId.hex(), compute_node_id)
 
+    def wait_until_computation_has_finished(
+        self,
+        job_id: JobId,
+        /, *,
+        interval: int = 5,
+        timeout: int = None
+    ):
+        """
+        Wait for the given job to complete.
+
+        The method will check for the job's completeness every `interval` seconds and up to
+        an optional `timeout` seconds after which the method will raise an exception.
+        """
+        elapsed = 0
+        while True:
+            if timeout is not None and elapsed > timeout:
+                raise Exception(
+                    f"Timeout when trying to get result for job {job_id.id} of"
+                    f" {job_id.compute_node_id} (waited {timeout} seconds)"
+                )
+            elif job_id.compute_node_id in self.get_computation_status(job_id.id).completeComputeNodeNames:
+                break
+            else:
+                sleep(interval)
+                elapsed += interval
+
     def run_dev_computation(
             self,
             configuration_commit_id: str,
@@ -1056,17 +1082,13 @@ class Session():
         """
         elapsed = 0
         job_id_bytes = bytes.fromhex(job_id.id)
-        while True:
-            if timeout is not None and elapsed > timeout:
-                raise Exception(
-                    f"Timeout when trying to get result for job {job_id.id} of {job_id.compute_node_id} (waited {timeout} seconds)"
-                )
-            elif job_id.compute_node_id in self.get_computation_status(job_id.id).completeComputeNodeNames:
-                results = self._get_job_results(job_id_bytes, job_id.compute_node_id)
-                return results
-            else:
-                sleep(interval)
-                elapsed += interval
+        self.wait_until_computation_has_finished(
+            job_id,
+            interval=interval,
+            timeout=timeout
+        )
+        results = self._get_job_results(job_id_bytes, job_id.compute_node_id)
+        return results
 
     def run_computation_and_get_results(
             self,
