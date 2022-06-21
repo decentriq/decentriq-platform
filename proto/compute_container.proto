@@ -12,6 +12,7 @@ message StaticImage {
     repeated MountPoint mountPoints = 2;
     string outputPath = 3;
     bool includeContainerLogsOnError = 4;
+    bool includeContainerLogsOnSuccess = 5;
 }
 
 message MountPoint {

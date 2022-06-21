@@ -6,7 +6,11 @@ __docformat__ = "restructuredtext"
 
 from .client import Client, create_client, Session
 from .platform import ClientPlatformFeatures, SessionPlatformFeatures
-from .builders import DataRoomBuilder
+from .builders import (
+    DataRoomBuilder,
+    DataRoomCommitBuilder,
+    GovernanceProtocol
+)
 from .compute import Noop, StaticContent
 from .permission import Permissions
 from .storage import Key
@@ -18,7 +22,9 @@ __all__ = [
     "Client",
     "Session",
     "DataRoomBuilder",
+    "DataRoomCommitBuilder",
     "Permissions",
+    "GovernanceProtocol",
     "enclave_specifications",
     "EnclaveSpecifications",
     "Key",

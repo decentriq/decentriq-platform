@@ -28,40 +28,331 @@ global___ComputeNodeFormat = ComputeNodeFormat
 
 
 class DataRoom(google.protobuf.message.Message):
+    """/ To create a dataroom the user need to specify the `GovernanceProtocol`
+    / and the list of `ConfigurationModification`.
+    / The `GovernanceProtocol` defines how new modifications can be applied to an existing data room.
+    / The list of `ConfigurationModification`s (abbreviated by "Modification" in the diagram below)
+    / defined the structure of the data room itself (the compute nodes,
+    / the permissions, etc...), this list makes up the first `ConfigurationCommit` for the dataroom.
+    /
+    / ```diagram
+    /  ┌──────────────────────┐                               
+    /  │CreateDataRoomRequest │           ┌──────────────────┐
+    /  │ ┌──────────────────┐ │           │ DataRoomContext  │
+    /  │ │GovernanceProtocol│ │           │ ┌──────────────┐ │
+    /  │ └──────────────────┘ │           │ │  Leaf nodes  │ │
+    /  │ ┌─────────────┐      ├──────────▶│ │ manifest map │ │
+    /  │ │ ┌───────────┴─┐    │           │ └──────────────┘ │
+    /  │ └─┤┌────────────┴──┐ │           │ ┌──────────────┐ │
+    /  │   └┤ Modification  │ │           │ │CommitsHistory│ │
+    /  │    └───────────────┘ │           │ └──────────────┘ │
+    /  └──────────────────────┘           └──────────────────┘
+    / ```
+    /
+    / A dataroom has a corresponding `DataRoomContext` which includes a map of the
+    / currently published datasets (and corresponding encryption key) and the commits history
+    / which is a list of the `ConfigurationCommit` that make up the data room
+    /  
+    / ```diagram
+    /  ┌──────────────────────────────┐                                        
+    /  │        CommitsHistory        │                                        
+    /  │┌────────────────────┐        │        ┌────┬─────────────────────────┐
+    /  ││ ┌──────────────────┴─┐      │     ┌──│ Id │ConfigurationCommit #1   │
+    /  ││ │  ┌─────────────────┴──┐   │     │  └────┴─────────────────────────┘
+    /  ││ │  │ ┌──────────────────┴─┐ │     │  ┌────┬─────────────────────────┐
+    /  ││ │  │ │ConfigurationCommit │ │     ├──│ Id │ConfigurationCommit #2   │
+    /  ││ │  │ │┌──────────────────┐│ │     │  └────┴─────────────────────────┘
+    /  ││ │  │ ││    DataRoomId    ││ │     │  ┌────┬─────────────────────────┐
+    /  ││ │  │ │└──────────────────┘│ │     ├──│ Id │ConfigurationCommit #3   │
+    /  ││ │  │ │┌──────────────────┐│ │     │  └────┴─────────────────────────┘
+    /  ││ │  │ ││   DataRoomPin    ││ │     │  ┌────┬─────────────────────────┐
+    /  ││ │  │ │└──────────────────┘│ │     ├──│ Id │ConfigurationCommit #4   │
+    /  ││ │  │ │┌─────────────┐     │ │     │  └────┴─────────────────────────┘
+    /  ││ │  │ ││ ┌───────────┴─┐   │ │     │                                  
+    /  │└─┤  │ │└─┤┌────────────┴──┐│ │     │                                  
+    /  │  └──┤ │  └┤ Modification  ││ │     │    ┌──────────────────────────┐  
+    /  │     └─┤   └───────────────┘│ │     └───▶│       DataRoomPin        │  
+    /  │       └────────────────────┘ │          └──────────────────────────┘  
+    /  └──────────────────────────────┘
+    / ```
+    /
+    / Each `ConfigurationCommit` is identified by the data room which it refers to and the
+    / pin of the data room itself. A commit can only be merged if the `pin` corresponds to the
+    / current configuration history state of the data room
+    /
+    / ```diagram
+    /  ┌───────────────────────────────┐           ┌────────────────┐
+    /  │MergeConfigurationCommitRequest│           │ CommitsHistory │
+    /  │ ┌───────────────────────────┐ │           └────────────────┘
+    /  │ │  ConfigurationCommit #5   │ │              ┌────┐         
+    /  │ └───────────────────────────┘ │              │ ┌──┴─┐       
+    /  │ ┌─────────────────────┐       ├──────────▶   └─┤ ┌──┴─┐     
+    /  │ │  ┌──────────────────┴──┐    │                └─┤ ┌──┴─┐   
+    /  │ └──┤  ┌──────────────────┴──┐ │                  └─┤ ┌──┴─┐ 
+    /  │    └──┤   MergeSignature    │ │                    └─┤ 5  │ 
+    /  │       └─────────────────────┘ │                      └────┘ 
+    /  └───────────────────────────────┘                             
+    / ```
+    /
+    / When a user collects the approval signatures required to merge a commit, this can
+    / be added to the commits history.
+    / The list of approvers depends both on the commit and the `GovernanceProtocol` that
+    / the data room is configured with:
+    / - StaticDataRoomPolicy: the data room is static, there isn't an approver that
+    /    can authorize the merge
+    / - AffectedDataOwnersApprovePolicy: the approvers for a commit are the user which have
+    /     a CrudPermisison on the leaf node that the new nodes may use
+    /
+    / ```diagram
+    /                                           ┌────────────────────┐                         
+    /                                           │   UserPermission   │                         
+    /  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐      │ ┌───────────────┐  │                         
+    /            New Commit Node                │ │user1@email.com│──┼──┐                      
+    /  │          ┌───┬───────┐          │      │ └───────────────┘  │  │                      
+    /           ┌▶│0x4│Python │◀─┐              │ ┌──────────────┐   │  │                      
+    /  │        │ └───┴───────┘  │       │      │ │ ┌────────────┴─┐ │  │                      
+    /   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─       │ └─┤CrudPermission│ │  │     ┌───────────────┐
+    /  ┌ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐      │   │   id: 0x1    │ │  └────▶│   Required    │
+    /     ┌───┬─┴─────┐          │              │   └──────────────┘ │        │   Approvers   │
+    /  │  │0x3│  Sql  │          │       │      └────────────────────┘        ├───────────────┤
+    /     └───┴───────┘          │              ┌────────────────────┐  ┌────▶│user1@email.com│
+    /  │        ▲                │       │      │   UserPermission   │  │     │               │
+    /     ┌───┬─┴─────┐   ┌───┬──┴────┐         │ ┌───────────────┐  │  │     │user2@email.com│
+    /  │  │0x1│Leaf 1 │   │0x2│Leaf 2 │  │      │ │user2@email.com│──┼──┘     └───────────────┘
+    /     └───┴───────┘   └───┴───────┘         │ └───────────────┘  │                         
+    /  │                                 │      │ ┌──────────────┐   │                         
+    /      Old data room configuration          │ │ ┌────────────┴─┐ │                         
+    /  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘      │ └─┤CrudPermission│ │                         
+    /                                           │   │   id: 0x2    │ │                         
+    /                                           │   └──────────────┘ │                         
+    /                                           └────────────────────┘
+    / ```
+    /
+    / In the example above `user3@email.com` has created a new commit which adds node `0x4` to the
+    / data room. By walking the computation graph the node depends on node `0x2` directly and node
+    / `0x1` indirectly. To authorize the merge both owners of these leaf nodes must provide an approval
+    / signature. The ownership of the nodes is determined by checking who has `CrudPermission` on the
+    / leaf nodes.
+    /  
+    / Configuration commits don't have to be merged into a data room configuration
+    / history, but can also be used to execute computations on top of data the user
+    / already has access to. This is determined by checking if a user has ExecuteComputePermission
+    / on the node which the new nodes depend on
+    /
+    / ```diagram
+    /  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                          
+    /    New Commit Node                            
+    /  │  ┌───┬───────┐  │                          
+    /     │0x3│Python │       ┌────────────────────┐
+    /  │  └───┴───────┘  │    │   UserPermission   │
+    /   ─ ─ ─ ─ ▲ ─ ─ ─ ─     │ ┌───────────────┐  │
+    /  ┌ ─ ─ ─ ─│─ ─ ─ ─ ┐    │ │user2@email.com│  │
+    /     ┌───┬─┴─────┐       │ └───────────────┘  │
+    /  │  │0x2│  Sql  │  │    │ ┌──────────────┐   │
+    /     └───┴───────┘       │ │ ┌────────────┴─┐ │
+    /  │        ▲        │    │ └─┤ExecuteCompute│ │
+    /     ┌───┬─┴─────┐       │   │   id: 0x2    │ │
+    /  │  │0x1│Leaf 1 │  │    │   └──────────────┘ │
+    /     └───┴───────┘       └────────────────────┘
+    /  │  Old data room  │                          
+    /     configuration                             
+    /  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+    / ```
+    /
+    / In the example above `user2@email.com` has created a new commit which adds node `0x3` to the
+    / data room. The node has a dependency on `0x2`, for which the user has `ExecuteComputePermission`
+    / which means that the user can execute the node `0x3`
+
+    """
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     ID_FIELD_NUMBER: builtins.int
-    COMPUTENODES_FIELD_NUMBER: builtins.int
-    ATTESTATIONSPECIFICATIONS_FIELD_NUMBER: builtins.int
-    USERPERMISSIONS_FIELD_NUMBER: builtins.int
-    AUTHENTICATIONMETHODS_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     DESCRIPTION_FIELD_NUMBER: builtins.int
     OWNEREMAIL_FIELD_NUMBER: builtins.int
+    GOVERNANCEPROTOCOL_FIELD_NUMBER: builtins.int
     id: typing.Text = ...
-    @property
-    def computeNodes(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ComputeNode]: ...
-    @property
-    def attestationSpecifications(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[attestation_pb2.AttestationSpecification]: ...
-    @property
-    def userPermissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___UserPermission]: ...
-    @property
-    def authenticationMethods(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AuthenticationMethod]: ...
     name: typing.Text = ...
     description: typing.Text = ...
     ownerEmail: typing.Text = ...
+    @property
+    def governanceProtocol(self) -> global___GovernanceProtocol: ...
     def __init__(self,
         *,
         id : typing.Text = ...,
-        computeNodes : typing.Optional[typing.Iterable[global___ComputeNode]] = ...,
-        attestationSpecifications : typing.Optional[typing.Iterable[attestation_pb2.AttestationSpecification]] = ...,
-        userPermissions : typing.Optional[typing.Iterable[global___UserPermission]] = ...,
-        authenticationMethods : typing.Optional[typing.Iterable[global___AuthenticationMethod]] = ...,
         name : typing.Text = ...,
         description : typing.Text = ...,
         ownerEmail : typing.Text = ...,
+        governanceProtocol : typing.Optional[global___GovernanceProtocol] = ...,
         ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"attestationSpecifications",b"attestationSpecifications",u"authenticationMethods",b"authenticationMethods",u"computeNodes",b"computeNodes",u"description",b"description",u"id",b"id",u"name",b"name",u"ownerEmail",b"ownerEmail",u"userPermissions",b"userPermissions"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"governanceProtocol",b"governanceProtocol"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"description",b"description",u"governanceProtocol",b"governanceProtocol",u"id",b"id",u"name",b"name",u"ownerEmail",b"ownerEmail"]) -> None: ...
 global___DataRoom = DataRoom
+
+class GovernanceProtocol(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    STATICDATAROOMPOLICY_FIELD_NUMBER: builtins.int
+    AFFECTEDDATAOWNERSAPPROVEPOLICY_FIELD_NUMBER: builtins.int
+    @property
+    def staticDataRoomPolicy(self) -> global___StaticDataRoomPolicy: ...
+    @property
+    def affectedDataOwnersApprovePolicy(self) -> global___AffectedDataOwnersApprovePolicy: ...
+    def __init__(self,
+        *,
+        staticDataRoomPolicy : typing.Optional[global___StaticDataRoomPolicy] = ...,
+        affectedDataOwnersApprovePolicy : typing.Optional[global___AffectedDataOwnersApprovePolicy] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"affectedDataOwnersApprovePolicy",b"affectedDataOwnersApprovePolicy",u"policy",b"policy",u"staticDataRoomPolicy",b"staticDataRoomPolicy"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"affectedDataOwnersApprovePolicy",b"affectedDataOwnersApprovePolicy",u"policy",b"policy",u"staticDataRoomPolicy",b"staticDataRoomPolicy"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"policy",b"policy"]) -> typing.Optional[typing_extensions.Literal["staticDataRoomPolicy","affectedDataOwnersApprovePolicy"]]: ...
+global___GovernanceProtocol = GovernanceProtocol
+
+class StaticDataRoomPolicy(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    def __init__(self,
+        ) -> None: ...
+global___StaticDataRoomPolicy = StaticDataRoomPolicy
+
+class AffectedDataOwnersApprovePolicy(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    def __init__(self,
+        ) -> None: ...
+global___AffectedDataOwnersApprovePolicy = AffectedDataOwnersApprovePolicy
+
+class DataRoomConfiguration(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    class ElementsEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: typing.Text = ...
+        @property
+        def value(self) -> global___ConfigurationElement: ...
+        def __init__(self,
+            *,
+            key : typing.Text = ...,
+            value : typing.Optional[global___ConfigurationElement] = ...,
+            ) -> None: ...
+        def HasField(self, field_name: typing_extensions.Literal[u"value",b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing_extensions.Literal[u"key",b"key",u"value",b"value"]) -> None: ...
+
+    ELEMENTS_FIELD_NUMBER: builtins.int
+    @property
+    def elements(self) -> google.protobuf.internal.containers.MessageMap[typing.Text, global___ConfigurationElement]: ...
+    def __init__(self,
+        *,
+        elements : typing.Optional[typing.Mapping[typing.Text, global___ConfigurationElement]] = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"elements",b"elements"]) -> None: ...
+global___DataRoomConfiguration = DataRoomConfiguration
+
+class ConfigurationElement(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    COMPUTENODE_FIELD_NUMBER: builtins.int
+    ATTESTATIONSPECIFICATION_FIELD_NUMBER: builtins.int
+    USERPERMISSION_FIELD_NUMBER: builtins.int
+    AUTHENTICATIONMETHOD_FIELD_NUMBER: builtins.int
+    @property
+    def computeNode(self) -> global___ComputeNode: ...
+    @property
+    def attestationSpecification(self) -> attestation_pb2.AttestationSpecification: ...
+    @property
+    def userPermission(self) -> global___UserPermission: ...
+    @property
+    def authenticationMethod(self) -> global___AuthenticationMethod: ...
+    def __init__(self,
+        *,
+        computeNode : typing.Optional[global___ComputeNode] = ...,
+        attestationSpecification : typing.Optional[attestation_pb2.AttestationSpecification] = ...,
+        userPermission : typing.Optional[global___UserPermission] = ...,
+        authenticationMethod : typing.Optional[global___AuthenticationMethod] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"attestationSpecification",b"attestationSpecification",u"authenticationMethod",b"authenticationMethod",u"computeNode",b"computeNode",u"element",b"element",u"userPermission",b"userPermission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"attestationSpecification",b"attestationSpecification",u"authenticationMethod",b"authenticationMethod",u"computeNode",b"computeNode",u"element",b"element",u"userPermission",b"userPermission"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"element",b"element"]) -> typing.Optional[typing_extensions.Literal["computeNode","attestationSpecification","userPermission","authenticationMethod"]]: ...
+global___ConfigurationElement = ConfigurationElement
+
+class ConfigurationModification(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ADD_FIELD_NUMBER: builtins.int
+    CHANGE_FIELD_NUMBER: builtins.int
+    DELETE_FIELD_NUMBER: builtins.int
+    @property
+    def add(self) -> global___AddModification: ...
+    @property
+    def change(self) -> global___ChangeModification: ...
+    @property
+    def delete(self) -> global___DeleteModification: ...
+    def __init__(self,
+        *,
+        add : typing.Optional[global___AddModification] = ...,
+        change : typing.Optional[global___ChangeModification] = ...,
+        delete : typing.Optional[global___DeleteModification] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"add",b"add",u"change",b"change",u"delete",b"delete",u"modification",b"modification"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"add",b"add",u"change",b"change",u"delete",b"delete",u"modification",b"modification"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"modification",b"modification"]) -> typing.Optional[typing_extensions.Literal["add","change","delete"]]: ...
+global___ConfigurationModification = ConfigurationModification
+
+class AddModification(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ID_FIELD_NUMBER: builtins.int
+    ELEMENT_FIELD_NUMBER: builtins.int
+    id: typing.Text = ...
+    @property
+    def element(self) -> global___ConfigurationElement: ...
+    def __init__(self,
+        *,
+        id : typing.Text = ...,
+        element : typing.Optional[global___ConfigurationElement] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"element",b"element"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"element",b"element",u"id",b"id"]) -> None: ...
+global___AddModification = AddModification
+
+class ChangeModification(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ID_FIELD_NUMBER: builtins.int
+    ELEMENT_FIELD_NUMBER: builtins.int
+    id: typing.Text = ...
+    @property
+    def element(self) -> global___ConfigurationElement: ...
+    def __init__(self,
+        *,
+        id : typing.Text = ...,
+        element : typing.Optional[global___ConfigurationElement] = ...,
+        ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"element",b"element"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"element",b"element",u"id",b"id"]) -> None: ...
+global___ChangeModification = ChangeModification
+
+class DeleteModification(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    ID_FIELD_NUMBER: builtins.int
+    id: typing.Text = ...
+    def __init__(self,
+        *,
+        id : typing.Text = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"id",b"id"]) -> None: ...
+global___DeleteModification = DeleteModification
+
+class ConfigurationCommit(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    DATAROOMHISTORYPIN_FIELD_NUMBER: builtins.int
+    MODIFICATIONS_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes = ...
+    dataRoomHistoryPin: builtins.bytes = ...
+    @property
+    def modifications(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConfigurationModification]: ...
+    def __init__(self,
+        *,
+        dataRoomId : builtins.bytes = ...,
+        dataRoomHistoryPin : builtins.bytes = ...,
+        modifications : typing.Optional[typing.Iterable[global___ConfigurationModification]] = ...,
+        ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomHistoryPin",b"dataRoomHistoryPin",u"dataRoomId",b"dataRoomId",u"modifications",b"modifications"]) -> None: ...
+global___ConfigurationCommit = ConfigurationCommit
 
 class ComputeNode(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
@@ -110,44 +401,44 @@ class ComputeNodeBranch(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     CONFIG_FIELD_NUMBER: builtins.int
     DEPENDENCIES_FIELD_NUMBER: builtins.int
-    ATTESTATIONSPECIFICATIONINDEX_FIELD_NUMBER: builtins.int
     OUTPUTFORMAT_FIELD_NUMBER: builtins.int
     PROTOCOL_FIELD_NUMBER: builtins.int
+    ATTESTATIONSPECIFICATIONID_FIELD_NUMBER: builtins.int
     config: builtins.bytes = ...
     @property
     def dependencies(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
-    attestationSpecificationIndex: builtins.int = ...
     outputFormat: global___ComputeNodeFormat.V = ...
     @property
     def protocol(self) -> global___ComputeNodeProtocol: ...
+    attestationSpecificationId: typing.Text = ...
     def __init__(self,
         *,
         config : builtins.bytes = ...,
         dependencies : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        attestationSpecificationIndex : builtins.int = ...,
         outputFormat : global___ComputeNodeFormat.V = ...,
         protocol : typing.Optional[global___ComputeNodeProtocol] = ...,
+        attestationSpecificationId : typing.Text = ...,
         ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal[u"protocol",b"protocol"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"attestationSpecificationIndex",b"attestationSpecificationIndex",u"config",b"config",u"dependencies",b"dependencies",u"outputFormat",b"outputFormat",u"protocol",b"protocol"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"attestationSpecificationId",b"attestationSpecificationId",u"config",b"config",u"dependencies",b"dependencies",u"outputFormat",b"outputFormat",u"protocol",b"protocol"]) -> None: ...
 global___ComputeNodeBranch = ComputeNodeBranch
 
 class UserPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
     EMAIL_FIELD_NUMBER: builtins.int
-    AUTHENTICATIONMETHODINDEX_FIELD_NUMBER: builtins.int
     PERMISSIONS_FIELD_NUMBER: builtins.int
+    AUTHENTICATIONMETHODID_FIELD_NUMBER: builtins.int
     email: typing.Text = ...
-    authenticationMethodIndex: builtins.int = ...
     @property
     def permissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Permission]: ...
+    authenticationMethodId: typing.Text = ...
     def __init__(self,
         *,
         email : typing.Text = ...,
-        authenticationMethodIndex : builtins.int = ...,
         permissions : typing.Optional[typing.Iterable[global___Permission]] = ...,
+        authenticationMethodId : typing.Text = ...,
         ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"authenticationMethodIndex",b"authenticationMethodIndex",u"email",b"email",u"permissions",b"permissions"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"authenticationMethodId",b"authenticationMethodId",u"email",b"email",u"permissions",b"permissions"]) -> None: ...
 global___UserPermission = UserPermission
 
 class AuthenticationMethod(google.protobuf.message.Message):
@@ -185,6 +476,9 @@ class Permission(google.protobuf.message.Message):
     UPDATEDATAROOMSTATUSPERMISSION_FIELD_NUMBER: builtins.int
     RETRIEVEPUBLISHEDDATASETSPERMISSION_FIELD_NUMBER: builtins.int
     DRYRUNPERMISSION_FIELD_NUMBER: builtins.int
+    GENERATEMERGESIGNATUREPERMISSION_FIELD_NUMBER: builtins.int
+    EXECUTEDEVELOPMENTCOMPUTEPERMISSION_FIELD_NUMBER: builtins.int
+    MERGECONFIGURATIONCOMMITPERMISSION_FIELD_NUMBER: builtins.int
     @property
     def executeComputePermission(self) -> global___ExecuteComputePermission: ...
     @property
@@ -201,6 +495,12 @@ class Permission(google.protobuf.message.Message):
     def retrievePublishedDatasetsPermission(self) -> global___RetrievePublishedDatasetsPermission: ...
     @property
     def dryRunPermission(self) -> global___DryRunPermission: ...
+    @property
+    def generateMergeSignaturePermission(self) -> global___GenerateMergeSignaturePermission: ...
+    @property
+    def executeDevelopmentComputePermission(self) -> global___ExecuteDevelopmentComputePermission: ...
+    @property
+    def mergeConfigurationCommitPermission(self) -> global___MergeConfigurationCommitPermission: ...
     def __init__(self,
         *,
         executeComputePermission : typing.Optional[global___ExecuteComputePermission] = ...,
@@ -211,10 +511,13 @@ class Permission(google.protobuf.message.Message):
         updateDataRoomStatusPermission : typing.Optional[global___UpdateDataRoomStatusPermission] = ...,
         retrievePublishedDatasetsPermission : typing.Optional[global___RetrievePublishedDatasetsPermission] = ...,
         dryRunPermission : typing.Optional[global___DryRunPermission] = ...,
+        generateMergeSignaturePermission : typing.Optional[global___GenerateMergeSignaturePermission] = ...,
+        executeDevelopmentComputePermission : typing.Optional[global___ExecuteDevelopmentComputePermission] = ...,
+        mergeConfigurationCommitPermission : typing.Optional[global___MergeConfigurationCommitPermission] = ...,
         ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"dryRunPermission",b"dryRunPermission",u"executeComputePermission",b"executeComputePermission",u"leafCrudPermission",b"leafCrudPermission",u"permission",b"permission",u"retrieveAuditLogPermission",b"retrieveAuditLogPermission",u"retrieveDataRoomPermission",b"retrieveDataRoomPermission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dryRunPermission",b"dryRunPermission",u"executeComputePermission",b"executeComputePermission",u"leafCrudPermission",b"leafCrudPermission",u"permission",b"permission",u"retrieveAuditLogPermission",b"retrieveAuditLogPermission",u"retrieveDataRoomPermission",b"retrieveDataRoomPermission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"permission",b"permission"]) -> typing.Optional[typing_extensions.Literal["executeComputePermission","leafCrudPermission","retrieveDataRoomPermission","retrieveAuditLogPermission","retrieveDataRoomStatusPermission","updateDataRoomStatusPermission","retrievePublishedDatasetsPermission","dryRunPermission"]]: ...
+    def HasField(self, field_name: typing_extensions.Literal[u"dryRunPermission",b"dryRunPermission",u"executeComputePermission",b"executeComputePermission",u"executeDevelopmentComputePermission",b"executeDevelopmentComputePermission",u"generateMergeSignaturePermission",b"generateMergeSignaturePermission",u"leafCrudPermission",b"leafCrudPermission",u"mergeConfigurationCommitPermission",b"mergeConfigurationCommitPermission",u"permission",b"permission",u"retrieveAuditLogPermission",b"retrieveAuditLogPermission",u"retrieveDataRoomPermission",b"retrieveDataRoomPermission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal[u"dryRunPermission",b"dryRunPermission",u"executeComputePermission",b"executeComputePermission",u"executeDevelopmentComputePermission",b"executeDevelopmentComputePermission",u"generateMergeSignaturePermission",b"generateMergeSignaturePermission",u"leafCrudPermission",b"leafCrudPermission",u"mergeConfigurationCommitPermission",b"mergeConfigurationCommitPermission",u"permission",b"permission",u"retrieveAuditLogPermission",b"retrieveAuditLogPermission",u"retrieveDataRoomPermission",b"retrieveDataRoomPermission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"permission",b"permission"]) -> typing.Optional[typing_extensions.Literal["executeComputePermission","leafCrudPermission","retrieveDataRoomPermission","retrieveAuditLogPermission","retrieveDataRoomStatusPermission","updateDataRoomStatusPermission","retrievePublishedDatasetsPermission","dryRunPermission","generateMergeSignaturePermission","executeDevelopmentComputePermission","mergeConfigurationCommitPermission"]]: ...
 global___Permission = Permission
 
 class ExecuteComputePermission(google.protobuf.message.Message):
@@ -274,3 +577,21 @@ class DryRunPermission(google.protobuf.message.Message):
     def __init__(self,
         ) -> None: ...
 global___DryRunPermission = DryRunPermission
+
+class GenerateMergeSignaturePermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    def __init__(self,
+        ) -> None: ...
+global___GenerateMergeSignaturePermission = GenerateMergeSignaturePermission
+
+class ExecuteDevelopmentComputePermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    def __init__(self,
+        ) -> None: ...
+global___ExecuteDevelopmentComputePermission = ExecuteDevelopmentComputePermission
+
+class MergeConfigurationCommitPermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    def __init__(self,
+        ) -> None: ...
+global___MergeConfigurationCommitPermission = MergeConfigurationCommitPermission

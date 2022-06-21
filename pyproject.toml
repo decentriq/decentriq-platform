@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "decentriq-platform"
-version = "0.10.0"
+version = "0.11.0"
 description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.com>"]
 readme = 'README.md'
@@ -15,7 +15,7 @@ protobuf = "^3.18.0"
 requests = "^2.27.0"
 sgx-ias-structs = "^0.1.7"
 cryptography = "^3.4.8"
-chily = "^0.5.3"
+chily = "^0.6.0"
 asn1crypto = "^1.4.0"
 oscrypto = "^1.2.1"
 certvalidator = "^0.11.1"

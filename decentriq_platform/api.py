@@ -103,7 +103,7 @@ class API:
     def post(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
         response = self.session.post(
-            url, data=req_body, headers={**headers}, timeout=self.timeout
+            url, data=req_body, headers={**headers}, timeout=self.timeout, stream=True
         )
         API.__check_response_status_code(response)
         return response

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import datetime
 import base64
 import json
@@ -12,7 +12,7 @@ from .types import (
 )
 from .api import API, Endpoints
 from .proto import (
-    AuthenticationMethod, TrustedPki, DataRoom, DataRoomStatus
+    AuthenticationMethod, TrustedPki, DataRoom, DataRoomStatus, ConfigurationModification
 )
 from .config import (
     DECENTRIQ_CLIENT_ID,
@@ -142,19 +142,19 @@ class PlatformApi:
     def get_dataset_link(
             self,
             data_room_id: str,
-            leaf_name: str,
+            leaf_id: str,
     ) -> Optional[dict]:
         data_room = self.get_data_room_by_hash(data_room_id)
         if not data_room:
             raise Exception(f"Unable to get data room for hash '{data_room_id}'")
         data_room_uuid = data_room["dataRoomUuid"]
-        compute_node = self._get_compute_node(data_room_uuid, leaf_name)
+        compute_node = self._get_compute_node(data_room_uuid, leaf_id)
         if compute_node:
             compute_node_uuid = compute_node["computeNodeUuid"]
             return self._get_dataset_link(compute_node_uuid)
         else:
             raise Exception(
-                f"Unable to find leaf with name '{leaf_name}' for data room '{data_room_id}'"
+                f"Unable to find leaf with name '{leaf_id}' for data room '{data_room_id}'"
             )
 
     def get_dataset_links_for_manifest_hash(
@@ -209,13 +209,13 @@ class PlatformApi:
     def delete_dataset_link(
             self,
             data_room_id: str,
-            leaf_name: str,
+            leaf_id: str,
     ) -> Optional[dict]:
-        dataset_link = self.get_dataset_link(data_room_id, leaf_name)
+        dataset_link = self.get_dataset_link(data_room_id, leaf_id)
         if not dataset_link:
             raise Exception(
                 f"Unable to find a dataset link for data room '{data_room_id}'" +
-                f" and data node '{leaf_name}'"
+                f" and data node '{leaf_id}'"
             )
         else:
             self._post_graphql(
@@ -287,13 +287,20 @@ class PlatformApi:
 
     def publish_data_room(
             self,
-            data_room_definition: DataRoom,
+            data_room_definition: Tuple[DataRoom, List[ConfigurationModification]],
             data_room_hash: str,
-            mrenclave: str,
+            attestation_specification_hash: str,
             additional_fields: dict = {},
     ):
-        owner_email = data_room_definition.ownerEmail
-        participant_emails = set([p.email for p in data_room_definition.userPermissions])
+        data_room, conf_modifications = data_room_definition
+        owner_email = data_room.ownerEmail
+
+        participant_emails = [
+            op.add.element.userPermission.email
+            for op in conf_modifications
+            if op.HasField("add") and op.add.element.HasField("userPermission")
+        ]
+
         if owner_email in participant_emails:
             participant_emails.remove(owner_email)
 
@@ -323,11 +330,11 @@ class PlatformApi:
                     "dataRoom": {
                         "dataRoomHash": platform_hash_to_str(bytes.fromhex(data_room_hash)),
                         "dataRoomHashEncoded": data_room_hash,
-                        "name": data_room_definition.name,
-                        "description": data_room_definition.description,
-                        "mrenclave": mrenclave,
+                        "name": data_room.name,
+                        "description": data_room.description,
+                        "mrenclave": attestation_specification_hash,
                         "source": "PYTHON",
-                        "ownerEmail": data_room_definition.ownerEmail,
+                        "ownerEmail": data_room.ownerEmail,
                         "userPermissions": {
                             "create": user_permissions_input
                         },
@@ -480,7 +487,7 @@ class PlatformApi:
             self,
             data_room_id: str,
             manifest_hash: str,
-            leaf_name: str
+            leaf_id: str
     ):
         data_room = self.get_data_room_by_hash(data_room_id)
         if not data_room:
@@ -488,7 +495,7 @@ class PlatformApi:
         else:
             if data_room["source"] == "WEB":
                 data_room_uuid = data_room["dataRoomUuid"]
-                compute_node = self._get_compute_node(data_room_uuid, leaf_name)
+                compute_node = self._get_compute_node(data_room_uuid, leaf_id)
                 if compute_node:
                     compute_node_uuid = compute_node["computeNodeUuid"]
                     # Can link to both compute nodes (type BRANCH) and leaf nodes (type LEAF).
@@ -527,7 +534,7 @@ class PlatformApi:
                         )
                 else:
                     raise Exception(
-                        f"Unable to find leaf with name '{leaf_name}' for data room '{data_room_id}'"
+                        f"Unable to find leaf with name '{leaf_id}' for data room '{data_room_id}'"
                     )
             else:
                 pass
@@ -564,7 +571,7 @@ class PlatformApi:
         nodes = data.get("datasetMetas", {}).get("nodes", [])
         return [DatasetDescription(**node) for node in nodes]
 
-    def _get_compute_node(self, data_room_uuid: str, leaf_name: str) -> Optional[dict]:
+    def _get_compute_node(self, data_room_uuid: str, leaf_id: str) -> Optional[dict]:
         data = self._post_graphql(
             """
             query getComputeNodes($filter: ComputeNodeFilter!) {
@@ -580,7 +587,7 @@ class PlatformApi:
             {
                 "filter": {
                     "dataRoomId": { "equalTo": data_room_uuid },
-                    "nodeName": { "equalTo": leaf_name },
+                    "nodeName": { "equalTo": leaf_id },
                 }
             }
         )

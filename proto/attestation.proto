@@ -7,6 +7,7 @@ message Fatquote {
         FatquoteEpid epid = 1;
         FatquoteDcap dcap = 2;
         FatquoteNitro nitro = 3;
+        FatquoteSnp snp = 4;
     }
 };
 
@@ -31,11 +32,23 @@ message FatquoteNitro {
     bytes nitroRootCaDer = 2;
 }
 
+message FatquoteSnp {
+    bytes reportBin = 1;
+    bytes amdArkDer = 2;
+    bytes amdSevDer = 3;
+    bytes vcekCrtDer = 4;
+    bytes reportData = 5;
+    bytes roughtime_pub_key = 6;
+    bytes roughtime_nonce = 7;
+    bytes signedTimestamp = 8;
+}
+
 message AttestationSpecification {
     oneof attestation_specification {
         AttestationSpecificationIntelEpid intelEpid = 1;
         AttestationSpecificationIntelDcap intelDcap = 2;
         AttestationSpecificationAwsNitro awsNitro = 3;
+        AttestationSpecificationAmdSnp amdSnp = 4;
     }
 }
 
@@ -63,4 +76,11 @@ message AttestationSpecificationAwsNitro {
     bytes pcr1 = 3;
     bytes pcr2 = 4;
     bytes pcr8 = 5;
+}
+
+message AttestationSpecificationAmdSnp {
+    bytes amdArkDer = 1;
+    bytes measurement = 2;
+    bytes roughtimePubKey = 3;
+    repeated bytes authorizedChipIds = 4;
 }
