@@ -488,7 +488,7 @@ def create_client(
     The primary way to create a `Client` object.
 
     Client objects created using this method can optionally be integrated with the
-    Decentriq web platform (<http://platform.decentriq.com>).
+    Decentriq UI.
     This means that certain additional features, such as being able to retrieve the list
     of data rooms that you participate in, will be made available via the `Client.platform` field.
     This flag also needs to be set if you want to use the authentication objects that let
@@ -503,7 +503,7 @@ def create_client(
     **Parameters**:
     - `api_token`: An API token with which to authenticate oneself.
         The API token can be obtained in the user
-        panel of the decentriq platform <https://platform.decentriq.com/tokens>.
+        account settings in the Decentriq UI.
     - `user_email`: The email address of the user that generated the given API token.
     - `integrate_with_platform`: Whether to configure the client to integrate itself with our web platform.
         When this setting is set to False, none of the features provided via the
