@@ -347,6 +347,7 @@ class Session():
             self.email,
             {
                 "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+                "configuration_commit_id": configuration_commit_id,
             }
         )
         request = RetrieveConfigurationCommitRequest(
@@ -387,6 +388,7 @@ class Session():
             self.email,
             {
                 "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+                "configuration_commit_id": configuration_commit_id,
             }
         )
         request = RetrieveConfigurationCommitApproversRequest(
@@ -428,6 +430,7 @@ class Session():
             self.email,
             {
                 "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+                "configuration_commit_id": configuration_commit_id,
             }
         )
         request = GenerateMergeApprovalSignatureRequest(
@@ -470,6 +473,7 @@ class Session():
             self.email,
             {
                 "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+                "configuration_commit_id": configuration_commit_id,
             }
         )
         request = MergeConfigurationCommitRequest(
@@ -876,6 +880,7 @@ class Session():
             self.email,
             {
                 "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
+                "configuration_commit_id": configuration_commit_id,
             }
         )
         request = ExecuteDevelopmentComputeRequest(
