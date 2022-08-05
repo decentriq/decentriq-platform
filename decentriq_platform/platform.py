@@ -24,25 +24,6 @@ __all__ = [
 ]
 
 
-def platform_hash_from_str(s: str) -> bytes:
-    """
-    The reverse operation of `platform_hash_to_str`.
-    """
-    list_u8 = [int(x) for x in base64.b64decode(s).decode('ascii').split(',')]
-    return bytes(list_u8)
-
-
-def platform_hash_to_str(bs: bytes) -> str:
-    """
-    Transform a bytestring received from the
-    The platform stores hashes (both files and data rooms) in the following form:
-    Given a series of bytes with values 1 2 3, it will store the ascii codes of the
-    string '1,2,3' (including the commas), so we get the byte array 49 44 50 44 51.
-    This is then base64 encoded and sent to the backend where it is base64 decoded.
-    """
-    return base64.b64encode(','.join([str(b) for b in bs]).encode('ascii')).decode('ascii')
-
-
 _GET_DATASET_LINKS_QUERY = """
 query getDatasetLinks($filter: DatasetLinkFilter!) {
     datasetLinks(filter: $filter) {
@@ -53,12 +34,12 @@ query getDatasetLinks($filter: DatasetLinkFilter!) {
                 nodeName
                 dataRoom {
                     dataRoomUuid: dataRoomId
-                    dataRoomId: dataRoomHashEncoded
+                    dataRoomId: dataRoomHash
                 }
             }
             dataset {
                 name
-                datasetId: datasetHashEncoded
+                datasetId: datasetHash
             }
         }
     }
@@ -87,7 +68,7 @@ class PlatformApi:
             query getDataRooms($filter: DataRoomFilter) {
                 dataRooms(filter: $filter, orderBy: NAME_ASC) {
                     nodes {
-                        dataRoomId: dataRoomHashEncoded
+                        dataRoomId: dataRoomHash
                         name
                         description
                         mrenclave
@@ -154,7 +135,7 @@ class PlatformApi:
             return self._get_dataset_link(compute_node_uuid)
         else:
             raise Exception(
-                f"Unable to find leaf with name '{leaf_id}' for data room '{data_room_id}'"
+                f"Unable to find leaf with id '{leaf_id}' for data room '{data_room_id}'"
             )
 
     def get_dataset_links_for_manifest_hash(
@@ -172,7 +153,7 @@ class PlatformApi:
             _GET_DATASET_LINKS_QUERY,
             {
                 "filter": {
-                    "datasetHashEncoded": {"equalTo": manifest_hash},
+                    "datasetHash": {"equalTo": manifest_hash},
                 }
             }
         )
@@ -316,7 +297,7 @@ class PlatformApi:
                 createDataRoom(input: $input) {
                     dataRoom {
                         dataRoomUuid: dataRoomId
-                        dataRoomHashEncoded
+                        dataRoomHash
                         lock {
                             isLocked
                         }
@@ -328,8 +309,7 @@ class PlatformApi:
                 "input": {
                     "clientMutationId": str(uuid.uuid4()),
                     "dataRoom": {
-                        "dataRoomHash": platform_hash_to_str(bytes.fromhex(data_room_hash)),
-                        "dataRoomHashEncoded": data_room_hash,
+                        "dataRoomHash": data_room_hash,
                         "name": data_room.name,
                         "description": data_room.description,
                         "mrenclave": attestation_specification_hash,
@@ -377,8 +357,8 @@ class PlatformApi:
     def get_data_room_by_hash(self, data_room_hash: str) -> Optional[dict]:
         data = self._post_graphql(
             """
-            query getDataRoomByHash($dataRoomHashEncoded: String!) {
-                dataRooms(condition: {dataRoomHashEncoded: $dataRoomHashEncoded}) {
+            query getDataRoomByHash($dataRoomHash: String!) {
+                dataRooms(condition: {dataRoomHash: $dataRoomHash}) {
                     nodes {
                         dataRoomUuid: dataRoomId
                         source
@@ -386,7 +366,7 @@ class PlatformApi:
                 }
             }
             """,
-            { "dataRoomHashEncoded": data_room_hash }
+            { "dataRoomHash": data_room_hash }
         )
         entries = data.get("dataRooms", {}).get("nodes", [])
 
@@ -403,7 +383,7 @@ class PlatformApi:
             query getDatasets {
                 datasets {
                     nodes {
-                        datasetId: datasetHashEncoded
+                        datasetId: datasetHash
                         name
                         description
                         ownerEmail
@@ -447,7 +427,7 @@ class PlatformApi:
             mutation createDatasetMeta($input: CreateDatasetMetaInput!) {
                 createDatasetMeta(input: $input) {
                     datasetMeta {
-                        datasetHashEncoded
+                        datasetHash
                         name
                         description
                     }
@@ -458,7 +438,7 @@ class PlatformApi:
                 "input": {
                     "clientMutationId": str(uuid.uuid4()),
                     "datasetMeta": {
-                        "datasetHash": platform_hash_to_str(bytes.fromhex(manifest_hash)),
+                        "datasetHash": manifest_hash,
                         "name": file_name,
                         "description": description,
                         "ownerEmail": owner_email,
@@ -470,8 +450,8 @@ class PlatformApi:
     def delete_dataset_metadata(self, manifest_hash: str):
         self._post_graphql(
             """
-            mutation deleteDatasetMeta($datasetHashEncoded: String!) {
-                deleteDatasetMetaByDatasetHashEncoded(input: {datasetHashEncoded: $datasetHashEncoded}) {
+            mutation deleteDatasetMeta($datasetHash: String!) {
+                deleteDatasetMeta(input: {datasetHash: $datasetHash}) {
                     datasetMeta {
                         id
                     }
@@ -479,7 +459,7 @@ class PlatformApi:
             }
             """,
             {
-                "datasetHashEncoded":  manifest_hash
+                "datasetHash":  manifest_hash
             }
         )
 
@@ -515,7 +495,7 @@ class PlatformApi:
                                 createDatasetLink(input: $input) {
                                     clientMutationId
                                     datasetLink {
-                                        datasetHashEncoded
+                                        datasetHash
                                     }
                                 }
                             }
@@ -524,9 +504,7 @@ class PlatformApi:
                                 "input": {
                                     "clientMutationId": str(uuid.uuid4()),
                                     "datasetLink": {
-                                        "datasetHash": platform_hash_to_str(
-                                            bytes.fromhex(manifest_hash)
-                                        ),
+                                        "datasetHash": manifest_hash,
                                         "computeNodeId": compute_node_uuid,
                                     }
                                 }
@@ -534,7 +512,7 @@ class PlatformApi:
                         )
                 else:
                     raise Exception(
-                        f"Unable to find leaf with name '{leaf_id}' for data room '{data_room_id}'"
+                        f"Unable to find leaf with id '{leaf_id}' for data room '{data_room_id}'"
                     )
             else:
                 pass
@@ -551,7 +529,7 @@ class PlatformApi:
             query getDatasets($filter: DatasetMetaFilter!) {
                 datasetMetas(filter: $filter) {
                     nodes {
-                        datasetId: datasetHashEncoded
+                        datasetId: datasetHash
                         name
                         description
                         ownerEmail
@@ -562,7 +540,7 @@ class PlatformApi:
             """,
             {
                 "filter": {
-                    "datasetHashEncoded": {
+                    "datasetHash": {
                         "in": manifest_hashes
                     }
                 }

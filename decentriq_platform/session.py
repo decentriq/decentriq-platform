@@ -712,6 +712,11 @@ class Session():
         is a dataset published for the given data room.
         In this case, an exception will be thrown and the dataset
         will need to be unpublished first.
+
+        A special note for when the referenced data room was created using the Decentriq UI:
+        In this case, the `leaf_id` argument will have the format `@table/UUID/dataset`,
+        where `UUID` corresponds to the value that you see when hovering your mouse pointer over
+        the name of the data node.
         """
 
         endpoint_protocols = [0, 1]
@@ -790,6 +795,14 @@ class Session():
     ) -> RemovePublishedDatasetResponse:
         """
         Removes a published dataset from the data room.
+
+        **Parameters**:
+        - `data_room_id`: The ID of the data room that contains the given data set.
+        - `leaf_id`: The ID of the data node from which the dataset should be removed.
+            In case the referenced data room was created using the Decentriq UI,
+            the `leaf_id` argument will have the special format `@table/UUID/dataset`
+            (where `UUID` corresponds to the value that you see when hovering your mouse pointer over
+            the name of the data node).
         """
         endpoint_protocols = [0, 1]
         protocol = self._get_client_protocol(endpoint_protocols)
