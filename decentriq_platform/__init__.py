@@ -32,6 +32,7 @@ __all__ = [
     "Noop",
     "sql",
     "container",
+    "s3_sink",
     "storage",
     "attestation",
     "types",

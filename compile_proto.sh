@@ -28,7 +28,9 @@ function compile_pb() {
 MAIN_PACKAGE_PROTO=(gcg.proto data_room.proto attestation.proto delta_enclave_api.proto synth_data.proto compute_sql.proto)
 SQL_PACKAGE_PROTO=(compute_sql.proto)
 CONTAINER_PACKAGE_PROTO=(compute_container.proto)
+S3_SINK_PACKAGE_PROTO=(compute_s3_sink.proto)
 
 compile_pb "decentriq_platform/proto" "${MAIN_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/sql/proto" "${SQL_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/container/proto" "${CONTAINER_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/s3_sink/proto" "${S3_SINK_PACKAGE_PROTO[@]}"

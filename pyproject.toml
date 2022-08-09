@@ -26,6 +26,7 @@ sqloxide = "^0.1.11"
 
 [tool.poetry.dev-dependencies]
 mypy-protobuf = "^2.9"
+mypy = "^0.971"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

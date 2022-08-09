@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import List, Any, Optional, Callable, Dict, Tuple
+
 from .proto import (
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, Permission, DataRoom,
@@ -27,9 +28,9 @@ __all__ = [
 def _extract_configuration_elements(
         config: DataRoomConfiguration
 ) -> Tuple[
-        List[Tuple[string, AttestationSpecification]],
-        List[Tuple[string, AuthenticationMethod]],
-        List[Tuple[string, UserPermission]]
+        List[Tuple[str, AttestationSpecification]],
+        List[Tuple[str, AuthenticationMethod]],
+        List[Tuple[str, UserPermission]]
     ]:
     attestation_specs = {}
     authentication_methods = {}
@@ -400,7 +401,7 @@ class DataRoomModificationsBuilder():
 
     def _add_attestation_specification(
             self,
-            attestation_specification: attestation.AttestationSpecification
+            attestation_specification: AttestationSpecification
     ) -> str:
         existing_id = _find_matching_proto_object(
             attestation_specification,

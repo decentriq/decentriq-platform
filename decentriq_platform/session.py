@@ -28,7 +28,8 @@ from .proto import (
     RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
     UpdateDataRoomStatusResponse, DataRoomStatus, AttestationSpecification, Fatquote,
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
-    RetrieveConfigurationCommitRequest
+    RetrieveConfigurationCommitRequest, ConfigurationModification, ConfigurationCommit,
+    MergeConfigurationCommitResponse, DataRoomConfiguration
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
