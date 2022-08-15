@@ -33,6 +33,7 @@ from .attestation_pb2 import (
     FatquoteEpid, FatquoteDcap,
     AttestationSpecificationIntelDcap,
     AttestationSpecificationAwsNitro,
+    AttestationSpecificationAmdSnp,
 )
 from .gcg_pb2 import (
     DriverTaskConfig, NoopConfig, DataRoomStatus,

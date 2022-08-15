@@ -1,31 +1,61 @@
+import base64
 from typing import Dict, List, Tuple
 from .types import EnclaveSpecification
 from .compute import GcgDriverDecoder
 from .sql.compute import SqlWorkerDecoder
 from .container.compute import ContainerWorkerDecoder
+from .s3_sink.compute import S3SinkWorkerDecoder
 from .proto import (
     AttestationSpecification,
-    AttestationSpecificationIntelEpid,
     AttestationSpecificationIntelDcap,
     AttestationSpecificationAwsNitro,
+    AttestationSpecificationAmdSnp,
 )
 import asn1crypto.pem
 from .certs import (
     aws_nitro_root_ca_pem,
+    amd_snp_ark_pem,
     intel_sgx_dcap_root_ca,
-    intel_sgx_ias_root_ca
+    intel_sgx_ias_root_ca,
 )
 
 
 intel_sgx_dcap_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_dcap_root_ca)[2]
 intel_sgx_ias_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_ias_root_ca)[2]
 aws_nitro_root_ca_der = asn1crypto.pem.unarmor(aws_nitro_root_ca_pem)[2]
+amd_snp_ark_der = asn1crypto.pem.unarmor(amd_snp_ark_pem)[2]
 
+# From https://developers.cloudflare.com/time-services/roughtime/recipes/
+roughtime_public_key = base64.b64decode("gD63hSj3ScS+wuOeGrubXlq35N1c5Lby/S+T7MNTjxo=")
+
+# Allowed Decentriq AMD CPU Chip IDs
+amd_snp_authorized_chip_ids = [
+  bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
+  bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
+]
 
 SPECIFICATIONS = {
+    "decentriq.driver:v5": EnclaveSpecification(
+        name="decentriq.driver",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "5433c37d119b884d93cb2a42c491b2d98dda03a0dc4ec04b3734d2fb47962d1e"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_sw_hardening_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[0],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[1],
+    ),
     "decentriq.driver:v4": EnclaveSpecification(
         name="decentriq.driver",
-        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -45,7 +75,6 @@ SPECIFICATIONS = {
     ),
     "decentriq.driver:v3": EnclaveSpecification(
         name="decentriq.driver",
-        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -65,7 +94,6 @@ SPECIFICATIONS = {
     ),
     "decentriq.driver:v2": EnclaveSpecification(
         name="decentriq.driver",
-        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -83,9 +111,27 @@ SPECIFICATIONS = {
         decoder=GcgDriverDecoder(),
         clientProtocols=[0],
     ),
+    "decentriq.sql-worker:v5": EnclaveSpecification(
+        name="decentriq.sql-worker",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "4b6178678bd60bcb988234c6ec47b7d0ef1cf982dffc996bb7211ef8b3b72ad7"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_sw_hardening_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[0],
+        decoder=SqlWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.sql-worker:v4": EnclaveSpecification(
         name="decentriq.sql-worker",
-        version="4",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -100,11 +146,11 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=SqlWorkerDecoder()
+        decoder=SqlWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.sql-worker:v3": EnclaveSpecification(
         name="decentriq.sql-worker",
-        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -119,11 +165,11 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=SqlWorkerDecoder()
+        decoder=SqlWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.sql-worker:v2": EnclaveSpecification(
         name="decentriq.sql-worker",
-        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -138,11 +184,44 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=SqlWorkerDecoder()
+        decoder=SqlWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.s3-sink-worker:v1": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "799bb8ca2a4da8b74d4bbfabde3a2b2d3853f0c0b2c583a003e0163f6051c85c"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_sw_hardening_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[0],
+        decoder=S3SinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.python-ml-worker-32-64:v1": EnclaveSpecification(
+        name="decentriq.python-ml-worker",
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex("141ebf6108bd025b075bc833fb54b0d6e0bcb609b348991e0e15b1b6ba8e52fad6d727ae10fb2e6c3f9a89064cb18420"),
+                roughtimePubKey=roughtime_public_key,
+                authorizedChipIds=amd_snp_authorized_chip_ids,
+            )
+        ),
+        workerProtocols=[0],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.python-ml-worker:v2": EnclaveSpecification(
         name="decentriq.python-ml-worker",
-        version="2",
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
@@ -153,11 +232,11 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=ContainerWorkerDecoder()
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.python-ml-worker:v1": EnclaveSpecification(
         name="decentriq.python-ml-worker",
-        version="1",
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
@@ -168,11 +247,25 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=ContainerWorkerDecoder()
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.python-synth-data-worker-32-32:v1": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker",
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex("eb4da359c5a46bfea871dd06b987e61a9d062bf7e8dbdbbf8708a46ef0f9aa626748580d404e9f27a189471e49837ae5"),
+                roughtimePubKey=roughtime_public_key,
+                authorizedChipIds=amd_snp_authorized_chip_ids,
+            )
+        ),
+        workerProtocols=[0],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker:v2": EnclaveSpecification(
         name="decentriq.python-synth-data-worker",
-        version="2",
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
@@ -183,11 +276,11 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=ContainerWorkerDecoder()
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker:v1": EnclaveSpecification(
         name="decentriq.python-synth-data-worker",
-        version="1",
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
@@ -198,11 +291,11 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=ContainerWorkerDecoder()
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.r-latex-worker:v2": EnclaveSpecification(
         name="decentriq.r-latex-worker",
-        version="2",
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
@@ -213,11 +306,11 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=ContainerWorkerDecoder()
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     ),
     "decentriq.r-latex-worker:v1": EnclaveSpecification(
         name="decentriq.r-latex-worker",
-        version="1",
         proto=AttestationSpecification(
             awsNitro=AttestationSpecificationAwsNitro(
                 nitroRootCaDer=aws_nitro_root_ca_der,
@@ -228,7 +321,8 @@ SPECIFICATIONS = {
             )
         ),
         workerProtocols=[0],
-        decoder=ContainerWorkerDecoder()
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
     )
 }
 

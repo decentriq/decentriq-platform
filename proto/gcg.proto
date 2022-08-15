@@ -17,13 +17,13 @@ message GcgRequest {
         RemovePublishedDatasetRequest removePublishedDatasetRequest = 12;
         JobStatusRequest jobStatusRequest = 13;
         GetResultsRequest getResultsRequest = 14;
-	CreateConfigurationCommitRequest createConfigurationCommitRequest = 15;
+        CreateConfigurationCommitRequest createConfigurationCommitRequest = 15;
         ExecuteDevelopmentComputeRequest executeDevelopmentComputeRequest = 16;
-	GenerateMergeApprovalSignatureRequest generateMergeApprovalSignatureRequest = 17;
+        GenerateMergeApprovalSignatureRequest generateMergeApprovalSignatureRequest = 17;
         MergeConfigurationCommitRequest mergeConfigurationCommitRequest = 18;
-	RetrieveDataRoomConfigurationHistoryRequest retrieveDataRoomConfigurationHistoryRequest = 19;
-	RetrieveConfigurationCommitApproversRequest retrieveConfigurationCommitApproversRequest = 20;
-	RetrieveConfigurationCommitRequest retrieveConfigurationCommitRequest = 21;
+        RetrieveDataRoomConfigurationHistoryRequest retrieveDataRoomConfigurationHistoryRequest = 19;
+        RetrieveConfigurationCommitApproversRequest retrieveConfigurationCommitApproversRequest = 20;
+        RetrieveConfigurationCommitRequest retrieveConfigurationCommitRequest = 21;
     }
 }
 
@@ -42,12 +42,12 @@ message GcgResponse {
         JobStatusResponse jobStatusResponse = 13;
         GetResultsResponseChunk getResultsResponseChunk = 14;
         GetResultsResponseFooter getResultsResponseFooter = 15;
-	CreateConfigurationCommitResponse createConfigurationCommitResponse = 16;
-	GenerateMergeApprovalSignatureResponse generateMergeApprovalSignatureResponse = 17;
+        CreateConfigurationCommitResponse createConfigurationCommitResponse = 16;
+        GenerateMergeApprovalSignatureResponse generateMergeApprovalSignatureResponse = 17;
         MergeConfigurationCommitResponse mergeConfigurationCommitResponse = 18;
-	RetrieveDataRoomConfigurationHistoryResponse retrieveDataRoomConfigurationHistoryResponse = 19;
-	RetrieveConfigurationCommitApproversResponse retrieveConfigurationCommitApproversResponse = 20;
-	RetrieveConfigurationCommitResponse retrieveConfigurationCommitResponse = 21;
+        RetrieveDataRoomConfigurationHistoryResponse retrieveDataRoomConfigurationHistoryResponse = 19;
+        RetrieveConfigurationCommitApproversResponse retrieveConfigurationCommitApproversResponse = 20;
+        RetrieveConfigurationCommitResponse retrieveConfigurationCommitResponse = 21;
     }
 }
 

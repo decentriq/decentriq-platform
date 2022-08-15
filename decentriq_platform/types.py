@@ -137,8 +137,6 @@ class EnclaveSpecification(TypedDict):
     """
     name: str
     """The name of the enclave."""
-    version: str
-    """The version of the enclave."""
     proto: AttestationSpecification
     """The Protobuf object."""
     workerProtocols: List[int]

@@ -565,7 +565,7 @@ class PlatformApi:
             {
                 "filter": {
                     "dataRoomId": { "equalTo": data_room_uuid },
-                    "nodeName": { "equalTo": leaf_id },
+                    "computeNodeId": { "equalTo": leaf_id },
                 }
             }
         )
