@@ -52,7 +52,8 @@ from .gcg_pb2 import (
     MergeConfigurationCommitResponse, UpdateDataRoomStatusResponse,
     RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
     RetrieveConfigurationCommitRequest, StaticContentConfig,
-    CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest
+    CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
+    RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse
 )
 from .length_delimited import parse_length_delimited, serialize_length_delimited
 from .delta_enclave_api_pb2 import (

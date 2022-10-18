@@ -29,7 +29,8 @@ from .proto import (
     UpdateDataRoomStatusResponse, DataRoomStatus, AttestationSpecification, Fatquote,
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
     RetrieveConfigurationCommitRequest, ConfigurationModification, ConfigurationCommit,
-    MergeConfigurationCommitResponse, DataRoomConfiguration
+    MergeConfigurationCommitResponse, DataRoomConfiguration,
+    RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
@@ -43,7 +44,7 @@ if TYPE_CHECKING:
 __all__ = [ "Session", "LATEST_GCG_PROTOCOL_VERSION", "LATEST_WORKER_PROTOCOL_VERSION" ]
 
 
-LATEST_GCG_PROTOCOL_VERSION = 1
+LATEST_GCG_PROTOCOL_VERSION = 2
 LATEST_WORKER_PROTOCOL_VERSION = 0
 
 
@@ -98,6 +99,7 @@ class Session():
     quote: QuoteBody
     driver_attestation_specification: AttestationSpecification
     client_protocols: List[int]
+    _dcr_secret: Optional[str] = None
 
     def __init__(
             self,
@@ -192,6 +194,8 @@ class Session():
         Use this method if any of the convenience methods (such as `run_computation`) don't perform
         the exact task you want.
         """
+        if self.has_dcr_secret():
+            request.dcrSecret = self._dcr_secret
         gcg_protocol = serialize_length_delimited(
             ComputeNodeProtocol(
                 version=protocol
@@ -239,11 +243,12 @@ class Session():
             self,
             data_room_definition: Tuple[DataRoom, List[ConfigurationModification]],
     ) -> CreateDataRoomResponse:
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         data_room, conf_modifications = data_room_definition
         if not data_room.ownerEmail:
             data_room.ownerEmail = self.email
+
         request = CreateDataRoomRequest(
             dataRoom=data_room,
             initialConfiguration=conf_modifications,
@@ -303,7 +308,7 @@ class Session():
         computations or when trying to merge this commit into the main
         data room configuration.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -342,7 +347,7 @@ class Session():
         **Returns**:
         A `ConfigurationCommit`.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -383,7 +388,7 @@ class Session():
         A list of ids belonging to the users that need to approve the
         configuration commit.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -425,7 +430,7 @@ class Session():
         of ids returned by `retrieveConfigurationCommitApprovers` needs to
         generate an approval signature using this method.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -468,7 +473,7 @@ class Session():
         - `approval_signatures`: A dictionary containing the approval signature for
             each of the required approvers, e.g. `{ "some@email.com": signature }`.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -506,7 +511,7 @@ class Session():
         Retrieve the current merged data room configuration, as well as the
         history of configuration commits that have already been merged.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomConfigurationHistoryRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -561,7 +566,7 @@ class Session():
         For the special case of stopping a data room, the method
         `stop_data_room` can be used.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -602,7 +607,7 @@ class Session():
         """
         Returns the status of the data room. Valid values are `"Active"` or `"Stopped"`.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -637,7 +642,7 @@ class Session():
         """
         Returns the underlying protobuf object for the data room.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -663,7 +668,7 @@ class Session():
         """
         Returns the audit log for the data room.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -720,7 +725,7 @@ class Session():
         the name of the data node.
         """
 
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         dataset = self.client.get_dataset(manifest_hash)
         if not dataset and not force:
@@ -805,7 +810,7 @@ class Session():
             (where `UUID` corresponds to the value that you see when hovering your mouse pointer over
             the name of the data node).
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -850,7 +855,7 @@ class Session():
         """
         Returns the datasets published to the given data room.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -888,7 +893,7 @@ class Session():
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -928,7 +933,7 @@ class Session():
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_scope_with_metadata(
             self.email,
@@ -962,7 +967,7 @@ class Session():
         Returns the status of the provided `job_id` which will include the names
         of the nodes that completed their execution
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = JobStatusRequest(
             jobId=bytes.fromhex(job_id),
@@ -989,7 +994,7 @@ class Session():
         """
         Streams the results of the provided `job_id`
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [0, 1, 2]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = GetResultsRequest(
             jobId=job_id,
@@ -1187,3 +1192,33 @@ class Session():
     @property
     def is_integrated_with_platform(self):
         return self._platform is not None
+
+    def retrieve_dcr_secret_id(self, secret: string) -> RetrieveDcrSecretIdResponse:
+        endpoint_protocols = [2]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        
+        request = RetrieveDcrSecretIdRequest(
+            secret=secret
+        )
+        responses = self.send_request(
+            GcgRequest(retrieveDcrSecretIdRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+        response = responses[0]
+        if not response.HasField("retrieveDcrSecretIdResponse"):
+            raise Exception(
+                "Expected retrieveDcrSecretIdResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.retrieveDcrSecretIdResponse
+    
+    def has_dcr_secret(self) -> bool:
+        return self._dcr_secret is not None
+
+    def use_data_room_secret(self, dcr_secret: string):
+        self._dcr_secret = dcr_secret
+
+    def reset_data_room_secret(self):
+        self._dcr_secret = None

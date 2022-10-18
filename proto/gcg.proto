@@ -5,6 +5,7 @@ import "data_room.proto";
 import "attestation.proto";
 
 message GcgRequest {
+    optional string dcrSecret = 1;
     oneof gcg_request {
         ExecuteComputeRequest executeComputeRequest = 2;
         CreateDataRoomRequest createDataRoomRequest = 3;
@@ -24,6 +25,7 @@ message GcgRequest {
         RetrieveDataRoomConfigurationHistoryRequest retrieveDataRoomConfigurationHistoryRequest = 19;
         RetrieveConfigurationCommitApproversRequest retrieveConfigurationCommitApproversRequest = 20;
         RetrieveConfigurationCommitRequest retrieveConfigurationCommitRequest = 21;
+        RetrieveDcrSecretIdRequest retrieveDcrSecretIdRequest = 22;
     }
 }
 
@@ -48,6 +50,7 @@ message GcgResponse {
         RetrieveDataRoomConfigurationHistoryResponse retrieveDataRoomConfigurationHistoryResponse = 19;
         RetrieveConfigurationCommitApproversResponse retrieveConfigurationCommitApproversResponse = 20;
         RetrieveConfigurationCommitResponse retrieveConfigurationCommitResponse = 21;
+        RetrieveDcrSecretIdResponse retrieveDcrSecretIdResponse = 22;
     }
 }
 
@@ -256,4 +259,12 @@ message NoopConfig {
 
 message StaticContentConfig {
     bytes content = 1;
+}
+
+message RetrieveDcrSecretIdRequest {
+    string secret = 1;
+}
+
+message  RetrieveDcrSecretIdResponse {
+    bytes secretId = 1;
 }

@@ -146,6 +146,7 @@ message DataRoom {
     string description = 7;
     string ownerEmail = 8;
     GovernanceProtocol governanceProtocol = 9;
+    optional bytes dcrSecretId = 10;
 }
 
 message GovernanceProtocol {

@@ -17,7 +17,7 @@ from . import data_room_pb2 as data__room__pb2
 from . import attestation_pb2 as attestation__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tgcg.proto\x12\x03gcg\x1a\x0f\x64\x61ta_room.proto\x1a\x11\x61ttestation.proto\"\x83\x0b\n\nGcgRequest\x12;\n\x15\x65xecuteComputeRequest\x18\x02 \x01(\x0b\x32\x1a.gcg.ExecuteComputeRequestH\x00\x12;\n\x15\x63reateDataRoomRequest\x18\x03 \x01(\x0b\x32\x1a.gcg.CreateDataRoomRequestH\x00\x12O\n\x1fpublishDatasetToDataRoomRequest\x18\x04 \x01(\x0b\x32$.gcg.PublishDatasetToDataRoomRequestH\x00\x12?\n\x17retrieveDataRoomRequest\x18\x05 \x01(\x0b\x32\x1c.gcg.RetrieveDataRoomRequestH\x00\x12?\n\x17retrieveAuditLogRequest\x18\x06 \x01(\x0b\x32\x1c.gcg.RetrieveAuditLogRequestH\x00\x12K\n\x1dretrieveDataRoomStatusRequest\x18\x07 \x01(\x0b\x32\".gcg.RetrieveDataRoomStatusRequestH\x00\x12G\n\x1bupdateDataRoomStatusRequest\x18\n \x01(\x0b\x32 .gcg.UpdateDataRoomStatusRequestH\x00\x12Q\n retrievePublishedDatasetsRequest\x18\x0b \x01(\x0b\x32%.gcg.RetrievePublishedDatasetsRequestH\x00\x12K\n\x1dremovePublishedDatasetRequest\x18\x0c \x01(\x0b\x32\".gcg.RemovePublishedDatasetRequestH\x00\x12\x31\n\x10jobStatusRequest\x18\r \x01(\x0b\x32\x15.gcg.JobStatusRequestH\x00\x12\x33\n\x11getResultsRequest\x18\x0e \x01(\x0b\x32\x16.gcg.GetResultsRequestH\x00\x12Q\n createConfigurationCommitRequest\x18\x0f \x01(\x0b\x32%.gcg.CreateConfigurationCommitRequestH\x00\x12Q\n executeDevelopmentComputeRequest\x18\x10 \x01(\x0b\x32%.gcg.ExecuteDevelopmentComputeRequestH\x00\x12[\n%generateMergeApprovalSignatureRequest\x18\x11 \x01(\x0b\x32*.gcg.GenerateMergeApprovalSignatureRequestH\x00\x12O\n\x1fmergeConfigurationCommitRequest\x18\x12 \x01(\x0b\x32$.gcg.MergeConfigurationCommitRequestH\x00\x12g\n+retrieveDataRoomConfigurationHistoryRequest\x18\x13 \x01(\x0b\x32\x30.gcg.RetrieveDataRoomConfigurationHistoryRequestH\x00\x12g\n+retrieveConfigurationCommitApproversRequest\x18\x14 \x01(\x0b\x32\x30.gcg.RetrieveConfigurationCommitApproversRequestH\x00\x12U\n\"retrieveConfigurationCommitRequest\x18\x15 \x01(\x0b\x32\'.gcg.RetrieveConfigurationCommitRequestH\x00\x42\r\n\x0bgcg_request\"\xb4\x0b\n\x0bGcgResponse\x12\x11\n\x07\x66\x61ilure\x18\x01 \x01(\tH\x00\x12=\n\x16\x65xecuteComputeResponse\x18\x02 \x01(\x0b\x32\x1b.gcg.ExecuteComputeResponseH\x00\x12=\n\x16\x63reateDataRoomResponse\x18\x03 \x01(\x0b\x32\x1b.gcg.CreateDataRoomResponseH\x00\x12Q\n publishDatasetToDataRoomResponse\x18\x04 \x01(\x0b\x32%.gcg.PublishDatasetToDataRoomResponseH\x00\x12\x41\n\x18retrieveDataRoomResponse\x18\x05 \x01(\x0b\x32\x1d.gcg.RetrieveDataRoomResponseH\x00\x12\x41\n\x18retrieveAuditLogResponse\x18\x06 \x01(\x0b\x32\x1d.gcg.RetrieveAuditLogResponseH\x00\x12M\n\x1eretrieveDataRoomStatusResponse\x18\x07 \x01(\x0b\x32#.gcg.RetrieveDataRoomStatusResponseH\x00\x12I\n\x1cupdateDataRoomStatusResponse\x18\n \x01(\x0b\x32!.gcg.UpdateDataRoomStatusResponseH\x00\x12S\n!retrievePublishedDatasetsResponse\x18\x0b \x01(\x0b\x32&.gcg.RetrievePublishedDatasetsResponseH\x00\x12M\n\x1eremovePublishedDatasetResponse\x18\x0c \x01(\x0b\x32#.gcg.RemovePublishedDatasetResponseH\x00\x12\x33\n\x11jobStatusResponse\x18\r \x01(\x0b\x32\x16.gcg.JobStatusResponseH\x00\x12?\n\x17getResultsResponseChunk\x18\x0e \x01(\x0b\x32\x1c.gcg.GetResultsResponseChunkH\x00\x12\x41\n\x18getResultsResponseFooter\x18\x0f \x01(\x0b\x32\x1d.gcg.GetResultsResponseFooterH\x00\x12S\n!createConfigurationCommitResponse\x18\x10 \x01(\x0b\x32&.gcg.CreateConfigurationCommitResponseH\x00\x12]\n&generateMergeApprovalSignatureResponse\x18\x11 \x01(\x0b\x32+.gcg.GenerateMergeApprovalSignatureResponseH\x00\x12Q\n mergeConfigurationCommitResponse\x18\x12 \x01(\x0b\x32%.gcg.MergeConfigurationCommitResponseH\x00\x12i\n,retrieveDataRoomConfigurationHistoryResponse\x18\x13 \x01(\x0b\x32\x31.gcg.RetrieveDataRoomConfigurationHistoryResponseH\x00\x12i\n,retrieveConfigurationCommitApproversResponse\x18\x14 \x01(\x0b\x32\x31.gcg.RetrieveConfigurationCommitApproversResponseH\x00\x12W\n#retrieveConfigurationCommitResponse\x18\x15 \x01(\x0b\x32(.gcg.RetrieveConfigurationCommitResponseH\x00\x42\x0e\n\x0cgcg_response\"\x88\x01\n\x15\x43reateDataRoomRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x01(\x0b\x32\x13.data_room.DataRoom\x12\x42\n\x14initialConfiguration\x18\x03 \x03(\x0b\x32$.data_room.ConfigurationModificationJ\x04\x08\x02\x10\x03\"\x8c\x01\n\x16\x43reateDataRoomResponse\x12\x14\n\ndataRoomId\x18\x01 \x01(\x0cH\x00\x12?\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32\x1c.gcg.DataRoomValidationErrorH\x00\x42\x1b\n\x19\x63reate_data_room_response\"\xd2\x02\n\x17\x44\x61taRoomValidationError\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x1c\n\x0fpermissionIndex\x18\x06 \x01(\x04H\x00\x88\x01\x01\x12\x1a\n\rcomputeNodeId\x18\t \x01(\tH\x01\x88\x01\x01\x12\x1d\n\x10userPermissionId\x18\n \x01(\tH\x02\x88\x01\x01\x12\'\n\x1a\x61ttestationSpecificationId\x18\x0b \x01(\tH\x03\x88\x01\x01\x12#\n\x16\x61uthenticationMethodId\x18\x0c \x01(\tH\x04\x88\x01\x01\x42\x12\n\x10_permissionIndexB\x10\n\x0e_computeNodeIdB\x13\n\x11_userPermissionIdB\x1d\n\x1b_attestationSpecificationIdB\x19\n\x17_authenticationMethodIdJ\x04\x08\x02\x10\x06J\x04\x08\x07\x10\t\"\x82\x01\n\x1fPublishDatasetToDataRoomRequest\x12\x13\n\x0b\x64\x61tasetHash\x18\x01 \x01(\x0c\x12\x12\n\ndataRoomId\x18\x02 \x01(\x0c\x12\x10\n\x08leafName\x18\x03 \x01(\t\x12\x15\n\rencryptionKey\x18\x04 \x01(\x0c\x12\r\n\x05scope\x18\x05 \x01(\x0c\"\"\n PublishDatasetToDataRoomResponse\"f\n\x15\x45xecuteComputeRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\x18\n\x10\x63omputeNodeNames\x18\x02 \x03(\t\x12\x10\n\x08isDryRun\x18\x03 \x01(\x08\x12\r\n\x05scope\x18\x04 \x01(\x0c\"|\n ExecuteDevelopmentComputeRequest\x12\x1d\n\x15\x63onfigurationCommitId\x18\x01 \x01(\x0c\x12\x18\n\x10\x63omputeNodeNames\x18\x02 \x03(\t\x12\x10\n\x08isDryRun\x18\x03 \x01(\x08\x12\r\n\x05scope\x18\x04 \x01(\x0c\"\'\n\x16\x45xecuteComputeResponse\x12\r\n\x05jobId\x18\x01 \x01(\x0c\"!\n\x10JobStatusRequest\x12\r\n\x05jobId\x18\x01 \x01(\x0c\"5\n\x11JobStatusResponse\x12 \n\x18\x63ompleteComputeNodeNames\x18\x01 \x03(\t\";\n\x11GetResultsRequest\x12\r\n\x05jobId\x18\x01 \x01(\x0c\x12\x17\n\x0f\x63omputeNodeName\x18\x02 \x01(\t\"\'\n\x17GetResultsResponseChunk\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"\x1a\n\x18GetResultsResponseFooter\"3\n\x17RetrieveDataRoomRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0cJ\x04\x08\x02\x10\x03\"A\n\x18RetrieveDataRoomResponse\x12%\n\x08\x64\x61taRoom\x18\x01 \x01(\x0b\x32\x13.data_room.DataRoom\"<\n\x17RetrieveAuditLogRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"\'\n\x18RetrieveAuditLogResponse\x12\x0b\n\x03log\x18\x01 \x01(\x0c\"B\n\x1dRetrieveDataRoomStatusRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"E\n\x1eRetrieveDataRoomStatusResponse\x12#\n\x06status\x18\x01 \x01(\x0e\x32\x13.gcg.DataRoomStatus\"e\n\x1bUpdateDataRoomStatusRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\x12#\n\x06status\x18\x03 \x01(\x0e\x32\x13.gcg.DataRoomStatus\"\x1e\n\x1cUpdateDataRoomStatusResponse\"E\n RetrievePublishedDatasetsRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"Z\n\x10PublishedDataset\x12\x10\n\x08leafName\x18\x01 \x01(\t\x12\x0c\n\x04user\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x04\x12\x13\n\x0b\x64\x61tasetHash\x18\x04 \x01(\x0c\"U\n!RetrievePublishedDatasetsResponse\x12\x30\n\x11publishedDatasets\x18\x01 \x03(\x0b\x32\x15.gcg.PublishedDataset\"Z\n\x1dRemovePublishedDatasetRequest\x12\x12\n\ndataRoomId\x18\x02 \x01(\x0c\x12\x10\n\x08leafName\x18\x03 \x01(\t\x12\r\n\x05scope\x18\x04 \x01(\x0cJ\x04\x08\x01\x10\x02\" \n\x1eRemovePublishedDatasetResponse\"a\n CreateConfigurationCommitRequest\x12.\n\x06\x63ommit\x18\x01 \x01(\x0b\x32\x1e.data_room.ConfigurationCommit\x12\r\n\x05scope\x18\x02 \x01(\x0c\"5\n!CreateConfigurationCommitResponse\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\"H\n%GenerateMergeApprovalSignatureRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\";\n&GenerateMergeApprovalSignatureResponse\x12\x11\n\tsignature\x18\x01 \x01(\x0c\"\xd7\x01\n\x1fMergeConfigurationCommitRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12X\n\x12\x61pprovalSignatures\x18\x02 \x03(\x0b\x32<.gcg.MergeConfigurationCommitRequest.ApprovalSignaturesEntry\x12\r\n\x05scope\x18\x03 \x01(\x0c\x1a\x39\n\x17\x41pprovalSignaturesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\"A\n+RetrieveDataRoomConfigurationHistoryRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\"\x9a\x01\n,RetrieveDataRoomConfigurationHistoryResponse\x12>\n\x14\x63urrentConfiguration\x18\x01 \x01(\x0b\x32 .data_room.DataRoomConfiguration\x12\x1d\n\x15\x63onfigurationsHistory\x18\x02 \x03(\x0c\x12\x0b\n\x03pin\x18\x03 \x01(\x0c\"N\n+RetrieveConfigurationCommitApproversRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"A\n,RetrieveConfigurationCommitApproversResponse\x12\x11\n\tapprovers\x18\x01 \x03(\t\"E\n\"RetrieveConfigurationCommitRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"U\n#RetrieveConfigurationCommitResponse\x12.\n\x06\x63ommit\x18\x01 \x01(\x0b\x32\x1e.data_room.ConfigurationCommit\"\"\n MergeConfigurationCommitResponse\"|\n\x10\x44riverTaskConfig\x12\x1f\n\x04noop\x18\x01 \x01(\x0b\x32\x0f.gcg.NoopConfigH\x00\x12\x31\n\rstaticContent\x18\x02 \x01(\x0b\x32\x18.gcg.StaticContentConfigH\x00\x42\x14\n\x12\x64river_task_config\"\x0c\n\nNoopConfig\"&\n\x13StaticContentConfig\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c*)\n\x0e\x44\x61taRoomStatus\x12\n\n\x06\x41\x63tive\x10\x00\x12\x0b\n\x07Stopped\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tgcg.proto\x12\x03gcg\x1a\x0f\x64\x61ta_room.proto\x1a\x11\x61ttestation.proto\"\xf0\x0b\n\nGcgRequest\x12\x16\n\tdcrSecret\x18\x01 \x01(\tH\x01\x88\x01\x01\x12;\n\x15\x65xecuteComputeRequest\x18\x02 \x01(\x0b\x32\x1a.gcg.ExecuteComputeRequestH\x00\x12;\n\x15\x63reateDataRoomRequest\x18\x03 \x01(\x0b\x32\x1a.gcg.CreateDataRoomRequestH\x00\x12O\n\x1fpublishDatasetToDataRoomRequest\x18\x04 \x01(\x0b\x32$.gcg.PublishDatasetToDataRoomRequestH\x00\x12?\n\x17retrieveDataRoomRequest\x18\x05 \x01(\x0b\x32\x1c.gcg.RetrieveDataRoomRequestH\x00\x12?\n\x17retrieveAuditLogRequest\x18\x06 \x01(\x0b\x32\x1c.gcg.RetrieveAuditLogRequestH\x00\x12K\n\x1dretrieveDataRoomStatusRequest\x18\x07 \x01(\x0b\x32\".gcg.RetrieveDataRoomStatusRequestH\x00\x12G\n\x1bupdateDataRoomStatusRequest\x18\n \x01(\x0b\x32 .gcg.UpdateDataRoomStatusRequestH\x00\x12Q\n retrievePublishedDatasetsRequest\x18\x0b \x01(\x0b\x32%.gcg.RetrievePublishedDatasetsRequestH\x00\x12K\n\x1dremovePublishedDatasetRequest\x18\x0c \x01(\x0b\x32\".gcg.RemovePublishedDatasetRequestH\x00\x12\x31\n\x10jobStatusRequest\x18\r \x01(\x0b\x32\x15.gcg.JobStatusRequestH\x00\x12\x33\n\x11getResultsRequest\x18\x0e \x01(\x0b\x32\x16.gcg.GetResultsRequestH\x00\x12Q\n createConfigurationCommitRequest\x18\x0f \x01(\x0b\x32%.gcg.CreateConfigurationCommitRequestH\x00\x12Q\n executeDevelopmentComputeRequest\x18\x10 \x01(\x0b\x32%.gcg.ExecuteDevelopmentComputeRequestH\x00\x12[\n%generateMergeApprovalSignatureRequest\x18\x11 \x01(\x0b\x32*.gcg.GenerateMergeApprovalSignatureRequestH\x00\x12O\n\x1fmergeConfigurationCommitRequest\x18\x12 \x01(\x0b\x32$.gcg.MergeConfigurationCommitRequestH\x00\x12g\n+retrieveDataRoomConfigurationHistoryRequest\x18\x13 \x01(\x0b\x32\x30.gcg.RetrieveDataRoomConfigurationHistoryRequestH\x00\x12g\n+retrieveConfigurationCommitApproversRequest\x18\x14 \x01(\x0b\x32\x30.gcg.RetrieveConfigurationCommitApproversRequestH\x00\x12U\n\"retrieveConfigurationCommitRequest\x18\x15 \x01(\x0b\x32\'.gcg.RetrieveConfigurationCommitRequestH\x00\x12\x45\n\x1aretrieveDcrSecretIdRequest\x18\x16 \x01(\x0b\x32\x1f.gcg.RetrieveDcrSecretIdRequestH\x00\x42\r\n\x0bgcg_requestB\x0c\n\n_dcrSecret\"\xfd\x0b\n\x0bGcgResponse\x12\x11\n\x07\x66\x61ilure\x18\x01 \x01(\tH\x00\x12=\n\x16\x65xecuteComputeResponse\x18\x02 \x01(\x0b\x32\x1b.gcg.ExecuteComputeResponseH\x00\x12=\n\x16\x63reateDataRoomResponse\x18\x03 \x01(\x0b\x32\x1b.gcg.CreateDataRoomResponseH\x00\x12Q\n publishDatasetToDataRoomResponse\x18\x04 \x01(\x0b\x32%.gcg.PublishDatasetToDataRoomResponseH\x00\x12\x41\n\x18retrieveDataRoomResponse\x18\x05 \x01(\x0b\x32\x1d.gcg.RetrieveDataRoomResponseH\x00\x12\x41\n\x18retrieveAuditLogResponse\x18\x06 \x01(\x0b\x32\x1d.gcg.RetrieveAuditLogResponseH\x00\x12M\n\x1eretrieveDataRoomStatusResponse\x18\x07 \x01(\x0b\x32#.gcg.RetrieveDataRoomStatusResponseH\x00\x12I\n\x1cupdateDataRoomStatusResponse\x18\n \x01(\x0b\x32!.gcg.UpdateDataRoomStatusResponseH\x00\x12S\n!retrievePublishedDatasetsResponse\x18\x0b \x01(\x0b\x32&.gcg.RetrievePublishedDatasetsResponseH\x00\x12M\n\x1eremovePublishedDatasetResponse\x18\x0c \x01(\x0b\x32#.gcg.RemovePublishedDatasetResponseH\x00\x12\x33\n\x11jobStatusResponse\x18\r \x01(\x0b\x32\x16.gcg.JobStatusResponseH\x00\x12?\n\x17getResultsResponseChunk\x18\x0e \x01(\x0b\x32\x1c.gcg.GetResultsResponseChunkH\x00\x12\x41\n\x18getResultsResponseFooter\x18\x0f \x01(\x0b\x32\x1d.gcg.GetResultsResponseFooterH\x00\x12S\n!createConfigurationCommitResponse\x18\x10 \x01(\x0b\x32&.gcg.CreateConfigurationCommitResponseH\x00\x12]\n&generateMergeApprovalSignatureResponse\x18\x11 \x01(\x0b\x32+.gcg.GenerateMergeApprovalSignatureResponseH\x00\x12Q\n mergeConfigurationCommitResponse\x18\x12 \x01(\x0b\x32%.gcg.MergeConfigurationCommitResponseH\x00\x12i\n,retrieveDataRoomConfigurationHistoryResponse\x18\x13 \x01(\x0b\x32\x31.gcg.RetrieveDataRoomConfigurationHistoryResponseH\x00\x12i\n,retrieveConfigurationCommitApproversResponse\x18\x14 \x01(\x0b\x32\x31.gcg.RetrieveConfigurationCommitApproversResponseH\x00\x12W\n#retrieveConfigurationCommitResponse\x18\x15 \x01(\x0b\x32(.gcg.RetrieveConfigurationCommitResponseH\x00\x12G\n\x1bretrieveDcrSecretIdResponse\x18\x16 \x01(\x0b\x32 .gcg.RetrieveDcrSecretIdResponseH\x00\x42\x0e\n\x0cgcg_response\"\x88\x01\n\x15\x43reateDataRoomRequest\x12%\n\x08\x64\x61taRoom\x18\x01 \x01(\x0b\x32\x13.data_room.DataRoom\x12\x42\n\x14initialConfiguration\x18\x03 \x03(\x0b\x32$.data_room.ConfigurationModificationJ\x04\x08\x02\x10\x03\"\x8c\x01\n\x16\x43reateDataRoomResponse\x12\x14\n\ndataRoomId\x18\x01 \x01(\x0cH\x00\x12?\n\x17\x64\x61taRoomValidationError\x18\x02 \x01(\x0b\x32\x1c.gcg.DataRoomValidationErrorH\x00\x42\x1b\n\x19\x63reate_data_room_response\"\xd2\x02\n\x17\x44\x61taRoomValidationError\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x1c\n\x0fpermissionIndex\x18\x06 \x01(\x04H\x00\x88\x01\x01\x12\x1a\n\rcomputeNodeId\x18\t \x01(\tH\x01\x88\x01\x01\x12\x1d\n\x10userPermissionId\x18\n \x01(\tH\x02\x88\x01\x01\x12\'\n\x1a\x61ttestationSpecificationId\x18\x0b \x01(\tH\x03\x88\x01\x01\x12#\n\x16\x61uthenticationMethodId\x18\x0c \x01(\tH\x04\x88\x01\x01\x42\x12\n\x10_permissionIndexB\x10\n\x0e_computeNodeIdB\x13\n\x11_userPermissionIdB\x1d\n\x1b_attestationSpecificationIdB\x19\n\x17_authenticationMethodIdJ\x04\x08\x02\x10\x06J\x04\x08\x07\x10\t\"\x82\x01\n\x1fPublishDatasetToDataRoomRequest\x12\x13\n\x0b\x64\x61tasetHash\x18\x01 \x01(\x0c\x12\x12\n\ndataRoomId\x18\x02 \x01(\x0c\x12\x10\n\x08leafName\x18\x03 \x01(\t\x12\x15\n\rencryptionKey\x18\x04 \x01(\x0c\x12\r\n\x05scope\x18\x05 \x01(\x0c\"\"\n PublishDatasetToDataRoomResponse\"f\n\x15\x45xecuteComputeRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\x18\n\x10\x63omputeNodeNames\x18\x02 \x03(\t\x12\x10\n\x08isDryRun\x18\x03 \x01(\x08\x12\r\n\x05scope\x18\x04 \x01(\x0c\"|\n ExecuteDevelopmentComputeRequest\x12\x1d\n\x15\x63onfigurationCommitId\x18\x01 \x01(\x0c\x12\x18\n\x10\x63omputeNodeNames\x18\x02 \x03(\t\x12\x10\n\x08isDryRun\x18\x03 \x01(\x08\x12\r\n\x05scope\x18\x04 \x01(\x0c\"\'\n\x16\x45xecuteComputeResponse\x12\r\n\x05jobId\x18\x01 \x01(\x0c\"!\n\x10JobStatusRequest\x12\r\n\x05jobId\x18\x01 \x01(\x0c\"5\n\x11JobStatusResponse\x12 \n\x18\x63ompleteComputeNodeNames\x18\x01 \x03(\t\";\n\x11GetResultsRequest\x12\r\n\x05jobId\x18\x01 \x01(\x0c\x12\x17\n\x0f\x63omputeNodeName\x18\x02 \x01(\t\"\'\n\x17GetResultsResponseChunk\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\"\x1a\n\x18GetResultsResponseFooter\"3\n\x17RetrieveDataRoomRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0cJ\x04\x08\x02\x10\x03\"A\n\x18RetrieveDataRoomResponse\x12%\n\x08\x64\x61taRoom\x18\x01 \x01(\x0b\x32\x13.data_room.DataRoom\"<\n\x17RetrieveAuditLogRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"\'\n\x18RetrieveAuditLogResponse\x12\x0b\n\x03log\x18\x01 \x01(\x0c\"B\n\x1dRetrieveDataRoomStatusRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"E\n\x1eRetrieveDataRoomStatusResponse\x12#\n\x06status\x18\x01 \x01(\x0e\x32\x13.gcg.DataRoomStatus\"e\n\x1bUpdateDataRoomStatusRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\x12#\n\x06status\x18\x03 \x01(\x0e\x32\x13.gcg.DataRoomStatus\"\x1e\n\x1cUpdateDataRoomStatusResponse\"E\n RetrievePublishedDatasetsRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"Z\n\x10PublishedDataset\x12\x10\n\x08leafName\x18\x01 \x01(\t\x12\x0c\n\x04user\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x04\x12\x13\n\x0b\x64\x61tasetHash\x18\x04 \x01(\x0c\"U\n!RetrievePublishedDatasetsResponse\x12\x30\n\x11publishedDatasets\x18\x01 \x03(\x0b\x32\x15.gcg.PublishedDataset\"Z\n\x1dRemovePublishedDatasetRequest\x12\x12\n\ndataRoomId\x18\x02 \x01(\x0c\x12\x10\n\x08leafName\x18\x03 \x01(\t\x12\r\n\x05scope\x18\x04 \x01(\x0cJ\x04\x08\x01\x10\x02\" \n\x1eRemovePublishedDatasetResponse\"a\n CreateConfigurationCommitRequest\x12.\n\x06\x63ommit\x18\x01 \x01(\x0b\x32\x1e.data_room.ConfigurationCommit\x12\r\n\x05scope\x18\x02 \x01(\x0c\"5\n!CreateConfigurationCommitResponse\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\"H\n%GenerateMergeApprovalSignatureRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\";\n&GenerateMergeApprovalSignatureResponse\x12\x11\n\tsignature\x18\x01 \x01(\x0c\"\xd7\x01\n\x1fMergeConfigurationCommitRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12X\n\x12\x61pprovalSignatures\x18\x02 \x03(\x0b\x32<.gcg.MergeConfigurationCommitRequest.ApprovalSignaturesEntry\x12\r\n\x05scope\x18\x03 \x01(\x0c\x1a\x39\n\x17\x41pprovalSignaturesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x0c:\x02\x38\x01\"A\n+RetrieveDataRoomConfigurationHistoryRequest\x12\x12\n\ndataRoomId\x18\x01 \x01(\x0c\"\x9a\x01\n,RetrieveDataRoomConfigurationHistoryResponse\x12>\n\x14\x63urrentConfiguration\x18\x01 \x01(\x0b\x32 .data_room.DataRoomConfiguration\x12\x1d\n\x15\x63onfigurationsHistory\x18\x02 \x03(\x0c\x12\x0b\n\x03pin\x18\x03 \x01(\x0c\"N\n+RetrieveConfigurationCommitApproversRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"A\n,RetrieveConfigurationCommitApproversResponse\x12\x11\n\tapprovers\x18\x01 \x03(\t\"E\n\"RetrieveConfigurationCommitRequest\x12\x10\n\x08\x63ommitId\x18\x01 \x01(\x0c\x12\r\n\x05scope\x18\x02 \x01(\x0c\"U\n#RetrieveConfigurationCommitResponse\x12.\n\x06\x63ommit\x18\x01 \x01(\x0b\x32\x1e.data_room.ConfigurationCommit\"\"\n MergeConfigurationCommitResponse\"|\n\x10\x44riverTaskConfig\x12\x1f\n\x04noop\x18\x01 \x01(\x0b\x32\x0f.gcg.NoopConfigH\x00\x12\x31\n\rstaticContent\x18\x02 \x01(\x0b\x32\x18.gcg.StaticContentConfigH\x00\x42\x14\n\x12\x64river_task_config\"\x0c\n\nNoopConfig\"&\n\x13StaticContentConfig\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\",\n\x1aRetrieveDcrSecretIdRequest\x12\x0e\n\x06secret\x18\x01 \x01(\t\"/\n\x1bRetrieveDcrSecretIdResponse\x12\x10\n\x08secretId\x18\x01 \x01(\x0c*)\n\x0e\x44\x61taRoomStatus\x12\n\n\x06\x41\x63tive\x10\x00\x12\x0b\n\x07Stopped\x10\x01\x62\x06proto3')
 
 _DATAROOMSTATUS = DESCRIPTOR.enum_types_by_name['DataRoomStatus']
 DataRoomStatus = enum_type_wrapper.EnumTypeWrapper(_DATAROOMSTATUS)
@@ -69,6 +69,8 @@ _MERGECONFIGURATIONCOMMITRESPONSE = DESCRIPTOR.message_types_by_name['MergeConfi
 _DRIVERTASKCONFIG = DESCRIPTOR.message_types_by_name['DriverTaskConfig']
 _NOOPCONFIG = DESCRIPTOR.message_types_by_name['NoopConfig']
 _STATICCONTENTCONFIG = DESCRIPTOR.message_types_by_name['StaticContentConfig']
+_RETRIEVEDCRSECRETIDREQUEST = DESCRIPTOR.message_types_by_name['RetrieveDcrSecretIdRequest']
+_RETRIEVEDCRSECRETIDRESPONSE = DESCRIPTOR.message_types_by_name['RetrieveDcrSecretIdResponse']
 GcgRequest = _reflection.GeneratedProtocolMessageType('GcgRequest', (_message.Message,), {
   'DESCRIPTOR' : _GCGREQUEST,
   '__module__' : 'gcg_pb2'
@@ -378,99 +380,117 @@ StaticContentConfig = _reflection.GeneratedProtocolMessageType('StaticContentCon
   })
 _sym_db.RegisterMessage(StaticContentConfig)
 
+RetrieveDcrSecretIdRequest = _reflection.GeneratedProtocolMessageType('RetrieveDcrSecretIdRequest', (_message.Message,), {
+  'DESCRIPTOR' : _RETRIEVEDCRSECRETIDREQUEST,
+  '__module__' : 'gcg_pb2'
+  # @@protoc_insertion_point(class_scope:gcg.RetrieveDcrSecretIdRequest)
+  })
+_sym_db.RegisterMessage(RetrieveDcrSecretIdRequest)
+
+RetrieveDcrSecretIdResponse = _reflection.GeneratedProtocolMessageType('RetrieveDcrSecretIdResponse', (_message.Message,), {
+  'DESCRIPTOR' : _RETRIEVEDCRSECRETIDRESPONSE,
+  '__module__' : 'gcg_pb2'
+  # @@protoc_insertion_point(class_scope:gcg.RetrieveDcrSecretIdResponse)
+  })
+_sym_db.RegisterMessage(RetrieveDcrSecretIdResponse)
+
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _MERGECONFIGURATIONCOMMITREQUEST_APPROVALSIGNATURESENTRY._options = None
   _MERGECONFIGURATIONCOMMITREQUEST_APPROVALSIGNATURESENTRY._serialized_options = b'8\001'
-  _DATAROOMSTATUS._serialized_start=6339
-  _DATAROOMSTATUS._serialized_end=6380
+  _DATAROOMSTATUS._serialized_start=6616
+  _DATAROOMSTATUS._serialized_end=6657
   _GCGREQUEST._serialized_start=55
-  _GCGREQUEST._serialized_end=1466
-  _GCGRESPONSE._serialized_start=1469
-  _GCGRESPONSE._serialized_end=2929
-  _CREATEDATAROOMREQUEST._serialized_start=2932
-  _CREATEDATAROOMREQUEST._serialized_end=3068
-  _CREATEDATAROOMRESPONSE._serialized_start=3071
-  _CREATEDATAROOMRESPONSE._serialized_end=3211
-  _DATAROOMVALIDATIONERROR._serialized_start=3214
-  _DATAROOMVALIDATIONERROR._serialized_end=3552
-  _PUBLISHDATASETTODATAROOMREQUEST._serialized_start=3555
-  _PUBLISHDATASETTODATAROOMREQUEST._serialized_end=3685
-  _PUBLISHDATASETTODATAROOMRESPONSE._serialized_start=3687
-  _PUBLISHDATASETTODATAROOMRESPONSE._serialized_end=3721
-  _EXECUTECOMPUTEREQUEST._serialized_start=3723
-  _EXECUTECOMPUTEREQUEST._serialized_end=3825
-  _EXECUTEDEVELOPMENTCOMPUTEREQUEST._serialized_start=3827
-  _EXECUTEDEVELOPMENTCOMPUTEREQUEST._serialized_end=3951
-  _EXECUTECOMPUTERESPONSE._serialized_start=3953
-  _EXECUTECOMPUTERESPONSE._serialized_end=3992
-  _JOBSTATUSREQUEST._serialized_start=3994
-  _JOBSTATUSREQUEST._serialized_end=4027
-  _JOBSTATUSRESPONSE._serialized_start=4029
-  _JOBSTATUSRESPONSE._serialized_end=4082
-  _GETRESULTSREQUEST._serialized_start=4084
-  _GETRESULTSREQUEST._serialized_end=4143
-  _GETRESULTSRESPONSECHUNK._serialized_start=4145
-  _GETRESULTSRESPONSECHUNK._serialized_end=4184
-  _GETRESULTSRESPONSEFOOTER._serialized_start=4186
-  _GETRESULTSRESPONSEFOOTER._serialized_end=4212
-  _RETRIEVEDATAROOMREQUEST._serialized_start=4214
-  _RETRIEVEDATAROOMREQUEST._serialized_end=4265
-  _RETRIEVEDATAROOMRESPONSE._serialized_start=4267
-  _RETRIEVEDATAROOMRESPONSE._serialized_end=4332
-  _RETRIEVEAUDITLOGREQUEST._serialized_start=4334
-  _RETRIEVEAUDITLOGREQUEST._serialized_end=4394
-  _RETRIEVEAUDITLOGRESPONSE._serialized_start=4396
-  _RETRIEVEAUDITLOGRESPONSE._serialized_end=4435
-  _RETRIEVEDATAROOMSTATUSREQUEST._serialized_start=4437
-  _RETRIEVEDATAROOMSTATUSREQUEST._serialized_end=4503
-  _RETRIEVEDATAROOMSTATUSRESPONSE._serialized_start=4505
-  _RETRIEVEDATAROOMSTATUSRESPONSE._serialized_end=4574
-  _UPDATEDATAROOMSTATUSREQUEST._serialized_start=4576
-  _UPDATEDATAROOMSTATUSREQUEST._serialized_end=4677
-  _UPDATEDATAROOMSTATUSRESPONSE._serialized_start=4679
-  _UPDATEDATAROOMSTATUSRESPONSE._serialized_end=4709
-  _RETRIEVEPUBLISHEDDATASETSREQUEST._serialized_start=4711
-  _RETRIEVEPUBLISHEDDATASETSREQUEST._serialized_end=4780
-  _PUBLISHEDDATASET._serialized_start=4782
-  _PUBLISHEDDATASET._serialized_end=4872
-  _RETRIEVEPUBLISHEDDATASETSRESPONSE._serialized_start=4874
-  _RETRIEVEPUBLISHEDDATASETSRESPONSE._serialized_end=4959
-  _REMOVEPUBLISHEDDATASETREQUEST._serialized_start=4961
-  _REMOVEPUBLISHEDDATASETREQUEST._serialized_end=5051
-  _REMOVEPUBLISHEDDATASETRESPONSE._serialized_start=5053
-  _REMOVEPUBLISHEDDATASETRESPONSE._serialized_end=5085
-  _CREATECONFIGURATIONCOMMITREQUEST._serialized_start=5087
-  _CREATECONFIGURATIONCOMMITREQUEST._serialized_end=5184
-  _CREATECONFIGURATIONCOMMITRESPONSE._serialized_start=5186
-  _CREATECONFIGURATIONCOMMITRESPONSE._serialized_end=5239
-  _GENERATEMERGEAPPROVALSIGNATUREREQUEST._serialized_start=5241
-  _GENERATEMERGEAPPROVALSIGNATUREREQUEST._serialized_end=5313
-  _GENERATEMERGEAPPROVALSIGNATURERESPONSE._serialized_start=5315
-  _GENERATEMERGEAPPROVALSIGNATURERESPONSE._serialized_end=5374
-  _MERGECONFIGURATIONCOMMITREQUEST._serialized_start=5377
-  _MERGECONFIGURATIONCOMMITREQUEST._serialized_end=5592
-  _MERGECONFIGURATIONCOMMITREQUEST_APPROVALSIGNATURESENTRY._serialized_start=5535
-  _MERGECONFIGURATIONCOMMITREQUEST_APPROVALSIGNATURESENTRY._serialized_end=5592
-  _RETRIEVEDATAROOMCONFIGURATIONHISTORYREQUEST._serialized_start=5594
-  _RETRIEVEDATAROOMCONFIGURATIONHISTORYREQUEST._serialized_end=5659
-  _RETRIEVEDATAROOMCONFIGURATIONHISTORYRESPONSE._serialized_start=5662
-  _RETRIEVEDATAROOMCONFIGURATIONHISTORYRESPONSE._serialized_end=5816
-  _RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST._serialized_start=5818
-  _RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST._serialized_end=5896
-  _RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE._serialized_start=5898
-  _RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE._serialized_end=5963
-  _RETRIEVECONFIGURATIONCOMMITREQUEST._serialized_start=5965
-  _RETRIEVECONFIGURATIONCOMMITREQUEST._serialized_end=6034
-  _RETRIEVECONFIGURATIONCOMMITRESPONSE._serialized_start=6036
-  _RETRIEVECONFIGURATIONCOMMITRESPONSE._serialized_end=6121
-  _MERGECONFIGURATIONCOMMITRESPONSE._serialized_start=6123
-  _MERGECONFIGURATIONCOMMITRESPONSE._serialized_end=6157
-  _DRIVERTASKCONFIG._serialized_start=6159
-  _DRIVERTASKCONFIG._serialized_end=6283
-  _NOOPCONFIG._serialized_start=6285
-  _NOOPCONFIG._serialized_end=6297
-  _STATICCONTENTCONFIG._serialized_start=6299
-  _STATICCONTENTCONFIG._serialized_end=6337
+  _GCGREQUEST._serialized_end=1575
+  _GCGRESPONSE._serialized_start=1578
+  _GCGRESPONSE._serialized_end=3111
+  _CREATEDATAROOMREQUEST._serialized_start=3114
+  _CREATEDATAROOMREQUEST._serialized_end=3250
+  _CREATEDATAROOMRESPONSE._serialized_start=3253
+  _CREATEDATAROOMRESPONSE._serialized_end=3393
+  _DATAROOMVALIDATIONERROR._serialized_start=3396
+  _DATAROOMVALIDATIONERROR._serialized_end=3734
+  _PUBLISHDATASETTODATAROOMREQUEST._serialized_start=3737
+  _PUBLISHDATASETTODATAROOMREQUEST._serialized_end=3867
+  _PUBLISHDATASETTODATAROOMRESPONSE._serialized_start=3869
+  _PUBLISHDATASETTODATAROOMRESPONSE._serialized_end=3903
+  _EXECUTECOMPUTEREQUEST._serialized_start=3905
+  _EXECUTECOMPUTEREQUEST._serialized_end=4007
+  _EXECUTEDEVELOPMENTCOMPUTEREQUEST._serialized_start=4009
+  _EXECUTEDEVELOPMENTCOMPUTEREQUEST._serialized_end=4133
+  _EXECUTECOMPUTERESPONSE._serialized_start=4135
+  _EXECUTECOMPUTERESPONSE._serialized_end=4174
+  _JOBSTATUSREQUEST._serialized_start=4176
+  _JOBSTATUSREQUEST._serialized_end=4209
+  _JOBSTATUSRESPONSE._serialized_start=4211
+  _JOBSTATUSRESPONSE._serialized_end=4264
+  _GETRESULTSREQUEST._serialized_start=4266
+  _GETRESULTSREQUEST._serialized_end=4325
+  _GETRESULTSRESPONSECHUNK._serialized_start=4327
+  _GETRESULTSRESPONSECHUNK._serialized_end=4366
+  _GETRESULTSRESPONSEFOOTER._serialized_start=4368
+  _GETRESULTSRESPONSEFOOTER._serialized_end=4394
+  _RETRIEVEDATAROOMREQUEST._serialized_start=4396
+  _RETRIEVEDATAROOMREQUEST._serialized_end=4447
+  _RETRIEVEDATAROOMRESPONSE._serialized_start=4449
+  _RETRIEVEDATAROOMRESPONSE._serialized_end=4514
+  _RETRIEVEAUDITLOGREQUEST._serialized_start=4516
+  _RETRIEVEAUDITLOGREQUEST._serialized_end=4576
+  _RETRIEVEAUDITLOGRESPONSE._serialized_start=4578
+  _RETRIEVEAUDITLOGRESPONSE._serialized_end=4617
+  _RETRIEVEDATAROOMSTATUSREQUEST._serialized_start=4619
+  _RETRIEVEDATAROOMSTATUSREQUEST._serialized_end=4685
+  _RETRIEVEDATAROOMSTATUSRESPONSE._serialized_start=4687
+  _RETRIEVEDATAROOMSTATUSRESPONSE._serialized_end=4756
+  _UPDATEDATAROOMSTATUSREQUEST._serialized_start=4758
+  _UPDATEDATAROOMSTATUSREQUEST._serialized_end=4859
+  _UPDATEDATAROOMSTATUSRESPONSE._serialized_start=4861
+  _UPDATEDATAROOMSTATUSRESPONSE._serialized_end=4891
+  _RETRIEVEPUBLISHEDDATASETSREQUEST._serialized_start=4893
+  _RETRIEVEPUBLISHEDDATASETSREQUEST._serialized_end=4962
+  _PUBLISHEDDATASET._serialized_start=4964
+  _PUBLISHEDDATASET._serialized_end=5054
+  _RETRIEVEPUBLISHEDDATASETSRESPONSE._serialized_start=5056
+  _RETRIEVEPUBLISHEDDATASETSRESPONSE._serialized_end=5141
+  _REMOVEPUBLISHEDDATASETREQUEST._serialized_start=5143
+  _REMOVEPUBLISHEDDATASETREQUEST._serialized_end=5233
+  _REMOVEPUBLISHEDDATASETRESPONSE._serialized_start=5235
+  _REMOVEPUBLISHEDDATASETRESPONSE._serialized_end=5267
+  _CREATECONFIGURATIONCOMMITREQUEST._serialized_start=5269
+  _CREATECONFIGURATIONCOMMITREQUEST._serialized_end=5366
+  _CREATECONFIGURATIONCOMMITRESPONSE._serialized_start=5368
+  _CREATECONFIGURATIONCOMMITRESPONSE._serialized_end=5421
+  _GENERATEMERGEAPPROVALSIGNATUREREQUEST._serialized_start=5423
+  _GENERATEMERGEAPPROVALSIGNATUREREQUEST._serialized_end=5495
+  _GENERATEMERGEAPPROVALSIGNATURERESPONSE._serialized_start=5497
+  _GENERATEMERGEAPPROVALSIGNATURERESPONSE._serialized_end=5556
+  _MERGECONFIGURATIONCOMMITREQUEST._serialized_start=5559
+  _MERGECONFIGURATIONCOMMITREQUEST._serialized_end=5774
+  _MERGECONFIGURATIONCOMMITREQUEST_APPROVALSIGNATURESENTRY._serialized_start=5717
+  _MERGECONFIGURATIONCOMMITREQUEST_APPROVALSIGNATURESENTRY._serialized_end=5774
+  _RETRIEVEDATAROOMCONFIGURATIONHISTORYREQUEST._serialized_start=5776
+  _RETRIEVEDATAROOMCONFIGURATIONHISTORYREQUEST._serialized_end=5841
+  _RETRIEVEDATAROOMCONFIGURATIONHISTORYRESPONSE._serialized_start=5844
+  _RETRIEVEDATAROOMCONFIGURATIONHISTORYRESPONSE._serialized_end=5998
+  _RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST._serialized_start=6000
+  _RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST._serialized_end=6078
+  _RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE._serialized_start=6080
+  _RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE._serialized_end=6145
+  _RETRIEVECONFIGURATIONCOMMITREQUEST._serialized_start=6147
+  _RETRIEVECONFIGURATIONCOMMITREQUEST._serialized_end=6216
+  _RETRIEVECONFIGURATIONCOMMITRESPONSE._serialized_start=6218
+  _RETRIEVECONFIGURATIONCOMMITRESPONSE._serialized_end=6303
+  _MERGECONFIGURATIONCOMMITRESPONSE._serialized_start=6305
+  _MERGECONFIGURATIONCOMMITRESPONSE._serialized_end=6339
+  _DRIVERTASKCONFIG._serialized_start=6341
+  _DRIVERTASKCONFIG._serialized_end=6465
+  _NOOPCONFIG._serialized_start=6467
+  _NOOPCONFIG._serialized_end=6479
+  _STATICCONTENTCONFIG._serialized_start=6481
+  _STATICCONTENTCONFIG._serialized_end=6519
+  _RETRIEVEDCRSECRETIDREQUEST._serialized_start=6521
+  _RETRIEVEDCRSECRETIDREQUEST._serialized_end=6565
+  _RETRIEVEDCRSECRETIDRESPONSE._serialized_start=6567
+  _RETRIEVEDCRSECRETIDRESPONSE._serialized_end=6614
 # @@protoc_insertion_point(module_scope)

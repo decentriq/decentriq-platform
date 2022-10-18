@@ -35,6 +35,25 @@ amd_snp_authorized_chip_ids = [
 ]
 
 SPECIFICATIONS = {
+    "decentriq.driver:v6": EnclaveSpecification(
+        name="decentriq.driver",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "fcceb6327c283923e1ae608abf2906a3c94f24cad7f98016054cdda39e18dee0"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_sw_hardening_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[0],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[1, 2],
+    ),
     "decentriq.driver:v5": EnclaveSpecification(
         name="decentriq.driver",
         proto=AttestationSpecification(

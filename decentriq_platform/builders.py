@@ -14,6 +14,7 @@ from .proto import GovernanceProtocol as GovernanceProtocolProto
 from .node import Node
 from .permission import Permissions
 from .types import EnclaveSpecification
+from .session import Session
 import uuid
 
 
@@ -128,6 +129,7 @@ class DataRoomBuilder():
     governance_protocol: GovernanceProtocolProto
     description: Optional[str]
     owner_email: Optional[str]
+    dcr_secret_id: Optional[bytes]
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
@@ -139,6 +141,7 @@ class DataRoomBuilder():
             add_basic_user_permissions: bool = True,
             description: str = None,
             owner_email: str = None,
+            dcr_secret_id: bytes = None,
         ) -> None:
         """
         Create a data room builder object.
@@ -173,6 +176,7 @@ class DataRoomBuilder():
         self.description = description
         self.governance_protocol = governance_protocol
         self.enclave_specs = enclave_specs
+        self.dcr_secret_id = dcr_secret_id
 
         if description:
             self.add_description(description)
@@ -262,6 +266,16 @@ class DataRoomBuilder():
         """
         self.owner_email = email
 
+    def set_secret(self, secret: string, session: Session):
+        """
+        Specify a dcrSecret for the data room.
+        After publishing the data room, most interactions with 
+        the data room will require to pass the dcrSecret.
+        This can be done using the `decentriq_platform.Session.use_data_room_secret`
+        method.
+        """
+        self.dcr_secret_id = session.retrieve_dcr_secret_id(secret).secretId
+
     def build(self) -> Tuple[DataRoom, List[ConfigurationModification]]:
         """
         Finalize data room contruction.
@@ -283,6 +297,8 @@ class DataRoomBuilder():
             data_room.ownerEmail = self.owner_email
         if self.description:
             data_room.description = self.description
+        if self.dcr_secret_id:
+            data_room.dcrSecretId = self.dcr_secret_id
         data_room.id = DataRoomBuilder._generate_id()
         data_room.governanceProtocol.CopyFrom(self.governance_protocol)
         modifications = self.modifications_builder.build()
