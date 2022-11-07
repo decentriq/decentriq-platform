@@ -1100,7 +1100,7 @@ class Session():
         The method will check for the job's completeness every `interval` seconds and up to
         an optional `timeout` seconds after which the method will raise an exception.
         If the job completes and the results can be retrieved successfully, a raw byte string
-        will be returned. The bytes tring can be transformed into a more useful object using
+        will be returned. The bytes string can be transformed into a more useful object using
         a variety of helper methods. These helper methods are specific for the type of computation
         you ran and can be found in the corresponding packages.
         """
