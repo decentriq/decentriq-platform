@@ -141,12 +141,11 @@ import "attestation.proto";
 
 message DataRoom {
     string id = 1;
-    reserved 2 to 5;
-    string name = 6;
-    string description = 7;
-    string ownerEmail = 8;
-    GovernanceProtocol governanceProtocol = 9;
-    optional bytes dcrSecretId = 10;
+    string name = 2;
+    string description = 3;
+    GovernanceProtocol governanceProtocol = 4;
+    DataRoomConfiguration initialConfiguration = 5;
+    optional bytes dcrSecretId = 6;
 }
 
 message GovernanceProtocol {
@@ -160,55 +159,61 @@ message StaticDataRoomPolicy {}
 message AffectedDataOwnersApprovePolicy {}
 
 message DataRoomConfiguration {
-    map<string, ConfigurationElement> elements = 1;
+    repeated ConfigurationElement elements = 1;
 }
 
 message ConfigurationElement {
-   oneof element {
-       ComputeNode computeNode = 1;
-       attestation.AttestationSpecification attestationSpecification = 2;
-       UserPermission userPermission = 3;
-       AuthenticationMethod authenticationMethod = 4;
-   }
+    string id = 1;
+    oneof element {
+        ComputeNode computeNode = 2;
+        attestation.AttestationSpecification attestationSpecification = 3;
+        UserPermission userPermission = 4;
+        AuthenticationMethod authenticationMethod = 5;
+    }
 }
 
 message ConfigurationModification {
-   oneof modification {
-      AddModification add = 1;
-      ChangeModification change = 2;
-      DeleteModification delete = 3;
-   }
+    oneof modification {
+        AddModification add = 1;
+        ChangeModification change = 2;
+        DeleteModification delete = 3;
+    }
 }
 
 message AddModification {
-   string id = 1;
-   ConfigurationElement element = 2;
+    ConfigurationElement element = 1;
 }
 
 message ChangeModification {
-   string id = 1;
-   ConfigurationElement element = 2;
+    ConfigurationElement element = 1;
 }
 
 message DeleteModification {
-   string id = 1;
+    string id = 1;
 }
 
 message ConfigurationCommit {
-   bytes dataRoomId = 1;
-   bytes dataRoomHistoryPin = 2;
-   repeated ConfigurationModification modifications = 3;
+    string id = 1;
+    string name = 2;
+    bytes dataRoomId = 3;
+    bytes dataRoomHistoryPin = 4;
+    repeated ConfigurationModification modifications = 5;
 }
 
 message ComputeNode {
     string nodeName = 1;
     oneof node {
         ComputeNodeLeaf leaf = 2;
+        ComputeNodeParameter parameter = 4;
         ComputeNodeBranch branch = 3;
     }
 }
 
 message ComputeNodeLeaf {
+    bool isRequired = 1;
+}
+
+message ComputeNodeParameter {
     bool isRequired = 1;
 }
 
@@ -224,17 +229,15 @@ message ComputeNodeProtocol {
 message ComputeNodeBranch {
     bytes config = 1;
     repeated string dependencies = 2;
-    reserved 3;
-    ComputeNodeFormat outputFormat = 4;
-    ComputeNodeProtocol protocol = 5;
-    string attestationSpecificationId = 6;
+    ComputeNodeFormat outputFormat = 3;
+    ComputeNodeProtocol protocol = 4;
+    string attestationSpecificationId = 5;
 }
 
 message UserPermission {
     string email = 1;
-    reserved 2;
-    repeated Permission permissions = 3;
-    string authenticationMethodId = 4;
+    repeated Permission permissions = 2;
+    string authenticationMethodId = 3;
 }
 
 message AuthenticationMethod {
@@ -262,11 +265,11 @@ message Permission {
 }
 
 message ExecuteComputePermission {
-    string computeNodeName = 1;
+    string computeNodeId = 1;
 }
 
 message LeafCrudPermission {
-    string leafNodeName = 1;
+    string leafNodeId = 1;
 }
 
 message RetrieveDataRoomPermission {}

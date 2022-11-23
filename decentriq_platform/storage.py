@@ -21,7 +21,7 @@ class Key():
         """
         Returns a new `Key` instance, can optional specify the raw key material.
         """
-        if material == None:
+        if material is None:
             key_bytes = os.urandom(KEY_LEN)
         else:
             if len(material) != KEY_LEN:

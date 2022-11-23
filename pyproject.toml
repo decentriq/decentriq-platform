@@ -11,10 +11,10 @@ homepage = "https://github.com/decentriq/decentriq-platform"
 # main package
 python = "^3.9"
 typing-extensions = "^3.10.0"
-protobuf = "^3.18.0"
+protobuf = "3.20.1"
 requests = "^2.27.0"
 sgx-ias-structs = "^0.1.7"
-cryptography = "^3.4.8"
+cryptography = "==38.0.1"
 chily = "^0.6.0"
 asn1crypto = "^1.4.0"
 oscrypto = "^1.2.1"
@@ -23,9 +23,10 @@ ecdsa = "^0.17.0"
 pem = "^21.2.0"
 # sql compute 
 sqloxide = "^0.1.11"
+ddc = { path = "./../../dcr-compiler/ddc-py"}
 
 [tool.poetry.dev-dependencies]
-mypy-protobuf = "^2.9"
+mypy-protobuf = "^3.3.0"
 mypy = "^0.971"
 
 [build-system]

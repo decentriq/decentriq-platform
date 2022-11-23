@@ -50,8 +50,8 @@ from .gcg_pb2 import (
     GenerateMergeApprovalSignatureRequest, MergeConfigurationCommitRequest,
     CreateConfigurationCommitResponse, GenerateMergeApprovalSignatureResponse,
     MergeConfigurationCommitResponse, UpdateDataRoomStatusResponse,
-    RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
-    RetrieveConfigurationCommitRequest, StaticContentConfig,
+    RetrieveCurrentDataRoomConfigurationRequest, RetrieveCurrentDataRoomConfigurationResponse,
+    RetrieveConfigurationCommitRequest, RetrieveConfigurationCommitResponse, StaticContentConfig,
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
     RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse
 )
@@ -65,3 +65,8 @@ from .synth_data_pb2 import (
     Mask,
     Column,
 )
+from .metering_pb2 import (
+    DcrMetadata,
+    CreateDcrPurpose
+)
+

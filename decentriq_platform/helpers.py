@@ -22,11 +22,12 @@ def decode_compute_node_configs(
         data_room_configuration: DataRoomConfiguration,
         enclave_specs: List[EnclaveSpecification]
 ) -> Dict[str, Dict]:
-
-    current_configuration = data_room_configuration.elements
+    current_configuration = {}
+    for element in data_room_configuration.elements:
+        current_configuration[element.id] = element
     decoded_configuration = {}
 
-    for element_id, element in current_configuration.items():
+    for element in data_room_configuration.elements:
         if element.HasField("computeNode"):
             if element.computeNode.HasField("branch"):
                 config = element.computeNode.branch.config
@@ -34,7 +35,7 @@ def decode_compute_node_configs(
                 attestation_spec = current_configuration[index].attestationSpecification
                 config_decoded = decode_compute_node_config(config, attestation_spec, enclave_specs)
                 if config_decoded:
-                    decoded_configuration[element_id] = config_decoded
+                    decoded_configuration[element.id] = config_decoded
 
     return decoded_configuration
 
@@ -46,13 +47,13 @@ def decode_data_room_configuration(
     decoded_configs = decode_compute_node_configs(data_room_configuration, enclave_specifications)
     decoded_configuration = {}
 
-    for element_id, element in data_room_configuration.elements.items():
+    for element in data_room_configuration.elements:
         element_json = MessageToDict(element)
         is_branch = "computeNode" in element_json and "branch" in element_json["computeNode"]
-        if is_branch and element_id in decoded_configs:
-            decoded_config = decoded_configs[element_id]
+        if is_branch and element.id in decoded_configs:
+            decoded_config = decoded_configs[element.id]
             if decoded_config:
                 element_json["computeNode"]["branch"]["config"] =  decoded_config
-        decoded_configuration[element_id] = element_json
+        decoded_configuration[element.id] = element_json
 
     return decoded_configuration

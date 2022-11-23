@@ -20,10 +20,10 @@ class Permissions:
         """This class is not meant to be instantiated."""
 
     @staticmethod
-    def leaf_crud(leaf_node_name: str) -> Permission:
+    def leaf_crud(leaf_node_id: str) -> Permission:
         """Permission required for publishing a dataset to a data room."""
         return Permission(
-            leafCrudPermission=LeafCrudPermission(leafNodeName=leaf_node_name)
+            leafCrudPermission=LeafCrudPermission(leafNodeId=leaf_node_id)
         )
 
     @staticmethod
@@ -39,11 +39,11 @@ class Permissions:
         return Permission(retrieveAuditLogPermission=RetrieveAuditLogPermission())
 
     @staticmethod
-    def execute_compute(compute_node_name: str) -> Permission:
-        """Permission for executing the computation with the given name."""
+    def execute_compute(compute_node_id: str) -> Permission:
+        """Permission for executing the computation with the given id."""
         return Permission(
             executeComputePermission=ExecuteComputePermission(
-                computeNodeName=compute_node_name
+                computeNodeId=compute_node_id
             )
         )
 

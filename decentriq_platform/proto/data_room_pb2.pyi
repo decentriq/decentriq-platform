@@ -4,28 +4,35 @@ isort:skip_file
 """
 import attestation_pb2
 import builtins
+import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
+import sys
 import typing
-import typing_extensions
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
-class ComputeNodeFormat(_ComputeNodeFormat, metaclass=_ComputeNodeFormatEnumTypeWrapper):
-    pass
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+
 class _ComputeNodeFormat:
-    V = typing.NewType('V', builtins.int)
-class _ComputeNodeFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ComputeNodeFormat.V], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
-    RAW = ComputeNodeFormat.V(0)
-    ZIP = ComputeNodeFormat.V(1)
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-RAW = ComputeNodeFormat.V(0)
-ZIP = ComputeNodeFormat.V(1)
+class _ComputeNodeFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ComputeNodeFormat.ValueType], builtins.type):  # noqa: F821
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    RAW: _ComputeNodeFormat.ValueType  # 0
+    ZIP: _ComputeNodeFormat.ValueType  # 1
+
+class ComputeNodeFormat(_ComputeNodeFormat, metaclass=_ComputeNodeFormatEnumTypeWrapper): ...
+
+RAW: ComputeNodeFormat.ValueType  # 0
+ZIP: ComputeNodeFormat.ValueType  # 1
 global___ComputeNodeFormat = ComputeNodeFormat
-
 
 class DataRoom(google.protobuf.message.Message):
     """/ To create a dataroom the user need to specify the `GovernanceProtocol`
@@ -162,99 +169,103 @@ class DataRoom(google.protobuf.message.Message):
     / In the example above `user2@email.com` has created a new commit which adds node `0x3` to the
     / data room. The node has a dependency on `0x2`, for which the user has `ExecuteComputePermission`
     / which means that the user can execute the node `0x3`
-
     """
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ID_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     DESCRIPTION_FIELD_NUMBER: builtins.int
-    OWNEREMAIL_FIELD_NUMBER: builtins.int
     GOVERNANCEPROTOCOL_FIELD_NUMBER: builtins.int
+    INITIALCONFIGURATION_FIELD_NUMBER: builtins.int
     DCRSECRETID_FIELD_NUMBER: builtins.int
-    id: typing.Text = ...
-    name: typing.Text = ...
-    description: typing.Text = ...
-    ownerEmail: typing.Text = ...
+    id: builtins.str
+    name: builtins.str
+    description: builtins.str
     @property
     def governanceProtocol(self) -> global___GovernanceProtocol: ...
-    dcrSecretId: builtins.bytes = ...
-    def __init__(self,
+    @property
+    def initialConfiguration(self) -> global___DataRoomConfiguration: ...
+    dcrSecretId: builtins.bytes
+    def __init__(
+        self,
         *,
-        id : typing.Text = ...,
-        name : typing.Text = ...,
-        description : typing.Text = ...,
-        ownerEmail : typing.Text = ...,
-        governanceProtocol : typing.Optional[global___GovernanceProtocol] = ...,
-        dcrSecretId : builtins.bytes = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"_dcrSecretId",b"_dcrSecretId",u"dcrSecretId",b"dcrSecretId",u"governanceProtocol",b"governanceProtocol"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"_dcrSecretId",b"_dcrSecretId",u"dcrSecretId",b"dcrSecretId",u"description",b"description",u"governanceProtocol",b"governanceProtocol",u"id",b"id",u"name",b"name",u"ownerEmail",b"ownerEmail"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_dcrSecretId",b"_dcrSecretId"]) -> typing.Optional[typing_extensions.Literal["dcrSecretId"]]: ...
+        id: builtins.str = ...,
+        name: builtins.str = ...,
+        description: builtins.str = ...,
+        governanceProtocol: global___GovernanceProtocol | None = ...,
+        initialConfiguration: global___DataRoomConfiguration | None = ...,
+        dcrSecretId: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_dcrSecretId", b"_dcrSecretId", "dcrSecretId", b"dcrSecretId", "governanceProtocol", b"governanceProtocol", "initialConfiguration", b"initialConfiguration"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_dcrSecretId", b"_dcrSecretId", "dcrSecretId", b"dcrSecretId", "description", b"description", "governanceProtocol", b"governanceProtocol", "id", b"id", "initialConfiguration", b"initialConfiguration", "name", b"name"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_dcrSecretId", b"_dcrSecretId"]) -> typing_extensions.Literal["dcrSecretId"] | None: ...
+
 global___DataRoom = DataRoom
 
 class GovernanceProtocol(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     STATICDATAROOMPOLICY_FIELD_NUMBER: builtins.int
     AFFECTEDDATAOWNERSAPPROVEPOLICY_FIELD_NUMBER: builtins.int
     @property
     def staticDataRoomPolicy(self) -> global___StaticDataRoomPolicy: ...
     @property
     def affectedDataOwnersApprovePolicy(self) -> global___AffectedDataOwnersApprovePolicy: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        staticDataRoomPolicy : typing.Optional[global___StaticDataRoomPolicy] = ...,
-        affectedDataOwnersApprovePolicy : typing.Optional[global___AffectedDataOwnersApprovePolicy] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"affectedDataOwnersApprovePolicy",b"affectedDataOwnersApprovePolicy",u"policy",b"policy",u"staticDataRoomPolicy",b"staticDataRoomPolicy"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"affectedDataOwnersApprovePolicy",b"affectedDataOwnersApprovePolicy",u"policy",b"policy",u"staticDataRoomPolicy",b"staticDataRoomPolicy"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"policy",b"policy"]) -> typing.Optional[typing_extensions.Literal["staticDataRoomPolicy","affectedDataOwnersApprovePolicy"]]: ...
+        staticDataRoomPolicy: global___StaticDataRoomPolicy | None = ...,
+        affectedDataOwnersApprovePolicy: global___AffectedDataOwnersApprovePolicy | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["affectedDataOwnersApprovePolicy", b"affectedDataOwnersApprovePolicy", "policy", b"policy", "staticDataRoomPolicy", b"staticDataRoomPolicy"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["affectedDataOwnersApprovePolicy", b"affectedDataOwnersApprovePolicy", "policy", b"policy", "staticDataRoomPolicy", b"staticDataRoomPolicy"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["policy", b"policy"]) -> typing_extensions.Literal["staticDataRoomPolicy", "affectedDataOwnersApprovePolicy"] | None: ...
+
 global___GovernanceProtocol = GovernanceProtocol
 
 class StaticDataRoomPolicy(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___StaticDataRoomPolicy = StaticDataRoomPolicy
 
 class AffectedDataOwnersApprovePolicy(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___AffectedDataOwnersApprovePolicy = AffectedDataOwnersApprovePolicy
 
 class DataRoomConfiguration(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    class ElementsEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-        KEY_FIELD_NUMBER: builtins.int
-        VALUE_FIELD_NUMBER: builtins.int
-        key: typing.Text = ...
-        @property
-        def value(self) -> global___ConfigurationElement: ...
-        def __init__(self,
-            *,
-            key : typing.Text = ...,
-            value : typing.Optional[global___ConfigurationElement] = ...,
-            ) -> None: ...
-        def HasField(self, field_name: typing_extensions.Literal[u"value",b"value"]) -> builtins.bool: ...
-        def ClearField(self, field_name: typing_extensions.Literal[u"key",b"key",u"value",b"value"]) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ELEMENTS_FIELD_NUMBER: builtins.int
     @property
-    def elements(self) -> google.protobuf.internal.containers.MessageMap[typing.Text, global___ConfigurationElement]: ...
-    def __init__(self,
+    def elements(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConfigurationElement]: ...
+    def __init__(
+        self,
         *,
-        elements : typing.Optional[typing.Mapping[typing.Text, global___ConfigurationElement]] = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"elements",b"elements"]) -> None: ...
+        elements: collections.abc.Iterable[global___ConfigurationElement] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["elements", b"elements"]) -> None: ...
+
 global___DataRoomConfiguration = DataRoomConfiguration
 
 class ConfigurationElement(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
     COMPUTENODE_FIELD_NUMBER: builtins.int
     ATTESTATIONSPECIFICATION_FIELD_NUMBER: builtins.int
     USERPERMISSION_FIELD_NUMBER: builtins.int
     AUTHENTICATIONMETHOD_FIELD_NUMBER: builtins.int
+    id: builtins.str
     @property
     def computeNode(self) -> global___ComputeNode: ...
     @property
@@ -263,20 +274,24 @@ class ConfigurationElement(google.protobuf.message.Message):
     def userPermission(self) -> global___UserPermission: ...
     @property
     def authenticationMethod(self) -> global___AuthenticationMethod: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        computeNode : typing.Optional[global___ComputeNode] = ...,
-        attestationSpecification : typing.Optional[attestation_pb2.AttestationSpecification] = ...,
-        userPermission : typing.Optional[global___UserPermission] = ...,
-        authenticationMethod : typing.Optional[global___AuthenticationMethod] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"attestationSpecification",b"attestationSpecification",u"authenticationMethod",b"authenticationMethod",u"computeNode",b"computeNode",u"element",b"element",u"userPermission",b"userPermission"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"attestationSpecification",b"attestationSpecification",u"authenticationMethod",b"authenticationMethod",u"computeNode",b"computeNode",u"element",b"element",u"userPermission",b"userPermission"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"element",b"element"]) -> typing.Optional[typing_extensions.Literal["computeNode","attestationSpecification","userPermission","authenticationMethod"]]: ...
+        id: builtins.str = ...,
+        computeNode: global___ComputeNode | None = ...,
+        attestationSpecification: attestation_pb2.AttestationSpecification | None = ...,
+        userPermission: global___UserPermission | None = ...,
+        authenticationMethod: global___AuthenticationMethod | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["attestationSpecification", b"attestationSpecification", "authenticationMethod", b"authenticationMethod", "computeNode", b"computeNode", "element", b"element", "userPermission", b"userPermission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attestationSpecification", b"attestationSpecification", "authenticationMethod", b"authenticationMethod", "computeNode", b"computeNode", "element", b"element", "id", b"id", "userPermission", b"userPermission"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["element", b"element"]) -> typing_extensions.Literal["computeNode", "attestationSpecification", "userPermission", "authenticationMethod"] | None: ...
+
 global___ConfigurationElement = ConfigurationElement
 
 class ConfigurationModification(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ADD_FIELD_NUMBER: builtins.int
     CHANGE_FIELD_NUMBER: builtins.int
     DELETE_FIELD_NUMBER: builtins.int
@@ -286,192 +301,246 @@ class ConfigurationModification(google.protobuf.message.Message):
     def change(self) -> global___ChangeModification: ...
     @property
     def delete(self) -> global___DeleteModification: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        add : typing.Optional[global___AddModification] = ...,
-        change : typing.Optional[global___ChangeModification] = ...,
-        delete : typing.Optional[global___DeleteModification] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"add",b"add",u"change",b"change",u"delete",b"delete",u"modification",b"modification"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"add",b"add",u"change",b"change",u"delete",b"delete",u"modification",b"modification"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"modification",b"modification"]) -> typing.Optional[typing_extensions.Literal["add","change","delete"]]: ...
+        add: global___AddModification | None = ...,
+        change: global___ChangeModification | None = ...,
+        delete: global___DeleteModification | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["add", b"add", "change", b"change", "delete", b"delete", "modification", b"modification"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["add", b"add", "change", b"change", "delete", b"delete", "modification", b"modification"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["modification", b"modification"]) -> typing_extensions.Literal["add", "change", "delete"] | None: ...
+
 global___ConfigurationModification = ConfigurationModification
 
 class AddModification(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    ID_FIELD_NUMBER: builtins.int
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ELEMENT_FIELD_NUMBER: builtins.int
-    id: typing.Text = ...
     @property
     def element(self) -> global___ConfigurationElement: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        id : typing.Text = ...,
-        element : typing.Optional[global___ConfigurationElement] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"element",b"element"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"element",b"element",u"id",b"id"]) -> None: ...
+        element: global___ConfigurationElement | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["element", b"element"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["element", b"element"]) -> None: ...
+
 global___AddModification = AddModification
 
 class ChangeModification(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    ID_FIELD_NUMBER: builtins.int
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ELEMENT_FIELD_NUMBER: builtins.int
-    id: typing.Text = ...
     @property
     def element(self) -> global___ConfigurationElement: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        id : typing.Text = ...,
-        element : typing.Optional[global___ConfigurationElement] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"element",b"element"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"element",b"element",u"id",b"id"]) -> None: ...
+        element: global___ConfigurationElement | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["element", b"element"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["element", b"element"]) -> None: ...
+
 global___ChangeModification = ChangeModification
 
 class DeleteModification(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ID_FIELD_NUMBER: builtins.int
-    id: typing.Text = ...
-    def __init__(self,
+    id: builtins.str
+    def __init__(
+        self,
         *,
-        id : typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"id",b"id"]) -> None: ...
+        id: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
+
 global___DeleteModification = DeleteModification
 
 class ConfigurationCommit(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
     DATAROOMID_FIELD_NUMBER: builtins.int
     DATAROOMHISTORYPIN_FIELD_NUMBER: builtins.int
     MODIFICATIONS_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    dataRoomHistoryPin: builtins.bytes = ...
+    id: builtins.str
+    name: builtins.str
+    dataRoomId: builtins.bytes
+    dataRoomHistoryPin: builtins.bytes
     @property
     def modifications(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___ConfigurationModification]: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        dataRoomHistoryPin : builtins.bytes = ...,
-        modifications : typing.Optional[typing.Iterable[global___ConfigurationModification]] = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomHistoryPin",b"dataRoomHistoryPin",u"dataRoomId",b"dataRoomId",u"modifications",b"modifications"]) -> None: ...
+        id: builtins.str = ...,
+        name: builtins.str = ...,
+        dataRoomId: builtins.bytes = ...,
+        dataRoomHistoryPin: builtins.bytes = ...,
+        modifications: collections.abc.Iterable[global___ConfigurationModification] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomHistoryPin", b"dataRoomHistoryPin", "dataRoomId", b"dataRoomId", "id", b"id", "modifications", b"modifications", "name", b"name"]) -> None: ...
+
 global___ConfigurationCommit = ConfigurationCommit
 
 class ComputeNode(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     NODENAME_FIELD_NUMBER: builtins.int
     LEAF_FIELD_NUMBER: builtins.int
+    PARAMETER_FIELD_NUMBER: builtins.int
     BRANCH_FIELD_NUMBER: builtins.int
-    nodeName: typing.Text = ...
+    nodeName: builtins.str
     @property
     def leaf(self) -> global___ComputeNodeLeaf: ...
     @property
+    def parameter(self) -> global___ComputeNodeParameter: ...
+    @property
     def branch(self) -> global___ComputeNodeBranch: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        nodeName : typing.Text = ...,
-        leaf : typing.Optional[global___ComputeNodeLeaf] = ...,
-        branch : typing.Optional[global___ComputeNodeBranch] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"branch",b"branch",u"leaf",b"leaf",u"node",b"node"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"branch",b"branch",u"leaf",b"leaf",u"node",b"node",u"nodeName",b"nodeName"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"node",b"node"]) -> typing.Optional[typing_extensions.Literal["leaf","branch"]]: ...
+        nodeName: builtins.str = ...,
+        leaf: global___ComputeNodeLeaf | None = ...,
+        parameter: global___ComputeNodeParameter | None = ...,
+        branch: global___ComputeNodeBranch | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["node", b"node"]) -> typing_extensions.Literal["leaf", "parameter", "branch"] | None: ...
+
 global___ComputeNode = ComputeNode
 
 class ComputeNodeLeaf(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ISREQUIRED_FIELD_NUMBER: builtins.int
-    isRequired: builtins.bool = ...
-    def __init__(self,
+    isRequired: builtins.bool
+    def __init__(
+        self,
         *,
-        isRequired : builtins.bool = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"isRequired",b"isRequired"]) -> None: ...
+        isRequired: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["isRequired", b"isRequired"]) -> None: ...
+
 global___ComputeNodeLeaf = ComputeNodeLeaf
 
-class ComputeNodeProtocol(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    VERSION_FIELD_NUMBER: builtins.int
-    version: builtins.int = ...
-    def __init__(self,
+class ComputeNodeParameter(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ISREQUIRED_FIELD_NUMBER: builtins.int
+    isRequired: builtins.bool
+    def __init__(
+        self,
         *,
-        version : builtins.int = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"version",b"version"]) -> None: ...
+        isRequired: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["isRequired", b"isRequired"]) -> None: ...
+
+global___ComputeNodeParameter = ComputeNodeParameter
+
+class ComputeNodeProtocol(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    VERSION_FIELD_NUMBER: builtins.int
+    version: builtins.int
+    def __init__(
+        self,
+        *,
+        version: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["version", b"version"]) -> None: ...
+
 global___ComputeNodeProtocol = ComputeNodeProtocol
 
 class ComputeNodeBranch(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     CONFIG_FIELD_NUMBER: builtins.int
     DEPENDENCIES_FIELD_NUMBER: builtins.int
     OUTPUTFORMAT_FIELD_NUMBER: builtins.int
     PROTOCOL_FIELD_NUMBER: builtins.int
     ATTESTATIONSPECIFICATIONID_FIELD_NUMBER: builtins.int
-    config: builtins.bytes = ...
+    config: builtins.bytes
     @property
-    def dependencies(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
-    outputFormat: global___ComputeNodeFormat.V = ...
+    def dependencies(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    outputFormat: global___ComputeNodeFormat.ValueType
     @property
     def protocol(self) -> global___ComputeNodeProtocol: ...
-    attestationSpecificationId: typing.Text = ...
-    def __init__(self,
+    attestationSpecificationId: builtins.str
+    def __init__(
+        self,
         *,
-        config : builtins.bytes = ...,
-        dependencies : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        outputFormat : global___ComputeNodeFormat.V = ...,
-        protocol : typing.Optional[global___ComputeNodeProtocol] = ...,
-        attestationSpecificationId : typing.Text = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"protocol",b"protocol"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"attestationSpecificationId",b"attestationSpecificationId",u"config",b"config",u"dependencies",b"dependencies",u"outputFormat",b"outputFormat",u"protocol",b"protocol"]) -> None: ...
+        config: builtins.bytes = ...,
+        dependencies: collections.abc.Iterable[builtins.str] | None = ...,
+        outputFormat: global___ComputeNodeFormat.ValueType = ...,
+        protocol: global___ComputeNodeProtocol | None = ...,
+        attestationSpecificationId: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["protocol", b"protocol"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attestationSpecificationId", b"attestationSpecificationId", "config", b"config", "dependencies", b"dependencies", "outputFormat", b"outputFormat", "protocol", b"protocol"]) -> None: ...
+
 global___ComputeNodeBranch = ComputeNodeBranch
 
 class UserPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     EMAIL_FIELD_NUMBER: builtins.int
     PERMISSIONS_FIELD_NUMBER: builtins.int
     AUTHENTICATIONMETHODID_FIELD_NUMBER: builtins.int
-    email: typing.Text = ...
+    email: builtins.str
     @property
     def permissions(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___Permission]: ...
-    authenticationMethodId: typing.Text = ...
-    def __init__(self,
+    authenticationMethodId: builtins.str
+    def __init__(
+        self,
         *,
-        email : typing.Text = ...,
-        permissions : typing.Optional[typing.Iterable[global___Permission]] = ...,
-        authenticationMethodId : typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"authenticationMethodId",b"authenticationMethodId",u"email",b"email",u"permissions",b"permissions"]) -> None: ...
+        email: builtins.str = ...,
+        permissions: collections.abc.Iterable[global___Permission] | None = ...,
+        authenticationMethodId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["authenticationMethodId", b"authenticationMethodId", "email", b"email", "permissions", b"permissions"]) -> None: ...
+
 global___UserPermission = UserPermission
 
 class AuthenticationMethod(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     TRUSTEDPKI_FIELD_NUMBER: builtins.int
     @property
     def trustedPki(self) -> global___TrustedPki: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        trustedPki : typing.Optional[global___TrustedPki] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"_trustedPki",b"_trustedPki",u"trustedPki",b"trustedPki"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"_trustedPki",b"_trustedPki",u"trustedPki",b"trustedPki"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_trustedPki",b"_trustedPki"]) -> typing.Optional[typing_extensions.Literal["trustedPki"]]: ...
+        trustedPki: global___TrustedPki | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_trustedPki", b"_trustedPki", "trustedPki", b"trustedPki"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_trustedPki", b"_trustedPki", "trustedPki", b"trustedPki"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_trustedPki", b"_trustedPki"]) -> typing_extensions.Literal["trustedPki"] | None: ...
+
 global___AuthenticationMethod = AuthenticationMethod
 
 class TrustedPki(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ROOTCERTIFICATEPEM_FIELD_NUMBER: builtins.int
-    rootCertificatePem: builtins.bytes = ...
-    def __init__(self,
+    rootCertificatePem: builtins.bytes
+    def __init__(
+        self,
         *,
-        rootCertificatePem : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"rootCertificatePem",b"rootCertificatePem"]) -> None: ...
+        rootCertificatePem: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["rootCertificatePem", b"rootCertificatePem"]) -> None: ...
+
 global___TrustedPki = TrustedPki
 
 class Permission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     EXECUTECOMPUTEPERMISSION_FIELD_NUMBER: builtins.int
     LEAFCRUDPERMISSION_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMPERMISSION_FIELD_NUMBER: builtins.int
@@ -505,97 +574,132 @@ class Permission(google.protobuf.message.Message):
     def executeDevelopmentComputePermission(self) -> global___ExecuteDevelopmentComputePermission: ...
     @property
     def mergeConfigurationCommitPermission(self) -> global___MergeConfigurationCommitPermission: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        executeComputePermission : typing.Optional[global___ExecuteComputePermission] = ...,
-        leafCrudPermission : typing.Optional[global___LeafCrudPermission] = ...,
-        retrieveDataRoomPermission : typing.Optional[global___RetrieveDataRoomPermission] = ...,
-        retrieveAuditLogPermission : typing.Optional[global___RetrieveAuditLogPermission] = ...,
-        retrieveDataRoomStatusPermission : typing.Optional[global___RetrieveDataRoomStatusPermission] = ...,
-        updateDataRoomStatusPermission : typing.Optional[global___UpdateDataRoomStatusPermission] = ...,
-        retrievePublishedDatasetsPermission : typing.Optional[global___RetrievePublishedDatasetsPermission] = ...,
-        dryRunPermission : typing.Optional[global___DryRunPermission] = ...,
-        generateMergeSignaturePermission : typing.Optional[global___GenerateMergeSignaturePermission] = ...,
-        executeDevelopmentComputePermission : typing.Optional[global___ExecuteDevelopmentComputePermission] = ...,
-        mergeConfigurationCommitPermission : typing.Optional[global___MergeConfigurationCommitPermission] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"dryRunPermission",b"dryRunPermission",u"executeComputePermission",b"executeComputePermission",u"executeDevelopmentComputePermission",b"executeDevelopmentComputePermission",u"generateMergeSignaturePermission",b"generateMergeSignaturePermission",u"leafCrudPermission",b"leafCrudPermission",u"mergeConfigurationCommitPermission",b"mergeConfigurationCommitPermission",u"permission",b"permission",u"retrieveAuditLogPermission",b"retrieveAuditLogPermission",u"retrieveDataRoomPermission",b"retrieveDataRoomPermission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dryRunPermission",b"dryRunPermission",u"executeComputePermission",b"executeComputePermission",u"executeDevelopmentComputePermission",b"executeDevelopmentComputePermission",u"generateMergeSignaturePermission",b"generateMergeSignaturePermission",u"leafCrudPermission",b"leafCrudPermission",u"mergeConfigurationCommitPermission",b"mergeConfigurationCommitPermission",u"permission",b"permission",u"retrieveAuditLogPermission",b"retrieveAuditLogPermission",u"retrieveDataRoomPermission",b"retrieveDataRoomPermission",u"retrieveDataRoomStatusPermission",b"retrieveDataRoomStatusPermission",u"retrievePublishedDatasetsPermission",b"retrievePublishedDatasetsPermission",u"updateDataRoomStatusPermission",b"updateDataRoomStatusPermission"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"permission",b"permission"]) -> typing.Optional[typing_extensions.Literal["executeComputePermission","leafCrudPermission","retrieveDataRoomPermission","retrieveAuditLogPermission","retrieveDataRoomStatusPermission","updateDataRoomStatusPermission","retrievePublishedDatasetsPermission","dryRunPermission","generateMergeSignaturePermission","executeDevelopmentComputePermission","mergeConfigurationCommitPermission"]]: ...
+        executeComputePermission: global___ExecuteComputePermission | None = ...,
+        leafCrudPermission: global___LeafCrudPermission | None = ...,
+        retrieveDataRoomPermission: global___RetrieveDataRoomPermission | None = ...,
+        retrieveAuditLogPermission: global___RetrieveAuditLogPermission | None = ...,
+        retrieveDataRoomStatusPermission: global___RetrieveDataRoomStatusPermission | None = ...,
+        updateDataRoomStatusPermission: global___UpdateDataRoomStatusPermission | None = ...,
+        retrievePublishedDatasetsPermission: global___RetrievePublishedDatasetsPermission | None = ...,
+        dryRunPermission: global___DryRunPermission | None = ...,
+        generateMergeSignaturePermission: global___GenerateMergeSignaturePermission | None = ...,
+        executeDevelopmentComputePermission: global___ExecuteDevelopmentComputePermission | None = ...,
+        mergeConfigurationCommitPermission: global___MergeConfigurationCommitPermission | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dryRunPermission", b"dryRunPermission", "executeComputePermission", b"executeComputePermission", "executeDevelopmentComputePermission", b"executeDevelopmentComputePermission", "generateMergeSignaturePermission", b"generateMergeSignaturePermission", "leafCrudPermission", b"leafCrudPermission", "mergeConfigurationCommitPermission", b"mergeConfigurationCommitPermission", "permission", b"permission", "retrieveAuditLogPermission", b"retrieveAuditLogPermission", "retrieveDataRoomPermission", b"retrieveDataRoomPermission", "retrieveDataRoomStatusPermission", b"retrieveDataRoomStatusPermission", "retrievePublishedDatasetsPermission", b"retrievePublishedDatasetsPermission", "updateDataRoomStatusPermission", b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dryRunPermission", b"dryRunPermission", "executeComputePermission", b"executeComputePermission", "executeDevelopmentComputePermission", b"executeDevelopmentComputePermission", "generateMergeSignaturePermission", b"generateMergeSignaturePermission", "leafCrudPermission", b"leafCrudPermission", "mergeConfigurationCommitPermission", b"mergeConfigurationCommitPermission", "permission", b"permission", "retrieveAuditLogPermission", b"retrieveAuditLogPermission", "retrieveDataRoomPermission", b"retrieveDataRoomPermission", "retrieveDataRoomStatusPermission", b"retrieveDataRoomStatusPermission", "retrievePublishedDatasetsPermission", b"retrievePublishedDatasetsPermission", "updateDataRoomStatusPermission", b"updateDataRoomStatusPermission"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["permission", b"permission"]) -> typing_extensions.Literal["executeComputePermission", "leafCrudPermission", "retrieveDataRoomPermission", "retrieveAuditLogPermission", "retrieveDataRoomStatusPermission", "updateDataRoomStatusPermission", "retrievePublishedDatasetsPermission", "dryRunPermission", "generateMergeSignaturePermission", "executeDevelopmentComputePermission", "mergeConfigurationCommitPermission"] | None: ...
+
 global___Permission = Permission
 
 class ExecuteComputePermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    COMPUTENODENAME_FIELD_NUMBER: builtins.int
-    computeNodeName: typing.Text = ...
-    def __init__(self,
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    COMPUTENODEID_FIELD_NUMBER: builtins.int
+    computeNodeId: builtins.str
+    def __init__(
+        self,
         *,
-        computeNodeName : typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"computeNodeName",b"computeNodeName"]) -> None: ...
+        computeNodeId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId"]) -> None: ...
+
 global___ExecuteComputePermission = ExecuteComputePermission
 
 class LeafCrudPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    LEAFNODENAME_FIELD_NUMBER: builtins.int
-    leafNodeName: typing.Text = ...
-    def __init__(self,
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LEAFNODEID_FIELD_NUMBER: builtins.int
+    leafNodeId: builtins.str
+    def __init__(
+        self,
         *,
-        leafNodeName : typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"leafNodeName",b"leafNodeName"]) -> None: ...
+        leafNodeId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["leafNodeId", b"leafNodeId"]) -> None: ...
+
 global___LeafCrudPermission = LeafCrudPermission
 
 class RetrieveDataRoomPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___RetrieveDataRoomPermission = RetrieveDataRoomPermission
 
 class RetrieveAuditLogPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___RetrieveAuditLogPermission = RetrieveAuditLogPermission
 
 class RetrieveDataRoomStatusPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___RetrieveDataRoomStatusPermission = RetrieveDataRoomStatusPermission
 
 class UpdateDataRoomStatusPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___UpdateDataRoomStatusPermission = UpdateDataRoomStatusPermission
 
 class RetrievePublishedDatasetsPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___RetrievePublishedDatasetsPermission = RetrievePublishedDatasetsPermission
 
 class DryRunPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___DryRunPermission = DryRunPermission
 
 class GenerateMergeSignaturePermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___GenerateMergeSignaturePermission = GenerateMergeSignaturePermission
 
 class ExecuteDevelopmentComputePermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___ExecuteDevelopmentComputePermission = ExecuteDevelopmentComputePermission
 
 class MergeConfigurationCommitPermission(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___MergeConfigurationCommitPermission = MergeConfigurationCommitPermission

@@ -82,7 +82,7 @@ class SqlCompute(Node):
             self,
             name: str,
             sql_statement: str,
-            dependencies: List[(str, str)],
+            dependencies: List[Tuple[str, str]],
             *,
             privacy_settings: Optional[PrivacySettings] = None,
             constraints: Optional[List[Constraint]] = None,

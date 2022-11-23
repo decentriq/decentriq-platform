@@ -1,11 +1,32 @@
 """
 .. include:: ../../decentriq_platform_docs/gcg_getting_started.md
----
+___
 """
 __docformat__ = "restructuredtext"
+__pdoc__ = {
+    "api": False,
+    "attestation": True,
+    "authentication": True,
+    "builders": False,
+    "certs": False,
+    "client": False,
+    "compute": False,
+    "config": False,
+    "container": True,
+    "graphql": False,
+    "helpers": False,
+    "node": True,
+    "permission": False,
+    "proto": False,
+    "s3_sink": True,
+    "session": True,
+    "sql": True,
+    "storage": True,
+    "types": True,
+    "verification": False,
+}
 
 from .client import Client, create_client, Session
-from .platform import ClientPlatformFeatures, SessionPlatformFeatures
 from .builders import (
     DataRoomBuilder,
     DataRoomCommitBuilder,
@@ -37,7 +58,6 @@ __all__ = [
     "attestation",
     "types",
     "authentication",
-    "platform",
     "session",
     "node",
 ]
