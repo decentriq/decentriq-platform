@@ -212,14 +212,12 @@ class AttestationSpecificationIntelDcap(google.protobuf.message.Message):
     ACCEPT_DEBUG_FIELD_NUMBER: builtins.int
     ACCEPT_OUT_OF_DATE_FIELD_NUMBER: builtins.int
     ACCEPT_CONFIGURATION_NEEDED_FIELD_NUMBER: builtins.int
-    ACCEPT_SW_HARDENING_NEEDED_FIELD_NUMBER: builtins.int
     ACCEPT_REVOKED_FIELD_NUMBER: builtins.int
     mrenclave: builtins.bytes
     dcapRootCaDer: builtins.bytes
     accept_debug: builtins.bool
     accept_out_of_date: builtins.bool
     accept_configuration_needed: builtins.bool
-    accept_sw_hardening_needed: builtins.bool
     accept_revoked: builtins.bool
     def __init__(
         self,
@@ -229,10 +227,9 @@ class AttestationSpecificationIntelDcap(google.protobuf.message.Message):
         accept_debug: builtins.bool = ...,
         accept_out_of_date: builtins.bool = ...,
         accept_configuration_needed: builtins.bool = ...,
-        accept_sw_hardening_needed: builtins.bool = ...,
         accept_revoked: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["accept_configuration_needed", b"accept_configuration_needed", "accept_debug", b"accept_debug", "accept_out_of_date", b"accept_out_of_date", "accept_revoked", b"accept_revoked", "accept_sw_hardening_needed", b"accept_sw_hardening_needed", "dcapRootCaDer", b"dcapRootCaDer", "mrenclave", b"mrenclave"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["accept_configuration_needed", b"accept_configuration_needed", "accept_debug", b"accept_debug", "accept_out_of_date", b"accept_out_of_date", "accept_revoked", b"accept_revoked", "dcapRootCaDer", b"dcapRootCaDer", "mrenclave", b"mrenclave"]) -> None: ...
 
 global___AttestationSpecificationIntelDcap = AttestationSpecificationIntelDcap
 

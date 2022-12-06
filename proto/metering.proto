@@ -11,8 +11,8 @@ message MeteringRequest {
         StopDcrRequest stopDcr = 3;
         PublishDatasetRequest publishDataset = 4;
         UnpublishDatasetRequest unpublishDataset = 5;
-        ContainerMetadataRequest containerMetadata = 6;
-        SubmitContainerExecutionTimeRequest submitContainerExecutionTime = 7;
+        WorkerMetadataRequest workerMetadata = 6;
+        SubmitWorkerExecutionTimeRequest submitWorkerExecutionTime = 7;
         DcrInteractionRequest dcrInteraction = 8;
     }
 }
@@ -24,8 +24,8 @@ message MeteringSuccessResponse {
         StopDcrResponse stopDcr = 3;
         PublishDatasetResponse publishDataset = 4;
         UnpublishDatasetResponse unpublishDataset = 5;
-        ContainerMetadataResponse containerMetadata = 6;
-        SubmitContainerExecutionTimeResponse submitContainerExecutionTime = 7;
+        WorkerMetadataResponse workerMetadata = 6;
+        SubmitWorkerExecutionTimeResponse submitWorkerExecutionTime = 7;
         DcrInteractionResponse dcrInteraction = 8;
     }
 }
@@ -60,7 +60,7 @@ message CreateDcrRequest {
     /// The driver attestation hash
     required string driverAttestationHash = 4;
     repeated string participantEmails = 5;
-    // Optional metadata that will be persisted to the database
+    /// Optional metadata that will be persisted to the database
     optional bytes metadata = 6;
 }
 
@@ -116,17 +116,22 @@ message PublishDatasetResponse {}
 
 message UnpublishDatasetResponse {}
 
-message ContainerMetadataRequest {
+message WorkerMetadataRequest {
+    /// Attestation spec of the worker for which to perform the metadata lookup
     required attestation.AttestationSpecification attestationSpec = 1;
+    /// Id of the scope in the context of which a computation is performed
+    required string scopeId = 2;
 }
 
-message ContainerMetadataResponse {
+message WorkerMetadataResponse {
     optional uint64 maxExecutionSeconds = 1;
 }
 
-message SubmitContainerExecutionTimeRequest {
+message SubmitWorkerExecutionTimeRequest {
     required uint32 executionTimeSeconds = 1;
-    required attestation.AttestationSpecification attestationSpec = 2;   
+    required attestation.AttestationSpecification attestationSpec = 2;
+    /// Id of the scope in the context of which a computation is performed
+    required string scopeId = 3;
 }
 
-message SubmitContainerExecutionTimeResponse {}
+message SubmitWorkerExecutionTimeResponse {}
