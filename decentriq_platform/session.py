@@ -30,6 +30,8 @@ from .proto import (
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
     RetrieveConfigurationCommitRequest, ConfigurationCommit,
     MergeConfigurationCommitResponse, DataRoomConfiguration,
+    EndorsementRequest, EndorsementResponse, Pki,
+    PkiEndorsementRequest, PkiEndorsementResponse,
     RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
@@ -66,15 +68,11 @@ def datanoncepubkey_to_message(
         encrypted_data: bytes,
         nonce: bytes,
         pubkey: bytes,
-        sigma_auth: Sigma
 ) -> DataNoncePubkey:
     message = DataNoncePubkey()
     message.data = encrypted_data
     message.nonce = nonce
     message.pubkey = pubkey
-    message.pki.certChainPem = sigma_auth.get_cert_chain()
-    message.pki.signature = sigma_auth.get_signature()
-    message.pki.idMac = sigma_auth.get_mac_tag()
     return message
 
 
@@ -164,25 +162,32 @@ class Session():
         pub_keyB = bytearray(self.report_data[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
 
-    def _encrypt_and_encode_data(self, data: bytes, auth: Auth) -> DataNoncePubkey:
-        nonce = chily.Nonce.from_random()
-        cipher = chily.Cipher(
-            self.keypair.secret, self._get_enclave_pubkey()
-        )
-        enc_data = cipher.encrypt("client sent session data", data, nonce)
-        public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
-        signature = auth._sign(public_keys)
+    def _get_message_pki(self, auth: Auth) -> Pki:
         shared_key = bytes(self.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes)
         hkdf = HKDF(algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b"")
         mac_key = hkdf.derive(shared_key)
         mac_tag = hmac.digest(mac_key, auth._get_user_id().encode(), "sha512")
+        public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
+        signature = auth._sign(public_keys)
         sigma_auth = Sigma(signature, mac_tag, auth)
-        return datanoncepubkey_to_message(
+        return Pki(
+            certChainPem=sigma_auth.get_cert_chain(),
+            signature=sigma_auth.get_signature(),
+            idMac=sigma_auth.get_mac_tag(),
+        )
+
+    def _encrypt_and_encode_data(self, data: bytes) -> DataNoncePubkey:
+        nonce = chily.Nonce.from_random()
+        cipher = chily.Cipher(
+            self.keypair.secret, self._get_enclave_pubkey()
+        )
+        enc_data = cipher.encrypt("client sent session data", data, nonce)        
+        data_nonce_pubkey = datanoncepubkey_to_message(
             bytes(enc_data),
             bytes(nonce.bytes),
             bytes(self.keypair.public_key.bytes),
-            sigma_auth
         )
+        return data_nonce_pubkey 
 
     def _decode_and_decrypt_data(self, data: bytes) -> bytes:
         dec_data, nonceB, _ = message_to_datanoncepubkey(data)
@@ -190,6 +195,43 @@ class Session():
             self.keypair.secret, self._get_enclave_pubkey()
         )
         return cipher.decrypt("client received session data", dec_data, chily.Nonce.from_bytes(nonceB))
+
+    def _send_endorsement_request(
+            self,
+            request: EndorsementRequest,
+            protocol: int,
+    ) -> EndorsementResponse:
+        responses = self.send_request(GcgRequest(endorsementRequest=request), protocol)
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+
+        if not response.HasField("endorsementResponse"):
+            raise Exception(
+                "Expected endorsementResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.endorsementResponse
+
+    def pki_endorsement(
+            self,
+            certificate_chain_pem: bytes,
+    ) -> PkiEndorsementResponse:
+        endpoint_protocols = [3]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        request = PkiEndorsementRequest(
+            certificateChainPem=certificate_chain_pem
+        )
+        response = self._send_endorsement_request(EndorsementRequest(pkiEndorsementRequest=request), protocol)
+
+        if not response.HasField("pkiEndorsementResponse"):
+            raise Exception(
+                "Expected createDataRoomResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+
+        return response.pkiEndorsementResponse
 
     def send_request(
             self,
@@ -203,6 +245,9 @@ class Session():
         """
         if self.has_dcr_secret:
             request.dcrSecret = self._dcr_secret
+        message_pki = self._get_message_pki(self.auth)
+        request.userAuth.pki.CopyFrom(message_pki)
+        request.userAuth.enclaveEndorsements.CopyFrom(self.auth.endorsements)
         gcg_protocol = serialize_length_delimited(
             ComputeNodeProtocol(
                 version=protocol
@@ -211,8 +256,7 @@ class Session():
         serialized_request = serialize_length_delimited(
             Request(
                 deltaRequest = self._encrypt_and_encode_data(
-                    gcg_protocol + serialize_length_delimited(request),
-                    self.auth
+                    gcg_protocol + serialize_length_delimited(request)
                 )
             )
         )

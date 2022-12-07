@@ -2,9 +2,11 @@ syntax = "proto3";
 package gcg;
 
 import "data_room.proto";
+import "identity_endorsement.proto";
 
 message GcgRequest {
     optional string dcrSecret = 1;
+    UserAuth userAuth = 901; // TODO: change to 1 once we've implemented dcrSecret as enclaveEndorsement 
     oneof gcg_request {
         CreateDataRoomRequest createDataRoomRequest = 2;
         RetrieveDataRoomRequest retrieveDataRoomRequest = 3;
@@ -25,6 +27,7 @@ message GcgRequest {
         MergeConfigurationCommitRequest mergeConfigurationCommitRequest = 18;
         RetrieveConfigurationCommitApproversRequest retrieveConfigurationCommitApproversRequest = 19;
         RetrieveDcrSecretIdRequest retrieveDcrSecretIdRequest = 20;
+        identity_endorsement.EndorsementRequest endorsementRequest = 101;
     }
 }
 
@@ -50,7 +53,19 @@ message GcgResponse {
         MergeConfigurationCommitResponse mergeConfigurationCommitResponse = 18;
         RetrieveConfigurationCommitApproversResponse retrieveConfigurationCommitApproversResponse = 19;
         RetrieveDcrSecretIdResponse retrieveDcrSecretIdResponse = 20;
+        identity_endorsement.EndorsementResponse endorsementResponse = 101;
     }
+}
+
+message UserAuth {
+    Pki pki = 1;
+    identity_endorsement.EnclaveEndorsements enclaveEndorsements = 2;
+}
+
+message Pki {
+    bytes certChainPem = 1;
+    bytes signature = 2;
+    bytes idMac = 3;
 }
 
 message CreateDataRoomRequest {

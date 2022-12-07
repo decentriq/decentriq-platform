@@ -14,15 +14,15 @@ _sym_db = _symbol_database.Default()
 from . import attestation_pb2 as attestation__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\x1a\x11\x61ttestation.proto\"\xde\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x39\n\x12governanceProtocol\x18\x04 \x01(\x0b\x32\x1d.data_room.GovernanceProtocol\x12>\n\x14initialConfiguration\x18\x05 \x01(\x0b\x32 .data_room.DataRoomConfiguration\x12\x18\n\x0b\x64\x63rSecretId\x18\x06 \x01(\x0cH\x00\x88\x01\x01\x42\x0e\n\x0c_dcrSecretId\"\xb6\x01\n\x12GovernanceProtocol\x12?\n\x14staticDataRoomPolicy\x18\x01 \x01(\x0b\x32\x1f.data_room.StaticDataRoomPolicyH\x00\x12U\n\x1f\x61\x66\x66\x65\x63tedDataOwnersApprovePolicy\x18\x02 \x01(\x0b\x32*.data_room.AffectedDataOwnersApprovePolicyH\x00\x42\x08\n\x06policy\"\x16\n\x14StaticDataRoomPolicy\"!\n\x1f\x41\x66\x66\x65\x63tedDataOwnersApprovePolicy\"J\n\x15\x44\x61taRoomConfiguration\x12\x31\n\x08\x65lements\x18\x01 \x03(\x0b\x32\x1f.data_room.ConfigurationElement\"\x9d\x02\n\x14\x43onfigurationElement\x12\n\n\x02id\x18\x01 \x01(\t\x12-\n\x0b\x63omputeNode\x18\x02 \x01(\x0b\x32\x16.data_room.ComputeNodeH\x00\x12I\n\x18\x61ttestationSpecification\x18\x03 \x01(\x0b\x32%.attestation.AttestationSpecificationH\x00\x12\x33\n\x0euserPermission\x18\x04 \x01(\x0b\x32\x19.data_room.UserPermissionH\x00\x12?\n\x14\x61uthenticationMethod\x18\x05 \x01(\x0b\x32\x1f.data_room.AuthenticationMethodH\x00\x42\t\n\x07\x65lement\"\xb8\x01\n\x19\x43onfigurationModification\x12)\n\x03\x61\x64\x64\x18\x01 \x01(\x0b\x32\x1a.data_room.AddModificationH\x00\x12/\n\x06\x63hange\x18\x02 \x01(\x0b\x32\x1d.data_room.ChangeModificationH\x00\x12/\n\x06\x64\x65lete\x18\x03 \x01(\x0b\x32\x1d.data_room.DeleteModificationH\x00\x42\x0e\n\x0cmodification\"C\n\x0f\x41\x64\x64Modification\x12\x30\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1f.data_room.ConfigurationElement\"F\n\x12\x43hangeModification\x12\x30\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1f.data_room.ConfigurationElement\" \n\x12\x44\x65leteModification\x12\n\n\x02id\x18\x01 \x01(\t\"\x9c\x01\n\x13\x43onfigurationCommit\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x12\n\ndataRoomId\x18\x03 \x01(\x0c\x12\x1a\n\x12\x64\x61taRoomHistoryPin\x18\x04 \x01(\x0c\x12;\n\rmodifications\x18\x05 \x03(\x0b\x32$.data_room.ConfigurationModification\"\xb9\x01\n\x0b\x43omputeNode\x12\x10\n\x08nodeName\x18\x01 \x01(\t\x12*\n\x04leaf\x18\x02 \x01(\x0b\x32\x1a.data_room.ComputeNodeLeafH\x00\x12\x34\n\tparameter\x18\x04 \x01(\x0b\x32\x1f.data_room.ComputeNodeParameterH\x00\x12.\n\x06\x62ranch\x18\x03 \x01(\x0b\x32\x1c.data_room.ComputeNodeBranchH\x00\x42\x06\n\x04node\"%\n\x0f\x43omputeNodeLeaf\x12\x12\n\nisRequired\x18\x01 \x01(\x08\"*\n\x14\x43omputeNodeParameter\x12\x12\n\nisRequired\x18\x01 \x01(\x08\"&\n\x13\x43omputeNodeProtocol\x12\x0f\n\x07version\x18\x01 \x01(\r\"\xc3\x01\n\x11\x43omputeNodeBranch\x12\x0e\n\x06\x63onfig\x18\x01 \x01(\x0c\x12\x14\n\x0c\x64\x65pendencies\x18\x02 \x03(\t\x12\x32\n\x0coutputFormat\x18\x03 \x01(\x0e\x32\x1c.data_room.ComputeNodeFormat\x12\x30\n\x08protocol\x18\x04 \x01(\x0b\x32\x1e.data_room.ComputeNodeProtocol\x12\"\n\x1a\x61ttestationSpecificationId\x18\x05 \x01(\t\"k\n\x0eUserPermission\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12*\n\x0bpermissions\x18\x02 \x03(\x0b\x32\x15.data_room.Permission\x12\x1e\n\x16\x61uthenticationMethodId\x18\x03 \x01(\t\"U\n\x14\x41uthenticationMethod\x12.\n\ntrustedPki\x18\x01 \x01(\x0b\x32\x15.data_room.TrustedPkiH\x00\x88\x01\x01\x42\r\n\x0b_trustedPki\"(\n\nTrustedPki\x12\x1a\n\x12rootCertificatePem\x18\x01 \x01(\x0c\"\x95\x07\n\nPermission\x12G\n\x18\x65xecuteComputePermission\x18\x01 \x01(\x0b\x32#.data_room.ExecuteComputePermissionH\x00\x12;\n\x12leafCrudPermission\x18\x02 \x01(\x0b\x32\x1d.data_room.LeafCrudPermissionH\x00\x12K\n\x1aretrieveDataRoomPermission\x18\x03 \x01(\x0b\x32%.data_room.RetrieveDataRoomPermissionH\x00\x12K\n\x1aretrieveAuditLogPermission\x18\x04 \x01(\x0b\x32%.data_room.RetrieveAuditLogPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x12]\n#retrievePublishedDatasetsPermission\x18\x07 \x01(\x0b\x32..data_room.RetrievePublishedDatasetsPermissionH\x00\x12\x37\n\x10\x64ryRunPermission\x18\x08 \x01(\x0b\x32\x1b.data_room.DryRunPermissionH\x00\x12W\n generateMergeSignaturePermission\x18\t \x01(\x0b\x32+.data_room.GenerateMergeSignaturePermissionH\x00\x12]\n#executeDevelopmentComputePermission\x18\n \x01(\x0b\x32..data_room.ExecuteDevelopmentComputePermissionH\x00\x12[\n\"mergeConfigurationCommitPermission\x18\x0b \x01(\x0b\x32-.data_room.MergeConfigurationCommitPermissionH\x00\x42\x0c\n\npermission\"1\n\x18\x45xecuteComputePermission\x12\x15\n\rcomputeNodeId\x18\x01 \x01(\t\"(\n\x12LeafCrudPermission\x12\x12\n\nleafNodeId\x18\x01 \x01(\t\"\x1c\n\x1aRetrieveDataRoomPermission\"\x1c\n\x1aRetrieveAuditLogPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"%\n#RetrievePublishedDatasetsPermission\"\x12\n\x10\x44ryRunPermission\"\"\n GenerateMergeSignaturePermission\"%\n#ExecuteDevelopmentComputePermission\"$\n\"MergeConfigurationCommitPermission*%\n\x11\x43omputeNodeFormat\x12\x07\n\x03RAW\x10\x00\x12\x07\n\x03ZIP\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x64\x61ta_room.proto\x12\tdata_room\x1a\x11\x61ttestation.proto\"\xde\x01\n\x08\x44\x61taRoom\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x39\n\x12governanceProtocol\x18\x04 \x01(\x0b\x32\x1d.data_room.GovernanceProtocol\x12>\n\x14initialConfiguration\x18\x05 \x01(\x0b\x32 .data_room.DataRoomConfiguration\x12\x18\n\x0b\x64\x63rSecretId\x18\x06 \x01(\x0cH\x00\x88\x01\x01\x42\x0e\n\x0c_dcrSecretId\"\xb6\x01\n\x12GovernanceProtocol\x12?\n\x14staticDataRoomPolicy\x18\x01 \x01(\x0b\x32\x1f.data_room.StaticDataRoomPolicyH\x00\x12U\n\x1f\x61\x66\x66\x65\x63tedDataOwnersApprovePolicy\x18\x02 \x01(\x0b\x32*.data_room.AffectedDataOwnersApprovePolicyH\x00\x42\x08\n\x06policy\"\x16\n\x14StaticDataRoomPolicy\"!\n\x1f\x41\x66\x66\x65\x63tedDataOwnersApprovePolicy\"J\n\x15\x44\x61taRoomConfiguration\x12\x31\n\x08\x65lements\x18\x01 \x03(\x0b\x32\x1f.data_room.ConfigurationElement\"\x9d\x02\n\x14\x43onfigurationElement\x12\n\n\x02id\x18\x01 \x01(\t\x12-\n\x0b\x63omputeNode\x18\x02 \x01(\x0b\x32\x16.data_room.ComputeNodeH\x00\x12I\n\x18\x61ttestationSpecification\x18\x03 \x01(\x0b\x32%.attestation.AttestationSpecificationH\x00\x12\x33\n\x0euserPermission\x18\x04 \x01(\x0b\x32\x19.data_room.UserPermissionH\x00\x12?\n\x14\x61uthenticationMethod\x18\x05 \x01(\x0b\x32\x1f.data_room.AuthenticationMethodH\x00\x42\t\n\x07\x65lement\"\xb8\x01\n\x19\x43onfigurationModification\x12)\n\x03\x61\x64\x64\x18\x01 \x01(\x0b\x32\x1a.data_room.AddModificationH\x00\x12/\n\x06\x63hange\x18\x02 \x01(\x0b\x32\x1d.data_room.ChangeModificationH\x00\x12/\n\x06\x64\x65lete\x18\x03 \x01(\x0b\x32\x1d.data_room.DeleteModificationH\x00\x42\x0e\n\x0cmodification\"C\n\x0f\x41\x64\x64Modification\x12\x30\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1f.data_room.ConfigurationElement\"F\n\x12\x43hangeModification\x12\x30\n\x07\x65lement\x18\x01 \x01(\x0b\x32\x1f.data_room.ConfigurationElement\" \n\x12\x44\x65leteModification\x12\n\n\x02id\x18\x01 \x01(\t\"\x9c\x01\n\x13\x43onfigurationCommit\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x12\n\ndataRoomId\x18\x03 \x01(\x0c\x12\x1a\n\x12\x64\x61taRoomHistoryPin\x18\x04 \x01(\x0c\x12;\n\rmodifications\x18\x05 \x03(\x0b\x32$.data_room.ConfigurationModification\"\xb9\x01\n\x0b\x43omputeNode\x12\x10\n\x08nodeName\x18\x01 \x01(\t\x12*\n\x04leaf\x18\x02 \x01(\x0b\x32\x1a.data_room.ComputeNodeLeafH\x00\x12\x34\n\tparameter\x18\x04 \x01(\x0b\x32\x1f.data_room.ComputeNodeParameterH\x00\x12.\n\x06\x62ranch\x18\x03 \x01(\x0b\x32\x1c.data_room.ComputeNodeBranchH\x00\x42\x06\n\x04node\"%\n\x0f\x43omputeNodeLeaf\x12\x12\n\nisRequired\x18\x01 \x01(\x08\"*\n\x14\x43omputeNodeParameter\x12\x12\n\nisRequired\x18\x01 \x01(\x08\"&\n\x13\x43omputeNodeProtocol\x12\x0f\n\x07version\x18\x01 \x01(\r\"\xc3\x01\n\x11\x43omputeNodeBranch\x12\x0e\n\x06\x63onfig\x18\x01 \x01(\x0c\x12\x14\n\x0c\x64\x65pendencies\x18\x02 \x03(\t\x12\x32\n\x0coutputFormat\x18\x03 \x01(\x0e\x32\x1c.data_room.ComputeNodeFormat\x12\x30\n\x08protocol\x18\x04 \x01(\x0b\x32\x1e.data_room.ComputeNodeProtocol\x12\"\n\x1a\x61ttestationSpecificationId\x18\x05 \x01(\t\"k\n\x0eUserPermission\x12\r\n\x05\x65mail\x18\x01 \x01(\t\x12*\n\x0bpermissions\x18\x02 \x03(\x0b\x32\x15.data_room.Permission\x12\x1e\n\x16\x61uthenticationMethodId\x18\x03 \x01(\t\"f\n\x14\x41uthenticationMethod\x12)\n\x0bpersonalPki\x18\x01 \x01(\x0b\x32\x14.data_room.PkiPolicy\x12#\n\x05\x64qPki\x18\x02 \x01(\x0b\x32\x14.data_room.PkiPolicy\"\'\n\tPkiPolicy\x12\x1a\n\x12rootCertificatePem\x18\x01 \x01(\x0c\"\x95\x07\n\nPermission\x12G\n\x18\x65xecuteComputePermission\x18\x01 \x01(\x0b\x32#.data_room.ExecuteComputePermissionH\x00\x12;\n\x12leafCrudPermission\x18\x02 \x01(\x0b\x32\x1d.data_room.LeafCrudPermissionH\x00\x12K\n\x1aretrieveDataRoomPermission\x18\x03 \x01(\x0b\x32%.data_room.RetrieveDataRoomPermissionH\x00\x12K\n\x1aretrieveAuditLogPermission\x18\x04 \x01(\x0b\x32%.data_room.RetrieveAuditLogPermissionH\x00\x12W\n retrieveDataRoomStatusPermission\x18\x05 \x01(\x0b\x32+.data_room.RetrieveDataRoomStatusPermissionH\x00\x12S\n\x1eupdateDataRoomStatusPermission\x18\x06 \x01(\x0b\x32).data_room.UpdateDataRoomStatusPermissionH\x00\x12]\n#retrievePublishedDatasetsPermission\x18\x07 \x01(\x0b\x32..data_room.RetrievePublishedDatasetsPermissionH\x00\x12\x37\n\x10\x64ryRunPermission\x18\x08 \x01(\x0b\x32\x1b.data_room.DryRunPermissionH\x00\x12W\n generateMergeSignaturePermission\x18\t \x01(\x0b\x32+.data_room.GenerateMergeSignaturePermissionH\x00\x12]\n#executeDevelopmentComputePermission\x18\n \x01(\x0b\x32..data_room.ExecuteDevelopmentComputePermissionH\x00\x12[\n\"mergeConfigurationCommitPermission\x18\x0b \x01(\x0b\x32-.data_room.MergeConfigurationCommitPermissionH\x00\x42\x0c\n\npermission\"1\n\x18\x45xecuteComputePermission\x12\x15\n\rcomputeNodeId\x18\x01 \x01(\t\"(\n\x12LeafCrudPermission\x12\x12\n\nleafNodeId\x18\x01 \x01(\t\"\x1c\n\x1aRetrieveDataRoomPermission\"\x1c\n\x1aRetrieveAuditLogPermission\"\"\n RetrieveDataRoomStatusPermission\" \n\x1eUpdateDataRoomStatusPermission\"%\n#RetrievePublishedDatasetsPermission\"\x12\n\x10\x44ryRunPermission\"\"\n GenerateMergeSignaturePermission\"%\n#ExecuteDevelopmentComputePermission\"$\n\"MergeConfigurationCommitPermission*%\n\x11\x43omputeNodeFormat\x12\x07\n\x03RAW\x10\x00\x12\x07\n\x03ZIP\x10\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'data_room_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _COMPUTENODEFORMAT._serialized_start=3465
-  _COMPUTENODEFORMAT._serialized_end=3502
+  _COMPUTENODEFORMAT._serialized_start=3481
+  _COMPUTENODEFORMAT._serialized_end=3518
   _DATAROOM._serialized_start=50
   _DATAROOM._serialized_end=272
   _GOVERNANCEPROTOCOL._serialized_start=275
@@ -58,31 +58,31 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _USERPERMISSION._serialized_start=1912
   _USERPERMISSION._serialized_end=2019
   _AUTHENTICATIONMETHOD._serialized_start=2021
-  _AUTHENTICATIONMETHOD._serialized_end=2106
-  _TRUSTEDPKI._serialized_start=2108
-  _TRUSTEDPKI._serialized_end=2148
-  _PERMISSION._serialized_start=2151
-  _PERMISSION._serialized_end=3068
-  _EXECUTECOMPUTEPERMISSION._serialized_start=3070
-  _EXECUTECOMPUTEPERMISSION._serialized_end=3119
-  _LEAFCRUDPERMISSION._serialized_start=3121
-  _LEAFCRUDPERMISSION._serialized_end=3161
-  _RETRIEVEDATAROOMPERMISSION._serialized_start=3163
-  _RETRIEVEDATAROOMPERMISSION._serialized_end=3191
-  _RETRIEVEAUDITLOGPERMISSION._serialized_start=3193
-  _RETRIEVEAUDITLOGPERMISSION._serialized_end=3221
-  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_start=3223
-  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_end=3257
-  _UPDATEDATAROOMSTATUSPERMISSION._serialized_start=3259
-  _UPDATEDATAROOMSTATUSPERMISSION._serialized_end=3291
-  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_start=3293
-  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_end=3330
-  _DRYRUNPERMISSION._serialized_start=3332
-  _DRYRUNPERMISSION._serialized_end=3350
-  _GENERATEMERGESIGNATUREPERMISSION._serialized_start=3352
-  _GENERATEMERGESIGNATUREPERMISSION._serialized_end=3386
-  _EXECUTEDEVELOPMENTCOMPUTEPERMISSION._serialized_start=3388
-  _EXECUTEDEVELOPMENTCOMPUTEPERMISSION._serialized_end=3425
-  _MERGECONFIGURATIONCOMMITPERMISSION._serialized_start=3427
-  _MERGECONFIGURATIONCOMMITPERMISSION._serialized_end=3463
+  _AUTHENTICATIONMETHOD._serialized_end=2123
+  _PKIPOLICY._serialized_start=2125
+  _PKIPOLICY._serialized_end=2164
+  _PERMISSION._serialized_start=2167
+  _PERMISSION._serialized_end=3084
+  _EXECUTECOMPUTEPERMISSION._serialized_start=3086
+  _EXECUTECOMPUTEPERMISSION._serialized_end=3135
+  _LEAFCRUDPERMISSION._serialized_start=3137
+  _LEAFCRUDPERMISSION._serialized_end=3177
+  _RETRIEVEDATAROOMPERMISSION._serialized_start=3179
+  _RETRIEVEDATAROOMPERMISSION._serialized_end=3207
+  _RETRIEVEAUDITLOGPERMISSION._serialized_start=3209
+  _RETRIEVEAUDITLOGPERMISSION._serialized_end=3237
+  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_start=3239
+  _RETRIEVEDATAROOMSTATUSPERMISSION._serialized_end=3273
+  _UPDATEDATAROOMSTATUSPERMISSION._serialized_start=3275
+  _UPDATEDATAROOMSTATUSPERMISSION._serialized_end=3307
+  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_start=3309
+  _RETRIEVEPUBLISHEDDATASETSPERMISSION._serialized_end=3346
+  _DRYRUNPERMISSION._serialized_start=3348
+  _DRYRUNPERMISSION._serialized_end=3366
+  _GENERATEMERGESIGNATUREPERMISSION._serialized_start=3368
+  _GENERATEMERGESIGNATUREPERMISSION._serialized_end=3402
+  _EXECUTEDEVELOPMENTCOMPUTEPERMISSION._serialized_start=3404
+  _EXECUTEDEVELOPMENTCOMPUTEPERMISSION._serialized_end=3441
+  _MERGECONFIGURATIONCOMMITPERMISSION._serialized_start=3443
+  _MERGECONFIGURATIONCOMMITPERMISSION._serialized_end=3479
 # @@protoc_insertion_point(module_scope)

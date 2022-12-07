@@ -37,6 +37,7 @@ from .permission import Permissions
 from .storage import Key
 from .attestation import enclave_specifications, EnclaveSpecifications
 
+from .endorsement import Endorser
 
 __all__ = [
     "create_client",
@@ -60,4 +61,5 @@ __all__ = [
     "authentication",
     "session",
     "node",
+    "Endorser"
 ]

@@ -510,21 +510,29 @@ global___UserPermission = UserPermission
 class AuthenticationMethod(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    TRUSTEDPKI_FIELD_NUMBER: builtins.int
+    PERSONALPKI_FIELD_NUMBER: builtins.int
+    DQPKI_FIELD_NUMBER: builtins.int
     @property
-    def trustedPki(self) -> global___TrustedPki: ...
+    def personalPki(self) -> global___PkiPolicy: ...
+    @property
+    def dqPki(self) -> global___PkiPolicy:
+        """the policies below could be implemented later on
+        EmailVerificationPolicy emailVerificationPolicy = 3;
+        OpenIdConnectPolicy openIdConnectPolicy = 4;
+        DcrSecretPolicy
+        """
     def __init__(
         self,
         *,
-        trustedPki: global___TrustedPki | None = ...,
+        personalPki: global___PkiPolicy | None = ...,
+        dqPki: global___PkiPolicy | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_trustedPki", b"_trustedPki", "trustedPki", b"trustedPki"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_trustedPki", b"_trustedPki", "trustedPki", b"trustedPki"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_trustedPki", b"_trustedPki"]) -> typing_extensions.Literal["trustedPki"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dqPki", b"dqPki", "personalPki", b"personalPki"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dqPki", b"dqPki", "personalPki", b"personalPki"]) -> None: ...
 
 global___AuthenticationMethod = AuthenticationMethod
 
-class TrustedPki(google.protobuf.message.Message):
+class PkiPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ROOTCERTIFICATEPEM_FIELD_NUMBER: builtins.int
@@ -536,7 +544,7 @@ class TrustedPki(google.protobuf.message.Message):
     ) -> None: ...
     def ClearField(self, field_name: typing_extensions.Literal["rootCertificatePem", b"rootCertificatePem"]) -> None: ...
 
-global___TrustedPki = TrustedPki
+global___PkiPolicy = PkiPolicy
 
 class Permission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor

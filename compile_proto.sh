@@ -25,7 +25,7 @@ function compile_pb() {
     done
 }
 
-MAIN_PACKAGE_PROTO=(gcg.proto data_room.proto attestation.proto delta_enclave_api.proto synth_data.proto compute_sql.proto metering.proto)
+MAIN_PACKAGE_PROTO=(gcg.proto data_room.proto attestation.proto delta_enclave_api.proto synth_data.proto compute_sql.proto metering.proto identity_endorsement.proto)
 SQL_PACKAGE_PROTO=(compute_sql.proto)
 CONTAINER_PACKAGE_PROTO=(compute_container.proto)
 S3_SINK_PACKAGE_PROTO=(compute_s3_sink.proto)

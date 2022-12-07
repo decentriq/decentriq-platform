@@ -13,7 +13,6 @@ from .data_room_pb2 import (
     DryRunPermission,
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, DataRoom,
-    TrustedPki,
     ComputeNodeFormat,
     ComputeNodeProtocol,
     ConfigurationModification,
@@ -24,7 +23,8 @@ from .data_room_pb2 import (
     StaticDataRoomPolicy,
     AffectedDataOwnersApprovePolicy,
     ConfigurationCommit,
-    DataRoomConfiguration
+    DataRoomConfiguration,
+    PkiPolicy,
 )
 from .attestation_pb2 import (
     AttestationSpecification,
@@ -53,7 +53,7 @@ from .gcg_pb2 import (
     RetrieveCurrentDataRoomConfigurationRequest, RetrieveCurrentDataRoomConfigurationResponse,
     RetrieveConfigurationCommitRequest, RetrieveConfigurationCommitResponse, StaticContentConfig,
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
-    RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse
+    RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse, UserAuth, Pki
 )
 from .length_delimited import parse_length_delimited, serialize_length_delimited
 from .delta_enclave_api_pb2 import (
@@ -68,5 +68,13 @@ from .synth_data_pb2 import (
 from .metering_pb2 import (
     DcrMetadata,
     CreateDcrPurpose
+)
+from .identity_endorsement_pb2 import (
+    EndorsementRequest,
+    EndorsementResponse,
+    PkiEndorsementRequest,
+    PkiEndorsementResponse,
+    EnclaveEndorsement,
+    EnclaveEndorsements,
 )
 

@@ -1,19 +1,21 @@
+from typing import BinaryIO, List, Dict, Optional, Tuple
+from .endorsement import Endorser
+
 import hashlib
 import json
 import os
 from threading import BoundedSemaphore
 from concurrent import futures
 from base64 import b64encode
-from typing import BinaryIO, List, Dict, Optional
 from .api import Api
-from .authentication import Auth, generate_key, generate_csr
+from .authentication import Auth, generate_key, generate_self_signed_certificate
 from .config import (
         DECENTRIQ_CLIENT_ID,
         DECENTRIQ_HOST,
         DECENTRIQ_PORT,
         DECENTRIQ_USE_TLS,
 )
-from .session import Session, LATEST_WORKER_PROTOCOL_VERSION
+from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
 from .types import (
     EnclaveSpecification,
@@ -22,16 +24,17 @@ from .types import (
 )
 from .api import NotFoundError
 from .proto import (
-    TrustedPki,
     AttestationSpecification,
     parse_length_delimited,
     serialize_length_delimited,
-    AuthenticationMethod
+    AuthenticationMethod,
+    PkiPolicy
 )
 from .api import (
     Endpoints,
 )
 from .graphql import GqlClient
+
 import base64
 
 
@@ -547,21 +550,27 @@ class Client:
         """
         root_pki = self.decentriq_ca_root_certificate
         return AuthenticationMethod(
-            trustedPki=TrustedPki(rootCertificatePem=root_pki)
+            dqPki=PkiPolicy(rootCertificatePem=root_pki)
         )
 
-    def create_auth_using_decentriq_pki(self) -> Auth:
+    def create_auth_using_decentriq_pki(
+        self,
+        enclaves: Dict[str, EnclaveSpecification]
+    ) -> Tuple[Auth, Endorser]:
+        auth = self.create_auth()
+        endorser = Endorser(auth, self, enclaves)
+        dq_pki = endorser.decentriq_pki_endorsement()
+        auth.attach_endorsement(decentriq_pki=dq_pki)
+        return auth, endorser
+
+    def create_auth(self) -> Auth:
         """
-        Creates a `decentriq_platform.authentication.Auth` object which can be
-        attached to a `decentriq_platform.session.Session`.
-        Sessions created using such an `Auth` object will commonly be used with
-        data rooms that have been configured to use the `decentriq_pki_authentication`
-        authentication method.
+        Creates a `decentriq_platform.authentication.Auth` object which can be attached 
+        to `decentriq_platform.session.Session`.
         """
         keypair = generate_key()
-        csr = generate_csr(self.user_email, keypair)
-        cert_chain_pem = self._get_user_certificate(self.user_email, csr.decode("utf-8"))
-        auth = Auth(cert_chain_pem.encode("utf-8"), keypair, self.user_email)
+        cert_chain_pem = generate_self_signed_certificate(self.user_email, keypair)
+        auth = Auth(cert_chain_pem, keypair, self.user_email)
         return auth
 
     def get_data_room_descriptions(self) -> List[DataRoomDescription]:

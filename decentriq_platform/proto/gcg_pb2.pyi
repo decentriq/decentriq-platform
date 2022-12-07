@@ -9,6 +9,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
+import identity_endorsement_pb2
 import sys
 import typing
 
@@ -38,6 +39,7 @@ class GcgRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     DCRSECRET_FIELD_NUMBER: builtins.int
+    USERAUTH_FIELD_NUMBER: builtins.int
     CREATEDATAROOMREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVECURRENTDATAROOMCONFIGURATIONREQUEST_FIELD_NUMBER: builtins.int
@@ -57,7 +59,11 @@ class GcgRequest(google.protobuf.message.Message):
     MERGECONFIGURATIONCOMMITREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVEDCRSECRETIDREQUEST_FIELD_NUMBER: builtins.int
+    ENDORSEMENTREQUEST_FIELD_NUMBER: builtins.int
     dcrSecret: builtins.str
+    @property
+    def userAuth(self) -> global___UserAuth:
+        """TODO: change to 1 once we've implemented dcrSecret as enclaveEndorsement"""
     @property
     def createDataRoomRequest(self) -> global___CreateDataRoomRequest: ...
     @property
@@ -96,10 +102,13 @@ class GcgRequest(google.protobuf.message.Message):
     def retrieveConfigurationCommitApproversRequest(self) -> global___RetrieveConfigurationCommitApproversRequest: ...
     @property
     def retrieveDcrSecretIdRequest(self) -> global___RetrieveDcrSecretIdRequest: ...
+    @property
+    def endorsementRequest(self) -> identity_endorsement_pb2.EndorsementRequest: ...
     def __init__(
         self,
         *,
         dcrSecret: builtins.str | None = ...,
+        userAuth: global___UserAuth | None = ...,
         createDataRoomRequest: global___CreateDataRoomRequest | None = ...,
         retrieveDataRoomRequest: global___RetrieveDataRoomRequest | None = ...,
         retrieveCurrentDataRoomConfigurationRequest: global___RetrieveCurrentDataRoomConfigurationRequest | None = ...,
@@ -119,13 +128,14 @@ class GcgRequest(google.protobuf.message.Message):
         mergeConfigurationCommitRequest: global___MergeConfigurationCommitRequest | None = ...,
         retrieveConfigurationCommitApproversRequest: global___RetrieveConfigurationCommitApproversRequest | None = ...,
         retrieveDcrSecretIdRequest: global___RetrieveDcrSecretIdRequest | None = ...,
+        endorsementRequest: identity_endorsement_pb2.EndorsementRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_dcrSecret", b"_dcrSecret", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "dcrSecret", b"dcrSecret", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrieveDcrSecretIdRequest", b"retrieveDcrSecretIdRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_dcrSecret", b"_dcrSecret", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "dcrSecret", b"dcrSecret", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrieveDcrSecretIdRequest", b"retrieveDcrSecretIdRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_dcrSecret", b"_dcrSecret", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "dcrSecret", b"dcrSecret", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrieveDcrSecretIdRequest", b"retrieveDcrSecretIdRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_dcrSecret", b"_dcrSecret", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "dcrSecret", b"dcrSecret", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrieveDcrSecretIdRequest", b"retrieveDcrSecretIdRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_dcrSecret", b"_dcrSecret"]) -> typing_extensions.Literal["dcrSecret"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "retrieveDcrSecretIdRequest"] | None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "retrieveDcrSecretIdRequest", "endorsementRequest"] | None: ...
 
 global___GcgRequest = GcgRequest
 
@@ -152,6 +162,7 @@ class GcgResponse(google.protobuf.message.Message):
     MERGECONFIGURATIONCOMMITRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVEDCRSECRETIDRESPONSE_FIELD_NUMBER: builtins.int
+    ENDORSEMENTRESPONSE_FIELD_NUMBER: builtins.int
     failure: builtins.str
     @property
     def createDataRoomResponse(self) -> global___CreateDataRoomResponse: ...
@@ -191,6 +202,8 @@ class GcgResponse(google.protobuf.message.Message):
     def retrieveConfigurationCommitApproversResponse(self) -> global___RetrieveConfigurationCommitApproversResponse: ...
     @property
     def retrieveDcrSecretIdResponse(self) -> global___RetrieveDcrSecretIdResponse: ...
+    @property
+    def endorsementResponse(self) -> identity_endorsement_pb2.EndorsementResponse: ...
     def __init__(
         self,
         *,
@@ -214,12 +227,53 @@ class GcgResponse(google.protobuf.message.Message):
         mergeConfigurationCommitResponse: global___MergeConfigurationCommitResponse | None = ...,
         retrieveConfigurationCommitApproversResponse: global___RetrieveConfigurationCommitApproversResponse | None = ...,
         retrieveDcrSecretIdResponse: global___RetrieveDcrSecretIdResponse | None = ...,
+        endorsementResponse: identity_endorsement_pb2.EndorsementResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrieveDcrSecretIdResponse", b"retrieveDcrSecretIdResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrieveDcrSecretIdResponse", b"retrieveDcrSecretIdResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "retrieveDcrSecretIdResponse"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrieveDcrSecretIdResponse", b"retrieveDcrSecretIdResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrieveDcrSecretIdResponse", b"retrieveDcrSecretIdResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "retrieveDcrSecretIdResponse", "endorsementResponse"] | None: ...
 
 global___GcgResponse = GcgResponse
+
+class UserAuth(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PKI_FIELD_NUMBER: builtins.int
+    ENCLAVEENDORSEMENTS_FIELD_NUMBER: builtins.int
+    @property
+    def pki(self) -> global___Pki: ...
+    @property
+    def enclaveEndorsements(self) -> identity_endorsement_pb2.EnclaveEndorsements: ...
+    def __init__(
+        self,
+        *,
+        pki: global___Pki | None = ...,
+        enclaveEndorsements: identity_endorsement_pb2.EnclaveEndorsements | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["enclaveEndorsements", b"enclaveEndorsements", "pki", b"pki"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["enclaveEndorsements", b"enclaveEndorsements", "pki", b"pki"]) -> None: ...
+
+global___UserAuth = UserAuth
+
+class Pki(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CERTCHAINPEM_FIELD_NUMBER: builtins.int
+    SIGNATURE_FIELD_NUMBER: builtins.int
+    IDMAC_FIELD_NUMBER: builtins.int
+    certChainPem: builtins.bytes
+    signature: builtins.bytes
+    idMac: builtins.bytes
+    def __init__(
+        self,
+        *,
+        certChainPem: builtins.bytes = ...,
+        signature: builtins.bytes = ...,
+        idMac: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["certChainPem", b"certChainPem", "idMac", b"idMac", "signature", b"signature"]) -> None: ...
+
+global___Pki = Pki
 
 class CreateDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor

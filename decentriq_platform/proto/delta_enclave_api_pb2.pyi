@@ -85,45 +85,19 @@ class DataNoncePubkey(google.protobuf.message.Message):
     DATA_FIELD_NUMBER: builtins.int
     NONCE_FIELD_NUMBER: builtins.int
     PUBKEY_FIELD_NUMBER: builtins.int
-    PKI_FIELD_NUMBER: builtins.int
     data: builtins.bytes
     nonce: builtins.bytes
     pubkey: builtins.bytes
-    @property
-    def pki(self) -> global___Pki: ...
     def __init__(
         self,
         *,
         data: builtins.bytes = ...,
         nonce: builtins.bytes = ...,
         pubkey: builtins.bytes = ...,
-        pki: global___Pki | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["auth", b"auth", "pki", b"pki"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["auth", b"auth", "data", b"data", "nonce", b"nonce", "pki", b"pki", "pubkey", b"pubkey"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["auth", b"auth"]) -> typing_extensions.Literal["pki"] | None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["data", b"data", "nonce", b"nonce", "pubkey", b"pubkey"]) -> None: ...
 
 global___DataNoncePubkey = DataNoncePubkey
-
-class Pki(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor
-
-    CERTCHAINPEM_FIELD_NUMBER: builtins.int
-    SIGNATURE_FIELD_NUMBER: builtins.int
-    IDMAC_FIELD_NUMBER: builtins.int
-    certChainPem: builtins.bytes
-    signature: builtins.bytes
-    idMac: builtins.bytes
-    def __init__(
-        self,
-        *,
-        certChainPem: builtins.bytes = ...,
-        signature: builtins.bytes = ...,
-        idMac: builtins.bytes = ...,
-    ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["certChainPem", b"certChainPem", "idMac", b"idMac", "signature", b"signature"]) -> None: ...
-
-global___Pki = Pki
 
 class DataNonce(google.protobuf.message.Message):
     """=========================================================================================================

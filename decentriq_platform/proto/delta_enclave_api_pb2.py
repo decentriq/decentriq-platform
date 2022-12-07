@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x64\x65lta_enclave_api.proto\x12\x11\x64\x65lta_enclave_api\"\x91\x01\n\x07Request\x12:\n\x0c\x64\x65ltaRequest\x18\x01 \x01(\x0b\x32\".delta_enclave_api.DataNoncePubkeyH\x00\x12?\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32#.delta_enclave_api.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\"m\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x01(\x0c\x12%\n\x03pki\x18\x04 \x01(\x0b\x32\x16.delta_enclave_api.PkiH\x00\x42\x06\n\x04\x61uth\"=\n\x03Pki\x12\x14\n\x0c\x63\x65rtChainPem\x18\x01 \x01(\x0c\x12\x11\n\tsignature\x18\x02 \x01(\x0c\x12\r\n\x05idMac\x18\x03 \x01(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\"j\n\x16SealedEncryptedMessage\x12\x36\n\x10\x65ncryptedMessage\x18\x01 \x01(\x0b\x32\x1c.delta_enclave_api.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x01(\x0c\"W\n\x10\x45ncryptionHeader\x12/\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x1b.delta_enclave_api.ChilyKeyH\x00\x42\x12\n\x10\x65ncryptionHeader\"#\n\x08\x43hilyKey\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x01(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x01(\x03\"#\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x01(\x0c\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x64\x65lta_enclave_api.proto\x12\x11\x64\x65lta_enclave_api\"\x91\x01\n\x07Request\x12:\n\x0c\x64\x65ltaRequest\x18\x01 \x01(\x0b\x32\".delta_enclave_api.DataNoncePubkeyH\x00\x12?\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32#.delta_enclave_api.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x01(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\"j\n\x16SealedEncryptedMessage\x12\x36\n\x10\x65ncryptedMessage\x18\x01 \x01(\x0b\x32\x1c.delta_enclave_api.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x01(\x0c\"W\n\x10\x45ncryptionHeader\x12/\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x1b.delta_enclave_api.ChilyKeyH\x00\x42\x12\n\x10\x65ncryptionHeader\"#\n\x08\x43hilyKey\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x01(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x01(\x03\"#\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x01(\x0c\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'delta_enclave_api_pb2', globals())
@@ -27,19 +27,17 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _RESPONSE._serialized_start=245
   _RESPONSE._serialized_end=329
   _DATANONCEPUBKEY._serialized_start=331
-  _DATANONCEPUBKEY._serialized_end=440
-  _PKI._serialized_start=442
-  _PKI._serialized_end=503
-  _DATANONCE._serialized_start=505
-  _DATANONCE._serialized_end=545
-  _SEALEDENCRYPTEDMESSAGE._serialized_start=547
-  _SEALEDENCRYPTEDMESSAGE._serialized_end=653
-  _ENCRYPTIONHEADER._serialized_start=655
-  _ENCRYPTIONHEADER._serialized_end=742
-  _CHILYKEY._serialized_start=744
-  _CHILYKEY._serialized_end=779
-  _VERSIONHEADER._serialized_start=781
-  _VERSIONHEADER._serialized_end=813
-  _CHUNKHEADER._serialized_start=815
-  _CHUNKHEADER._serialized_end=850
+  _DATANONCEPUBKEY._serialized_end=393
+  _DATANONCE._serialized_start=395
+  _DATANONCE._serialized_end=435
+  _SEALEDENCRYPTEDMESSAGE._serialized_start=437
+  _SEALEDENCRYPTEDMESSAGE._serialized_end=543
+  _ENCRYPTIONHEADER._serialized_start=545
+  _ENCRYPTIONHEADER._serialized_end=632
+  _CHILYKEY._serialized_start=634
+  _CHILYKEY._serialized_end=669
+  _VERSIONHEADER._serialized_start=671
+  _VERSIONHEADER._serialized_end=703
+  _CHUNKHEADER._serialized_start=705
+  _CHUNKHEADER._serialized_end=740
 # @@protoc_insertion_point(module_scope)

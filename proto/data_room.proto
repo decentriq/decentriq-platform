@@ -241,10 +241,15 @@ message UserPermission {
 }
 
 message AuthenticationMethod {
-    optional TrustedPki trustedPki = 1;
+    PkiPolicy personalPki = 1;
+    PkiPolicy dqPki = 2;
+	// the policies below could be implemented later on
+    // EmailVerificationPolicy emailVerificationPolicy = 3;
+	// OpenIdConnectPolicy openIdConnectPolicy = 4;
+    // DcrSecretPolicy
 }
 
-message TrustedPki {
+message PkiPolicy {
     bytes rootCertificatePem = 1;
 }
 
