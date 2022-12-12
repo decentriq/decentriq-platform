@@ -52,16 +52,14 @@ message DcrMetadata {
 }
 
 message CreateDcrRequest {
-    /// The data room UUID to be used for the published data room
-    required string id = 1;
+    /// The DCR hash to be used for the published data room
+    required string idHex = 1;
     required string name = 2;
-    /// The hex-encoded data room hash
-    required string enclaveId = 3;
     /// The driver attestation hash
-    required string driverAttestationHash = 4;
-    repeated string participantEmails = 5;
+    required string driverAttestationHash = 3;
+    repeated string participantEmails = 4;
     /// Optional metadata that will be persisted to the database
-    optional bytes metadata = 6;
+    optional bytes metadata = 5;
 }
 
 message DcrInteractionRequest {

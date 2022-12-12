@@ -171,17 +171,14 @@ global___DcrMetadata = DcrMetadata
 class CreateDcrRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-    ID_FIELD_NUMBER: builtins.int
+    IDHEX_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
-    ENCLAVEID_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
     PARTICIPANTEMAILS_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
-    id: builtins.str
-    """/ The data room UUID to be used for the published data room"""
+    idHex: builtins.str
+    """/ The DCR hash to be used for the published data room"""
     name: builtins.str
-    enclaveId: builtins.str
-    """/ The hex-encoded data room hash"""
     driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
     @property
@@ -191,15 +188,14 @@ class CreateDcrRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        id: builtins.str | None = ...,
+        idHex: builtins.str | None = ...,
         name: builtins.str | None = ...,
-        enclaveId: builtins.str | None = ...,
         driverAttestationHash: builtins.str | None = ...,
         participantEmails: collections.abc.Iterable[builtins.str] | None = ...,
         metadata: builtins.bytes | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["driverAttestationHash", b"driverAttestationHash", "enclaveId", b"enclaveId", "id", b"id", "metadata", b"metadata", "name", b"name"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["driverAttestationHash", b"driverAttestationHash", "enclaveId", b"enclaveId", "id", b"id", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails"]) -> None: ...
 
 global___CreateDcrRequest = CreateDcrRequest
 

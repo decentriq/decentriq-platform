@@ -93,8 +93,6 @@ class DataRoomDescription(TypedDict):
     id: str
     """The title that was given to the data room"""
     title: str
-    """The id of the data room on the enclave side"""
-    enclaveId: str
     """The hex-encoded hash of the driver attestation specification"""
     driverAttestationHash: str
     """Whether the data room has been stopped"""

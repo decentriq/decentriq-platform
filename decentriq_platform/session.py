@@ -1,7 +1,6 @@
 from __future__ import annotations
 import chily
 import hashlib
-import uuid
 import hmac
 from base64 import b64decode
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -112,7 +111,7 @@ class Session():
         """
         data = client._graphql.post(
             """
-            query GetFatquote($id: UUID!) {
+            query GetFatquote($id: String!) {
                 session(id: $id) {
                     fatquote
                 }
@@ -716,7 +715,7 @@ class Session():
             data_room_id,
             self.driver_attestation_specification_hash
         )
-        scope_id_bytes = uuid.UUID(scope_id).bytes
+        scope_id_bytes = bytes.fromhex(scope_id)
         request = PublishDatasetToDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             datasetHash=bytes.fromhex(manifest_hash),
@@ -820,7 +819,7 @@ class Session():
             data_room_id,
             self.driver_attestation_specification_hash
         )
-        scope_id_bytes = uuid.UUID(scope_id).bytes
+        scope_id_bytes = bytes.fromhex(scope_id)
         request = ExecuteDevelopmentComputeRequest(
             configurationCommitId=bytes.fromhex(configuration_commit_id),
             computeNodeIds=compute_node_ids,
@@ -858,7 +857,7 @@ class Session():
             data_room_id,
             self.driver_attestation_specification_hash
         )
-        scope_id_bytes = uuid.UUID(scope_id).bytes
+        scope_id_bytes = bytes.fromhex(scope_id)
         request = ExecuteComputeRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             computeNodeIds=compute_node_ids,

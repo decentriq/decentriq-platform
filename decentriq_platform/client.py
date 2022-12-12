@@ -585,7 +585,6 @@ class Client:
                     nodes {
                         id
                         title
-                        enclaveId
                         driverAttestationHash
                         isStopped
                         createdAt
@@ -622,11 +621,10 @@ class Client:
     ) -> Optional[DataRoomDescription]:
         data = self._graphql.post(
             """
-            query GetPublishedDataRoom($dataRoomHash: HexString!, $driverAttestationHash: HexString!) {
-                publishedDataRoomByHash(dataRoomHash: $dataRoomHash, driverAttestationHash: $driverAttestationHash) {
+            query GetPublishedDataRoom($dataRoomHash: String!) {
+                publishedDataRoom(id: $dataRoomHash) {
                     id
                     title
-                    enclaveId
                     driverAttestationHash
                     isStopped
                     createdAt
@@ -639,7 +637,16 @@ class Client:
                 "driverAttestationHash": driver_attestation_hash,
             }
         )
-        return data.get("publishedDataRoomByHash")
+        result = data.get("publishedDataRoom")
+        if result is not None:
+            dcr: DataRoomDescription = result
+            if dcr["driverAttestationHash"] != driver_attestation_hash:
+                raise Exception(
+                    f"Driver attestation hash for request dataroom doesn't match '{dcr['driverAttestationHash']}' != {driver_attestation_hash})"
+                )
+            return dcr
+        else:
+            return None
 
     def _get_user_certificate(self, email: str, csr_pem: str) -> str:
         data = self._graphql.post("""
@@ -668,7 +675,6 @@ class Client:
                                 dataRoom {
                                     id
                                     title
-                                    enclaveId
                                     driverAttestationHash
                                     isStopped
                                     createdAt
@@ -702,7 +708,7 @@ class Client:
     def _get_scope(self, scope_id: str):
         data = self._graphql.post(
             """
-            query GetScope($scopeId: UUID!) {
+            query GetScope($scopeId: String!) {
                 scope(id: $scopeId) {
                     id
                     organization {
