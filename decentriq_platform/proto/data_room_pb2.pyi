@@ -37,13 +37,14 @@ global___ComputeNodeFormat = ComputeNodeFormat
 class DataRoom(google.protobuf.message.Message):
     """/ To create a dataroom the user need to specify the `GovernanceProtocol`
     / and the list of `ConfigurationModification`.
-    / The `GovernanceProtocol` defines how new modifications can be applied to an existing data room.
-    / The list of `ConfigurationModification`s (abbreviated by "Modification" in the diagram below)
-    / defined the structure of the data room itself (the compute nodes,
-    / the permissions, etc...), this list makes up the first `ConfigurationCommit` for the dataroom.
+    / The `GovernanceProtocol` defines how new modifications can be applied to an
+    / existing data room. The list of `ConfigurationModification`s (abbreviated by
+    / "Modification" in the diagram below) defined the structure of the data room
+    / itself (the compute nodes, the permissions, etc...), this list makes up the
+    / first `ConfigurationCommit` for the dataroom.
     /
     / ```diagram
-    /  ┌──────────────────────┐                               
+    /  ┌──────────────────────┐
     /  │CreateDataRoomRequest │           ┌──────────────────┐
     /  │ ┌──────────────────┐ │           │ DataRoomContext  │
     /  │ │GovernanceProtocol│ │           │ ┌──────────────┐ │
@@ -57,12 +58,13 @@ class DataRoom(google.protobuf.message.Message):
     / ```
     /
     / A dataroom has a corresponding `DataRoomContext` which includes a map of the
-    / currently published datasets (and corresponding encryption key) and the commits history
-    / which is a list of the `ConfigurationCommit` that make up the data room
-    /  
+    / currently published datasets (and corresponding encryption key) and the
+    / commits history which is a list of the `ConfigurationCommit` that make up
+    / the data room
+    /
     / ```diagram
-    /  ┌──────────────────────────────┐                                        
-    /  │        CommitsHistory        │                                        
+    /  ┌──────────────────────────────┐
+    /  │        CommitsHistory        │
     /  │┌────────────────────┐        │        ┌────┬─────────────────────────┐
     /  ││ ┌──────────────────┴─┐      │     ┌──│ Id │ConfigurationCommit #1   │
     /  ││ │  ┌─────────────────┴──┐   │     │  └────┴─────────────────────────┘
@@ -75,81 +77,92 @@ class DataRoom(google.protobuf.message.Message):
     /  ││ │  │ ││   DataRoomPin    ││ │     │  ┌────┬─────────────────────────┐
     /  ││ │  │ │└──────────────────┘│ │     ├──│ Id │ConfigurationCommit #4   │
     /  ││ │  │ │┌─────────────┐     │ │     │  └────┴─────────────────────────┘
-    /  ││ │  │ ││ ┌───────────┴─┐   │ │     │                                  
-    /  │└─┤  │ │└─┤┌────────────┴──┐│ │     │                                  
-    /  │  └──┤ │  └┤ Modification  ││ │     │    ┌──────────────────────────┐  
-    /  │     └─┤   └───────────────┘│ │     └───▶│       DataRoomPin        │  
-    /  │       └────────────────────┘ │          └──────────────────────────┘  
+    /  ││ │  │ ││ ┌───────────┴─┐   │ │     │
+    /  │└─┤  │ │└─┤┌────────────┴──┐│ │     │
+    /  │  └──┤ │  └┤ Modification  ││ │     │    ┌──────────────────────────┐
+    /  │     └─┤   └───────────────┘│ │     └───▶│       DataRoomPin        │
+    /  │       └────────────────────┘ │          └──────────────────────────┘
     /  └──────────────────────────────┘
     / ```
     /
-    / Each `ConfigurationCommit` is identified by the data room which it refers to and the
-    / pin of the data room itself. A commit can only be merged if the `pin` corresponds to the
-    / current configuration history state of the data room
+    / Each `ConfigurationCommit` is identified by the data room which it refers to
+    / and the pin of the data room itself. A commit can only be merged if the
+    / `pin` corresponds to the current configuration history state of the data
+    / room
     /
     / ```diagram
     /  ┌───────────────────────────────┐           ┌────────────────┐
     /  │MergeConfigurationCommitRequest│           │ CommitsHistory │
     /  │ ┌───────────────────────────┐ │           └────────────────┘
-    /  │ │  ConfigurationCommit #5   │ │              ┌────┐         
-    /  │ └───────────────────────────┘ │              │ ┌──┴─┐       
-    /  │ ┌─────────────────────┐       ├──────────▶   └─┤ ┌──┴─┐     
-    /  │ │  ┌──────────────────┴──┐    │                └─┤ ┌──┴─┐   
-    /  │ └──┤  ┌──────────────────┴──┐ │                  └─┤ ┌──┴─┐ 
-    /  │    └──┤   MergeSignature    │ │                    └─┤ 5  │ 
-    /  │       └─────────────────────┘ │                      └────┘ 
-    /  └───────────────────────────────┘                             
+    /  │ │  ConfigurationCommit #5   │ │              ┌────┐
+    /  │ └───────────────────────────┘ │              │ ┌──┴─┐
+    /  │ ┌─────────────────────┐       ├──────────▶   └─┤ ┌──┴─┐
+    /  │ │  ┌──────────────────┴──┐    │                └─┤ ┌──┴─┐
+    /  │ └──┤  ┌──────────────────┴──┐ │                  └─┤ ┌──┴─┐
+    /  │    └──┤   MergeSignature    │ │                    └─┤ 5  │
+    /  │       └─────────────────────┘ │                      └────┘
+    /  └───────────────────────────────┘
     / ```
     /
-    / When a user collects the approval signatures required to merge a commit, this can
-    / be added to the commits history.
-    / The list of approvers depends both on the commit and the `GovernanceProtocol` that
-    / the data room is configured with:
-    / - StaticDataRoomPolicy: the data room is static, there isn't an approver that
+    / When a user collects the approval signatures required to merge a commit,
+    / this can be added to the commits history. The list of approvers depends both
+    / on the commit and the `GovernanceProtocol` that the data room is configured
+    / with:
+    / - StaticDataRoomPolicy: the data room is static, there isn't an approver
+    / that
     /    can authorize the merge
-    / - AffectedDataOwnersApprovePolicy: the approvers for a commit are the user which have
+    / - AffectedDataOwnersApprovePolicy: the approvers for a commit are the user
+    / which have
     /     a CrudPermisison on the leaf node that the new nodes may use
     /
     / ```diagram
-    /                                           ┌────────────────────┐                         
-    /                                           │   UserPermission   │                         
-    /  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐      │ ┌───────────────┐  │                         
-    /            New Commit Node                │ │user1@email.com│──┼──┐                      
-    /  │          ┌───┬───────┐          │      │ └───────────────┘  │  │                      
-    /           ┌▶│0x4│Python │◀─┐              │ ┌──────────────┐   │  │                      
-    /  │        │ └───┴───────┘  │       │      │ │ ┌────────────┴─┐ │  │                      
-    /   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─       │ └─┤CrudPermission│ │  │     ┌───────────────┐
-    /  ┌ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐      │   │   id: 0x1    │ │  └────▶│   Required    │
-    /     ┌───┬─┴─────┐          │              │   └──────────────┘ │        │   Approvers   │
-    /  │  │0x3│  Sql  │          │       │      └────────────────────┘        ├───────────────┤
-    /     └───┴───────┘          │              ┌────────────────────┐  ┌────▶│user1@email.com│
-    /  │        ▲                │       │      │   UserPermission   │  │     │               │
-    /     ┌───┬─┴─────┐   ┌───┬──┴────┐         │ ┌───────────────┐  │  │     │user2@email.com│
-    /  │  │0x1│Leaf 1 │   │0x2│Leaf 2 │  │      │ │user2@email.com│──┼──┘     └───────────────┘
-    /     └───┴───────┘   └───┴───────┘         │ └───────────────┘  │                         
-    /  │                                 │      │ ┌──────────────┐   │                         
-    /      Old data room configuration          │ │ ┌────────────┴─┐ │                         
-    /  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘      │ └─┤CrudPermission│ │                         
-    /                                           │   │   id: 0x2    │ │                         
-    /                                           │   └──────────────┘ │                         
+    /                                           ┌────────────────────┐
+    /                                           │   UserPermission   │
+    /  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐      │ ┌───────────────┐  │
+    /            New Commit Node                │ │user1@email.com│──┼──┐
+    /  │          ┌───┬───────┐          │      │ └───────────────┘  │  │
+    /           ┌▶│0x4│Python │◀─┐              │ ┌──────────────┐   │  │
+    /  │        │ └───┴───────┘  │       │      │ │ ┌────────────┴─┐ │  │
+    /   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─       │ └─┤CrudPermission│ │  │
+    /   ┌───────────────┐
+    /  ┌ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐      │   │   id: 0x1    │ │  └────▶│
+    /  Required    │
+    /     ┌───┬─┴─────┐          │              │   └──────────────┘ │        │
+    /     Approvers   │
+    /  │  │0x3│  Sql  │          │       │      └────────────────────┘
+    /  ├───────────────┤
+    /     └───┴───────┘          │              ┌────────────────────┐
+    /     ┌────▶│user1@email.com│
+    /  │        ▲                │       │      │   UserPermission   │  │     │ │
+    /     ┌───┬─┴─────┐   ┌───┬──┴────┐         │ ┌───────────────┐  │  │
+    /     │user2@email.com│
+    /  │  │0x1│Leaf 1 │   │0x2│Leaf 2 │  │      │ │user2@email.com│──┼──┘
+    /  └───────────────┘
+    /     └───┴───────┘   └───┴───────┘         │ └───────────────┘  │
+    /  │                                 │      │ ┌──────────────┐   │
+    /      Old data room configuration          │ │ ┌────────────┴─┐ │
+    /  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘      │ └─┤CrudPermission│ │
+    /                                           │   │   id: 0x2    │ │
+    /                                           │   └──────────────┘ │
     /                                           └────────────────────┘
     / ```
     /
-    / In the example above `user3@email.com` has created a new commit which adds node `0x4` to the
-    / data room. By walking the computation graph the node depends on node `0x2` directly and node
-    / `0x1` indirectly. To authorize the merge both owners of these leaf nodes must provide an approval
-    / signature. The ownership of the nodes is determined by checking who has `CrudPermission` on the
-    / leaf nodes.
-    /  
+    / In the example above `user3@email.com` has created a new commit which adds
+    / node `0x4` to the data room. By walking the computation graph the node
+    / depends on node `0x2` directly and node `0x1` indirectly. To authorize the
+    / merge both owners of these leaf nodes must provide an approval signature.
+    / The ownership of the nodes is determined by checking who has
+    / `CrudPermission` on the leaf nodes.
+    /
     / Configuration commits don't have to be merged into a data room configuration
-    / history, but can also be used to execute computations on top of data the user
-    / already has access to. This is determined by checking if a user has ExecuteComputePermission
-    / on the node which the new nodes depend on
+    / history, but can also be used to execute computations on top of data the
+    / user already has access to. This is determined by checking if a user has
+    / ExecuteComputePermission on the node which the new nodes depend on
     /
     / ```diagram
-    /  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐                          
-    /    New Commit Node                            
-    /  │  ┌───┬───────┐  │                          
+    /  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+    /    New Commit Node
+    /  │  ┌───┬───────┐  │
     /     │0x3│Python │       ┌────────────────────┐
     /  │  └───┴───────┘  │    │   UserPermission   │
     /   ─ ─ ─ ─ ▲ ─ ─ ─ ─     │ ┌───────────────┐  │
@@ -161,14 +174,15 @@ class DataRoom(google.protobuf.message.Message):
     /     ┌───┬─┴─────┐       │   │   id: 0x2    │ │
     /  │  │0x1│Leaf 1 │  │    │   └──────────────┘ │
     /     └───┴───────┘       └────────────────────┘
-    /  │  Old data room  │                          
-    /     configuration                             
+    /  │  Old data room  │
+    /     configuration
     /  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
     / ```
     /
-    / In the example above `user2@email.com` has created a new commit which adds node `0x3` to the
-    / data room. The node has a dependency on `0x2`, for which the user has `ExecuteComputePermission`
-    / which means that the user can execute the node `0x3`
+    / In the example above `user2@email.com` has created a new commit which adds
+    / node `0x3` to the data room. The node has a dependency on `0x2`, for which
+    / the user has `ExecuteComputePermission` which means that the user can
+    / execute the node `0x3`
     """
 
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -178,7 +192,6 @@ class DataRoom(google.protobuf.message.Message):
     DESCRIPTION_FIELD_NUMBER: builtins.int
     GOVERNANCEPROTOCOL_FIELD_NUMBER: builtins.int
     INITIALCONFIGURATION_FIELD_NUMBER: builtins.int
-    DCRSECRETID_FIELD_NUMBER: builtins.int
     id: builtins.str
     name: builtins.str
     description: builtins.str
@@ -186,7 +199,6 @@ class DataRoom(google.protobuf.message.Message):
     def governanceProtocol(self) -> global___GovernanceProtocol: ...
     @property
     def initialConfiguration(self) -> global___DataRoomConfiguration: ...
-    dcrSecretId: builtins.bytes
     def __init__(
         self,
         *,
@@ -195,11 +207,9 @@ class DataRoom(google.protobuf.message.Message):
         description: builtins.str = ...,
         governanceProtocol: global___GovernanceProtocol | None = ...,
         initialConfiguration: global___DataRoomConfiguration | None = ...,
-        dcrSecretId: builtins.bytes | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_dcrSecretId", b"_dcrSecretId", "dcrSecretId", b"dcrSecretId", "governanceProtocol", b"governanceProtocol", "initialConfiguration", b"initialConfiguration"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_dcrSecretId", b"_dcrSecretId", "dcrSecretId", b"dcrSecretId", "description", b"description", "governanceProtocol", b"governanceProtocol", "id", b"id", "initialConfiguration", b"initialConfiguration", "name", b"name"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_dcrSecretId", b"_dcrSecretId"]) -> typing_extensions.Literal["dcrSecretId"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["governanceProtocol", b"governanceProtocol", "initialConfiguration", b"initialConfiguration"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["description", b"description", "governanceProtocol", b"governanceProtocol", "id", b"id", "initialConfiguration", b"initialConfiguration", "name", b"name"]) -> None: ...
 
 global___DataRoom = DataRoom
 
@@ -512,10 +522,13 @@ class AuthenticationMethod(google.protobuf.message.Message):
 
     PERSONALPKI_FIELD_NUMBER: builtins.int
     DQPKI_FIELD_NUMBER: builtins.int
+    DCRSECRET_FIELD_NUMBER: builtins.int
     @property
     def personalPki(self) -> global___PkiPolicy: ...
     @property
-    def dqPki(self) -> global___PkiPolicy:
+    def dqPki(self) -> global___PkiPolicy: ...
+    @property
+    def dcrSecret(self) -> global___DcrSecretPolicy:
         """the policies below could be implemented later on
         EmailVerificationPolicy emailVerificationPolicy = 3;
         OpenIdConnectPolicy openIdConnectPolicy = 4;
@@ -526,9 +539,10 @@ class AuthenticationMethod(google.protobuf.message.Message):
         *,
         personalPki: global___PkiPolicy | None = ...,
         dqPki: global___PkiPolicy | None = ...,
+        dcrSecret: global___DcrSecretPolicy | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["dqPki", b"dqPki", "personalPki", b"personalPki"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["dqPki", b"dqPki", "personalPki", b"personalPki"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dcrSecret", b"dcrSecret", "dqPki", b"dqPki", "personalPki", b"personalPki"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecret", b"dcrSecret", "dqPki", b"dqPki", "personalPki", b"personalPki"]) -> None: ...
 
 global___AuthenticationMethod = AuthenticationMethod
 
@@ -545,6 +559,20 @@ class PkiPolicy(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["rootCertificatePem", b"rootCertificatePem"]) -> None: ...
 
 global___PkiPolicy = PkiPolicy
+
+class DcrSecretPolicy(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DCRSECRETID_FIELD_NUMBER: builtins.int
+    dcrSecretId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dcrSecretId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecretId", b"dcrSecretId"]) -> None: ...
+
+global___DcrSecretPolicy = DcrSecretPolicy
 
 class Permission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor

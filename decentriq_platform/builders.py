@@ -254,16 +254,6 @@ class DataRoomBuilder():
         """Add a description to the data room being built."""
         self.description = description
 
-    def set_secret(self, secret: str, session: Session):
-        """
-        Specify a dcrSecret for the data room.
-        After publishing the data room, most interactions with 
-        the data room will require to pass the dcrSecret.
-        This can be done using the `decentriq_platform.Session.use_data_room_secret`
-        method.
-        """
-        self.dcr_secret_id = session.retrieve_dcr_secret_id(secret).secretId
-
     def build(self) -> DataRoom:
         """
         Finalize data room contruction.
@@ -283,8 +273,6 @@ class DataRoomBuilder():
         data_room.name = self.name
         if self.description:
             data_room.description = self.description
-        if self.dcr_secret_id:
-            data_room.dcrSecretId = self.dcr_secret_id
         data_room.id = DataRoomBuilder._generate_id()
         data_room.governanceProtocol.CopyFrom(self.governance_protocol)
         data_room.initialConfiguration.CopyFrom(self.modifications_builder.build_flat())

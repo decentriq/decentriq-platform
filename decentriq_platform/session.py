@@ -31,7 +31,7 @@ from .proto import (
     MergeConfigurationCommitResponse, DataRoomConfiguration,
     EndorsementRequest, EndorsementResponse, Pki,
     PkiEndorsementRequest, PkiEndorsementResponse,
-    RetrieveDcrSecretIdRequest, RetrieveDcrSecretIdResponse
+    DcrSecretEndorsementRequest, DcrSecretEndorsementResponse,
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
@@ -95,7 +95,6 @@ class Session():
     quote: QuoteBody
     driver_attestation_specification: AttestationSpecification
     client_protocols: List[int]
-    _dcr_secret: Optional[str] = None
 
     def __init__(
             self,
@@ -226,11 +225,28 @@ class Session():
 
         if not response.HasField("pkiEndorsementResponse"):
             raise Exception(
-                "Expected createDataRoomResponse, got "
+                "Expected pkiEndorsementResponse, got "
                 + str(response.WhichOneof("gcg_response"))
             )
-
         return response.pkiEndorsementResponse
+
+    def dcr_secret_endorsement(
+        self,
+        dcr_secret: str,
+    ) -> DcrSecretEndorsementResponse:
+        endpoint_protocols = [3]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        request = DcrSecretEndorsementRequest(
+            dcrSecret=dcr_secret,
+        )
+        response = self._send_endorsement_request(EndorsementRequest(dcrSecretEndorsementRequest=request), protocol)
+        
+        if not response.HasField("dcrSecretEndorsementResponse"):
+            raise Exception(
+                "Expected dcrSecretEndorsementResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.dcrSecretEndorsementResponse
 
     def send_request(
             self,
@@ -242,8 +258,6 @@ class Session():
         Use this method if any of the convenience methods (such as `run_computation`) don't perform
         the exact task you want.
         """
-        if self.has_dcr_secret:
-            request.dcrSecret = self._dcr_secret
         message_pki = self._get_message_pki(self.auth)
         request.userAuth.pki.CopyFrom(message_pki)
         request.userAuth.enclaveEndorsements.CopyFrom(self.auth.endorsements)
@@ -1055,34 +1069,3 @@ class Session():
             interval=interval,
             timeout=timeout
         )
-
-    @property
-    def has_dcr_secret(self):
-        return self._dcr_secret is not None
-
-    def retrieve_dcr_secret_id(self, secret: str) -> RetrieveDcrSecretIdResponse:
-        endpoint_protocols = [3]
-        protocol = self._get_client_protocol(endpoint_protocols)
-
-        request = RetrieveDcrSecretIdRequest(
-            secret=secret
-        )
-        responses = self.send_request(
-            GcgRequest(retrieveDcrSecretIdRequest=request),
-            protocol
-        )
-        if len(responses) != 1:
-            raise Exception("Malformed response")
-        response = responses[0]
-        if not response.HasField("retrieveDcrSecretIdResponse"):
-            raise Exception(
-                "Expected retrieveDcrSecretIdResponse, got "
-                + str(response.WhichOneof("gcg_response"))
-            )
-        return response.retrieveDcrSecretIdResponse
-
-    def use_data_room_secret(self, dcr_secret: str):
-        self._dcr_secret = dcr_secret
-
-    def reset_data_room_secret(self):
-        self._dcr_secret = None

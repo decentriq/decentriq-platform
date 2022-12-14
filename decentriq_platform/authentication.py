@@ -59,15 +59,16 @@ class Auth:
             self,
             /,
             decentriq_pki: Optional[EnclaveEndorsement] = None,
-            personal_pki: Optional[EnclaveEndorsement] = None
+            personal_pki: Optional[EnclaveEndorsement] = None,
+            dcr_secret: Optional[EnclaveEndorsement] = None
     ):
         if decentriq_pki:
             self._endorsements.dqPki.CopyFrom(decentriq_pki)
         if personal_pki:
             self._endorsements.personalPki.CopyFrom(personal_pki)
-
+        if dcr_secret:
+            self._endorsements.dcrSecret.CopyFrom(dcr_secret)
     
-
 class Sigma:
     def __init__(self, signature: bytes, mac_tag: bytes, auth_pki: Auth):
         self.signature: bytes = signature

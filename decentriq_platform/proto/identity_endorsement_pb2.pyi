@@ -18,16 +18,20 @@ class EndorsementRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     PKIENDORSEMENTREQUEST_FIELD_NUMBER: builtins.int
+    DCRSECRETENDORSEMENTREQUEST_FIELD_NUMBER: builtins.int
     @property
     def pkiEndorsementRequest(self) -> global___PkiEndorsementRequest: ...
+    @property
+    def dcrSecretEndorsementRequest(self) -> global___DcrSecretEndorsementRequest: ...
     def __init__(
         self,
         *,
         pkiEndorsementRequest: global___PkiEndorsementRequest | None = ...,
+        dcrSecretEndorsementRequest: global___DcrSecretEndorsementRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["endorsementRequest", b"endorsementRequest", "pkiEndorsementRequest", b"pkiEndorsementRequest"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["endorsementRequest", b"endorsementRequest", "pkiEndorsementRequest", b"pkiEndorsementRequest"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["endorsementRequest", b"endorsementRequest"]) -> typing_extensions.Literal["pkiEndorsementRequest"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dcrSecretEndorsementRequest", b"dcrSecretEndorsementRequest", "endorsementRequest", b"endorsementRequest", "pkiEndorsementRequest", b"pkiEndorsementRequest"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecretEndorsementRequest", b"dcrSecretEndorsementRequest", "endorsementRequest", b"endorsementRequest", "pkiEndorsementRequest", b"pkiEndorsementRequest"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["endorsementRequest", b"endorsementRequest"]) -> typing_extensions.Literal["pkiEndorsementRequest", "dcrSecretEndorsementRequest"] | None: ...
 
 global___EndorsementRequest = EndorsementRequest
 
@@ -35,16 +39,20 @@ class EndorsementResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     PKIENDORSEMENTRESPONSE_FIELD_NUMBER: builtins.int
+    DCRSECRETENDORSEMENTRESPONSE_FIELD_NUMBER: builtins.int
     @property
     def pkiEndorsementResponse(self) -> global___PkiEndorsementResponse: ...
+    @property
+    def dcrSecretEndorsementResponse(self) -> global___DcrSecretEndorsementResponse: ...
     def __init__(
         self,
         *,
         pkiEndorsementResponse: global___PkiEndorsementResponse | None = ...,
+        dcrSecretEndorsementResponse: global___DcrSecretEndorsementResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["endorsementResponse", b"endorsementResponse", "pkiEndorsementResponse", b"pkiEndorsementResponse"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["endorsementResponse", b"endorsementResponse", "pkiEndorsementResponse", b"pkiEndorsementResponse"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["endorsementResponse", b"endorsementResponse"]) -> typing_extensions.Literal["pkiEndorsementResponse"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dcrSecretEndorsementResponse", b"dcrSecretEndorsementResponse", "endorsementResponse", b"endorsementResponse", "pkiEndorsementResponse", b"pkiEndorsementResponse"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecretEndorsementResponse", b"dcrSecretEndorsementResponse", "endorsementResponse", b"endorsementResponse", "pkiEndorsementResponse", b"pkiEndorsementResponse"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["endorsementResponse", b"endorsementResponse"]) -> typing_extensions.Literal["pkiEndorsementResponse", "dcrSecretEndorsementResponse"] | None: ...
 
 global___EndorsementResponse = EndorsementResponse
 
@@ -78,23 +86,60 @@ class PkiEndorsementResponse(google.protobuf.message.Message):
 
 global___PkiEndorsementResponse = PkiEndorsementResponse
 
+class DcrSecretEndorsementRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DCRSECRET_FIELD_NUMBER: builtins.int
+    dcrSecret: builtins.str
+    def __init__(
+        self,
+        *,
+        dcrSecret: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecret", b"dcrSecret"]) -> None: ...
+
+global___DcrSecretEndorsementRequest = DcrSecretEndorsementRequest
+
+class DcrSecretEndorsementResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DCRSECRETENDORSEMENT_FIELD_NUMBER: builtins.int
+    DCRSECRETID_FIELD_NUMBER: builtins.int
+    @property
+    def dcrSecretEndorsement(self) -> global___EnclaveEndorsement: ...
+    dcrSecretId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dcrSecretEndorsement: global___EnclaveEndorsement | None = ...,
+        dcrSecretId: builtins.bytes = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dcrSecretEndorsement", b"dcrSecretEndorsement"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecretEndorsement", b"dcrSecretEndorsement", "dcrSecretId", b"dcrSecretId"]) -> None: ...
+
+global___DcrSecretEndorsementResponse = DcrSecretEndorsementResponse
+
 class EnclaveEndorsements(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     PERSONALPKI_FIELD_NUMBER: builtins.int
     DQPKI_FIELD_NUMBER: builtins.int
+    DCRSECRET_FIELD_NUMBER: builtins.int
     @property
     def personalPki(self) -> global___EnclaveEndorsement: ...
     @property
     def dqPki(self) -> global___EnclaveEndorsement: ...
+    @property
+    def dcrSecret(self) -> global___EnclaveEndorsement: ...
     def __init__(
         self,
         *,
         personalPki: global___EnclaveEndorsement | None = ...,
         dqPki: global___EnclaveEndorsement | None = ...,
+        dcrSecret: global___EnclaveEndorsement | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["dqPki", b"dqPki", "personalPki", b"personalPki"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["dqPki", b"dqPki", "personalPki", b"personalPki"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dcrSecret", b"dcrSecret", "dqPki", b"dqPki", "personalPki", b"personalPki"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecret", b"dcrSecret", "dqPki", b"dqPki", "personalPki", b"personalPki"]) -> None: ...
 
 global___EnclaveEndorsements = EnclaveEndorsements
 
@@ -125,3 +170,17 @@ class PkiClaim(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["rootCertificateDer", b"rootCertificateDer"]) -> None: ...
 
 global___PkiClaim = PkiClaim
+
+class DcrSecretClaim(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DCRSECRETID_FIELD_NUMBER: builtins.int
+    dcrSecretId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dcrSecretId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrSecretId", b"dcrSecretId"]) -> None: ...
+
+global___DcrSecretClaim = DcrSecretClaim
