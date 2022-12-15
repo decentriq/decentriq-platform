@@ -712,8 +712,8 @@ class Session():
         will need to be unpublished first.
 
         A special note for when the referenced data room was created using the Decentriq UI:
-        In this case, the `leaf_id` argument will have the format `@table/UUID/dataset`,
-        where `UUID` corresponds to the value that you see when hovering your mouse pointer over
+        In this case, the `leaf_id` argument will have the format `{UUID}_leaf`,
+        where `{UUID}` corresponds to the value that you see when hovering your mouse pointer over
         the name of the data node.
         """
 
