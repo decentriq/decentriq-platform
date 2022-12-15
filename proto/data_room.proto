@@ -266,6 +266,7 @@ message Permission {
     ExecuteDevelopmentComputePermission executeDevelopmentComputePermission =
         10;
     MergeConfigurationCommitPermission mergeConfigurationCommitPermission = 11;
+    RetrieveComputeResultPermission retrieveComputeResultPermission = 12;
   }
 }
 
@@ -290,3 +291,5 @@ message GenerateMergeSignaturePermission {}
 message ExecuteDevelopmentComputePermission {}
 
 message MergeConfigurationCommitPermission {}
+
+message RetrieveComputeResultPermission { string computeNodeId = 1; }

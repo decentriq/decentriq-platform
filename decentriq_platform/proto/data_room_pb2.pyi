@@ -588,6 +588,7 @@ class Permission(google.protobuf.message.Message):
     GENERATEMERGESIGNATUREPERMISSION_FIELD_NUMBER: builtins.int
     EXECUTEDEVELOPMENTCOMPUTEPERMISSION_FIELD_NUMBER: builtins.int
     MERGECONFIGURATIONCOMMITPERMISSION_FIELD_NUMBER: builtins.int
+    RETRIEVECOMPUTERESULTPERMISSION_FIELD_NUMBER: builtins.int
     @property
     def executeComputePermission(self) -> global___ExecuteComputePermission: ...
     @property
@@ -610,6 +611,8 @@ class Permission(google.protobuf.message.Message):
     def executeDevelopmentComputePermission(self) -> global___ExecuteDevelopmentComputePermission: ...
     @property
     def mergeConfigurationCommitPermission(self) -> global___MergeConfigurationCommitPermission: ...
+    @property
+    def retrieveComputeResultPermission(self) -> global___RetrieveComputeResultPermission: ...
     def __init__(
         self,
         *,
@@ -624,10 +627,11 @@ class Permission(google.protobuf.message.Message):
         generateMergeSignaturePermission: global___GenerateMergeSignaturePermission | None = ...,
         executeDevelopmentComputePermission: global___ExecuteDevelopmentComputePermission | None = ...,
         mergeConfigurationCommitPermission: global___MergeConfigurationCommitPermission | None = ...,
+        retrieveComputeResultPermission: global___RetrieveComputeResultPermission | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["dryRunPermission", b"dryRunPermission", "executeComputePermission", b"executeComputePermission", "executeDevelopmentComputePermission", b"executeDevelopmentComputePermission", "generateMergeSignaturePermission", b"generateMergeSignaturePermission", "leafCrudPermission", b"leafCrudPermission", "mergeConfigurationCommitPermission", b"mergeConfigurationCommitPermission", "permission", b"permission", "retrieveAuditLogPermission", b"retrieveAuditLogPermission", "retrieveDataRoomPermission", b"retrieveDataRoomPermission", "retrieveDataRoomStatusPermission", b"retrieveDataRoomStatusPermission", "retrievePublishedDatasetsPermission", b"retrievePublishedDatasetsPermission", "updateDataRoomStatusPermission", b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["dryRunPermission", b"dryRunPermission", "executeComputePermission", b"executeComputePermission", "executeDevelopmentComputePermission", b"executeDevelopmentComputePermission", "generateMergeSignaturePermission", b"generateMergeSignaturePermission", "leafCrudPermission", b"leafCrudPermission", "mergeConfigurationCommitPermission", b"mergeConfigurationCommitPermission", "permission", b"permission", "retrieveAuditLogPermission", b"retrieveAuditLogPermission", "retrieveDataRoomPermission", b"retrieveDataRoomPermission", "retrieveDataRoomStatusPermission", b"retrieveDataRoomStatusPermission", "retrievePublishedDatasetsPermission", b"retrievePublishedDatasetsPermission", "updateDataRoomStatusPermission", b"updateDataRoomStatusPermission"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["permission", b"permission"]) -> typing_extensions.Literal["executeComputePermission", "leafCrudPermission", "retrieveDataRoomPermission", "retrieveAuditLogPermission", "retrieveDataRoomStatusPermission", "updateDataRoomStatusPermission", "retrievePublishedDatasetsPermission", "dryRunPermission", "generateMergeSignaturePermission", "executeDevelopmentComputePermission", "mergeConfigurationCommitPermission"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dryRunPermission", b"dryRunPermission", "executeComputePermission", b"executeComputePermission", "executeDevelopmentComputePermission", b"executeDevelopmentComputePermission", "generateMergeSignaturePermission", b"generateMergeSignaturePermission", "leafCrudPermission", b"leafCrudPermission", "mergeConfigurationCommitPermission", b"mergeConfigurationCommitPermission", "permission", b"permission", "retrieveAuditLogPermission", b"retrieveAuditLogPermission", "retrieveComputeResultPermission", b"retrieveComputeResultPermission", "retrieveDataRoomPermission", b"retrieveDataRoomPermission", "retrieveDataRoomStatusPermission", b"retrieveDataRoomStatusPermission", "retrievePublishedDatasetsPermission", b"retrievePublishedDatasetsPermission", "updateDataRoomStatusPermission", b"updateDataRoomStatusPermission"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dryRunPermission", b"dryRunPermission", "executeComputePermission", b"executeComputePermission", "executeDevelopmentComputePermission", b"executeDevelopmentComputePermission", "generateMergeSignaturePermission", b"generateMergeSignaturePermission", "leafCrudPermission", b"leafCrudPermission", "mergeConfigurationCommitPermission", b"mergeConfigurationCommitPermission", "permission", b"permission", "retrieveAuditLogPermission", b"retrieveAuditLogPermission", "retrieveComputeResultPermission", b"retrieveComputeResultPermission", "retrieveDataRoomPermission", b"retrieveDataRoomPermission", "retrieveDataRoomStatusPermission", b"retrieveDataRoomStatusPermission", "retrievePublishedDatasetsPermission", b"retrievePublishedDatasetsPermission", "updateDataRoomStatusPermission", b"updateDataRoomStatusPermission"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["permission", b"permission"]) -> typing_extensions.Literal["executeComputePermission", "leafCrudPermission", "retrieveDataRoomPermission", "retrieveAuditLogPermission", "retrieveDataRoomStatusPermission", "updateDataRoomStatusPermission", "retrievePublishedDatasetsPermission", "dryRunPermission", "generateMergeSignaturePermission", "executeDevelopmentComputePermission", "mergeConfigurationCommitPermission", "retrieveComputeResultPermission"] | None: ...
 
 global___Permission = Permission
 
@@ -739,3 +743,17 @@ class MergeConfigurationCommitPermission(google.protobuf.message.Message):
     ) -> None: ...
 
 global___MergeConfigurationCommitPermission = MergeConfigurationCommitPermission
+
+class RetrieveComputeResultPermission(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    COMPUTENODEID_FIELD_NUMBER: builtins.int
+    computeNodeId: builtins.str
+    def __init__(
+        self,
+        *,
+        computeNodeId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId"]) -> None: ...
+
+global___RetrieveComputeResultPermission = RetrieveComputeResultPermission

@@ -3,6 +3,7 @@ from .data_room_pb2 import (
     LeafCrudPermission,
     RetrieveAuditLogPermission,
     ExecuteComputePermission,
+    RetrieveComputeResultPermission,
     RetrieveDataRoomPermission,
     RetrieveDataRoomStatusPermission,
     GenerateMergeSignaturePermission,

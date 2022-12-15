@@ -3,6 +3,7 @@ from .proto import (
     LeafCrudPermission,
     RetrieveAuditLogPermission,
     ExecuteComputePermission,
+    RetrieveComputeResultPermission,
     RetrieveDataRoomPermission,
     RetrieveDataRoomStatusPermission,
     UpdateDataRoomStatusPermission,
@@ -43,6 +44,15 @@ class Permissions:
         """Permission for executing the computation with the given id."""
         return Permission(
             executeComputePermission=ExecuteComputePermission(
+                computeNodeId=compute_node_id
+            )
+        )
+
+    @staticmethod
+    def retrieve_compute_result(compute_node_id: str) -> Permission:
+        """Permission for executing the computation with the given id."""
+        return Permission(
+            retrieveComputeResultPermission=RetrieveComputeResultPermission(
                 computeNodeId=compute_node_id
             )
         )
