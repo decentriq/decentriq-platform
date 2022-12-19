@@ -34,6 +34,21 @@ STANDARD: CreateDcrPurpose.ValueType  # 0
 VALIDATION: CreateDcrPurpose.ValueType  # 1
 global___CreateDcrPurpose = CreateDcrPurpose
 
+class _CreateDcrKind:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _CreateDcrKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrKind.ValueType], builtins.type):  # noqa: F821
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    EXPERT: _CreateDcrKind.ValueType  # 0
+    DATASCIENCE: _CreateDcrKind.ValueType  # 1
+
+class CreateDcrKind(_CreateDcrKind, metaclass=_CreateDcrKindEnumTypeWrapper): ...
+
+EXPERT: CreateDcrKind.ValueType  # 0
+DATASCIENCE: CreateDcrKind.ValueType  # 1
+global___CreateDcrKind = CreateDcrKind
+
 class MeteringRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -136,7 +151,7 @@ class MeteringResponse(google.protobuf.message.Message):
         self,
         *,
         success: global___MeteringSuccessResponse | None = ...,
-        failure: builtins.str | None = ...,
+        failure: builtins.str = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["failure", b"failure", "response", b"response", "success", b"success"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["failure", b"failure", "response", b"response", "success", b"success"]) -> None: ...
@@ -150,21 +165,24 @@ class DcrMetadata(google.protobuf.message.Message):
     PURPOSE_FIELD_NUMBER: builtins.int
     SHOWORGANIZATIONLOGO_FIELD_NUMBER: builtins.int
     REQUIREPASSWORD_FIELD_NUMBER: builtins.int
+    KIND_FIELD_NUMBER: builtins.int
     purpose: global___CreateDcrPurpose.ValueType
     """/ Why this data room is being created (allows for purpose-based filtering of data rooms)"""
     showOrganizationLogo: builtins.bool
     """/ Whether to show the organization logo"""
     requirePassword: builtins.bool
     """/ Whether the DCR requires a password"""
+    kind: global___CreateDcrKind.ValueType
+    """/ The dcr type"""
     def __init__(
         self,
         *,
-        purpose: global___CreateDcrPurpose.ValueType | None = ...,
-        showOrganizationLogo: builtins.bool | None = ...,
-        requirePassword: builtins.bool | None = ...,
+        purpose: global___CreateDcrPurpose.ValueType = ...,
+        showOrganizationLogo: builtins.bool = ...,
+        requirePassword: builtins.bool = ...,
+        kind: global___CreateDcrKind.ValueType = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["purpose", b"purpose", "requirePassword", b"requirePassword", "showOrganizationLogo", b"showOrganizationLogo"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["purpose", b"purpose", "requirePassword", b"requirePassword", "showOrganizationLogo", b"showOrganizationLogo"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["kind", b"kind", "purpose", b"purpose", "requirePassword", b"requirePassword", "showOrganizationLogo", b"showOrganizationLogo"]) -> None: ...
 
 global___DcrMetadata = DcrMetadata
 
@@ -188,14 +206,15 @@ class CreateDcrRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        idHex: builtins.str | None = ...,
-        name: builtins.str | None = ...,
-        driverAttestationHash: builtins.str | None = ...,
+        idHex: builtins.str = ...,
+        name: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
         participantEmails: collections.abc.Iterable[builtins.str] | None = ...,
         metadata: builtins.bytes | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "metadata", b"metadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_metadata", b"_metadata"]) -> typing_extensions.Literal["metadata"] | None: ...
 
 global___CreateDcrRequest = CreateDcrRequest
 
@@ -214,11 +233,10 @@ class DcrInteractionRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        dataRoomHash: builtins.str | None = ...,
-        driverAttestationHash: builtins.str | None = ...,
-        scopeId: builtins.str | None = ...,
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
+        scopeId: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash", "scopeId", b"scopeId"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash", "scopeId", b"scopeId"]) -> None: ...
 
 global___DcrInteractionRequest = DcrInteractionRequest
@@ -241,12 +259,11 @@ class PublishDatasetRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        computeNodeId: builtins.str | None = ...,
-        manifestHash: builtins.str | None = ...,
-        dataRoomHash: builtins.str | None = ...,
-        driverAttestationHash: builtins.str | None = ...,
+        computeNodeId: builtins.str = ...,
+        manifestHash: builtins.str = ...,
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash", "manifestHash", b"manifestHash"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash", "manifestHash", b"manifestHash"]) -> None: ...
 
 global___PublishDatasetRequest = PublishDatasetRequest
@@ -266,11 +283,10 @@ class UnpublishDatasetRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        computeNodeId: builtins.str | None = ...,
-        dataRoomHash: builtins.str | None = ...,
-        driverAttestationHash: builtins.str | None = ...,
+        computeNodeId: builtins.str = ...,
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash"]) -> None: ...
 
 global___UnpublishDatasetRequest = UnpublishDatasetRequest
@@ -287,10 +303,9 @@ class StopDcrRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        dataRoomHash: builtins.str | None = ...,
-        driverAttestationHash: builtins.str | None = ...,
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash"]) -> None: ...
 
 global___StopDcrRequest = StopDcrRequest
@@ -303,9 +318,8 @@ class CreateDcrCommitRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        id: builtins.str | None = ...,
+        id: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["id", b"id"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
 
 global___CreateDcrCommitRequest = CreateDcrCommitRequest
@@ -378,9 +392,9 @@ class WorkerMetadataRequest(google.protobuf.message.Message):
         self,
         *,
         attestationSpec: attestation_pb2.AttestationSpecification | None = ...,
-        scopeId: builtins.str | None = ...,
+        scopeId: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec", "scopeId", b"scopeId"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec", "scopeId", b"scopeId"]) -> None: ...
 
 global___WorkerMetadataRequest = WorkerMetadataRequest
@@ -393,9 +407,8 @@ class WorkerMetadataResponse(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        maxExecutionSeconds: builtins.int | None = ...,
+        maxExecutionSeconds: builtins.int = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["maxExecutionSeconds", b"maxExecutionSeconds"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["maxExecutionSeconds", b"maxExecutionSeconds"]) -> None: ...
 
 global___WorkerMetadataResponse = WorkerMetadataResponse
@@ -414,11 +427,11 @@ class SubmitWorkerExecutionTimeRequest(google.protobuf.message.Message):
     def __init__(
         self,
         *,
-        executionTimeSeconds: builtins.int | None = ...,
+        executionTimeSeconds: builtins.int = ...,
         attestationSpec: attestation_pb2.AttestationSpecification | None = ...,
-        scopeId: builtins.str | None = ...,
+        scopeId: builtins.str = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec", "executionTimeSeconds", b"executionTimeSeconds", "scopeId", b"scopeId"]) -> builtins.bool: ...
+    def HasField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec"]) -> builtins.bool: ...
     def ClearField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec", "executionTimeSeconds", b"executionTimeSeconds", "scopeId", b"scopeId"]) -> None: ...
 
 global___SubmitWorkerExecutionTimeRequest = SubmitWorkerExecutionTimeRequest

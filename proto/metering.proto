@@ -1,4 +1,4 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package metering;
 
@@ -42,21 +42,28 @@ enum CreateDcrPurpose {
     VALIDATION = 1;
 }
 
+enum CreateDcrKind {
+    EXPERT = 0;
+    DATASCIENCE = 1;
+}
+
 message DcrMetadata {
     /// Why this data room is being created (allows for purpose-based filtering of data rooms)
-    optional CreateDcrPurpose purpose = 1;
+    CreateDcrPurpose purpose = 1;
     /// Whether to show the organization logo
-    optional bool showOrganizationLogo = 2;
+    bool showOrganizationLogo = 2;
     /// Whether the DCR requires a password
-    optional bool requirePassword = 3;
+    bool requirePassword = 3;
+    /// The dcr type
+    CreateDcrKind kind = 4;
 }
 
 message CreateDcrRequest {
     /// The DCR hash to be used for the published data room
-    required string idHex = 1;
-    required string name = 2;
+    string idHex = 1;
+    string name = 2;
     /// The driver attestation hash
-    required string driverAttestationHash = 3;
+    string driverAttestationHash = 3;
     repeated string participantEmails = 4;
     /// Optional metadata that will be persisted to the database
     optional bytes metadata = 5;
@@ -64,42 +71,42 @@ message CreateDcrRequest {
 
 message DcrInteractionRequest {
     /// The hex-encoded hash of the data room
-    required string dataRoomHash = 1;
+    string dataRoomHash = 1;
     /// The driver attestation hash
-    required string driverAttestationHash = 2;
+    string driverAttestationHash = 2;
     // Id of the scope to check
-    required string scopeId = 3;
+    string scopeId = 3;
 }
 
 message PublishDatasetRequest {
     /// The UUID of the compute node to which this dataset is being published
-    required string computeNodeId = 1;
+    string computeNodeId = 1;
     /// The hex-encoded manifest hash of the dataset
-    required string manifestHash = 2;
+    string manifestHash = 2;
     /// The hex-encoded hash of the data room
-    required string dataRoomHash = 3;
+    string dataRoomHash = 3;
     /// The driver attestation hash
-    required string driverAttestationHash = 4;
+    string driverAttestationHash = 4;
 }
 
 message UnpublishDatasetRequest {
     /// The UUID of the compute node to which this dataset is being published
-    required string computeNodeId = 1;
+    string computeNodeId = 1;
     /// The hex-encoded hash of the data room
-    required string dataRoomHash = 2;
+    string dataRoomHash = 2;
     /// The driver attestation hash
-    required string driverAttestationHash = 3;
+    string driverAttestationHash = 3;
 }
 
 message StopDcrRequest {
     /// The hex-encoded data room hash
-    required string dataRoomHash = 1;
+    string dataRoomHash = 1;
     /// The driver attestation hash
-    required string driverAttestationHash = 2;
+    string driverAttestationHash = 2;
 }
 
 message CreateDcrCommitRequest {
-    required string id = 1;
+    string id = 1;
 }
 
 message CreateDcrResponse {}
@@ -116,20 +123,20 @@ message UnpublishDatasetResponse {}
 
 message WorkerMetadataRequest {
     /// Attestation spec of the worker for which to perform the metadata lookup
-    required attestation.AttestationSpecification attestationSpec = 1;
+    attestation.AttestationSpecification attestationSpec = 1;
     /// Id of the scope in the context of which a computation is performed
-    required string scopeId = 2;
+    string scopeId = 2;
 }
 
 message WorkerMetadataResponse {
-    optional uint64 maxExecutionSeconds = 1;
+    uint64 maxExecutionSeconds = 1;
 }
 
 message SubmitWorkerExecutionTimeRequest {
-    required uint32 executionTimeSeconds = 1;
-    required attestation.AttestationSpecification attestationSpec = 2;
+    uint32 executionTimeSeconds = 1;
+    attestation.AttestationSpecification attestationSpec = 2;
     /// Id of the scope in the context of which a computation is performed
-    required string scopeId = 3;
+    string scopeId = 3;
 }
 
 message SubmitWorkerExecutionTimeResponse {}

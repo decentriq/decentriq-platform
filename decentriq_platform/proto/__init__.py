@@ -69,7 +69,8 @@ from .synth_data_pb2 import (
 )
 from .metering_pb2 import (
     DcrMetadata,
-    CreateDcrPurpose
+    CreateDcrPurpose,
+    CreateDcrKind
 )
 from .identity_endorsement_pb2 import (
     DcrSecretEndorsementRequest,

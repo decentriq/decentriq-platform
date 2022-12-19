@@ -10,7 +10,7 @@ from time import sleep
 from .api import Endpoints
 from .authentication import Auth, Sigma
 from .proto import (
-    DcrMetadata,
+    DcrMetadata, CreateDcrPurpose, CreateDcrKind,
     DataRoom, ComputeNodeProtocol, DataNoncePubkey, Request, Response,
     CreateDataRoomRequest, CreateDataRoomResponse,
     ExecuteComputeRequest, ExecuteComputeResponse, GcgRequest, GcgResponse, GetResultsRequest,
@@ -305,19 +305,23 @@ class Session():
     def _publish_data_room(
             self,
             data_room_definition: DataRoom,
+            purpose: CreateDcrPurpose.V = CreateDcrPurpose.STANDARD,
+            kind: CreateDcrKind.V = CreateDcrKind.EXPERT,
             show_organization_logo: bool = False,
-            data_room_purpose = None,
+            require_password: bool = False,
     ) -> CreateDataRoomResponse:
         endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
 
-        purpose = DcrMetadata(
-            purpose=data_room_purpose,
-            showOrganizationLogo=show_organization_logo
+        metadata = DcrMetadata(
+            showOrganizationLogo=show_organization_logo,
+            requirePassword=require_password,
+            purpose=purpose,
+            kind=kind,
         )
         request = CreateDataRoomRequest(
             dataRoom=data_room_definition,
-            dataRoomMetadata=serialize_length_delimited(purpose),
+            dataRoomMetadata=serialize_length_delimited(metadata),
         )
         responses = self.send_request(GcgRequest(createDataRoomRequest=request), protocol)
         if len(responses) != 1:
@@ -344,8 +348,11 @@ class Session():
     def publish_data_room(
             self,
             data_room_definition: DataRoom,
+            /, *,
             show_organization_logo: bool = False,
-            data_room_purpose = None
+            require_password: bool = False,
+            purpose: CreateDcrPurpose.V = CreateDcrPurpose.STANDARD,
+            kind: CreateDcrKind.V = CreateDcrKind.EXPERT,
     ) -> str:
         """
         Create a data room with the provided protobuf configuration object
@@ -358,8 +365,10 @@ class Session():
         """
         response = self._publish_data_room(
             data_room_definition,
-            show_organization_logo=show_organization_logo,
-            data_room_purpose=data_room_purpose
+            purpose,
+            kind,
+            show_organization_logo,
+            require_password
         )
         return _get_data_room_id(response).hex()
 
