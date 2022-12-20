@@ -267,6 +267,8 @@ message Permission {
         10;
     MergeConfigurationCommitPermission mergeConfigurationCommitPermission = 11;
     RetrieveComputeResultPermission retrieveComputeResultPermission = 12;
+    CasAuxiliaryStatePermission casAuxiliaryStatePermission = 13;
+    ReadAuxiliaryStatePermission readAuxiliaryStatePermission = 14;
   }
 }
 
@@ -293,3 +295,7 @@ message ExecuteDevelopmentComputePermission {}
 message MergeConfigurationCommitPermission {}
 
 message RetrieveComputeResultPermission { string computeNodeId = 1; }
+
+message CasAuxiliaryStatePermission {}
+
+message ReadAuxiliaryStatePermission {}

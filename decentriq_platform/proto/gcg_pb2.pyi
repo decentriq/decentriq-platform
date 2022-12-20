@@ -57,6 +57,8 @@ class GcgRequest(google.protobuf.message.Message):
     GENERATEMERGEAPPROVALSIGNATUREREQUEST_FIELD_NUMBER: builtins.int
     MERGECONFIGURATIONCOMMITREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST_FIELD_NUMBER: builtins.int
+    CASAUXILIARYSTATEREQUEST_FIELD_NUMBER: builtins.int
+    READAUXILIARYSTATEREQUEST_FIELD_NUMBER: builtins.int
     ENDORSEMENTREQUEST_FIELD_NUMBER: builtins.int
     @property
     def userAuth(self) -> global___UserAuth: ...
@@ -97,6 +99,10 @@ class GcgRequest(google.protobuf.message.Message):
     @property
     def retrieveConfigurationCommitApproversRequest(self) -> global___RetrieveConfigurationCommitApproversRequest: ...
     @property
+    def casAuxiliaryStateRequest(self) -> global___CasAuxiliaryStateRequest: ...
+    @property
+    def readAuxiliaryStateRequest(self) -> global___ReadAuxiliaryStateRequest: ...
+    @property
     def endorsementRequest(self) -> identity_endorsement_pb2.EndorsementRequest: ...
     def __init__(
         self,
@@ -120,11 +126,13 @@ class GcgRequest(google.protobuf.message.Message):
         generateMergeApprovalSignatureRequest: global___GenerateMergeApprovalSignatureRequest | None = ...,
         mergeConfigurationCommitRequest: global___MergeConfigurationCommitRequest | None = ...,
         retrieveConfigurationCommitApproversRequest: global___RetrieveConfigurationCommitApproversRequest | None = ...,
+        casAuxiliaryStateRequest: global___CasAuxiliaryStateRequest | None = ...,
+        readAuxiliaryStateRequest: global___ReadAuxiliaryStateRequest | None = ...,
         endorsementRequest: identity_endorsement_pb2.EndorsementRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "endorsementRequest"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "casAuxiliaryStateRequest", "readAuxiliaryStateRequest", "endorsementRequest"] | None: ...
 
 global___GcgRequest = GcgRequest
 
@@ -150,6 +158,8 @@ class GcgResponse(google.protobuf.message.Message):
     GENERATEMERGEAPPROVALSIGNATURERESPONSE_FIELD_NUMBER: builtins.int
     MERGECONFIGURATIONCOMMITRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE_FIELD_NUMBER: builtins.int
+    CASAUXILIARYSTATERESPONSE_FIELD_NUMBER: builtins.int
+    READAUXILIARYSTATERESPONSE_FIELD_NUMBER: builtins.int
     ENDORSEMENTRESPONSE_FIELD_NUMBER: builtins.int
     failure: builtins.str
     @property
@@ -189,6 +199,10 @@ class GcgResponse(google.protobuf.message.Message):
     @property
     def retrieveConfigurationCommitApproversResponse(self) -> global___RetrieveConfigurationCommitApproversResponse: ...
     @property
+    def casAuxiliaryStateResponse(self) -> global___CasAuxiliaryStateResponse: ...
+    @property
+    def readAuxiliaryStateResponse(self) -> global___ReadAuxiliaryStateResponse: ...
+    @property
     def endorsementResponse(self) -> identity_endorsement_pb2.EndorsementResponse: ...
     def __init__(
         self,
@@ -212,11 +226,13 @@ class GcgResponse(google.protobuf.message.Message):
         generateMergeApprovalSignatureResponse: global___GenerateMergeApprovalSignatureResponse | None = ...,
         mergeConfigurationCommitResponse: global___MergeConfigurationCommitResponse | None = ...,
         retrieveConfigurationCommitApproversResponse: global___RetrieveConfigurationCommitApproversResponse | None = ...,
+        casAuxiliaryStateResponse: global___CasAuxiliaryStateResponse | None = ...,
+        readAuxiliaryStateResponse: global___ReadAuxiliaryStateResponse | None = ...,
         endorsementResponse: identity_endorsement_pb2.EndorsementResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "endorsementResponse"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "casAuxiliaryStateResponse", "readAuxiliaryStateResponse", "endorsementResponse"] | None: ...
 
 global___GcgResponse = GcgResponse
 
@@ -943,6 +959,112 @@ class RetrieveConfigurationCommitResponse(google.protobuf.message.Message):
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation"]) -> typing_extensions.Literal["highLevelRepresentation"] | None: ...
 
 global___RetrieveConfigurationCommitResponse = RetrieveConfigurationCommitResponse
+
+class CasAuxiliaryStateRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    index: builtins.int
+    """The index indicates what the client thinks the state is. The CAS operation will only succeed if the index
+    matches what's stored in the enclave. The index is 0 iff the value doesn't exist/was deleted.
+    """
+    value: builtins.bytes
+    """If null it will try to delete value."""
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+        index: builtins.int = ...,
+        value: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_value", b"_value", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_value", b"_value", "dataRoomId", b"dataRoomId", "index", b"index", "value", b"value"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_value", b"_value"]) -> typing_extensions.Literal["value"] | None: ...
+
+global___CasAuxiliaryStateRequest = CasAuxiliaryStateRequest
+
+class CasAuxiliaryStateResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SUCCESS_FIELD_NUMBER: builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    success: builtins.bool
+    index: builtins.int
+    """The index at the end of the operation, 0 if delete was successful. If success=false, the client should use this
+    index and retry the operation, possibly modified based on the returned value.
+    Example: User A is racing on two clients X and Y to add numbers 1 and 2 to an initially empty list.
+      1. index=0 list=[]: initial state
+      2. index=1 list=[1]: User A on client X does CAS(index=0, value=[1])
+      3. index=1 list=[1]: User A on client Y does CAS(index=0, value=[2]) => success=false, index=1, value=[1]
+      4. index=2 list=[1,2]: User A on client Y retries with CAS(index=1, value=[1,2])
+    """
+    value: builtins.bytes
+    """The value at the end of the operation."""
+    def __init__(
+        self,
+        *,
+        success: builtins.bool = ...,
+        index: builtins.int = ...,
+        value: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_value", b"_value", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_value", b"_value", "index", b"index", "success", b"success", "value", b"value"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_value", b"_value"]) -> typing_extensions.Literal["value"] | None: ...
+
+global___CasAuxiliaryStateResponse = CasAuxiliaryStateResponse
+
+class ReadAuxiliaryStateRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
+global___ReadAuxiliaryStateRequest = ReadAuxiliaryStateRequest
+
+class ReadAuxiliaryStateResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    VALUES_FIELD_NUMBER: builtins.int
+    @property
+    def values(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AuxiliaryStateValue]: ...
+    def __init__(
+        self,
+        *,
+        values: collections.abc.Iterable[global___AuxiliaryStateValue] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["values", b"values"]) -> None: ...
+
+global___ReadAuxiliaryStateResponse = ReadAuxiliaryStateResponse
+
+class AuxiliaryStateValue(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    USER_FIELD_NUMBER: builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    user: builtins.str
+    index: builtins.int
+    value: builtins.bytes
+    def __init__(
+        self,
+        *,
+        user: builtins.str = ...,
+        index: builtins.int = ...,
+        value: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["index", b"index", "user", b"user", "value", b"value"]) -> None: ...
+
+global___AuxiliaryStateValue = AuxiliaryStateValue
 
 class MergeConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
