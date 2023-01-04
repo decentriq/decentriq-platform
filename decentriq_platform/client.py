@@ -292,9 +292,8 @@ class Client:
                 None,
                 futures.FIRST_EXCEPTION
             )
-        if len(pending):
-            # re-raise exception
-            for future in completed: future.result()
+        # re-raise exception
+        for future in completed: future.result()
         uploader.shutdown(wait=False)
 
         # create manifest and upload
