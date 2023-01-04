@@ -45,7 +45,6 @@ amd_snp_authorized_chip_ids = [
 
 SPECIFICATIONS = {
     "decentriq.driver:v10": EnclaveSpecification(
-        name="decentriq.driver",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -63,7 +62,6 @@ SPECIFICATIONS = {
         clientProtocols=[3],
     ),
     "decentriq.sql-worker:v10": EnclaveSpecification(
-        name="decentriq.sql-worker",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -81,7 +79,6 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v10": EnclaveSpecification(
-        name="decentriq.python-ml-worker",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -97,7 +94,6 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
-        name="decentriq.python-synth-data-worker",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -113,7 +109,6 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v10": EnclaveSpecification(
-        name="decentriq.r-latex-worker",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -175,11 +170,11 @@ class EnclaveSpecifications:
         Refer to the main documentation page of each compute module to learn which
         enclaves are available.
         """
-        selected_specifcations = {}
+        selected_specifications = {}
         for version in enclave_versions:
             enclave_type = version.split(":")[0]
-            selected_specifcations[enclave_type] = self.specifications[version]
-        return selected_specifcations
+            selected_specifications[enclave_type] = self.specifications[version]
+        return selected_specifications
 
     def all(self) -> List[EnclaveSpecification]:
         """Get a list of all available enclave specifications."""

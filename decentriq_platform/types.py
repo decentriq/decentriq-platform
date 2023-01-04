@@ -139,8 +139,6 @@ class EnclaveSpecification(TypedDict):
     This class includes information about an enclave deployed in the platform.
     Please refer to `decentriq_platform.EnclaveSpecifications` for a detailed explanation.
     """
-    name: str
-    """The name of the enclave."""
     proto: AttestationSpecification
     """The Protobuf object."""
     workerProtocols: List[int]
