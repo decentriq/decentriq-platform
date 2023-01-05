@@ -66,8 +66,7 @@ message AttestationSpecificationIntelDcap {
     bool accept_debug = 3;
     bool accept_out_of_date = 4;
     bool accept_configuration_needed = 5;
-    bool accept_sw_hardening_needed = 6;
-    bool accept_revoked = 7;
+    bool accept_revoked = 6;
 }
 
 message AttestationSpecificationAwsNitro {

@@ -31,9 +31,8 @@ class JobId:
 
 
 class ScopeTypes(str, Enum):
-    USER_FILE = "user_file",
-    DATA_ROOM_INTERMEDIATE_DATA = "dataroom_intermediate_data"
-    DATA_ROOM_COMMITS_DATA = "dataroom_commits_data"
+    DATASET = "DATASET",
+    DCR_DATA = "DCR_DATA"
 
 
 class UserResponse(TypedDict):
@@ -84,40 +83,45 @@ class ChunkDescription(TypedDict):
     chunkHash: str
 
 
+class UserDescription(TypedDict):
+    id: str
+    email: str
+
+
 class DataRoomDescription(TypedDict):
-    dataRoomId: str
-    name: str
-    description: str
-    mrenclave: str
-    ownerEmail: str
-    creationDate: str
-    status: str
+    """The identifier of the data room"""
+    id: str
+    """The title that was given to the data room"""
+    title: str
+    """The hex-encoded hash of the driver attestation specification"""
+    driverAttestationHash: str
+    """Whether the data room has been stopped"""
+    isStopped: bool
+    """When the data room was created"""
+    createdAt: str
+    """When the data room was last updated"""
+    updatedAt: str
 
 
 class DatasetDescription(TypedDict):
     """
     This class includes information about an uploaded dataset
     """
-    datasetId: str
-    """
-    The data set id as a hex-encoded string. This id is also called the manifest hash.
-    """
+    id: str
+    """The identifier of this dataset"""
+    manifestHash: str
+    """The data set id as a hex-encoded string. This id is also called the manifest hash."""
     name: str
     """The name of this dataset"""
     description: str
     """An optional description"""
-    ownerEmail: str
-    """The original uploader of the dataset"""
-    creationDate: str
+    createdAt: str
+    """When the dataset was uploaded"""
 
 
 class SignatureResponse(TypedDict):
     type: str
     data: List[int]
-
-
-class EnclaveMessage(TypedDict):
-    data: str
 
 
 class FatquoteResBody(TypedDict):
@@ -135,10 +139,6 @@ class EnclaveSpecification(TypedDict):
     This class includes information about an enclave deployed in the platform.
     Please refer to `decentriq_platform.EnclaveSpecifications` for a detailed explanation.
     """
-    name: str
-    """The name of the enclave."""
-    version: str
-    """The version of the enclave."""
     proto: AttestationSpecification
     """The Protobuf object."""
     workerProtocols: List[int]
@@ -150,15 +150,6 @@ class EnclaveSpecification(TypedDict):
     """
     clientProtocols: Optional[List[int]]
     """The client protocol versions supported by the node"""
-
-
-class CreateScopeRequest(TypedDict):
-    metadata: Dict[str, str]
-
-
-class ScopeJson(TypedDict):
-    scopeId: str
-    metadata: Dict[str, str]
 
 
 class EnclaveSpecificationJson(TypedDict):

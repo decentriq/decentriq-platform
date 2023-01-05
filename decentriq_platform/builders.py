@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import List, Any, Optional, Callable, Dict, Tuple
+
 from .proto import (
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, Permission, DataRoom,
@@ -13,6 +14,7 @@ from .proto import GovernanceProtocol as GovernanceProtocolProto
 from .node import Node
 from .permission import Permissions
 from .types import EnclaveSpecification
+from .session import Session
 import uuid
 
 
@@ -25,25 +27,25 @@ __all__ = [
 
 
 def _extract_configuration_elements(
-        config: DataRoomConfiguration
+        config: Optional[DataRoomConfiguration]
 ) -> Tuple[
-        List[Tuple[string, AttestationSpecification]],
-        List[Tuple[string, AuthenticationMethod]],
-        List[Tuple[string, UserPermission]]
+        List[Tuple[str, AttestationSpecification]],
+        List[Tuple[str, AuthenticationMethod]],
+        List[Tuple[str, UserPermission]]
     ]:
     attestation_specs = {}
     authentication_methods = {}
     user_permissions = {}
 
-    items = config.elements.items() if config else []
+    items = config.elements if config else []
 
-    for node_id, element in items:
+    for element in items:
         if element.HasField("attestationSpecification"):
-            attestation_specs[node_id] = element.attestationSpecification
+            attestation_specs[element.id] = element.attestationSpecification
         elif element.HasField("authenticationMethod"):
-            authentication_methods[node_id] = element.authenticationMethod
+            authentication_methods[element.id] = element.authenticationMethod
         elif element.HasField("userPermission"):
-            user_permissions[node_id] = element.userPermission
+            user_permissions[element.id] = element.userPermission
 
     return (
         list(attestation_specs.items()),
@@ -54,7 +56,7 @@ def _extract_configuration_elements(
 
 def _find_matching_proto_object(
         proto_object: Any,
-        other_proto_objects: List[Tuple(str, Any)]
+        other_proto_objects: List[Tuple[str, Any]]
 ) -> Optional[str]:
     existing_node_id = next(
         (node_id
@@ -126,7 +128,7 @@ class DataRoomBuilder():
     name: str
     governance_protocol: GovernanceProtocolProto
     description: Optional[str]
-    owner_email: Optional[str]
+    dcr_secret_id: Optional[bytes]
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
@@ -137,7 +139,7 @@ class DataRoomBuilder():
             *,
             add_basic_user_permissions: bool = True,
             description: str = None,
-            owner_email: str = None,
+            dcr_secret_id: bytes = None,
         ) -> None:
         """
         Create a data room builder object.
@@ -158,8 +160,6 @@ class DataRoomBuilder():
             4. Permission to retrieve the list of datasets that have been published to the data room
             5. Permission to run development computations
         - `description`: Description of the data room.
-        - `owner_email`: A custom owner of the data room. By default this will
-            be set to the owner of the session publishing the data room.
         """
         assert name, "The DCR must have a non-empty name"
 
@@ -168,10 +168,10 @@ class DataRoomBuilder():
             add_basic_user_permissions=add_basic_user_permissions
         )
         self.name = name
-        self.owner_email = owner_email
         self.description = description
         self.governance_protocol = governance_protocol
         self.enclave_specs = enclave_specs
+        self.dcr_secret_id = dcr_secret_id
 
         if description:
             self.add_description(description)
@@ -254,14 +254,7 @@ class DataRoomBuilder():
         """Add a description to the data room being built."""
         self.description = description
 
-    def add_owner_email(self, email: str):
-        """
-        Specify a specific owner of the data room.
-        By default, the current user will be used.
-        """
-        self.owner_email = email
-
-    def build(self) -> Tuple[DataRoom, List[ConfigurationModification]]:
+    def build(self) -> DataRoom:
         """
         Finalize data room contruction.
 
@@ -278,15 +271,13 @@ class DataRoomBuilder():
         """
         data_room = DataRoom()
         data_room.name = self.name
-        if self.owner_email:
-            data_room.ownerEmail = self.owner_email
         if self.description:
             data_room.description = self.description
         data_room.id = DataRoomBuilder._generate_id()
         data_room.governanceProtocol.CopyFrom(self.governance_protocol)
-        modifications = self.modifications_builder.build()
+        data_room.initialConfiguration.CopyFrom(self.modifications_builder.build_flat())
 
-        return data_room, modifications
+        return data_room
 
     @staticmethod
     def _generate_id():
@@ -400,7 +391,7 @@ class DataRoomModificationsBuilder():
 
     def _add_attestation_specification(
             self,
-            attestation_specification: attestation.AttestationSpecification
+            attestation_specification: AttestationSpecification
     ) -> str:
         existing_id = _find_matching_proto_object(
             attestation_specification,
@@ -419,7 +410,7 @@ class DataRoomModificationsBuilder():
             self,
             attestation_id: str,
             attestation_specification: AttestationSpecification
-    ) -> str:
+    ) -> None:
         """
         Change a particular attestation specification within an existing data room
         configuration to a different one.
@@ -430,13 +421,15 @@ class DataRoomModificationsBuilder():
         - `attestation_id`: The id of the attestation to be replaced.
         - `attestation_specification`: The attestation specification protobuf object.
         """
-        existing_spec_ix = next(
-            (ix for ix, (a_id, ) in enumerate(self.new_attestation_specs)
-                if a_id == attestation_id),
-            None
-        )
+        existing_spec_ix = None
+        for ix, (a_id, attestation) in enumerate(self.new_attestation_specs):
+            if a_id == attestation_id:
+                existing_spec_ix = ix
+                break
+
         if existing_spec_ix:
-            self.new_attestation_specs[existing_spec_ix][1] = attestation_specification
+            old_spec_id, old_spec = self.new_attestation_specs[existing_spec_ix]
+            self.new_attestation_specs[existing_spec_ix] = old_spec_id, attestation_specification
         elif attestation_id in dict(self.existing_attestation_specs):
             self.change_attestation_specs.append(
                 (attestation_id, attestation_specification)
@@ -581,6 +574,44 @@ class DataRoomModificationsBuilder():
                 (DataRoomModificationsBuilder._generate_id(), permission)
             )
 
+    def build_flat(self) -> DataRoomConfiguration:
+        configuration_elements = []
+
+        for spec_id, attestation_spec in self.new_attestation_specs:
+            configuration_elements.append(
+                ConfigurationElement(
+                    id=spec_id,
+                    attestationSpecification=attestation_spec
+                )
+            )
+
+        for node_id, compute_node in self.new_compute_nodes:
+            configuration_elements.append(
+                ConfigurationElement(
+                    id=node_id,
+                    computeNode=compute_node
+                )
+            )
+
+        for auth_id, auth_method in self.new_authentication_methods:
+            configuration_elements.append(
+                ConfigurationElement(
+                    id=auth_id,
+                    authenticationMethod=auth_method
+                )
+            )
+
+        for perm_id, permission in self.new_user_permissions:
+            configuration_elements.append(
+                ConfigurationElement(
+                    id=perm_id,
+                    userPermission=permission
+                )
+            )
+
+        configuration = DataRoomConfiguration(elements=configuration_elements)
+        return configuration
+
     def build(self) -> List[ConfigurationModification]:
         """
         Build the list of configuration modifications.
@@ -591,8 +622,8 @@ class DataRoomModificationsBuilder():
             modifications.append(
                 ConfigurationModification(
                     add=AddModification(
-                        id=spec_id,
                         element=ConfigurationElement(
+                            id=spec_id,
                             attestationSpecification=attestation_spec
                         )
                     )
@@ -603,8 +634,8 @@ class DataRoomModificationsBuilder():
             modifications.append(
                 ConfigurationModification(
                     add=AddModification(
-                        id=node_id,
                         element=ConfigurationElement(
+                            id=node_id,
                             computeNode=compute_node
                         )
                     )
@@ -615,8 +646,8 @@ class DataRoomModificationsBuilder():
             modifications.append(
                 ConfigurationModification(
                     add=AddModification(
-                        id=auth_id,
                         element=ConfigurationElement(
+                            id=auth_id,
                             authenticationMethod=auth_method
                         )
                     )
@@ -627,8 +658,8 @@ class DataRoomModificationsBuilder():
             modifications.append(
                 ConfigurationModification(
                     add=AddModification(
-                        id=perm_id,
                         element=ConfigurationElement(
+                            id=perm_id,
                             userPermission=permission
                         )
                     )
@@ -639,8 +670,8 @@ class DataRoomModificationsBuilder():
             modifications.append(
                 ConfigurationModification(
                     change=ChangeModification(
-                        id=perm_id,
                         element=ConfigurationElement(
+                            id=perm_id,
                             userPermission=permission
                         )
                     )
@@ -651,8 +682,8 @@ class DataRoomModificationsBuilder():
             modifications.append(
                 ConfigurationModification(
                     change=ChangeModification(
-                        id=attestation_id,
                         element=ConfigurationElement(
+                            id=attestation_id,
                             attestationSpecification=attestation_spec
                         )
                     )
@@ -672,12 +703,14 @@ class DataRoomCommitBuilder:
     i.e. a list of modifications that are to be applied to the configuration
     of an existing data room.
     """
+    name: str
     data_room_id: str
     history_pin: str
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
             self,
+            name: str,
             data_room_id: str,
             current_configuration: DataRoomConfiguration,
             history_pin: str,
@@ -710,6 +743,7 @@ class DataRoomCommitBuilder:
             4. Permission to retrieve the list of datasets that have been published to the data room
             5. Permission to run development computations
         """
+        self.name = name
         self.data_room_id = data_room_id
         self.history_pin = history_pin
         self.modifications_builder = DataRoomModificationsBuilder(
@@ -753,7 +787,7 @@ class DataRoomCommitBuilder:
             self,
             attestation_id: str,
             attestation_specification: AttestationSpecification
-    ) -> str:
+    ) -> None:
         self.modifications_builder.change_attestation_specification(
             attestation_id, attestation_specification
         )
@@ -803,6 +837,10 @@ class DataRoomCommitBuilder:
             permissions
         )
 
+    @staticmethod
+    def _generate_id():
+        return str(uuid.uuid4())
+
     def build(self):
         """
         Build the data room configuration commit.
@@ -811,6 +849,8 @@ class DataRoomCommitBuilder:
         it to be made part of the data room configuration.
         """
         return ConfigurationCommit(
+            id=DataRoomCommitBuilder._generate_id(),
+            name=self.name,
             dataRoomId=bytes.fromhex(self.data_room_id),
             dataRoomHistoryPin=bytes.fromhex(self.history_pin),
             modifications=self.modifications_builder.build()

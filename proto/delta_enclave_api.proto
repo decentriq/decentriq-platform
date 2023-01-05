@@ -33,15 +33,6 @@ message DataNoncePubkey {
     bytes data = 1;
     bytes nonce = 2;
     bytes pubkey = 3;
-    oneof auth {
-        Pki pki = 4;
-    }
-}
-
-message Pki {
-    bytes certChainPem = 1;
-    bytes signature = 2;
-    bytes idMac = 3;
 }
 
 /* =========================================================================================================

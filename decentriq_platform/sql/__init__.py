@@ -1,8 +1,13 @@
 """
 .. include:: ../../../decentriq_platform_docs/sql_getting_started.md
----
+___
 """
 __docformat__ = "restructuredtext"
+__pdoc__ = {
+    "compute": False,
+    "helpers": False,
+    "proto": False,
+}
 
 from .compute import SqlCompute, SqlSchemaVerifier
 from .proto.compute_sql_pb2 import (

@@ -2,258 +2,272 @@ syntax = "proto3";
 package gcg;
 
 import "data_room.proto";
-import "attestation.proto";
+import "identity_endorsement.proto";
 
 message GcgRequest {
-    oneof gcg_request {
-        ExecuteComputeRequest executeComputeRequest = 2;
-        CreateDataRoomRequest createDataRoomRequest = 3;
-        PublishDatasetToDataRoomRequest publishDatasetToDataRoomRequest = 4;
-        RetrieveDataRoomRequest retrieveDataRoomRequest = 5;
-        RetrieveAuditLogRequest retrieveAuditLogRequest = 6;
-        RetrieveDataRoomStatusRequest retrieveDataRoomStatusRequest = 7;
-        UpdateDataRoomStatusRequest updateDataRoomStatusRequest = 10;
-        RetrievePublishedDatasetsRequest retrievePublishedDatasetsRequest = 11;
-        RemovePublishedDatasetRequest removePublishedDatasetRequest = 12;
-        JobStatusRequest jobStatusRequest = 13;
-        GetResultsRequest getResultsRequest = 14;
-	CreateConfigurationCommitRequest createConfigurationCommitRequest = 15;
-        ExecuteDevelopmentComputeRequest executeDevelopmentComputeRequest = 16;
-	GenerateMergeApprovalSignatureRequest generateMergeApprovalSignatureRequest = 17;
-        MergeConfigurationCommitRequest mergeConfigurationCommitRequest = 18;
-	RetrieveDataRoomConfigurationHistoryRequest retrieveDataRoomConfigurationHistoryRequest = 19;
-	RetrieveConfigurationCommitApproversRequest retrieveConfigurationCommitApproversRequest = 20;
-	RetrieveConfigurationCommitRequest retrieveConfigurationCommitRequest = 21;
-    }
+  UserAuth userAuth = 1;
+  oneof gcg_request {
+    CreateDataRoomRequest createDataRoomRequest = 2;
+    RetrieveDataRoomRequest retrieveDataRoomRequest = 3;
+    RetrieveCurrentDataRoomConfigurationRequest
+        retrieveCurrentDataRoomConfigurationRequest = 4;
+    RetrieveDataRoomStatusRequest retrieveDataRoomStatusRequest = 5;
+    UpdateDataRoomStatusRequest updateDataRoomStatusRequest = 6;
+    RetrieveAuditLogRequest retrieveAuditLogRequest = 7;
+    PublishDatasetToDataRoomRequest publishDatasetToDataRoomRequest = 8;
+    RetrievePublishedDatasetsRequest retrievePublishedDatasetsRequest = 9;
+    RemovePublishedDatasetRequest removePublishedDatasetRequest = 10;
+    ExecuteComputeRequest executeComputeRequest = 11;
+    JobStatusRequest jobStatusRequest = 12;
+    GetResultsRequest getResultsRequest = 13;
+    CreateConfigurationCommitRequest createConfigurationCommitRequest = 14;
+    RetrieveConfigurationCommitRequest retrieveConfigurationCommitRequest = 15;
+    ExecuteDevelopmentComputeRequest executeDevelopmentComputeRequest = 16;
+    GenerateMergeApprovalSignatureRequest
+        generateMergeApprovalSignatureRequest = 17;
+    MergeConfigurationCommitRequest mergeConfigurationCommitRequest = 18;
+    RetrieveConfigurationCommitApproversRequest
+        retrieveConfigurationCommitApproversRequest = 19;
+    CasAuxiliaryStateRequest casAuxiliaryStateRequest = 20;
+    ReadAuxiliaryStateRequest readAuxiliaryStateRequest = 21;
+    identity_endorsement.EndorsementRequest endorsementRequest = 101;
+  }
 }
 
 message GcgResponse {
-    oneof gcg_response {
-        string failure = 1;
-        ExecuteComputeResponse executeComputeResponse = 2;
-        CreateDataRoomResponse createDataRoomResponse = 3;
-        PublishDatasetToDataRoomResponse publishDatasetToDataRoomResponse = 4;
-        RetrieveDataRoomResponse retrieveDataRoomResponse = 5;
-        RetrieveAuditLogResponse retrieveAuditLogResponse = 6;
-        RetrieveDataRoomStatusResponse retrieveDataRoomStatusResponse = 7;
-        UpdateDataRoomStatusResponse updateDataRoomStatusResponse = 10;
-        RetrievePublishedDatasetsResponse retrievePublishedDatasetsResponse = 11;
-        RemovePublishedDatasetResponse removePublishedDatasetResponse = 12;
-        JobStatusResponse jobStatusResponse = 13;
-        GetResultsResponseChunk getResultsResponseChunk = 14;
-        GetResultsResponseFooter getResultsResponseFooter = 15;
-	CreateConfigurationCommitResponse createConfigurationCommitResponse = 16;
-	GenerateMergeApprovalSignatureResponse generateMergeApprovalSignatureResponse = 17;
-        MergeConfigurationCommitResponse mergeConfigurationCommitResponse = 18;
-	RetrieveDataRoomConfigurationHistoryResponse retrieveDataRoomConfigurationHistoryResponse = 19;
-	RetrieveConfigurationCommitApproversResponse retrieveConfigurationCommitApproversResponse = 20;
-	RetrieveConfigurationCommitResponse retrieveConfigurationCommitResponse = 21;
-    }
+  oneof gcg_response {
+    string failure = 1;
+    CreateDataRoomResponse createDataRoomResponse = 2;
+    RetrieveDataRoomResponse retrieveDataRoomResponse = 3;
+    RetrieveCurrentDataRoomConfigurationResponse
+        retrieveCurrentDataRoomConfigurationResponse = 4;
+    RetrieveDataRoomStatusResponse retrieveDataRoomStatusResponse = 5;
+    UpdateDataRoomStatusResponse updateDataRoomStatusResponse = 6;
+    RetrieveAuditLogResponse retrieveAuditLogResponse = 7;
+    PublishDatasetToDataRoomResponse publishDatasetToDataRoomResponse = 8;
+    RetrievePublishedDatasetsResponse retrievePublishedDatasetsResponse = 9;
+    RemovePublishedDatasetResponse removePublishedDatasetResponse = 10;
+    ExecuteComputeResponse executeComputeResponse = 11;
+    JobStatusResponse jobStatusResponse = 12;
+    GetResultsResponseChunk getResultsResponseChunk = 13;
+    GetResultsResponseFooter getResultsResponseFooter = 14;
+    CreateConfigurationCommitResponse createConfigurationCommitResponse = 15;
+    RetrieveConfigurationCommitResponse retrieveConfigurationCommitResponse =
+        16;
+    GenerateMergeApprovalSignatureResponse
+        generateMergeApprovalSignatureResponse = 17;
+    MergeConfigurationCommitResponse mergeConfigurationCommitResponse = 18;
+    RetrieveConfigurationCommitApproversResponse
+        retrieveConfigurationCommitApproversResponse = 19;
+    CasAuxiliaryStateResponse casAuxiliaryStateResponse = 20;
+    ReadAuxiliaryStateResponse readAuxiliaryStateResponse = 21;
+    identity_endorsement.EndorsementResponse endorsementResponse = 101;
+  }
+}
+
+message UserAuth {
+  Pki pki = 1;
+  identity_endorsement.EnclaveEndorsements enclaveEndorsements = 2;
+}
+
+message Pki {
+  bytes certChainPem = 1;
+  bytes signature = 2;
+  bytes idMac = 3;
 }
 
 message CreateDataRoomRequest {
-    data_room.DataRoom dataRoom = 1;
-    reserved 2;
-    repeated data_room.ConfigurationModification initialConfiguration = 3;
+  data_room.DataRoom dataRoom = 1;
+  optional bytes highLevelRepresentation = 2;
+  optional bytes dataRoomMetadata = 3;
 }
 
 message CreateDataRoomResponse {
-    oneof create_data_room_response {
-        bytes dataRoomId = 1;
-        DataRoomValidationError dataRoomValidationError = 2;
-    }
+  oneof create_data_room_response {
+    bytes dataRoomId = 1;
+    DataRoomValidationError dataRoomValidationError = 2;
+  }
 }
 
 message DataRoomValidationError {
-    string message = 1;
-    reserved 2 to 5;
-    optional uint64 permissionIndex = 6;
-    reserved 7 to 8;
-    optional string computeNodeId = 9;
-    optional string userPermissionId = 10;
-    optional string attestationSpecificationId = 11;
-    optional string authenticationMethodId = 12;
+  string message = 1;
+  optional uint64 permissionIndex = 2;
+  optional string computeNodeId = 3;
+  optional string userPermissionId = 4;
+  optional string attestationSpecificationId = 5;
+  optional string authenticationMethodId = 6;
 }
 
 message PublishDatasetToDataRoomRequest {
-    bytes datasetHash = 1;
-    bytes dataRoomId = 2;
-    string leafName = 3;
-    bytes encryptionKey = 4;
-    bytes scope = 5;
+  bytes datasetHash = 1;
+  bytes dataRoomId = 2;
+  string leafId = 3;
+  bytes encryptionKey = 4;
+  bytes scope = 5;
 }
 
-message PublishDatasetToDataRoomResponse {
-}
+message PublishDatasetToDataRoomResponse {}
 
 message ExecuteComputeRequest {
-    bytes dataRoomId = 1;
-    repeated string computeNodeNames = 2;
-    bool isDryRun = 3;
-    bytes scope = 4;
+  bytes dataRoomId = 1;
+  repeated string computeNodeIds = 2;
+  bool isDryRun = 3;
+  bytes scope = 4;
+  map<string, string> parameters = 5;
 }
 
 message ExecuteDevelopmentComputeRequest {
-    bytes configurationCommitId = 1;
-    repeated string computeNodeNames = 2;
-    bool isDryRun = 3;
-    bytes scope = 4;
+  bytes configurationCommitId = 1;
+  repeated string computeNodeIds = 2;
+  bool isDryRun = 3;
+  bytes scope = 4;
+  map<string, string> parameters = 5;
 }
 
-message ExecuteComputeResponse {
-    bytes jobId = 1;
-}
+message ExecuteComputeResponse { bytes jobId = 1; }
 
-message JobStatusRequest {
-    bytes jobId = 1;
-}
+message JobStatusRequest { bytes jobId = 1; }
 
-message JobStatusResponse {
-    repeated string completeComputeNodeNames = 1;
-}
+message JobStatusResponse { repeated string completeComputeNodeIds = 1; }
 
 message GetResultsRequest {
-    bytes jobId = 1;
-    string computeNodeName = 2;
+  bytes jobId = 1;
+  string computeNodeId = 2;
 }
 
-message GetResultsResponseChunk {
-    bytes data = 1;
-}
+message GetResultsResponseChunk { bytes data = 1; }
 
-message GetResultsResponseFooter {
-}
+message GetResultsResponseFooter {}
 
-message RetrieveDataRoomRequest {
-    bytes dataRoomId = 1;
-    reserved 2;
-}
+message RetrieveDataRoomRequest { bytes dataRoomId = 1; }
 
 message RetrieveDataRoomResponse {
-    data_room.DataRoom dataRoom = 1;
+  data_room.DataRoom dataRoom = 1;
+  repeated data_room.ConfigurationCommit commits = 2;
+  optional bytes highLevelRepresentation = 3;
 }
 
-message RetrieveAuditLogRequest {
-    bytes dataRoomId = 1;
-    bytes scope = 2;
-}
+message RetrieveAuditLogRequest { bytes dataRoomId = 1; }
 
-message RetrieveAuditLogResponse {
-    bytes log = 1;
-}
+message RetrieveAuditLogResponse { bytes log = 1; }
 
 enum DataRoomStatus {
-    Active = 0;
-    Stopped = 1;
+  Active = 0;
+  Stopped = 1;
 }
 
-message RetrieveDataRoomStatusRequest {
-    bytes dataRoomId = 1;
-    bytes scope = 2;
-}
+message RetrieveDataRoomStatusRequest { bytes dataRoomId = 1; }
 
-message RetrieveDataRoomStatusResponse {
-    DataRoomStatus status = 1;
-}
+message RetrieveDataRoomStatusResponse { DataRoomStatus status = 1; }
 
 message UpdateDataRoomStatusRequest {
-    bytes dataRoomId = 1;
-    bytes scope = 2;
-    DataRoomStatus status = 3;
+  bytes dataRoomId = 1;
+  DataRoomStatus status = 2;
 }
 
-message UpdateDataRoomStatusResponse {
-}
+message UpdateDataRoomStatusResponse {}
 
-message RetrievePublishedDatasetsRequest {
-    bytes dataRoomId = 1;
-    bytes scope = 2;
-}
+message RetrievePublishedDatasetsRequest { bytes dataRoomId = 1; }
 
 message PublishedDataset {
-    string leafName = 1;
-    string user = 2;
-    uint64 timestamp = 3;
-    bytes datasetHash = 4;
+  string leafId = 1;
+  string user = 2;
+  uint64 timestamp = 3;
+  bytes datasetHash = 4;
 }
 
 message RetrievePublishedDatasetsResponse {
-    repeated PublishedDataset publishedDatasets = 1;
+  repeated PublishedDataset publishedDatasets = 1;
 }
 
 message RemovePublishedDatasetRequest {
-    reserved 1;
-    bytes dataRoomId = 2;
-    string leafName = 3;
-    bytes scope = 4;
+  bytes dataRoomId = 1;
+  string leafId = 2;
 }
 
 message RemovePublishedDatasetResponse {}
 
 message CreateConfigurationCommitRequest {
-    data_room.ConfigurationCommit commit = 1;
-    bytes scope = 2;
+  data_room.ConfigurationCommit commit = 1;
+  optional bytes highLevelRepresentation = 2;
 }
 
-message CreateConfigurationCommitResponse {
-    bytes commitId = 1;
-}
+message CreateConfigurationCommitResponse { bytes commitId = 1; }
 
-message GenerateMergeApprovalSignatureRequest {
-    bytes commitId = 1;
-    bytes scope = 2;
-}
+message GenerateMergeApprovalSignatureRequest { bytes commitId = 1; }
 
-message GenerateMergeApprovalSignatureResponse {
-    bytes signature = 1;
-}
+message GenerateMergeApprovalSignatureResponse { bytes signature = 1; }
 
 message MergeConfigurationCommitRequest {
-    bytes commitId = 1;
-    map<string, bytes> approvalSignatures = 2;
-    bytes scope = 3;
+  bytes commitId = 1;
+  map<string, bytes> approvalSignatures = 2;
+  optional bytes newDataRoomHighLevelRepresentation = 3;
 }
 
-message RetrieveDataRoomConfigurationHistoryRequest {
+message RetrieveCurrentDataRoomConfigurationRequest { bytes dataRoomId = 1; }
+
+message RetrieveCurrentDataRoomConfigurationResponse {
+  data_room.DataRoomConfiguration configuration = 1;
+  bytes pin = 2;
+}
+
+message RetrieveConfigurationCommitApproversRequest { bytes commitId = 1; }
+
+message RetrieveConfigurationCommitApproversResponse {
+  repeated string approvers = 1;
+}
+
+message RetrieveConfigurationCommitRequest { bytes commitId = 1; }
+
+message RetrieveConfigurationCommitResponse {
+  data_room.ConfigurationCommit commit = 1;
+  optional bytes highLevelRepresentation = 2;
+}
+
+message CasAuxiliaryStateRequest {
+    bytes dataRoomId = 1;
+    // The index indicates what the client thinks the state is. The CAS operation will only succeed if the index
+    // matches what's stored in the enclave. The index is 0 iff the value doesn't exist/was deleted.
+    uint64 index = 2;
+    optional bytes value = 3; // If null it will try to delete value.
+}
+
+message CasAuxiliaryStateResponse {
+  bool success = 1;
+  // The index at the end of the operation, 0 if delete was successful. If success=false, the client should use this
+  // index and retry the operation, possibly modified based on the returned value.
+  // Example: User A is racing on two clients X and Y to add numbers 1 and 2 to an initially empty list.
+  //   1. index=0 list=[]: initial state
+  //   2. index=1 list=[1]: User A on client X does CAS(index=0, value=[1])
+  //   3. index=1 list=[1]: User A on client Y does CAS(index=0, value=[2]) => success=false, index=1, value=[1]
+  //   4. index=2 list=[1,2]: User A on client Y retries with CAS(index=1, value=[1,2])
+  uint64 index = 2;
+  optional bytes value = 3; // The value at the end of the operation.
+}
+
+message ReadAuxiliaryStateRequest {
     bytes dataRoomId = 1;
 }
 
-message RetrieveDataRoomConfigurationHistoryResponse {
-    data_room.DataRoomConfiguration currentConfiguration = 1;
-    repeated bytes configurationsHistory = 2;
-    bytes pin = 3;
+message ReadAuxiliaryStateResponse {
+    repeated AuxiliaryStateValue values = 2;
 }
 
-message RetrieveConfigurationCommitApproversRequest {
-    bytes commitId = 1;
-    bytes scope = 2;
-}
-
-message RetrieveConfigurationCommitApproversResponse {
-    repeated string approvers = 1;
-}
-
-message RetrieveConfigurationCommitRequest {
-    bytes commitId = 1;
-    bytes scope = 2;
-}
-
-message RetrieveConfigurationCommitResponse {
-    data_room.ConfigurationCommit commit = 1;
+message AuxiliaryStateValue {
+    string user = 1;
+    uint64 index = 2;
+    bytes value = 3;
 }
 
 message MergeConfigurationCommitResponse {}
 
 message DriverTaskConfig {
-    oneof driver_task_config {
-        NoopConfig noop = 1;
-        StaticContentConfig staticContent = 2;
-    }
+  oneof driver_task_config {
+    NoopConfig noop = 1;
+    StaticContentConfig staticContent = 2;
+  }
 }
 
-message NoopConfig {
-}
+message NoopConfig {}
 
-message StaticContentConfig {
-    bytes content = 1;
-}
+message StaticContentConfig { bytes content = 1; }

@@ -3,68 +3,85 @@
 isort:skip_file
 """
 import builtins
+import collections.abc
 import data_room_pb2
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
+import identity_endorsement_pb2
+import sys
 import typing
-import typing_extensions
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
-class DataRoomStatus(_DataRoomStatus, metaclass=_DataRoomStatusEnumTypeWrapper):
-    pass
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+
 class _DataRoomStatus:
-    V = typing.NewType('V', builtins.int)
-class _DataRoomStatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataRoomStatus.V], builtins.type):
-    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor = ...
-    Active = DataRoomStatus.V(0)
-    Stopped = DataRoomStatus.V(1)
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
 
-Active = DataRoomStatus.V(0)
-Stopped = DataRoomStatus.V(1)
+class _DataRoomStatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataRoomStatus.ValueType], builtins.type):  # noqa: F821
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    Active: _DataRoomStatus.ValueType  # 0
+    Stopped: _DataRoomStatus.ValueType  # 1
+
+class DataRoomStatus(_DataRoomStatus, metaclass=_DataRoomStatusEnumTypeWrapper): ...
+
+Active: DataRoomStatus.ValueType  # 0
+Stopped: DataRoomStatus.ValueType  # 1
 global___DataRoomStatus = DataRoomStatus
 
-
 class GcgRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    EXECUTECOMPUTEREQUEST_FIELD_NUMBER: builtins.int
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    USERAUTH_FIELD_NUMBER: builtins.int
     CREATEDATAROOMREQUEST_FIELD_NUMBER: builtins.int
-    PUBLISHDATASETTODATAROOMREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMREQUEST_FIELD_NUMBER: builtins.int
-    RETRIEVEAUDITLOGREQUEST_FIELD_NUMBER: builtins.int
+    RETRIEVECURRENTDATAROOMCONFIGURATIONREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMSTATUSREQUEST_FIELD_NUMBER: builtins.int
     UPDATEDATAROOMSTATUSREQUEST_FIELD_NUMBER: builtins.int
+    RETRIEVEAUDITLOGREQUEST_FIELD_NUMBER: builtins.int
+    PUBLISHDATASETTODATAROOMREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVEPUBLISHEDDATASETSREQUEST_FIELD_NUMBER: builtins.int
     REMOVEPUBLISHEDDATASETREQUEST_FIELD_NUMBER: builtins.int
+    EXECUTECOMPUTEREQUEST_FIELD_NUMBER: builtins.int
     JOBSTATUSREQUEST_FIELD_NUMBER: builtins.int
     GETRESULTSREQUEST_FIELD_NUMBER: builtins.int
     CREATECONFIGURATIONCOMMITREQUEST_FIELD_NUMBER: builtins.int
+    RETRIEVECONFIGURATIONCOMMITREQUEST_FIELD_NUMBER: builtins.int
     EXECUTEDEVELOPMENTCOMPUTEREQUEST_FIELD_NUMBER: builtins.int
     GENERATEMERGEAPPROVALSIGNATUREREQUEST_FIELD_NUMBER: builtins.int
     MERGECONFIGURATIONCOMMITREQUEST_FIELD_NUMBER: builtins.int
-    RETRIEVEDATAROOMCONFIGURATIONHISTORYREQUEST_FIELD_NUMBER: builtins.int
     RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST_FIELD_NUMBER: builtins.int
-    RETRIEVECONFIGURATIONCOMMITREQUEST_FIELD_NUMBER: builtins.int
+    CASAUXILIARYSTATEREQUEST_FIELD_NUMBER: builtins.int
+    READAUXILIARYSTATEREQUEST_FIELD_NUMBER: builtins.int
+    ENDORSEMENTREQUEST_FIELD_NUMBER: builtins.int
     @property
-    def executeComputeRequest(self) -> global___ExecuteComputeRequest: ...
+    def userAuth(self) -> global___UserAuth: ...
     @property
     def createDataRoomRequest(self) -> global___CreateDataRoomRequest: ...
     @property
-    def publishDatasetToDataRoomRequest(self) -> global___PublishDatasetToDataRoomRequest: ...
-    @property
     def retrieveDataRoomRequest(self) -> global___RetrieveDataRoomRequest: ...
     @property
-    def retrieveAuditLogRequest(self) -> global___RetrieveAuditLogRequest: ...
+    def retrieveCurrentDataRoomConfigurationRequest(self) -> global___RetrieveCurrentDataRoomConfigurationRequest: ...
     @property
     def retrieveDataRoomStatusRequest(self) -> global___RetrieveDataRoomStatusRequest: ...
     @property
     def updateDataRoomStatusRequest(self) -> global___UpdateDataRoomStatusRequest: ...
     @property
+    def retrieveAuditLogRequest(self) -> global___RetrieveAuditLogRequest: ...
+    @property
+    def publishDatasetToDataRoomRequest(self) -> global___PublishDatasetToDataRoomRequest: ...
+    @property
     def retrievePublishedDatasetsRequest(self) -> global___RetrievePublishedDatasetsRequest: ...
     @property
     def removePublishedDatasetRequest(self) -> global___RemovePublishedDatasetRequest: ...
+    @property
+    def executeComputeRequest(self) -> global___ExecuteComputeRequest: ...
     @property
     def jobStatusRequest(self) -> global___JobStatusRequest: ...
     @property
@@ -72,83 +89,99 @@ class GcgRequest(google.protobuf.message.Message):
     @property
     def createConfigurationCommitRequest(self) -> global___CreateConfigurationCommitRequest: ...
     @property
+    def retrieveConfigurationCommitRequest(self) -> global___RetrieveConfigurationCommitRequest: ...
+    @property
     def executeDevelopmentComputeRequest(self) -> global___ExecuteDevelopmentComputeRequest: ...
     @property
     def generateMergeApprovalSignatureRequest(self) -> global___GenerateMergeApprovalSignatureRequest: ...
     @property
     def mergeConfigurationCommitRequest(self) -> global___MergeConfigurationCommitRequest: ...
     @property
-    def retrieveDataRoomConfigurationHistoryRequest(self) -> global___RetrieveDataRoomConfigurationHistoryRequest: ...
-    @property
     def retrieveConfigurationCommitApproversRequest(self) -> global___RetrieveConfigurationCommitApproversRequest: ...
     @property
-    def retrieveConfigurationCommitRequest(self) -> global___RetrieveConfigurationCommitRequest: ...
-    def __init__(self,
+    def casAuxiliaryStateRequest(self) -> global___CasAuxiliaryStateRequest: ...
+    @property
+    def readAuxiliaryStateRequest(self) -> global___ReadAuxiliaryStateRequest: ...
+    @property
+    def endorsementRequest(self) -> identity_endorsement_pb2.EndorsementRequest: ...
+    def __init__(
+        self,
         *,
-        executeComputeRequest : typing.Optional[global___ExecuteComputeRequest] = ...,
-        createDataRoomRequest : typing.Optional[global___CreateDataRoomRequest] = ...,
-        publishDatasetToDataRoomRequest : typing.Optional[global___PublishDatasetToDataRoomRequest] = ...,
-        retrieveDataRoomRequest : typing.Optional[global___RetrieveDataRoomRequest] = ...,
-        retrieveAuditLogRequest : typing.Optional[global___RetrieveAuditLogRequest] = ...,
-        retrieveDataRoomStatusRequest : typing.Optional[global___RetrieveDataRoomStatusRequest] = ...,
-        updateDataRoomStatusRequest : typing.Optional[global___UpdateDataRoomStatusRequest] = ...,
-        retrievePublishedDatasetsRequest : typing.Optional[global___RetrievePublishedDatasetsRequest] = ...,
-        removePublishedDatasetRequest : typing.Optional[global___RemovePublishedDatasetRequest] = ...,
-        jobStatusRequest : typing.Optional[global___JobStatusRequest] = ...,
-        getResultsRequest : typing.Optional[global___GetResultsRequest] = ...,
-        createConfigurationCommitRequest : typing.Optional[global___CreateConfigurationCommitRequest] = ...,
-        executeDevelopmentComputeRequest : typing.Optional[global___ExecuteDevelopmentComputeRequest] = ...,
-        generateMergeApprovalSignatureRequest : typing.Optional[global___GenerateMergeApprovalSignatureRequest] = ...,
-        mergeConfigurationCommitRequest : typing.Optional[global___MergeConfigurationCommitRequest] = ...,
-        retrieveDataRoomConfigurationHistoryRequest : typing.Optional[global___RetrieveDataRoomConfigurationHistoryRequest] = ...,
-        retrieveConfigurationCommitApproversRequest : typing.Optional[global___RetrieveConfigurationCommitApproversRequest] = ...,
-        retrieveConfigurationCommitRequest : typing.Optional[global___RetrieveConfigurationCommitRequest] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"createConfigurationCommitRequest",b"createConfigurationCommitRequest",u"createDataRoomRequest",b"createDataRoomRequest",u"executeComputeRequest",b"executeComputeRequest",u"executeDevelopmentComputeRequest",b"executeDevelopmentComputeRequest",u"gcg_request",b"gcg_request",u"generateMergeApprovalSignatureRequest",b"generateMergeApprovalSignatureRequest",u"getResultsRequest",b"getResultsRequest",u"jobStatusRequest",b"jobStatusRequest",u"mergeConfigurationCommitRequest",b"mergeConfigurationCommitRequest",u"publishDatasetToDataRoomRequest",b"publishDatasetToDataRoomRequest",u"removePublishedDatasetRequest",b"removePublishedDatasetRequest",u"retrieveAuditLogRequest",b"retrieveAuditLogRequest",u"retrieveConfigurationCommitApproversRequest",b"retrieveConfigurationCommitApproversRequest",u"retrieveConfigurationCommitRequest",b"retrieveConfigurationCommitRequest",u"retrieveDataRoomConfigurationHistoryRequest",b"retrieveDataRoomConfigurationHistoryRequest",u"retrieveDataRoomRequest",b"retrieveDataRoomRequest",u"retrieveDataRoomStatusRequest",b"retrieveDataRoomStatusRequest",u"retrievePublishedDatasetsRequest",b"retrievePublishedDatasetsRequest",u"updateDataRoomStatusRequest",b"updateDataRoomStatusRequest"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"createConfigurationCommitRequest",b"createConfigurationCommitRequest",u"createDataRoomRequest",b"createDataRoomRequest",u"executeComputeRequest",b"executeComputeRequest",u"executeDevelopmentComputeRequest",b"executeDevelopmentComputeRequest",u"gcg_request",b"gcg_request",u"generateMergeApprovalSignatureRequest",b"generateMergeApprovalSignatureRequest",u"getResultsRequest",b"getResultsRequest",u"jobStatusRequest",b"jobStatusRequest",u"mergeConfigurationCommitRequest",b"mergeConfigurationCommitRequest",u"publishDatasetToDataRoomRequest",b"publishDatasetToDataRoomRequest",u"removePublishedDatasetRequest",b"removePublishedDatasetRequest",u"retrieveAuditLogRequest",b"retrieveAuditLogRequest",u"retrieveConfigurationCommitApproversRequest",b"retrieveConfigurationCommitApproversRequest",u"retrieveConfigurationCommitRequest",b"retrieveConfigurationCommitRequest",u"retrieveDataRoomConfigurationHistoryRequest",b"retrieveDataRoomConfigurationHistoryRequest",u"retrieveDataRoomRequest",b"retrieveDataRoomRequest",u"retrieveDataRoomStatusRequest",b"retrieveDataRoomStatusRequest",u"retrievePublishedDatasetsRequest",b"retrievePublishedDatasetsRequest",u"updateDataRoomStatusRequest",b"updateDataRoomStatusRequest"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"gcg_request",b"gcg_request"]) -> typing.Optional[typing_extensions.Literal["executeComputeRequest","createDataRoomRequest","publishDatasetToDataRoomRequest","retrieveDataRoomRequest","retrieveAuditLogRequest","retrieveDataRoomStatusRequest","updateDataRoomStatusRequest","retrievePublishedDatasetsRequest","removePublishedDatasetRequest","jobStatusRequest","getResultsRequest","createConfigurationCommitRequest","executeDevelopmentComputeRequest","generateMergeApprovalSignatureRequest","mergeConfigurationCommitRequest","retrieveDataRoomConfigurationHistoryRequest","retrieveConfigurationCommitApproversRequest","retrieveConfigurationCommitRequest"]]: ...
+        userAuth: global___UserAuth | None = ...,
+        createDataRoomRequest: global___CreateDataRoomRequest | None = ...,
+        retrieveDataRoomRequest: global___RetrieveDataRoomRequest | None = ...,
+        retrieveCurrentDataRoomConfigurationRequest: global___RetrieveCurrentDataRoomConfigurationRequest | None = ...,
+        retrieveDataRoomStatusRequest: global___RetrieveDataRoomStatusRequest | None = ...,
+        updateDataRoomStatusRequest: global___UpdateDataRoomStatusRequest | None = ...,
+        retrieveAuditLogRequest: global___RetrieveAuditLogRequest | None = ...,
+        publishDatasetToDataRoomRequest: global___PublishDatasetToDataRoomRequest | None = ...,
+        retrievePublishedDatasetsRequest: global___RetrievePublishedDatasetsRequest | None = ...,
+        removePublishedDatasetRequest: global___RemovePublishedDatasetRequest | None = ...,
+        executeComputeRequest: global___ExecuteComputeRequest | None = ...,
+        jobStatusRequest: global___JobStatusRequest | None = ...,
+        getResultsRequest: global___GetResultsRequest | None = ...,
+        createConfigurationCommitRequest: global___CreateConfigurationCommitRequest | None = ...,
+        retrieveConfigurationCommitRequest: global___RetrieveConfigurationCommitRequest | None = ...,
+        executeDevelopmentComputeRequest: global___ExecuteDevelopmentComputeRequest | None = ...,
+        generateMergeApprovalSignatureRequest: global___GenerateMergeApprovalSignatureRequest | None = ...,
+        mergeConfigurationCommitRequest: global___MergeConfigurationCommitRequest | None = ...,
+        retrieveConfigurationCommitApproversRequest: global___RetrieveConfigurationCommitApproversRequest | None = ...,
+        casAuxiliaryStateRequest: global___CasAuxiliaryStateRequest | None = ...,
+        readAuxiliaryStateRequest: global___ReadAuxiliaryStateRequest | None = ...,
+        endorsementRequest: identity_endorsement_pb2.EndorsementRequest | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "casAuxiliaryStateRequest", "readAuxiliaryStateRequest", "endorsementRequest"] | None: ...
+
 global___GcgRequest = GcgRequest
 
 class GcgResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     FAILURE_FIELD_NUMBER: builtins.int
-    EXECUTECOMPUTERESPONSE_FIELD_NUMBER: builtins.int
     CREATEDATAROOMRESPONSE_FIELD_NUMBER: builtins.int
-    PUBLISHDATASETTODATAROOMRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMRESPONSE_FIELD_NUMBER: builtins.int
-    RETRIEVEAUDITLOGRESPONSE_FIELD_NUMBER: builtins.int
+    RETRIEVECURRENTDATAROOMCONFIGURATIONRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVEDATAROOMSTATUSRESPONSE_FIELD_NUMBER: builtins.int
     UPDATEDATAROOMSTATUSRESPONSE_FIELD_NUMBER: builtins.int
+    RETRIEVEAUDITLOGRESPONSE_FIELD_NUMBER: builtins.int
+    PUBLISHDATASETTODATAROOMRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVEPUBLISHEDDATASETSRESPONSE_FIELD_NUMBER: builtins.int
     REMOVEPUBLISHEDDATASETRESPONSE_FIELD_NUMBER: builtins.int
+    EXECUTECOMPUTERESPONSE_FIELD_NUMBER: builtins.int
     JOBSTATUSRESPONSE_FIELD_NUMBER: builtins.int
     GETRESULTSRESPONSECHUNK_FIELD_NUMBER: builtins.int
     GETRESULTSRESPONSEFOOTER_FIELD_NUMBER: builtins.int
     CREATECONFIGURATIONCOMMITRESPONSE_FIELD_NUMBER: builtins.int
+    RETRIEVECONFIGURATIONCOMMITRESPONSE_FIELD_NUMBER: builtins.int
     GENERATEMERGEAPPROVALSIGNATURERESPONSE_FIELD_NUMBER: builtins.int
     MERGECONFIGURATIONCOMMITRESPONSE_FIELD_NUMBER: builtins.int
-    RETRIEVEDATAROOMCONFIGURATIONHISTORYRESPONSE_FIELD_NUMBER: builtins.int
     RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE_FIELD_NUMBER: builtins.int
-    RETRIEVECONFIGURATIONCOMMITRESPONSE_FIELD_NUMBER: builtins.int
-    failure: typing.Text = ...
-    @property
-    def executeComputeResponse(self) -> global___ExecuteComputeResponse: ...
+    CASAUXILIARYSTATERESPONSE_FIELD_NUMBER: builtins.int
+    READAUXILIARYSTATERESPONSE_FIELD_NUMBER: builtins.int
+    ENDORSEMENTRESPONSE_FIELD_NUMBER: builtins.int
+    failure: builtins.str
     @property
     def createDataRoomResponse(self) -> global___CreateDataRoomResponse: ...
     @property
-    def publishDatasetToDataRoomResponse(self) -> global___PublishDatasetToDataRoomResponse: ...
-    @property
     def retrieveDataRoomResponse(self) -> global___RetrieveDataRoomResponse: ...
     @property
-    def retrieveAuditLogResponse(self) -> global___RetrieveAuditLogResponse: ...
+    def retrieveCurrentDataRoomConfigurationResponse(self) -> global___RetrieveCurrentDataRoomConfigurationResponse: ...
     @property
     def retrieveDataRoomStatusResponse(self) -> global___RetrieveDataRoomStatusResponse: ...
     @property
     def updateDataRoomStatusResponse(self) -> global___UpdateDataRoomStatusResponse: ...
     @property
+    def retrieveAuditLogResponse(self) -> global___RetrieveAuditLogResponse: ...
+    @property
+    def publishDatasetToDataRoomResponse(self) -> global___PublishDatasetToDataRoomResponse: ...
+    @property
     def retrievePublishedDatasetsResponse(self) -> global___RetrievePublishedDatasetsResponse: ...
     @property
     def removePublishedDatasetResponse(self) -> global___RemovePublishedDatasetResponse: ...
+    @property
+    def executeComputeResponse(self) -> global___ExecuteComputeResponse: ...
     @property
     def jobStatusResponse(self) -> global___JobStatusResponse: ...
     @property
@@ -158,619 +191,930 @@ class GcgResponse(google.protobuf.message.Message):
     @property
     def createConfigurationCommitResponse(self) -> global___CreateConfigurationCommitResponse: ...
     @property
+    def retrieveConfigurationCommitResponse(self) -> global___RetrieveConfigurationCommitResponse: ...
+    @property
     def generateMergeApprovalSignatureResponse(self) -> global___GenerateMergeApprovalSignatureResponse: ...
     @property
     def mergeConfigurationCommitResponse(self) -> global___MergeConfigurationCommitResponse: ...
     @property
-    def retrieveDataRoomConfigurationHistoryResponse(self) -> global___RetrieveDataRoomConfigurationHistoryResponse: ...
-    @property
     def retrieveConfigurationCommitApproversResponse(self) -> global___RetrieveConfigurationCommitApproversResponse: ...
     @property
-    def retrieveConfigurationCommitResponse(self) -> global___RetrieveConfigurationCommitResponse: ...
-    def __init__(self,
+    def casAuxiliaryStateResponse(self) -> global___CasAuxiliaryStateResponse: ...
+    @property
+    def readAuxiliaryStateResponse(self) -> global___ReadAuxiliaryStateResponse: ...
+    @property
+    def endorsementResponse(self) -> identity_endorsement_pb2.EndorsementResponse: ...
+    def __init__(
+        self,
         *,
-        failure : typing.Text = ...,
-        executeComputeResponse : typing.Optional[global___ExecuteComputeResponse] = ...,
-        createDataRoomResponse : typing.Optional[global___CreateDataRoomResponse] = ...,
-        publishDatasetToDataRoomResponse : typing.Optional[global___PublishDatasetToDataRoomResponse] = ...,
-        retrieveDataRoomResponse : typing.Optional[global___RetrieveDataRoomResponse] = ...,
-        retrieveAuditLogResponse : typing.Optional[global___RetrieveAuditLogResponse] = ...,
-        retrieveDataRoomStatusResponse : typing.Optional[global___RetrieveDataRoomStatusResponse] = ...,
-        updateDataRoomStatusResponse : typing.Optional[global___UpdateDataRoomStatusResponse] = ...,
-        retrievePublishedDatasetsResponse : typing.Optional[global___RetrievePublishedDatasetsResponse] = ...,
-        removePublishedDatasetResponse : typing.Optional[global___RemovePublishedDatasetResponse] = ...,
-        jobStatusResponse : typing.Optional[global___JobStatusResponse] = ...,
-        getResultsResponseChunk : typing.Optional[global___GetResultsResponseChunk] = ...,
-        getResultsResponseFooter : typing.Optional[global___GetResultsResponseFooter] = ...,
-        createConfigurationCommitResponse : typing.Optional[global___CreateConfigurationCommitResponse] = ...,
-        generateMergeApprovalSignatureResponse : typing.Optional[global___GenerateMergeApprovalSignatureResponse] = ...,
-        mergeConfigurationCommitResponse : typing.Optional[global___MergeConfigurationCommitResponse] = ...,
-        retrieveDataRoomConfigurationHistoryResponse : typing.Optional[global___RetrieveDataRoomConfigurationHistoryResponse] = ...,
-        retrieveConfigurationCommitApproversResponse : typing.Optional[global___RetrieveConfigurationCommitApproversResponse] = ...,
-        retrieveConfigurationCommitResponse : typing.Optional[global___RetrieveConfigurationCommitResponse] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"createConfigurationCommitResponse",b"createConfigurationCommitResponse",u"createDataRoomResponse",b"createDataRoomResponse",u"executeComputeResponse",b"executeComputeResponse",u"failure",b"failure",u"gcg_response",b"gcg_response",u"generateMergeApprovalSignatureResponse",b"generateMergeApprovalSignatureResponse",u"getResultsResponseChunk",b"getResultsResponseChunk",u"getResultsResponseFooter",b"getResultsResponseFooter",u"jobStatusResponse",b"jobStatusResponse",u"mergeConfigurationCommitResponse",b"mergeConfigurationCommitResponse",u"publishDatasetToDataRoomResponse",b"publishDatasetToDataRoomResponse",u"removePublishedDatasetResponse",b"removePublishedDatasetResponse",u"retrieveAuditLogResponse",b"retrieveAuditLogResponse",u"retrieveConfigurationCommitApproversResponse",b"retrieveConfigurationCommitApproversResponse",u"retrieveConfigurationCommitResponse",b"retrieveConfigurationCommitResponse",u"retrieveDataRoomConfigurationHistoryResponse",b"retrieveDataRoomConfigurationHistoryResponse",u"retrieveDataRoomResponse",b"retrieveDataRoomResponse",u"retrieveDataRoomStatusResponse",b"retrieveDataRoomStatusResponse",u"retrievePublishedDatasetsResponse",b"retrievePublishedDatasetsResponse",u"updateDataRoomStatusResponse",b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"createConfigurationCommitResponse",b"createConfigurationCommitResponse",u"createDataRoomResponse",b"createDataRoomResponse",u"executeComputeResponse",b"executeComputeResponse",u"failure",b"failure",u"gcg_response",b"gcg_response",u"generateMergeApprovalSignatureResponse",b"generateMergeApprovalSignatureResponse",u"getResultsResponseChunk",b"getResultsResponseChunk",u"getResultsResponseFooter",b"getResultsResponseFooter",u"jobStatusResponse",b"jobStatusResponse",u"mergeConfigurationCommitResponse",b"mergeConfigurationCommitResponse",u"publishDatasetToDataRoomResponse",b"publishDatasetToDataRoomResponse",u"removePublishedDatasetResponse",b"removePublishedDatasetResponse",u"retrieveAuditLogResponse",b"retrieveAuditLogResponse",u"retrieveConfigurationCommitApproversResponse",b"retrieveConfigurationCommitApproversResponse",u"retrieveConfigurationCommitResponse",b"retrieveConfigurationCommitResponse",u"retrieveDataRoomConfigurationHistoryResponse",b"retrieveDataRoomConfigurationHistoryResponse",u"retrieveDataRoomResponse",b"retrieveDataRoomResponse",u"retrieveDataRoomStatusResponse",b"retrieveDataRoomStatusResponse",u"retrievePublishedDatasetsResponse",b"retrievePublishedDatasetsResponse",u"updateDataRoomStatusResponse",b"updateDataRoomStatusResponse"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"gcg_response",b"gcg_response"]) -> typing.Optional[typing_extensions.Literal["failure","executeComputeResponse","createDataRoomResponse","publishDatasetToDataRoomResponse","retrieveDataRoomResponse","retrieveAuditLogResponse","retrieveDataRoomStatusResponse","updateDataRoomStatusResponse","retrievePublishedDatasetsResponse","removePublishedDatasetResponse","jobStatusResponse","getResultsResponseChunk","getResultsResponseFooter","createConfigurationCommitResponse","generateMergeApprovalSignatureResponse","mergeConfigurationCommitResponse","retrieveDataRoomConfigurationHistoryResponse","retrieveConfigurationCommitApproversResponse","retrieveConfigurationCommitResponse"]]: ...
+        failure: builtins.str = ...,
+        createDataRoomResponse: global___CreateDataRoomResponse | None = ...,
+        retrieveDataRoomResponse: global___RetrieveDataRoomResponse | None = ...,
+        retrieveCurrentDataRoomConfigurationResponse: global___RetrieveCurrentDataRoomConfigurationResponse | None = ...,
+        retrieveDataRoomStatusResponse: global___RetrieveDataRoomStatusResponse | None = ...,
+        updateDataRoomStatusResponse: global___UpdateDataRoomStatusResponse | None = ...,
+        retrieveAuditLogResponse: global___RetrieveAuditLogResponse | None = ...,
+        publishDatasetToDataRoomResponse: global___PublishDatasetToDataRoomResponse | None = ...,
+        retrievePublishedDatasetsResponse: global___RetrievePublishedDatasetsResponse | None = ...,
+        removePublishedDatasetResponse: global___RemovePublishedDatasetResponse | None = ...,
+        executeComputeResponse: global___ExecuteComputeResponse | None = ...,
+        jobStatusResponse: global___JobStatusResponse | None = ...,
+        getResultsResponseChunk: global___GetResultsResponseChunk | None = ...,
+        getResultsResponseFooter: global___GetResultsResponseFooter | None = ...,
+        createConfigurationCommitResponse: global___CreateConfigurationCommitResponse | None = ...,
+        retrieveConfigurationCommitResponse: global___RetrieveConfigurationCommitResponse | None = ...,
+        generateMergeApprovalSignatureResponse: global___GenerateMergeApprovalSignatureResponse | None = ...,
+        mergeConfigurationCommitResponse: global___MergeConfigurationCommitResponse | None = ...,
+        retrieveConfigurationCommitApproversResponse: global___RetrieveConfigurationCommitApproversResponse | None = ...,
+        casAuxiliaryStateResponse: global___CasAuxiliaryStateResponse | None = ...,
+        readAuxiliaryStateResponse: global___ReadAuxiliaryStateResponse | None = ...,
+        endorsementResponse: identity_endorsement_pb2.EndorsementResponse | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "casAuxiliaryStateResponse", "readAuxiliaryStateResponse", "endorsementResponse"] | None: ...
+
 global___GcgResponse = GcgResponse
 
+class UserAuth(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    PKI_FIELD_NUMBER: builtins.int
+    ENCLAVEENDORSEMENTS_FIELD_NUMBER: builtins.int
+    @property
+    def pki(self) -> global___Pki: ...
+    @property
+    def enclaveEndorsements(self) -> identity_endorsement_pb2.EnclaveEndorsements: ...
+    def __init__(
+        self,
+        *,
+        pki: global___Pki | None = ...,
+        enclaveEndorsements: identity_endorsement_pb2.EnclaveEndorsements | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["enclaveEndorsements", b"enclaveEndorsements", "pki", b"pki"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["enclaveEndorsements", b"enclaveEndorsements", "pki", b"pki"]) -> None: ...
+
+global___UserAuth = UserAuth
+
+class Pki(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CERTCHAINPEM_FIELD_NUMBER: builtins.int
+    SIGNATURE_FIELD_NUMBER: builtins.int
+    IDMAC_FIELD_NUMBER: builtins.int
+    certChainPem: builtins.bytes
+    signature: builtins.bytes
+    idMac: builtins.bytes
+    def __init__(
+        self,
+        *,
+        certChainPem: builtins.bytes = ...,
+        signature: builtins.bytes = ...,
+        idMac: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["certChainPem", b"certChainPem", "idMac", b"idMac", "signature", b"signature"]) -> None: ...
+
+global___Pki = Pki
+
 class CreateDataRoomRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOM_FIELD_NUMBER: builtins.int
-    INITIALCONFIGURATION_FIELD_NUMBER: builtins.int
+    HIGHLEVELREPRESENTATION_FIELD_NUMBER: builtins.int
+    DATAROOMMETADATA_FIELD_NUMBER: builtins.int
     @property
     def dataRoom(self) -> data_room_pb2.DataRoom: ...
-    @property
-    def initialConfiguration(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[data_room_pb2.ConfigurationModification]: ...
-    def __init__(self,
+    highLevelRepresentation: builtins.bytes
+    dataRoomMetadata: builtins.bytes
+    def __init__(
+        self,
         *,
-        dataRoom : typing.Optional[data_room_pb2.DataRoom] = ...,
-        initialConfiguration : typing.Optional[typing.Iterable[data_room_pb2.ConfigurationModification]] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"dataRoom",b"dataRoom"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoom",b"dataRoom",u"initialConfiguration",b"initialConfiguration"]) -> None: ...
+        dataRoom: data_room_pb2.DataRoom | None = ...,
+        highLevelRepresentation: builtins.bytes | None = ...,
+        dataRoomMetadata: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_dataRoomMetadata", b"_dataRoomMetadata", "_highLevelRepresentation", b"_highLevelRepresentation", "dataRoom", b"dataRoom", "dataRoomMetadata", b"dataRoomMetadata", "highLevelRepresentation", b"highLevelRepresentation"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_dataRoomMetadata", b"_dataRoomMetadata", "_highLevelRepresentation", b"_highLevelRepresentation", "dataRoom", b"dataRoom", "dataRoomMetadata", b"dataRoomMetadata", "highLevelRepresentation", b"highLevelRepresentation"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_dataRoomMetadata", b"_dataRoomMetadata"]) -> typing_extensions.Literal["dataRoomMetadata"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation"]) -> typing_extensions.Literal["highLevelRepresentation"] | None: ...
+
 global___CreateDataRoomRequest = CreateDataRoomRequest
 
 class CreateDataRoomResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
     DATAROOMVALIDATIONERROR_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
+    dataRoomId: builtins.bytes
     @property
     def dataRoomValidationError(self) -> global___DataRoomValidationError: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        dataRoomValidationError : typing.Optional[global___DataRoomValidationError] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"create_data_room_response",b"create_data_room_response",u"dataRoomId",b"dataRoomId",u"dataRoomValidationError",b"dataRoomValidationError"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"create_data_room_response",b"create_data_room_response",u"dataRoomId",b"dataRoomId",u"dataRoomValidationError",b"dataRoomValidationError"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"create_data_room_response",b"create_data_room_response"]) -> typing.Optional[typing_extensions.Literal["dataRoomId","dataRoomValidationError"]]: ...
+        dataRoomId: builtins.bytes = ...,
+        dataRoomValidationError: global___DataRoomValidationError | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["create_data_room_response", b"create_data_room_response", "dataRoomId", b"dataRoomId", "dataRoomValidationError", b"dataRoomValidationError"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["create_data_room_response", b"create_data_room_response", "dataRoomId", b"dataRoomId", "dataRoomValidationError", b"dataRoomValidationError"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["create_data_room_response", b"create_data_room_response"]) -> typing_extensions.Literal["dataRoomId", "dataRoomValidationError"] | None: ...
+
 global___CreateDataRoomResponse = CreateDataRoomResponse
 
 class DataRoomValidationError(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     MESSAGE_FIELD_NUMBER: builtins.int
     PERMISSIONINDEX_FIELD_NUMBER: builtins.int
     COMPUTENODEID_FIELD_NUMBER: builtins.int
     USERPERMISSIONID_FIELD_NUMBER: builtins.int
     ATTESTATIONSPECIFICATIONID_FIELD_NUMBER: builtins.int
     AUTHENTICATIONMETHODID_FIELD_NUMBER: builtins.int
-    message: typing.Text = ...
-    permissionIndex: builtins.int = ...
-    computeNodeId: typing.Text = ...
-    userPermissionId: typing.Text = ...
-    attestationSpecificationId: typing.Text = ...
-    authenticationMethodId: typing.Text = ...
-    def __init__(self,
+    message: builtins.str
+    permissionIndex: builtins.int
+    computeNodeId: builtins.str
+    userPermissionId: builtins.str
+    attestationSpecificationId: builtins.str
+    authenticationMethodId: builtins.str
+    def __init__(
+        self,
         *,
-        message : typing.Text = ...,
-        permissionIndex : builtins.int = ...,
-        computeNodeId : typing.Text = ...,
-        userPermissionId : typing.Text = ...,
-        attestationSpecificationId : typing.Text = ...,
-        authenticationMethodId : typing.Text = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"_attestationSpecificationId",b"_attestationSpecificationId",u"_authenticationMethodId",b"_authenticationMethodId",u"_computeNodeId",b"_computeNodeId",u"_permissionIndex",b"_permissionIndex",u"_userPermissionId",b"_userPermissionId",u"attestationSpecificationId",b"attestationSpecificationId",u"authenticationMethodId",b"authenticationMethodId",u"computeNodeId",b"computeNodeId",u"permissionIndex",b"permissionIndex",u"userPermissionId",b"userPermissionId"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"_attestationSpecificationId",b"_attestationSpecificationId",u"_authenticationMethodId",b"_authenticationMethodId",u"_computeNodeId",b"_computeNodeId",u"_permissionIndex",b"_permissionIndex",u"_userPermissionId",b"_userPermissionId",u"attestationSpecificationId",b"attestationSpecificationId",u"authenticationMethodId",b"authenticationMethodId",u"computeNodeId",b"computeNodeId",u"message",b"message",u"permissionIndex",b"permissionIndex",u"userPermissionId",b"userPermissionId"]) -> None: ...
+        message: builtins.str = ...,
+        permissionIndex: builtins.int | None = ...,
+        computeNodeId: builtins.str | None = ...,
+        userPermissionId: builtins.str | None = ...,
+        attestationSpecificationId: builtins.str | None = ...,
+        authenticationMethodId: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_attestationSpecificationId", b"_attestationSpecificationId", "_authenticationMethodId", b"_authenticationMethodId", "_computeNodeId", b"_computeNodeId", "_permissionIndex", b"_permissionIndex", "_userPermissionId", b"_userPermissionId", "attestationSpecificationId", b"attestationSpecificationId", "authenticationMethodId", b"authenticationMethodId", "computeNodeId", b"computeNodeId", "permissionIndex", b"permissionIndex", "userPermissionId", b"userPermissionId"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_attestationSpecificationId", b"_attestationSpecificationId", "_authenticationMethodId", b"_authenticationMethodId", "_computeNodeId", b"_computeNodeId", "_permissionIndex", b"_permissionIndex", "_userPermissionId", b"_userPermissionId", "attestationSpecificationId", b"attestationSpecificationId", "authenticationMethodId", b"authenticationMethodId", "computeNodeId", b"computeNodeId", "message", b"message", "permissionIndex", b"permissionIndex", "userPermissionId", b"userPermissionId"]) -> None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_attestationSpecificationId",b"_attestationSpecificationId"]) -> typing.Optional[typing_extensions.Literal["attestationSpecificationId"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_attestationSpecificationId", b"_attestationSpecificationId"]) -> typing_extensions.Literal["attestationSpecificationId"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_authenticationMethodId",b"_authenticationMethodId"]) -> typing.Optional[typing_extensions.Literal["authenticationMethodId"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_authenticationMethodId", b"_authenticationMethodId"]) -> typing_extensions.Literal["authenticationMethodId"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_computeNodeId",b"_computeNodeId"]) -> typing.Optional[typing_extensions.Literal["computeNodeId"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_computeNodeId", b"_computeNodeId"]) -> typing_extensions.Literal["computeNodeId"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_permissionIndex",b"_permissionIndex"]) -> typing.Optional[typing_extensions.Literal["permissionIndex"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_permissionIndex", b"_permissionIndex"]) -> typing_extensions.Literal["permissionIndex"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"_userPermissionId",b"_userPermissionId"]) -> typing.Optional[typing_extensions.Literal["userPermissionId"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_userPermissionId", b"_userPermissionId"]) -> typing_extensions.Literal["userPermissionId"] | None: ...
+
 global___DataRoomValidationError = DataRoomValidationError
 
 class PublishDatasetToDataRoomRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATASETHASH_FIELD_NUMBER: builtins.int
     DATAROOMID_FIELD_NUMBER: builtins.int
-    LEAFNAME_FIELD_NUMBER: builtins.int
+    LEAFID_FIELD_NUMBER: builtins.int
     ENCRYPTIONKEY_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
-    datasetHash: builtins.bytes = ...
-    dataRoomId: builtins.bytes = ...
-    leafName: typing.Text = ...
-    encryptionKey: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    datasetHash: builtins.bytes
+    dataRoomId: builtins.bytes
+    leafId: builtins.str
+    encryptionKey: builtins.bytes
+    scope: builtins.bytes
+    def __init__(
+        self,
         *,
-        datasetHash : builtins.bytes = ...,
-        dataRoomId : builtins.bytes = ...,
-        leafName : typing.Text = ...,
-        encryptionKey : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId",u"datasetHash",b"datasetHash",u"encryptionKey",b"encryptionKey",u"leafName",b"leafName",u"scope",b"scope"]) -> None: ...
+        datasetHash: builtins.bytes = ...,
+        dataRoomId: builtins.bytes = ...,
+        leafId: builtins.str = ...,
+        encryptionKey: builtins.bytes = ...,
+        scope: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId", "datasetHash", b"datasetHash", "encryptionKey", b"encryptionKey", "leafId", b"leafId", "scope", b"scope"]) -> None: ...
+
 global___PublishDatasetToDataRoomRequest = PublishDatasetToDataRoomRequest
 
 class PublishDatasetToDataRoomResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___PublishDatasetToDataRoomResponse = PublishDatasetToDataRoomResponse
 
 class ExecuteComputeRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    class ParametersEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    COMPUTENODENAMES_FIELD_NUMBER: builtins.int
+    COMPUTENODEIDS_FIELD_NUMBER: builtins.int
     ISDRYRUN_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
+    PARAMETERS_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
     @property
-    def computeNodeNames(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
-    isDryRun: builtins.bool = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    def computeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    isDryRun: builtins.bool
+    scope: builtins.bytes
+    @property
+    def parameters(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        computeNodeNames : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        isDryRun : builtins.bool = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"computeNodeNames",b"computeNodeNames",u"dataRoomId",b"dataRoomId",u"isDryRun",b"isDryRun",u"scope",b"scope"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+        computeNodeIds: collections.abc.Iterable[builtins.str] | None = ...,
+        isDryRun: builtins.bool = ...,
+        scope: builtins.bytes = ...,
+        parameters: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "dataRoomId", b"dataRoomId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope"]) -> None: ...
+
 global___ExecuteComputeRequest = ExecuteComputeRequest
 
 class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    class ParametersEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        value: builtins.str
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: builtins.str = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     CONFIGURATIONCOMMITID_FIELD_NUMBER: builtins.int
-    COMPUTENODENAMES_FIELD_NUMBER: builtins.int
+    COMPUTENODEIDS_FIELD_NUMBER: builtins.int
     ISDRYRUN_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
-    configurationCommitId: builtins.bytes = ...
+    PARAMETERS_FIELD_NUMBER: builtins.int
+    configurationCommitId: builtins.bytes
     @property
-    def computeNodeNames(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
-    isDryRun: builtins.bool = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    def computeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    isDryRun: builtins.bool
+    scope: builtins.bytes
+    @property
+    def parameters(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    def __init__(
+        self,
         *,
-        configurationCommitId : builtins.bytes = ...,
-        computeNodeNames : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        isDryRun : builtins.bool = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"computeNodeNames",b"computeNodeNames",u"configurationCommitId",b"configurationCommitId",u"isDryRun",b"isDryRun",u"scope",b"scope"]) -> None: ...
+        configurationCommitId: builtins.bytes = ...,
+        computeNodeIds: collections.abc.Iterable[builtins.str] | None = ...,
+        isDryRun: builtins.bool = ...,
+        scope: builtins.bytes = ...,
+        parameters: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "configurationCommitId", b"configurationCommitId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope"]) -> None: ...
+
 global___ExecuteDevelopmentComputeRequest = ExecuteDevelopmentComputeRequest
 
 class ExecuteComputeResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     JOBID_FIELD_NUMBER: builtins.int
-    jobId: builtins.bytes = ...
-    def __init__(self,
+    jobId: builtins.bytes
+    def __init__(
+        self,
         *,
-        jobId : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"jobId",b"jobId"]) -> None: ...
+        jobId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["jobId", b"jobId"]) -> None: ...
+
 global___ExecuteComputeResponse = ExecuteComputeResponse
 
 class JobStatusRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     JOBID_FIELD_NUMBER: builtins.int
-    jobId: builtins.bytes = ...
-    def __init__(self,
+    jobId: builtins.bytes
+    def __init__(
+        self,
         *,
-        jobId : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"jobId",b"jobId"]) -> None: ...
+        jobId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["jobId", b"jobId"]) -> None: ...
+
 global___JobStatusRequest = JobStatusRequest
 
 class JobStatusResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    COMPLETECOMPUTENODENAMES_FIELD_NUMBER: builtins.int
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    COMPLETECOMPUTENODEIDS_FIELD_NUMBER: builtins.int
     @property
-    def completeComputeNodeNames(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
-    def __init__(self,
+    def completeComputeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def __init__(
+        self,
         *,
-        completeComputeNodeNames : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"completeComputeNodeNames",b"completeComputeNodeNames"]) -> None: ...
+        completeComputeNodeIds: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["completeComputeNodeIds", b"completeComputeNodeIds"]) -> None: ...
+
 global___JobStatusResponse = JobStatusResponse
 
 class GetResultsRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     JOBID_FIELD_NUMBER: builtins.int
-    COMPUTENODENAME_FIELD_NUMBER: builtins.int
-    jobId: builtins.bytes = ...
-    computeNodeName: typing.Text = ...
-    def __init__(self,
+    COMPUTENODEID_FIELD_NUMBER: builtins.int
+    jobId: builtins.bytes
+    computeNodeId: builtins.str
+    def __init__(
+        self,
         *,
-        jobId : builtins.bytes = ...,
-        computeNodeName : typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"computeNodeName",b"computeNodeName",u"jobId",b"jobId"]) -> None: ...
+        jobId: builtins.bytes = ...,
+        computeNodeId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "jobId", b"jobId"]) -> None: ...
+
 global___GetResultsRequest = GetResultsRequest
 
 class GetResultsResponseChunk(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATA_FIELD_NUMBER: builtins.int
-    data: builtins.bytes = ...
-    def __init__(self,
+    data: builtins.bytes
+    def __init__(
+        self,
         *,
-        data : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"data",b"data"]) -> None: ...
+        data: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["data", b"data"]) -> None: ...
+
 global___GetResultsResponseChunk = GetResultsResponseChunk
 
 class GetResultsResponseFooter(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___GetResultsResponseFooter = GetResultsResponseFooter
 
 class RetrieveDataRoomRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    def __init__(self,
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
 global___RetrieveDataRoomRequest = RetrieveDataRoomRequest
 
 class RetrieveDataRoomResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOM_FIELD_NUMBER: builtins.int
+    COMMITS_FIELD_NUMBER: builtins.int
+    HIGHLEVELREPRESENTATION_FIELD_NUMBER: builtins.int
     @property
     def dataRoom(self) -> data_room_pb2.DataRoom: ...
-    def __init__(self,
+    @property
+    def commits(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[data_room_pb2.ConfigurationCommit]: ...
+    highLevelRepresentation: builtins.bytes
+    def __init__(
+        self,
         *,
-        dataRoom : typing.Optional[data_room_pb2.DataRoom] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"dataRoom",b"dataRoom"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoom",b"dataRoom"]) -> None: ...
+        dataRoom: data_room_pb2.DataRoom | None = ...,
+        commits: collections.abc.Iterable[data_room_pb2.ConfigurationCommit] | None = ...,
+        highLevelRepresentation: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation", "dataRoom", b"dataRoom", "highLevelRepresentation", b"highLevelRepresentation"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation", "commits", b"commits", "dataRoom", b"dataRoom", "highLevelRepresentation", b"highLevelRepresentation"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation"]) -> typing_extensions.Literal["highLevelRepresentation"] | None: ...
+
 global___RetrieveDataRoomResponse = RetrieveDataRoomResponse
 
 class RetrieveAuditLogRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId",u"scope",b"scope"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
 global___RetrieveAuditLogRequest = RetrieveAuditLogRequest
 
 class RetrieveAuditLogResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     LOG_FIELD_NUMBER: builtins.int
-    log: builtins.bytes = ...
-    def __init__(self,
+    log: builtins.bytes
+    def __init__(
+        self,
         *,
-        log : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"log",b"log"]) -> None: ...
+        log: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["log", b"log"]) -> None: ...
+
 global___RetrieveAuditLogResponse = RetrieveAuditLogResponse
 
 class RetrieveDataRoomStatusRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId",u"scope",b"scope"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
 global___RetrieveDataRoomStatusRequest = RetrieveDataRoomStatusRequest
 
 class RetrieveDataRoomStatusResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     STATUS_FIELD_NUMBER: builtins.int
-    status: global___DataRoomStatus.V = ...
-    def __init__(self,
+    status: global___DataRoomStatus.ValueType
+    def __init__(
+        self,
         *,
-        status : global___DataRoomStatus.V = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"status",b"status"]) -> None: ...
+        status: global___DataRoomStatus.ValueType = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["status", b"status"]) -> None: ...
+
 global___RetrieveDataRoomStatusResponse = RetrieveDataRoomStatusResponse
 
 class UpdateDataRoomStatusRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
     STATUS_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    status: global___DataRoomStatus.V = ...
-    def __init__(self,
+    dataRoomId: builtins.bytes
+    status: global___DataRoomStatus.ValueType
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        status : global___DataRoomStatus.V = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId",u"scope",b"scope",u"status",b"status"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+        status: global___DataRoomStatus.ValueType = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId", "status", b"status"]) -> None: ...
+
 global___UpdateDataRoomStatusRequest = UpdateDataRoomStatusRequest
 
 class UpdateDataRoomStatusResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___UpdateDataRoomStatusResponse = UpdateDataRoomStatusResponse
 
 class RetrievePublishedDatasetsRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId",u"scope",b"scope"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
 global___RetrievePublishedDatasetsRequest = RetrievePublishedDatasetsRequest
 
 class PublishedDataset(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    LEAFNAME_FIELD_NUMBER: builtins.int
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LEAFID_FIELD_NUMBER: builtins.int
     USER_FIELD_NUMBER: builtins.int
     TIMESTAMP_FIELD_NUMBER: builtins.int
     DATASETHASH_FIELD_NUMBER: builtins.int
-    leafName: typing.Text = ...
-    user: typing.Text = ...
-    timestamp: builtins.int = ...
-    datasetHash: builtins.bytes = ...
-    def __init__(self,
+    leafId: builtins.str
+    user: builtins.str
+    timestamp: builtins.int
+    datasetHash: builtins.bytes
+    def __init__(
+        self,
         *,
-        leafName : typing.Text = ...,
-        user : typing.Text = ...,
-        timestamp : builtins.int = ...,
-        datasetHash : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"datasetHash",b"datasetHash",u"leafName",b"leafName",u"timestamp",b"timestamp",u"user",b"user"]) -> None: ...
+        leafId: builtins.str = ...,
+        user: builtins.str = ...,
+        timestamp: builtins.int = ...,
+        datasetHash: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["datasetHash", b"datasetHash", "leafId", b"leafId", "timestamp", b"timestamp", "user", b"user"]) -> None: ...
+
 global___PublishedDataset = PublishedDataset
 
 class RetrievePublishedDatasetsResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     PUBLISHEDDATASETS_FIELD_NUMBER: builtins.int
     @property
     def publishedDatasets(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___PublishedDataset]: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        publishedDatasets : typing.Optional[typing.Iterable[global___PublishedDataset]] = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"publishedDatasets",b"publishedDatasets"]) -> None: ...
+        publishedDatasets: collections.abc.Iterable[global___PublishedDataset] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["publishedDatasets", b"publishedDatasets"]) -> None: ...
+
 global___RetrievePublishedDatasetsResponse = RetrievePublishedDatasetsResponse
 
 class RemovePublishedDatasetRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMID_FIELD_NUMBER: builtins.int
-    LEAFNAME_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    leafName: typing.Text = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    LEAFID_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    leafId: builtins.str
+    def __init__(
+        self,
         *,
-        dataRoomId : builtins.bytes = ...,
-        leafName : typing.Text = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId",u"leafName",b"leafName",u"scope",b"scope"]) -> None: ...
+        dataRoomId: builtins.bytes = ...,
+        leafId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId", "leafId", b"leafId"]) -> None: ...
+
 global___RemovePublishedDatasetRequest = RemovePublishedDatasetRequest
 
 class RemovePublishedDatasetResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___RemovePublishedDatasetResponse = RemovePublishedDatasetResponse
 
 class CreateConfigurationCommitRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMIT_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
+    HIGHLEVELREPRESENTATION_FIELD_NUMBER: builtins.int
     @property
     def commit(self) -> data_room_pb2.ConfigurationCommit: ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    highLevelRepresentation: builtins.bytes
+    def __init__(
+        self,
         *,
-        commit : typing.Optional[data_room_pb2.ConfigurationCommit] = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"commit",b"commit"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"commit",b"commit",u"scope",b"scope"]) -> None: ...
+        commit: data_room_pb2.ConfigurationCommit | None = ...,
+        highLevelRepresentation: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation", "commit", b"commit", "highLevelRepresentation", b"highLevelRepresentation"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation", "commit", b"commit", "highLevelRepresentation", b"highLevelRepresentation"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation"]) -> typing_extensions.Literal["highLevelRepresentation"] | None: ...
+
 global___CreateConfigurationCommitRequest = CreateConfigurationCommitRequest
 
 class CreateConfigurationCommitResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMITID_FIELD_NUMBER: builtins.int
-    commitId: builtins.bytes = ...
-    def __init__(self,
+    commitId: builtins.bytes
+    def __init__(
+        self,
         *,
-        commitId : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"commitId",b"commitId"]) -> None: ...
+        commitId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["commitId", b"commitId"]) -> None: ...
+
 global___CreateConfigurationCommitResponse = CreateConfigurationCommitResponse
 
 class GenerateMergeApprovalSignatureRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMITID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    commitId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    commitId: builtins.bytes
+    def __init__(
+        self,
         *,
-        commitId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"commitId",b"commitId",u"scope",b"scope"]) -> None: ...
+        commitId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["commitId", b"commitId"]) -> None: ...
+
 global___GenerateMergeApprovalSignatureRequest = GenerateMergeApprovalSignatureRequest
 
 class GenerateMergeApprovalSignatureResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     SIGNATURE_FIELD_NUMBER: builtins.int
-    signature: builtins.bytes = ...
-    def __init__(self,
+    signature: builtins.bytes
+    def __init__(
+        self,
         *,
-        signature : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"signature",b"signature"]) -> None: ...
+        signature: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["signature", b"signature"]) -> None: ...
+
 global___GenerateMergeApprovalSignatureResponse = GenerateMergeApprovalSignatureResponse
 
 class MergeConfigurationCommitRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     class ApprovalSignaturesEntry(google.protobuf.message.Message):
-        DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
         KEY_FIELD_NUMBER: builtins.int
         VALUE_FIELD_NUMBER: builtins.int
-        key: typing.Text = ...
-        value: builtins.bytes = ...
-        def __init__(self,
+        key: builtins.str
+        value: builtins.bytes
+        def __init__(
+            self,
             *,
-            key : typing.Text = ...,
-            value : builtins.bytes = ...,
-            ) -> None: ...
-        def ClearField(self, field_name: typing_extensions.Literal[u"key",b"key",u"value",b"value"]) -> None: ...
+            key: builtins.str = ...,
+            value: builtins.bytes = ...,
+        ) -> None: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
     COMMITID_FIELD_NUMBER: builtins.int
     APPROVALSIGNATURES_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    commitId: builtins.bytes = ...
+    NEWDATAROOMHIGHLEVELREPRESENTATION_FIELD_NUMBER: builtins.int
+    commitId: builtins.bytes
     @property
-    def approvalSignatures(self) -> google.protobuf.internal.containers.ScalarMap[typing.Text, builtins.bytes]: ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    def approvalSignatures(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.bytes]: ...
+    newDataRoomHighLevelRepresentation: builtins.bytes
+    def __init__(
+        self,
         *,
-        commitId : builtins.bytes = ...,
-        approvalSignatures : typing.Optional[typing.Mapping[typing.Text, builtins.bytes]] = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"approvalSignatures",b"approvalSignatures",u"commitId",b"commitId",u"scope",b"scope"]) -> None: ...
+        commitId: builtins.bytes = ...,
+        approvalSignatures: collections.abc.Mapping[builtins.str, builtins.bytes] | None = ...,
+        newDataRoomHighLevelRepresentation: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_newDataRoomHighLevelRepresentation", b"_newDataRoomHighLevelRepresentation", "newDataRoomHighLevelRepresentation", b"newDataRoomHighLevelRepresentation"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_newDataRoomHighLevelRepresentation", b"_newDataRoomHighLevelRepresentation", "approvalSignatures", b"approvalSignatures", "commitId", b"commitId", "newDataRoomHighLevelRepresentation", b"newDataRoomHighLevelRepresentation"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_newDataRoomHighLevelRepresentation", b"_newDataRoomHighLevelRepresentation"]) -> typing_extensions.Literal["newDataRoomHighLevelRepresentation"] | None: ...
+
 global___MergeConfigurationCommitRequest = MergeConfigurationCommitRequest
 
-class RetrieveDataRoomConfigurationHistoryRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    DATAROOMID_FIELD_NUMBER: builtins.int
-    dataRoomId: builtins.bytes = ...
-    def __init__(self,
-        *,
-        dataRoomId : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dataRoomId",b"dataRoomId"]) -> None: ...
-global___RetrieveDataRoomConfigurationHistoryRequest = RetrieveDataRoomConfigurationHistoryRequest
+class RetrieveCurrentDataRoomConfigurationRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
-class RetrieveDataRoomConfigurationHistoryResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    CURRENTCONFIGURATION_FIELD_NUMBER: builtins.int
-    CONFIGURATIONSHISTORY_FIELD_NUMBER: builtins.int
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
+global___RetrieveCurrentDataRoomConfigurationRequest = RetrieveCurrentDataRoomConfigurationRequest
+
+class RetrieveCurrentDataRoomConfigurationResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CONFIGURATION_FIELD_NUMBER: builtins.int
     PIN_FIELD_NUMBER: builtins.int
     @property
-    def currentConfiguration(self) -> data_room_pb2.DataRoomConfiguration: ...
-    @property
-    def configurationsHistory(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.bytes]: ...
-    pin: builtins.bytes = ...
-    def __init__(self,
+    def configuration(self) -> data_room_pb2.DataRoomConfiguration: ...
+    pin: builtins.bytes
+    def __init__(
+        self,
         *,
-        currentConfiguration : typing.Optional[data_room_pb2.DataRoomConfiguration] = ...,
-        configurationsHistory : typing.Optional[typing.Iterable[builtins.bytes]] = ...,
-        pin : builtins.bytes = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"currentConfiguration",b"currentConfiguration"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"configurationsHistory",b"configurationsHistory",u"currentConfiguration",b"currentConfiguration",u"pin",b"pin"]) -> None: ...
-global___RetrieveDataRoomConfigurationHistoryResponse = RetrieveDataRoomConfigurationHistoryResponse
+        configuration: data_room_pb2.DataRoomConfiguration | None = ...,
+        pin: builtins.bytes = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["configuration", b"configuration"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["configuration", b"configuration", "pin", b"pin"]) -> None: ...
+
+global___RetrieveCurrentDataRoomConfigurationResponse = RetrieveCurrentDataRoomConfigurationResponse
 
 class RetrieveConfigurationCommitApproversRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMITID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    commitId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    commitId: builtins.bytes
+    def __init__(
+        self,
         *,
-        commitId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"commitId",b"commitId",u"scope",b"scope"]) -> None: ...
+        commitId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["commitId", b"commitId"]) -> None: ...
+
 global___RetrieveConfigurationCommitApproversRequest = RetrieveConfigurationCommitApproversRequest
 
 class RetrieveConfigurationCommitApproversResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     APPROVERS_FIELD_NUMBER: builtins.int
     @property
-    def approvers(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
-    def __init__(self,
+    def approvers(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def __init__(
+        self,
         *,
-        approvers : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"approvers",b"approvers"]) -> None: ...
+        approvers: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["approvers", b"approvers"]) -> None: ...
+
 global___RetrieveConfigurationCommitApproversResponse = RetrieveConfigurationCommitApproversResponse
 
 class RetrieveConfigurationCommitRequest(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMITID_FIELD_NUMBER: builtins.int
-    SCOPE_FIELD_NUMBER: builtins.int
-    commitId: builtins.bytes = ...
-    scope: builtins.bytes = ...
-    def __init__(self,
+    commitId: builtins.bytes
+    def __init__(
+        self,
         *,
-        commitId : builtins.bytes = ...,
-        scope : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"commitId",b"commitId",u"scope",b"scope"]) -> None: ...
+        commitId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["commitId", b"commitId"]) -> None: ...
+
 global___RetrieveConfigurationCommitRequest = RetrieveConfigurationCommitRequest
 
 class RetrieveConfigurationCommitResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMIT_FIELD_NUMBER: builtins.int
+    HIGHLEVELREPRESENTATION_FIELD_NUMBER: builtins.int
     @property
     def commit(self) -> data_room_pb2.ConfigurationCommit: ...
-    def __init__(self,
+    highLevelRepresentation: builtins.bytes
+    def __init__(
+        self,
         *,
-        commit : typing.Optional[data_room_pb2.ConfigurationCommit] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"commit",b"commit"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"commit",b"commit"]) -> None: ...
+        commit: data_room_pb2.ConfigurationCommit | None = ...,
+        highLevelRepresentation: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation", "commit", b"commit", "highLevelRepresentation", b"highLevelRepresentation"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation", "commit", b"commit", "highLevelRepresentation", b"highLevelRepresentation"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_highLevelRepresentation", b"_highLevelRepresentation"]) -> typing_extensions.Literal["highLevelRepresentation"] | None: ...
+
 global___RetrieveConfigurationCommitResponse = RetrieveConfigurationCommitResponse
 
+class CasAuxiliaryStateRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    index: builtins.int
+    """The index indicates what the client thinks the state is. The CAS operation will only succeed if the index
+    matches what's stored in the enclave. The index is 0 iff the value doesn't exist/was deleted.
+    """
+    value: builtins.bytes
+    """If null it will try to delete value."""
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+        index: builtins.int = ...,
+        value: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_value", b"_value", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_value", b"_value", "dataRoomId", b"dataRoomId", "index", b"index", "value", b"value"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_value", b"_value"]) -> typing_extensions.Literal["value"] | None: ...
+
+global___CasAuxiliaryStateRequest = CasAuxiliaryStateRequest
+
+class CasAuxiliaryStateResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SUCCESS_FIELD_NUMBER: builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    success: builtins.bool
+    index: builtins.int
+    """The index at the end of the operation, 0 if delete was successful. If success=false, the client should use this
+    index and retry the operation, possibly modified based on the returned value.
+    Example: User A is racing on two clients X and Y to add numbers 1 and 2 to an initially empty list.
+      1. index=0 list=[]: initial state
+      2. index=1 list=[1]: User A on client X does CAS(index=0, value=[1])
+      3. index=1 list=[1]: User A on client Y does CAS(index=0, value=[2]) => success=false, index=1, value=[1]
+      4. index=2 list=[1,2]: User A on client Y retries with CAS(index=1, value=[1,2])
+    """
+    value: builtins.bytes
+    """The value at the end of the operation."""
+    def __init__(
+        self,
+        *,
+        success: builtins.bool = ...,
+        index: builtins.int = ...,
+        value: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_value", b"_value", "value", b"value"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_value", b"_value", "index", b"index", "success", b"success", "value", b"value"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_value", b"_value"]) -> typing_extensions.Literal["value"] | None: ...
+
+global___CasAuxiliaryStateResponse = CasAuxiliaryStateResponse
+
+class ReadAuxiliaryStateRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
+global___ReadAuxiliaryStateRequest = ReadAuxiliaryStateRequest
+
+class ReadAuxiliaryStateResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    VALUES_FIELD_NUMBER: builtins.int
+    @property
+    def values(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AuxiliaryStateValue]: ...
+    def __init__(
+        self,
+        *,
+        values: collections.abc.Iterable[global___AuxiliaryStateValue] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["values", b"values"]) -> None: ...
+
+global___ReadAuxiliaryStateResponse = ReadAuxiliaryStateResponse
+
+class AuxiliaryStateValue(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    USER_FIELD_NUMBER: builtins.int
+    INDEX_FIELD_NUMBER: builtins.int
+    VALUE_FIELD_NUMBER: builtins.int
+    user: builtins.str
+    index: builtins.int
+    value: builtins.bytes
+    def __init__(
+        self,
+        *,
+        user: builtins.str = ...,
+        index: builtins.int = ...,
+        value: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["index", b"index", "user", b"user", "value", b"value"]) -> None: ...
+
+global___AuxiliaryStateValue = AuxiliaryStateValue
+
 class MergeConfigurationCommitResponse(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___MergeConfigurationCommitResponse = MergeConfigurationCommitResponse
 
 class DriverTaskConfig(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     NOOP_FIELD_NUMBER: builtins.int
     STATICCONTENT_FIELD_NUMBER: builtins.int
     @property
     def noop(self) -> global___NoopConfig: ...
     @property
     def staticContent(self) -> global___StaticContentConfig: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        noop : typing.Optional[global___NoopConfig] = ...,
-        staticContent : typing.Optional[global___StaticContentConfig] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"driver_task_config",b"driver_task_config",u"noop",b"noop",u"staticContent",b"staticContent"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"driver_task_config",b"driver_task_config",u"noop",b"noop",u"staticContent",b"staticContent"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"driver_task_config",b"driver_task_config"]) -> typing.Optional[typing_extensions.Literal["noop","staticContent"]]: ...
+        noop: global___NoopConfig | None = ...,
+        staticContent: global___StaticContentConfig | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["driver_task_config", b"driver_task_config", "noop", b"noop", "staticContent", b"staticContent"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["driver_task_config", b"driver_task_config", "noop", b"noop", "staticContent", b"staticContent"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["driver_task_config", b"driver_task_config"]) -> typing_extensions.Literal["noop", "staticContent"] | None: ...
+
 global___DriverTaskConfig = DriverTaskConfig
 
 class NoopConfig(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    def __init__(self,
-        ) -> None: ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___NoopConfig = NoopConfig
 
 class StaticContentConfig(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     CONTENT_FIELD_NUMBER: builtins.int
-    content: builtins.bytes = ...
-    def __init__(self,
+    content: builtins.bytes
+    def __init__(
+        self,
         *,
-        content : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"content",b"content"]) -> None: ...
+        content: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["content", b"content"]) -> None: ...
+
 global___StaticContentConfig = StaticContentConfig

@@ -186,7 +186,7 @@ class Verification:
         return cert
 
     def _dcap_check_status(self, spec_dcap: AttestationSpecificationIntelDcap, status: str):
-        if status == "UpToDate":
+        if status == "UpToDate" or status == "SWHardeningNeeded":
             return
         if spec_dcap.accept_out_of_date and status in [
             "OutOfDate",
@@ -196,11 +196,6 @@ class Verification:
         if spec_dcap.accept_configuration_needed and status in [
             "ConfigurationNeeded",
             "OutOfDateConfigurationNeeded",
-            "ConfigurationAndSWHardeningNeeded",
-        ]:
-            return
-        if spec_dcap.accept_sw_hardening_needed and status in [
-            "SWHardeningNeeded",
             "ConfigurationAndSWHardeningNeeded",
         ]:
             return

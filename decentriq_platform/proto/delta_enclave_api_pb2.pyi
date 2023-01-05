@@ -5,146 +5,142 @@ isort:skip_file
 import builtins
 import google.protobuf.descriptor
 import google.protobuf.message
-import typing
-import typing_extensions
+import sys
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
+if sys.version_info >= (3, 8):
+    import typing as typing_extensions
+else:
+    import typing_extensions
+
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class Request(google.protobuf.message.Message):
     """=========================================================================================================
     CONTAINER
-
     """
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DELTAREQUEST_FIELD_NUMBER: builtins.int
     EXTENSIONMESSAGE_FIELD_NUMBER: builtins.int
     @property
     def deltaRequest(self) -> global___DataNoncePubkey: ...
     @property
     def extensionMessage(self) -> global___ExtensionMessage: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        deltaRequest : typing.Optional[global___DataNoncePubkey] = ...,
-        extensionMessage : typing.Optional[global___ExtensionMessage] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"deltaRequest",b"deltaRequest",u"extensionMessage",b"extensionMessage",u"request",b"request"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"deltaRequest",b"deltaRequest",u"extensionMessage",b"extensionMessage",u"request",b"request"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"request",b"request"]) -> typing.Optional[typing_extensions.Literal["deltaRequest","extensionMessage"]]: ...
+        deltaRequest: global___DataNoncePubkey | None = ...,
+        extensionMessage: global___ExtensionMessage | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["deltaRequest", b"deltaRequest", "extensionMessage", b"extensionMessage", "request", b"request"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["deltaRequest", b"deltaRequest", "extensionMessage", b"extensionMessage", "request", b"request"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["deltaRequest", "extensionMessage"] | None: ...
+
 global___Request = Request
 
 class ExtensionMessage(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     NAME_FIELD_NUMBER: builtins.int
     PAYLOAD_FIELD_NUMBER: builtins.int
-    name: typing.Text = ...
-    payload: builtins.bytes = ...
-    def __init__(self,
+    name: builtins.str
+    payload: builtins.bytes
+    def __init__(
+        self,
         *,
-        name : typing.Text = ...,
-        payload : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"name",b"name",u"payload",b"payload"]) -> None: ...
+        name: builtins.str = ...,
+        payload: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["name", b"name", "payload", b"payload"]) -> None: ...
+
 global___ExtensionMessage = ExtensionMessage
 
 class Response(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     SUCCESSFULRESPONSE_FIELD_NUMBER: builtins.int
     UNSUCCESSFULRESPONSE_FIELD_NUMBER: builtins.int
-    successfulResponse: builtins.bytes = ...
-    unsuccessfulResponse: typing.Text = ...
-    def __init__(self,
+    successfulResponse: builtins.bytes
+    unsuccessfulResponse: builtins.str
+    def __init__(
+        self,
         *,
-        successfulResponse : builtins.bytes = ...,
-        unsuccessfulResponse : typing.Text = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"response",b"response",u"successfulResponse",b"successfulResponse",u"unsuccessfulResponse",b"unsuccessfulResponse"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"response",b"response",u"successfulResponse",b"successfulResponse",u"unsuccessfulResponse",b"unsuccessfulResponse"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"response",b"response"]) -> typing.Optional[typing_extensions.Literal["successfulResponse","unsuccessfulResponse"]]: ...
+        successfulResponse: builtins.bytes = ...,
+        unsuccessfulResponse: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["response", b"response", "successfulResponse", b"successfulResponse", "unsuccessfulResponse", b"unsuccessfulResponse"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["response", b"response", "successfulResponse", b"successfulResponse", "unsuccessfulResponse", b"unsuccessfulResponse"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["successfulResponse", "unsuccessfulResponse"] | None: ...
+
 global___Response = Response
 
 class DataNoncePubkey(google.protobuf.message.Message):
     """=========================================================================================================
     ENCRYPTED MESSAGE FORMAT
-
     """
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATA_FIELD_NUMBER: builtins.int
     NONCE_FIELD_NUMBER: builtins.int
     PUBKEY_FIELD_NUMBER: builtins.int
-    PKI_FIELD_NUMBER: builtins.int
-    data: builtins.bytes = ...
-    nonce: builtins.bytes = ...
-    pubkey: builtins.bytes = ...
-    @property
-    def pki(self) -> global___Pki: ...
-    def __init__(self,
+    data: builtins.bytes
+    nonce: builtins.bytes
+    pubkey: builtins.bytes
+    def __init__(
+        self,
         *,
-        data : builtins.bytes = ...,
-        nonce : builtins.bytes = ...,
-        pubkey : builtins.bytes = ...,
-        pki : typing.Optional[global___Pki] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"auth",b"auth",u"pki",b"pki"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"auth",b"auth",u"data",b"data",u"nonce",b"nonce",u"pki",b"pki",u"pubkey",b"pubkey"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"auth",b"auth"]) -> typing.Optional[typing_extensions.Literal["pki"]]: ...
-global___DataNoncePubkey = DataNoncePubkey
+        data: builtins.bytes = ...,
+        nonce: builtins.bytes = ...,
+        pubkey: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["data", b"data", "nonce", b"nonce", "pubkey", b"pubkey"]) -> None: ...
 
-class Pki(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
-    CERTCHAINPEM_FIELD_NUMBER: builtins.int
-    SIGNATURE_FIELD_NUMBER: builtins.int
-    IDMAC_FIELD_NUMBER: builtins.int
-    certChainPem: builtins.bytes = ...
-    signature: builtins.bytes = ...
-    idMac: builtins.bytes = ...
-    def __init__(self,
-        *,
-        certChainPem : builtins.bytes = ...,
-        signature : builtins.bytes = ...,
-        idMac : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"certChainPem",b"certChainPem",u"idMac",b"idMac",u"signature",b"signature"]) -> None: ...
-global___Pki = Pki
+global___DataNoncePubkey = DataNoncePubkey
 
 class DataNonce(google.protobuf.message.Message):
     """=========================================================================================================
     ENCRYPTED SEALED MESSAGED FORMAT
-
     """
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATA_FIELD_NUMBER: builtins.int
     NONCE_FIELD_NUMBER: builtins.int
-    data: builtins.bytes = ...
-    nonce: builtins.bytes = ...
-    def __init__(self,
+    data: builtins.bytes
+    nonce: builtins.bytes
+    def __init__(
+        self,
         *,
-        data : builtins.bytes = ...,
-        nonce : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"data",b"data",u"nonce",b"nonce"]) -> None: ...
+        data: builtins.bytes = ...,
+        nonce: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["data", b"data", "nonce", b"nonce"]) -> None: ...
+
 global___DataNonce = DataNonce
 
 class SealedEncryptedMessage(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ENCRYPTEDMESSAGE_FIELD_NUMBER: builtins.int
     SEALINGKEYPARAMS_FIELD_NUMBER: builtins.int
     @property
     def encryptedMessage(self) -> global___DataNonce: ...
-    sealingKeyParams: builtins.bytes = ...
-    def __init__(self,
+    sealingKeyParams: builtins.bytes
+    def __init__(
+        self,
         *,
-        encryptedMessage : typing.Optional[global___DataNonce] = ...,
-        sealingKeyParams : builtins.bytes = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"encryptedMessage",b"encryptedMessage"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"encryptedMessage",b"encryptedMessage",u"sealingKeyParams",b"sealingKeyParams"]) -> None: ...
+        encryptedMessage: global___DataNonce | None = ...,
+        sealingKeyParams: builtins.bytes = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["encryptedMessage", b"encryptedMessage"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["encryptedMessage", b"encryptedMessage", "sealingKeyParams", b"sealingKeyParams"]) -> None: ...
+
 global___SealedEncryptedMessage = SealedEncryptedMessage
 
 class EncryptionHeader(google.protobuf.message.Message):
-    """=========================================================================================================
-    ENCRYPTED STORAGE FORMAT
-
-    * LAYOUT
+    """* LAYOUT
       Every stored file has the following layout: (EH || Enc(VH || CH || CB))
         EH = EncryptionHeader: specifies how the rest of the file is encrypted, including key ids.
         VH = VersionHeader: specifies a version number allowing for non-protobuf-supported changes in the rest of the layout.
@@ -208,50 +204,65 @@ class EncryptionHeader(google.protobuf.message.Message):
 
     Encryption header (unencrypted)
     """
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     CHILYKEY_FIELD_NUMBER: builtins.int
     @property
     def chilyKey(self) -> global___ChilyKey: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        chilyKey : typing.Optional[global___ChilyKey] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"chilyKey",b"chilyKey",u"encryptionHeader",b"encryptionHeader"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"chilyKey",b"chilyKey",u"encryptionHeader",b"encryptionHeader"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"encryptionHeader",b"encryptionHeader"]) -> typing.Optional[typing_extensions.Literal["chilyKey"]]: ...
+        chilyKey: global___ChilyKey | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["chilyKey", b"chilyKey", "encryptionHeader", b"encryptionHeader"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["chilyKey", b"chilyKey", "encryptionHeader", b"encryptionHeader"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["encryptionHeader", b"encryptionHeader"]) -> typing_extensions.Literal["chilyKey"] | None: ...
+
 global___EncryptionHeader = EncryptionHeader
 
 class ChilyKey(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ENCRYPTIONNONCE_FIELD_NUMBER: builtins.int
-    encryptionNonce: builtins.bytes = ...
-    def __init__(self,
+    encryptionNonce: builtins.bytes
+    def __init__(
+        self,
         *,
-        encryptionNonce : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"encryptionNonce",b"encryptionNonce"]) -> None: ...
+        encryptionNonce: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["encryptionNonce", b"encryptionNonce"]) -> None: ...
+
 global___ChilyKey = ChilyKey
 
 class VersionHeader(google.protobuf.message.Message):
     """Version header (encrypted)"""
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     VERSION_FIELD_NUMBER: builtins.int
-    version: builtins.int = ...
-    def __init__(self,
+    version: builtins.int
+    def __init__(
+        self,
         *,
-        version : builtins.int = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"version",b"version"]) -> None: ...
+        version: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["version", b"version"]) -> None: ...
+
 global___VersionHeader = VersionHeader
 
 class ChunkHeader(google.protobuf.message.Message):
     """Data format header (encrypted)"""
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     EXTRAENTROPY_FIELD_NUMBER: builtins.int
-    extraEntropy: builtins.bytes = ...
-    def __init__(self,
+    extraEntropy: builtins.bytes
+    def __init__(
+        self,
         *,
-        extraEntropy : builtins.bytes = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"extraEntropy",b"extraEntropy"]) -> None: ...
+        extraEntropy: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["extraEntropy", b"extraEntropy"]) -> None: ...
+
 global___ChunkHeader = ChunkHeader

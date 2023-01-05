@@ -1,0 +1,39 @@
+syntax = "proto3";
+package identity_endorsement;
+
+message EndorsementRequest {
+  oneof endorsementRequest {
+    PkiEndorsementRequest pkiEndorsementRequest = 2;
+    DcrSecretEndorsementRequest dcrSecretEndorsementRequest = 3;
+  }
+}
+
+message EndorsementResponse {
+  oneof endorsementResponse {
+    PkiEndorsementResponse pkiEndorsementResponse = 2;
+    DcrSecretEndorsementResponse dcrSecretEndorsementResponse = 3;
+  }
+}
+
+message PkiEndorsementRequest { bytes certificateChainPem = 1; }
+
+message PkiEndorsementResponse { EnclaveEndorsement pkiEndorsement = 1; }
+
+message DcrSecretEndorsementRequest { string dcrSecret = 1; }
+
+message DcrSecretEndorsementResponse {
+  EnclaveEndorsement dcrSecretEndorsement = 1;
+  bytes dcrSecretId = 2;
+}
+
+message EnclaveEndorsements {
+  EnclaveEndorsement personalPki = 1;
+  EnclaveEndorsement dqPki = 2;
+  EnclaveEndorsement dcrSecret = 3;
+}
+
+message EnclaveEndorsement { bytes endorsementCertificateDer = 1; }
+
+message PkiClaim { bytes rootCertificateDer = 1; }
+
+message DcrSecretClaim { bytes dcrSecretId = 1; }

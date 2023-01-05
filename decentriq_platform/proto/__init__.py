@@ -3,6 +3,7 @@ from .data_room_pb2 import (
     LeafCrudPermission,
     RetrieveAuditLogPermission,
     ExecuteComputePermission,
+    RetrieveComputeResultPermission,
     RetrieveDataRoomPermission,
     RetrieveDataRoomStatusPermission,
     GenerateMergeSignaturePermission,
@@ -13,7 +14,6 @@ from .data_room_pb2 import (
     DryRunPermission,
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, DataRoom,
-    TrustedPki,
     ComputeNodeFormat,
     ComputeNodeProtocol,
     ConfigurationModification,
@@ -24,7 +24,9 @@ from .data_room_pb2 import (
     StaticDataRoomPolicy,
     AffectedDataOwnersApprovePolicy,
     ConfigurationCommit,
-    DataRoomConfiguration
+    DataRoomConfiguration,
+    PkiPolicy,
+    DcrSecretPolicy,
 )
 from .attestation_pb2 import (
     AttestationSpecification,
@@ -33,6 +35,7 @@ from .attestation_pb2 import (
     FatquoteEpid, FatquoteDcap,
     AttestationSpecificationIntelDcap,
     AttestationSpecificationAwsNitro,
+    AttestationSpecificationAmdSnp,
 )
 from .gcg_pb2 import (
     DriverTaskConfig, NoopConfig, DataRoomStatus,
@@ -49,9 +52,10 @@ from .gcg_pb2 import (
     GenerateMergeApprovalSignatureRequest, MergeConfigurationCommitRequest,
     CreateConfigurationCommitResponse, GenerateMergeApprovalSignatureResponse,
     MergeConfigurationCommitResponse, UpdateDataRoomStatusResponse,
-    RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
-    RetrieveConfigurationCommitRequest, StaticContentConfig,
-    CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest
+    RetrieveCurrentDataRoomConfigurationRequest, RetrieveCurrentDataRoomConfigurationResponse,
+    RetrieveConfigurationCommitRequest, RetrieveConfigurationCommitResponse, StaticContentConfig,
+    CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
+    UserAuth, Pki
 )
 from .length_delimited import parse_length_delimited, serialize_length_delimited
 from .delta_enclave_api_pb2 import (
@@ -63,3 +67,19 @@ from .synth_data_pb2 import (
     Mask,
     Column,
 )
+from .metering_pb2 import (
+    DcrMetadata,
+    CreateDcrPurpose,
+    CreateDcrKind
+)
+from .identity_endorsement_pb2 import (
+    DcrSecretEndorsementRequest,
+    DcrSecretEndorsementResponse,
+    EndorsementRequest,
+    EndorsementResponse,
+    PkiEndorsementRequest,
+    PkiEndorsementResponse,
+    EnclaveEndorsement,
+    EnclaveEndorsements,
+)
+

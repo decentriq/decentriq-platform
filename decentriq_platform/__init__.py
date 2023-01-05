@@ -1,11 +1,32 @@
 """
 .. include:: ../../decentriq_platform_docs/gcg_getting_started.md
----
+___
 """
 __docformat__ = "restructuredtext"
+__pdoc__ = {
+    "api": False,
+    "attestation": True,
+    "authentication": True,
+    "builders": False,
+    "certs": False,
+    "client": False,
+    "compute": False,
+    "config": False,
+    "container": True,
+    "graphql": False,
+    "helpers": False,
+    "node": True,
+    "permission": False,
+    "proto": False,
+    "s3_sink": True,
+    "session": True,
+    "sql": True,
+    "storage": True,
+    "types": True,
+    "verification": False,
+}
 
 from .client import Client, create_client, Session
-from .platform import ClientPlatformFeatures, SessionPlatformFeatures
 from .builders import (
     DataRoomBuilder,
     DataRoomCommitBuilder,
@@ -16,6 +37,7 @@ from .permission import Permissions
 from .storage import Key
 from .attestation import enclave_specifications, EnclaveSpecifications
 
+from .endorsement import Endorser
 
 __all__ = [
     "create_client",
@@ -32,11 +54,12 @@ __all__ = [
     "Noop",
     "sql",
     "container",
+    "s3_sink",
     "storage",
     "attestation",
     "types",
     "authentication",
-    "platform",
     "session",
     "node",
+    "Endorser"
 ]

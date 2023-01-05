@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package metering;
+
+import "attestation.proto";
+
+message MeteringRequest {
+    oneof request {
+        CreateDcrRequest createDcr = 1;
+        CreateDcrCommitRequest createDcrCommit = 2;
+        StopDcrRequest stopDcr = 3;
+        PublishDatasetRequest publishDataset = 4;
+        UnpublishDatasetRequest unpublishDataset = 5;
+        WorkerMetadataRequest workerMetadata = 6;
+        SubmitWorkerExecutionTimeRequest submitWorkerExecutionTime = 7;
+        DcrInteractionRequest dcrInteraction = 8;
+    }
+}
+
+message MeteringSuccessResponse {
+    oneof response {
+        CreateDcrResponse createDcr = 1;
+        CreateDcrCommitResponse createDcrCommit = 2;
+        StopDcrResponse stopDcr = 3;
+        PublishDatasetResponse publishDataset = 4;
+        UnpublishDatasetResponse unpublishDataset = 5;
+        WorkerMetadataResponse workerMetadata = 6;
+        SubmitWorkerExecutionTimeResponse submitWorkerExecutionTime = 7;
+        DcrInteractionResponse dcrInteraction = 8;
+    }
+}
+
+message MeteringResponse {
+    oneof response {
+        MeteringSuccessResponse success = 1;
+        string failure = 2;
+    }
+}
+
+enum CreateDcrPurpose {
+    STANDARD = 0;
+    VALIDATION = 1;
+}
+
+enum CreateDcrKind {
+    EXPERT = 0;
+    DATASCIENCE = 1;
+}
+
+message DcrMetadata {
+    /// Why this data room is being created (allows for purpose-based filtering of data rooms)
+    CreateDcrPurpose purpose = 1;
+    /// Whether to show the organization logo
+    bool showOrganizationLogo = 2;
+    /// Whether the DCR requires a password
+    bool requirePassword = 3;
+    /// The dcr type
+    CreateDcrKind kind = 4;
+}
+
+message CreateDcrRequest {
+    /// The DCR hash to be used for the published data room
+    string idHex = 1;
+    string name = 2;
+    /// The driver attestation hash
+    string driverAttestationHash = 3;
+    repeated string participantEmails = 4;
+    /// Optional metadata that will be persisted to the database
+    optional bytes metadata = 5;
+}
+
+message DcrInteractionRequest {
+    /// The hex-encoded hash of the data room
+    string dataRoomHash = 1;
+    /// The driver attestation hash
+    string driverAttestationHash = 2;
+    // Id of the scope to check
+    string scopeId = 3;
+}
+
+message PublishDatasetRequest {
+    /// The UUID of the compute node to which this dataset is being published
+    string computeNodeId = 1;
+    /// The hex-encoded manifest hash of the dataset
+    string manifestHash = 2;
+    /// The hex-encoded hash of the data room
+    string dataRoomHash = 3;
+    /// The driver attestation hash
+    string driverAttestationHash = 4;
+}
+
+message UnpublishDatasetRequest {
+    /// The UUID of the compute node to which this dataset is being published
+    string computeNodeId = 1;
+    /// The hex-encoded hash of the data room
+    string dataRoomHash = 2;
+    /// The driver attestation hash
+    string driverAttestationHash = 3;
+}
+
+message StopDcrRequest {
+    /// The hex-encoded data room hash
+    string dataRoomHash = 1;
+    /// The driver attestation hash
+    string driverAttestationHash = 2;
+}
+
+message CreateDcrCommitRequest {
+    string id = 1;
+}
+
+message CreateDcrResponse {}
+
+message DcrInteractionResponse {}
+
+message CreateDcrCommitResponse {}
+
+message StopDcrResponse {}
+
+message PublishDatasetResponse {}
+
+message UnpublishDatasetResponse {}
+
+message WorkerMetadataRequest {
+    /// Attestation spec of the worker for which to perform the metadata lookup
+    attestation.AttestationSpecification attestationSpec = 1;
+    /// Id of the scope in the context of which a computation is performed
+    string scopeId = 2;
+}
+
+message WorkerMetadataResponse {
+    uint64 maxExecutionSeconds = 1;
+}
+
+message SubmitWorkerExecutionTimeRequest {
+    uint32 executionTimeSeconds = 1;
+    attestation.AttestationSpecification attestationSpec = 2;
+    /// Id of the scope in the context of which a computation is performed
+    string scopeId = 3;
+}
+
+message SubmitWorkerExecutionTimeResponse {}

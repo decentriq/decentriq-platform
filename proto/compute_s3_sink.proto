@@ -1,0 +1,40 @@
+syntax = "proto3";
+package compute_s3_sink;
+
+message S3SinkWorkerConfiguration {
+    string endpoint = 1;
+    string region = 2;
+    string credentialsDependency = 3;
+    repeated S3Object objects = 4;
+}
+
+message S3Object {
+    string dependency = 1;
+    oneof format {
+        ZipObject zip = 2;
+        RawObject raw = 3;
+    }
+}
+
+message RawObject {
+    string key = 1;
+}
+
+message ZipObject {
+    oneof kind {
+    	SingleFile singleFile = 1;
+    	FullContent fullContent = 2;
+    }
+}
+
+message SingleFile {
+    string key = 1;
+    string path = 2;
+}
+
+message FullContent {}
+
+message S3Credentials {
+    string accessKey = 1;
+    string secretKey = 2;
+}

@@ -1,18 +1,16 @@
 from __future__ import annotations
 import chily
-import re
 import hashlib
 import hmac
-import json
-from base64 import b64encode, b64decode
+from base64 import b64decode
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
 from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional, Dict
 from time import sleep
-from .platform import PlatformApi
 from .api import Endpoints
 from .authentication import Auth, Sigma
 from .proto import (
+    DcrMetadata, CreateDcrPurpose, CreateDcrKind,
     DataRoom, ComputeNodeProtocol, DataNoncePubkey, Request, Response,
     CreateDataRoomRequest, CreateDataRoomResponse,
     ExecuteComputeRequest, ExecuteComputeResponse, GcgRequest, GcgResponse, GetResultsRequest,
@@ -21,20 +19,24 @@ from .proto import (
     RemovePublishedDatasetRequest, RemovePublishedDatasetResponse,
     RetrieveAuditLogRequest, RetrieveAuditLogResponse, RetrieveDataRoomRequest,
     RetrieveDataRoomResponse, RetrieveDataRoomStatusRequest,
+    RetrieveConfigurationCommitResponse,
     RetrievePublishedDatasetsRequest,
     RetrievePublishedDatasetsResponse, UpdateDataRoomStatusRequest,
     ExecuteDevelopmentComputeRequest, CreateConfigurationCommitRequest,
     GenerateMergeApprovalSignatureRequest, MergeConfigurationCommitRequest,
-    RetrieveDataRoomConfigurationHistoryRequest, RetrieveDataRoomConfigurationHistoryResponse,
+    RetrieveCurrentDataRoomConfigurationRequest,
     UpdateDataRoomStatusResponse, DataRoomStatus, AttestationSpecification, Fatquote,
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
-    RetrieveConfigurationCommitRequest
+    RetrieveConfigurationCommitRequest, ConfigurationCommit,
+    MergeConfigurationCommitResponse, DataRoomConfiguration,
+    EndorsementRequest, EndorsementResponse, Pki,
+    PkiEndorsementRequest, PkiEndorsementResponse,
+    DcrSecretEndorsementRequest, DcrSecretEndorsementResponse,
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
-from .types import FatquoteResBody, EnclaveMessage, ScopeTypes, JobId
+from .types import JobId
 from .verification import QuoteBody, Verification
-from .platform import SessionPlatformFeatures
 if TYPE_CHECKING:
     from .client import Client
 
@@ -42,8 +44,8 @@ if TYPE_CHECKING:
 __all__ = [ "Session", "LATEST_GCG_PROTOCOL_VERSION", "LATEST_WORKER_PROTOCOL_VERSION" ]
 
 
-LATEST_GCG_PROTOCOL_VERSION = 1
-LATEST_WORKER_PROTOCOL_VERSION = 0
+LATEST_GCG_PROTOCOL_VERSION = 3
+LATEST_WORKER_PROTOCOL_VERSION = 1
 
 
 def _get_data_room_id(create_data_room_response: CreateDataRoomResponse) -> bytes:
@@ -65,15 +67,11 @@ def datanoncepubkey_to_message(
         encrypted_data: bytes,
         nonce: bytes,
         pubkey: bytes,
-        sigma_auth: Sigma
 ) -> DataNoncePubkey:
     message = DataNoncePubkey()
     message.data = encrypted_data
     message.nonce = nonce
     message.pubkey = pubkey
-    message.pki.certChainPem = sigma_auth.get_cert_chain()
-    message.pki.signature = sigma_auth.get_signature()
-    message.pki.idMac = sigma_auth.get_mac_tag()
     return message
 
 
@@ -105,17 +103,27 @@ class Session():
             driver_attestation_specification: AttestationSpecification,
             client_protocols: List[int],
             auth: Auth,
-            platform_api: Optional[PlatformApi] = None,
    ):
         """
         `Session` instances should not be instantiated directly but rather
          be created using a `Client` object using  `decentriq_platform.Client.create_session`.
         """
-        url = Endpoints.SESSION_FATQUOTE.replace(":sessionId", session_id)
-        response: FatquoteResBody = client._api.get(url).json()
-        fatquote_bytes = b64decode(response["fatquoteBase64"])
+        data = client._graphql.post(
+            """
+            query GetFatquote($id: String!) {
+                session(id: $id) {
+                    fatquote
+                }
+            }
+            """,
+            {
+                "id": session_id,
+            }
+        )
+
         fatquote = Fatquote()
-        fatquote.ParseFromString(fatquote_bytes)
+        fatquote_bytes_encoded = b64decode(data["session"]["fatquote"])
+        parse_length_delimited(fatquote_bytes_encoded, fatquote)
         verification = Verification(attestation_specification=driver_attestation_specification)
         report_data = verification.verify(fatquote)
         self.client = client
@@ -126,12 +134,10 @@ class Session():
         self.fatquote = fatquote
         self.report_data = report_data
         self.driver_attestation_specification = driver_attestation_specification
+        self.driver_attestation_specification_hash = hashlib.sha256(
+            serialize_length_delimited(driver_attestation_specification)
+        ).hexdigest()
         self.client_protocols = client_protocols
-
-        if platform_api:
-            self._platform = SessionPlatformFeatures(self, platform_api)
-        else:
-            self._platform = None
 
     def _get_client_protocol(self, endpoint_protocols: List[int]) -> int:
         try:
@@ -154,25 +160,32 @@ class Session():
         pub_keyB = bytearray(self.report_data[:32])
         return chily.PublicKey.from_bytes(pub_keyB)
 
-    def _encrypt_and_encode_data(self, data: bytes, auth: Auth) -> bytes:
-        nonce = chily.Nonce.from_random()
-        cipher = chily.Cipher(
-            self.keypair.secret, self._get_enclave_pubkey()
-        )
-        enc_data = cipher.encrypt("client sent session data", data, nonce)
-        public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
-        signature = auth._sign(public_keys)
+    def _get_message_pki(self, auth: Auth) -> Pki:
         shared_key = bytes(self.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes)
         hkdf = HKDF(algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b"")
         mac_key = hkdf.derive(shared_key)
         mac_tag = hmac.digest(mac_key, auth._get_user_id().encode(), "sha512")
+        public_keys = bytes(self.keypair.public_key.bytes) + bytes(self._get_enclave_pubkey().bytes)
+        signature = auth._sign(public_keys)
         sigma_auth = Sigma(signature, mac_tag, auth)
-        return datanoncepubkey_to_message(
+        return Pki(
+            certChainPem=sigma_auth.get_cert_chain(),
+            signature=sigma_auth.get_signature(),
+            idMac=sigma_auth.get_mac_tag(),
+        )
+
+    def _encrypt_and_encode_data(self, data: bytes) -> DataNoncePubkey:
+        nonce = chily.Nonce.from_random()
+        cipher = chily.Cipher(
+            self.keypair.secret, self._get_enclave_pubkey()
+        )
+        enc_data = cipher.encrypt("client sent session data", data, nonce)        
+        data_nonce_pubkey = datanoncepubkey_to_message(
             bytes(enc_data),
             bytes(nonce.bytes),
             bytes(self.keypair.public_key.bytes),
-            sigma_auth
         )
+        return data_nonce_pubkey 
 
     def _decode_and_decrypt_data(self, data: bytes) -> bytes:
         dec_data, nonceB, _ = message_to_datanoncepubkey(data)
@@ -180,6 +193,60 @@ class Session():
             self.keypair.secret, self._get_enclave_pubkey()
         )
         return cipher.decrypt("client received session data", dec_data, chily.Nonce.from_bytes(nonceB))
+
+    def _send_endorsement_request(
+            self,
+            request: EndorsementRequest,
+            protocol: int,
+    ) -> EndorsementResponse:
+        responses = self.send_request(GcgRequest(endorsementRequest=request), protocol)
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+
+        response = responses[0]
+
+        if not response.HasField("endorsementResponse"):
+            raise Exception(
+                "Expected endorsementResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.endorsementResponse
+
+    def pki_endorsement(
+            self,
+            certificate_chain_pem: bytes,
+    ) -> PkiEndorsementResponse:
+        endpoint_protocols = [3]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        request = PkiEndorsementRequest(
+            certificateChainPem=certificate_chain_pem
+        )
+        response = self._send_endorsement_request(EndorsementRequest(pkiEndorsementRequest=request), protocol)
+
+        if not response.HasField("pkiEndorsementResponse"):
+            raise Exception(
+                "Expected pkiEndorsementResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.pkiEndorsementResponse
+
+    def dcr_secret_endorsement(
+        self,
+        dcr_secret: str,
+    ) -> DcrSecretEndorsementResponse:
+        endpoint_protocols = [3]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        request = DcrSecretEndorsementRequest(
+            dcrSecret=dcr_secret,
+        )
+        response = self._send_endorsement_request(EndorsementRequest(dcrSecretEndorsementRequest=request), protocol)
+        
+        if not response.HasField("dcrSecretEndorsementResponse"):
+            raise Exception(
+                "Expected dcrSecretEndorsementResponse, got "
+                + str(response.WhichOneof("gcg_response"))
+            )
+        return response.dcrSecretEndorsementResponse
 
     def send_request(
             self,
@@ -191,6 +258,9 @@ class Session():
         Use this method if any of the convenience methods (such as `run_computation`) don't perform
         the exact task you want.
         """
+        message_pki = self._get_message_pki(self.auth)
+        request.userAuth.pki.CopyFrom(message_pki)
+        request.userAuth.enclaveEndorsements.CopyFrom(self.auth.endorsements)
         gcg_protocol = serialize_length_delimited(
             ComputeNodeProtocol(
                 version=protocol
@@ -198,16 +268,14 @@ class Session():
         )
         serialized_request = serialize_length_delimited(
             Request(
-                deltaRequest= self._encrypt_and_encode_data(
-                    gcg_protocol + serialize_length_delimited(request),
-                    self.auth
+                deltaRequest = self._encrypt_and_encode_data(
+                    gcg_protocol + serialize_length_delimited(request)
                 )
             )
         )
         url = Endpoints.SESSION_MESSAGES.replace(":sessionId", self.session_id)
-        enclave_request = EnclaveMessage(data=b64encode(serialized_request).decode("ascii"))
         enclave_response: bytes = self.client._api.post(
-            url, json.dumps(enclave_request), {"Content-type": "application/json", "Accept-Version": "2"}
+            url, serialized_request, {"Content-type": "application/octet-stream", "Accept-Version": "2"}
         ).content
 
         responses: List[GcgResponse] = []
@@ -236,16 +304,24 @@ class Session():
 
     def _publish_data_room(
             self,
-            data_room_definition: Tuple[DataRoom, List[ConfigurationModification]],
+            data_room_definition: DataRoom,
+            purpose: CreateDcrPurpose.V = CreateDcrPurpose.STANDARD,
+            kind: CreateDcrKind.V = CreateDcrKind.EXPERT,
+            show_organization_logo: bool = False,
+            require_password: bool = False,
     ) -> CreateDataRoomResponse:
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        data_room, conf_modifications = data_room_definition
-        if not data_room.ownerEmail:
-            data_room.ownerEmail = self.email
+
+        metadata = DcrMetadata(
+            showOrganizationLogo=show_organization_logo,
+            requirePassword=require_password,
+            purpose=purpose,
+            kind=kind,
+        )
         request = CreateDataRoomRequest(
-            dataRoom=data_room,
-            initialConfiguration=conf_modifications,
+            dataRoom=data_room_definition,
+            dataRoomMetadata=serialize_length_delimited(metadata),
         )
         responses = self.send_request(GcgRequest(createDataRoomRequest=request), protocol)
         if len(responses) != 1:
@@ -261,10 +337,6 @@ class Session():
                         response.createDataRoomResponse.dataRoomValidationError.computeNodeId
                     )
                 )
-            else:
-                if self.is_integrated_with_platform:
-                    data_room_hash = response.createDataRoomResponse.dataRoomId
-                    self._create_data_room_in_platform(data_room_definition, data_room_hash)
         else:
             raise Exception(
                 "Expected createDataRoomResponse, got "
@@ -275,7 +347,12 @@ class Session():
 
     def publish_data_room(
             self,
-            data_room_definition: Tuple[DataRoom, List[ConfigurationModification]]
+            data_room_definition: DataRoom,
+            /, *,
+            show_organization_logo: bool = False,
+            require_password: bool = False,
+            purpose: CreateDcrPurpose.V = CreateDcrPurpose.STANDARD,
+            kind: CreateDcrKind.V = CreateDcrKind.EXPERT,
     ) -> str:
         """
         Create a data room with the provided protobuf configuration object
@@ -286,7 +363,13 @@ class Session():
         published data room (for example when running computations or publishing
         datasets).
         """
-        response = self._publish_data_room(data_room_definition)
+        response = self._publish_data_room(
+            data_room_definition,
+            purpose,
+            kind,
+            show_organization_logo,
+            require_password
+        )
         return _get_data_room_id(response).hex()
 
     def publish_data_room_configuration_commit(
@@ -302,18 +385,10 @@ class Session():
         computations or when trying to merge this commit into the main
         data room configuration.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": configuration_commit.dataRoomId.hex(),
-            }
-        )
         request = CreateConfigurationCommitRequest(
             commit=configuration_commit,
-            scope=bytes.fromhex(scope_id)
         )
         responses = self.send_request(
             GcgRequest(createConfigurationCommitRequest=request),
@@ -334,24 +409,17 @@ class Session():
     def retrieve_configuration_commit(
         self,
         configuration_commit_id: str,
-    ) -> ConfigurationCommit:
+    ) -> RetrieveConfigurationCommitResponse:
         """
         Retrieve the content of given configuration commit id.
 
         **Returns**:
         A `ConfigurationCommit`.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
-            }
-        )
         request = RetrieveConfigurationCommitRequest(
             commitId=bytes.fromhex(configuration_commit_id),
-            scope=bytes.fromhex(scope_id),
         )
         responses = self.send_request(
             GcgRequest(retrieveConfigurationCommitRequest=request),
@@ -367,7 +435,7 @@ class Session():
                 + str(response.WhichOneof("gcg_response"))
             )
 
-        return response.retrieveConfigurationCommitResponse.commit
+        return response.retrieveConfigurationCommitResponse
 
     def retrieve_configuration_commit_approvers(
         self,
@@ -381,17 +449,10 @@ class Session():
         A list of ids belonging to the users that need to approve the
         configuration commit.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
-            }
-        )
         request = RetrieveConfigurationCommitApproversRequest(
             commitId=bytes.fromhex(configuration_commit_id),
-            scope=bytes.fromhex(scope_id),
         )
         responses = self.send_request(
             GcgRequest(retrieveConfigurationCommitApproversRequest=request),
@@ -407,7 +468,7 @@ class Session():
                 + str(response.WhichOneof("gcg_response"))
             )
 
-        return response.retrieveConfigurationCommitApproversResponse.approvers
+        return list(response.retrieveConfigurationCommitApproversResponse.approvers)
 
 
     def generate_merge_approval_signature(
@@ -422,17 +483,10 @@ class Session():
         of ids returned by `retrieveConfigurationCommitApprovers` needs to
         generate an approval signature using this method.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
-            }
-        )
         request = GenerateMergeApprovalSignatureRequest(
             commitId=bytes.fromhex(configuration_commit_id),
-            scope=bytes.fromhex(scope_id),
         )
         responses = self.send_request(
             GcgRequest(generateMergeApprovalSignatureRequest=request),
@@ -464,16 +518,9 @@ class Session():
         - `approval_signatures`: A dictionary containing the approval signature for
             each of the required approvers, e.g. `{ "some@email.com": signature }`.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
-            }
-        )
         request = MergeConfigurationCommitRequest(
-            scope=bytes.fromhex(scope_id),
             commitId=bytes.fromhex(configuration_commit_id),
             approvalSignatures=approval_signatures,
         )
@@ -493,34 +540,6 @@ class Session():
 
         return response.mergeConfigurationCommitResponse
 
-    def retrieve_data_room_configuration_history(
-        self,
-        data_room_id: str
-    ) -> RetrieveDataRoomConfigurationHistoryResponse:
-        """
-        Retrieve the current merged data room configuration, as well as the
-        history of configuration commits that have already been merged.
-        """
-        endpoint_protocols = [1]
-        protocol = self._get_client_protocol(endpoint_protocols)
-        request = RetrieveDataRoomConfigurationHistoryRequest(
-            dataRoomId=bytes.fromhex(data_room_id),
-        )
-        responses = self.send_request(
-            GcgRequest(retrieveDataRoomConfigurationHistoryRequest=request),
-            protocol
-        )
-        if len(responses) != 1:
-            raise Exception("Malformed response")
-        response = responses[0]
-        if not response.HasField("retrieveDataRoomConfigurationHistoryResponse"):
-            raise Exception(
-                "Expected retrieveDataRoomConfigurationHistoryResponse, got "
-                + str(response.WhichOneof("gcg_response"))
-            )
-
-        return response.retrieveDataRoomConfigurationHistoryResponse
-
     def retrieve_current_data_room_configuration(
             self,
             data_room_id: str
@@ -535,8 +554,26 @@ class Session():
         to extend an existing data room (for example by adding new compute nodes).
         Extending an existing data room is done using the `DataRoomCommitBuilder` class.
         """
-        response = self.retrieve_data_room_configuration_history(data_room_id)
-        return (response.currentConfiguration, response.pin.hex())
+        endpoint_protocols = [3]
+        protocol = self._get_client_protocol(endpoint_protocols)
+        request = RetrieveCurrentDataRoomConfigurationRequest(
+            dataRoomId=bytes.fromhex(data_room_id),
+        )
+        responses = self.send_request(
+            GcgRequest(retrieveCurrentDataRoomConfigurationRequest=request),
+            protocol
+        )
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+        gcg_response = responses[0]
+        if not gcg_response.HasField("retrieveCurrentDataRoomConfigurationResponse"):
+            raise Exception(
+                "Expected retrieveCurrentDataRoomConfigurationResponse, got "
+                + str(gcg_response.WhichOneof("gcg_response"))
+            )
+
+        response = gcg_response.retrieveCurrentDataRoomConfigurationResponse
+        return (response.configuration, response.pin.hex())
 
     def stop_data_room(self, data_room_id: str):
         """
@@ -556,17 +593,9 @@ class Session():
         For the special case of stopping a data room, the method
         `stop_data_room` can be used.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
         request = UpdateDataRoomStatusRequest(
-            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
             status=status,
         )
@@ -579,10 +608,7 @@ class Session():
             raise Exception("Malformed response")
 
         response = responses[0]
-        if response.HasField("updateDataRoomStatusResponse"):
-            if self.is_integrated_with_platform:
-                self.platform._platform_api.update_data_room_status(data_room_id, status)
-        else:
+        if not response.HasField("updateDataRoomStatusResponse"):
             raise Exception(
                 "Expected updateDataRoomStatusResponse, got "
                 + str(response.WhichOneof("gcg_response"))
@@ -597,17 +623,9 @@ class Session():
         """
         Returns the status of the data room. Valid values are `"Active"` or `"Stopped"`.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
         request = RetrieveDataRoomStatusRequest(
-            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
         )
         responses = self.send_request(
@@ -625,14 +643,14 @@ class Session():
 
         return DataRoomStatus.Name(response.retrieveDataRoomStatusResponse.status)
 
-    def retrieve_data_room_definition(
+    def retrieve_data_room(
             self,
             data_room_id: str
     ) -> RetrieveDataRoomResponse:
         """
         Returns the underlying protobuf object for the data room.
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -651,6 +669,7 @@ class Session():
             )
         return response.retrieveDataRoomResponse
 
+
     def retrieve_audit_log(
             self,
             data_room_id: str
@@ -658,17 +677,9 @@ class Session():
         """
         Returns the audit log for the data room.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
         request = RetrieveAuditLogRequest(
-            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
         )
         responses = self.send_request(
@@ -708,9 +719,14 @@ class Session():
         is a dataset published for the given data room.
         In this case, an exception will be thrown and the dataset
         will need to be unpublished first.
+
+        A special note for when the referenced data room was created using the Decentriq UI:
+        In this case, the `leaf_id` argument will have the format `{NODE_ID}_leaf`,
+        where `{NODE_ID}` corresponds to the value that you see when hovering your mouse pointer over
+        the name of the data node.
         """
 
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
         dataset = self.client.get_dataset(manifest_hash)
         if not dataset and not force:
@@ -718,36 +734,17 @@ class Session():
                 "The dataset you are trying to publish does not exist"
             )
 
-        should_create_dataset_links =\
-            self.is_integrated_with_platform and \
-            self._is_web_data_room(data_room_id)
-
-        if should_create_dataset_links:
-            existing_link = self.platform._platform_api.get_dataset_link(
-                data_room_id,
-                self._convert_data_node_name_to_verifier_node(leaf_id)
-            )
-            if existing_link:
-                existing_dataset = existing_link["dataset"]["datasetId"]
-                raise Exception(
-                    "The following dataset has already been published for this node." +
-                    " Please unpublish this dataset first." +
-                    f" Dataset: '{existing_dataset}'"
-                )
-
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
+        scope_id = self.client._ensure_dcr_data_scope(
+            data_room_id,
+            self.driver_attestation_specification_hash
         )
+        scope_id_bytes = bytes.fromhex(scope_id)
         request = PublishDatasetToDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             datasetHash=bytes.fromhex(manifest_hash),
-            leafName=leaf_id,
+            leafId=leaf_id,
             encryptionKey=key.material,
-            scope=bytes.fromhex(scope_id)
+            scope=scope_id_bytes
         )
         responses = self.send_request(
             GcgRequest(publishDatasetToDataRoomRequest=request),
@@ -761,23 +758,8 @@ class Session():
                 "Expected publishDatasetToDataRoomResponse, got "
                 + str(response.WhichOneof("gcg_response"))
             )
-        else:
-            if should_create_dataset_links:
-                self.platform._platform_api.create_dataset_link(
-                    data_room_id,
-                    manifest_hash,
-                    self._convert_data_node_name_to_verifier_node(leaf_id)
-                )
 
         return response.publishDatasetToDataRoomResponse
-
-    def _convert_data_node_name_to_verifier_node(self, node_name: str) -> str:
-        pattern = re.compile(r"@table/(.*)/dataset")
-        match = pattern.match(node_name)
-        if match:
-            return match.group(1)
-        else:
-            return node_name
 
     def remove_published_dataset(
             self,
@@ -786,20 +768,20 @@ class Session():
     ) -> RemovePublishedDatasetResponse:
         """
         Removes a published dataset from the data room.
+
+        **Parameters**:
+        - `data_room_id`: The ID of the data room that contains the given data set.
+        - `leaf_id`: The ID of the data node from which the dataset should be removed.
+            In case the referenced data room was created using the Decentriq UI,
+            the `leaf_id` argument will have the special format `@table/UUID/dataset`
+            (where `UUID` corresponds to the value that you see when hovering your mouse pointer over
+            the name of the data node).
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
         request = RemovePublishedDatasetRequest(
-            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
-            leafName=leaf_id,
+            leafId=leaf_id,
         )
         responses = self.send_request(
             GcgRequest(removePublishedDatasetRequest=request),
@@ -813,15 +795,6 @@ class Session():
                 "Expected removePublishedDatasetResponse, got "
                 + str(response.WhichOneof("gcg_response"))
             )
-        else:
-            if self.is_integrated_with_platform and self._is_web_data_room(data_room_id):
-                try:
-                    self.platform._platform_api.delete_dataset_link(
-                        data_room_id,
-                        self._convert_data_node_name_to_verifier_node(leaf_id)
-                    )
-                except Exception as error:
-                    print(f"Error when deleting dataset link on platform: {error}")
 
         return response.removePublishedDatasetResponse
 
@@ -832,17 +805,9 @@ class Session():
         """
         Returns the datasets published to the given data room.
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
-        )
         request = RetrievePublishedDatasetsRequest(
-            scope=bytes.fromhex(scope_id),
             dataRoomId=bytes.fromhex(data_room_id),
         )
         responses = self.send_request(
@@ -861,6 +826,7 @@ class Session():
 
     def _submit_dev_compute(
             self,
+            data_room_id: str,
             configuration_commit_id: str,
             compute_node_ids: List[str],
             /, *,
@@ -870,19 +836,18 @@ class Session():
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
-        endpoint_protocols = [1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_COMMITS_DATA,
-            }
+        scope_id = self.client._ensure_dcr_data_scope(
+            data_room_id,
+            self.driver_attestation_specification_hash
         )
+        scope_id_bytes = bytes.fromhex(scope_id)
         request = ExecuteDevelopmentComputeRequest(
             configurationCommitId=bytes.fromhex(configuration_commit_id),
-            computeNodeNames=compute_node_ids,
+            computeNodeIds=compute_node_ids,
             isDryRun=dry_run,
-            scope=bytes.fromhex(scope_id)
+            scope=scope_id_bytes,
         )
         responses = self.send_request(
             GcgRequest(executeDevelopmentComputeRequest=request),
@@ -909,20 +874,18 @@ class Session():
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
-        scope_id = self.client._ensure_scope_with_metadata(
-            self.email,
-            {
-                "type": ScopeTypes.DATA_ROOM_INTERMEDIATE_DATA,
-                "data_room_id": data_room_id,
-            }
+        scope_id = self.client._ensure_dcr_data_scope(
+            data_room_id,
+            self.driver_attestation_specification_hash
         )
+        scope_id_bytes = bytes.fromhex(scope_id)
         request = ExecuteComputeRequest(
             dataRoomId=bytes.fromhex(data_room_id),
-            computeNodeNames=compute_node_ids,
+            computeNodeIds=compute_node_ids,
             isDryRun=dry_run,
-            scope=bytes.fromhex(scope_id)
+            scope=scope_id_bytes,
         )
         responses = self.send_request(
             GcgRequest(executeComputeRequest=request),
@@ -943,7 +906,7 @@ class Session():
         Returns the status of the provided `job_id` which will include the names
         of the nodes that completed their execution
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = JobStatusRequest(
             jobId=bytes.fromhex(job_id),
@@ -970,11 +933,11 @@ class Session():
         """
         Streams the results of the provided `job_id`
         """
-        endpoint_protocols = [0, 1]
+        endpoint_protocols = [3]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = GetResultsRequest(
             jobId=job_id,
-            computeNodeName=compute_node_id,
+            computeNodeId=compute_node_id,
         )
         responses = self.send_request(
             GcgRequest(getResultsRequest=request),
@@ -1038,7 +1001,7 @@ class Session():
                     f"Timeout when trying to get result for job {job_id.id} of"
                     f" {job_id.compute_node_id} (waited {timeout} seconds)"
                 )
-            elif job_id.compute_node_id in self.get_computation_status(job_id.id).completeComputeNodeNames:
+            elif job_id.compute_node_id in self.get_computation_status(job_id.id).completeComputeNodeIds:
                 break
             else:
                 sleep(interval)
@@ -1046,6 +1009,7 @@ class Session():
 
     def run_dev_computation(
             self,
+            data_room_id: str,
             configuration_commit_id: str,
             compute_node_id: str,
             /, *,
@@ -1060,7 +1024,12 @@ class Session():
         The result will be an identifier object of the job executing the computation.
         This object is required for checking a job's status and retrieving its results.
         """
-        response = self._submit_dev_compute(configuration_commit_id, [compute_node_id], dry_run=dry_run)
+        response = self._submit_dev_compute(
+            data_room_id,
+            configuration_commit_id,
+            [compute_node_id],
+            dry_run=dry_run
+        )
         return JobId(response.jobId.hex(), compute_node_id)
 
     def get_computation_result(
@@ -1076,11 +1045,10 @@ class Session():
         The method will check for the job's completeness every `interval` seconds and up to
         an optional `timeout` seconds after which the method will raise an exception.
         If the job completes and the results can be retrieved successfully, a raw byte string
-        will be returned. The bytes tring can be transformed into a more useful object using
+        will be returned. The bytes string can be transformed into a more useful object using
         a variety of helper methods. These helper methods are specific for the type of computation
         you ran and can be found in the corresponding packages.
         """
-        elapsed = 0
         job_id_bytes = bytes.fromhex(job_id.id)
         self.wait_until_computation_has_finished(
             job_id,
@@ -1110,61 +1078,3 @@ class Session():
             interval=interval,
             timeout=timeout
         )
-
-    def _create_data_room_in_platform(
-            self,
-            data_room_definition: DataRoom,
-            data_room_hash: bytes
-    ):
-        attestation_spec_type =\
-                self.driver_attestation_specification.WhichOneof("attestation_specification")
-
-        if attestation_spec_type == "intelEpid":
-            mrenclave = self.driver_attestation_specification.intelEpid.mrenclave
-        elif attestation_spec_type == "intelDcap":
-            mrenclave = self.driver_attestation_specification.intelDcap.mrenclave
-        else:
-            raise Exception("Unknown attestation specification type")
-
-        attestation_specification_hash = hashlib.sha256(
-            serialize_length_delimited(
-                self.driver_attestation_specification
-            )
-        ).hexdigest()
-
-        self.platform._platform_api.publish_data_room(
-            data_room_definition,
-            data_room_hash=data_room_hash.hex(),
-            attestation_specification_hash=attestation_specification_hash
-        )
-
-    def _is_web_data_room(self, data_room_id: str) -> bool:
-        data_room = self.platform._platform_api.get_data_room_by_hash(data_room_id)
-        if data_room:
-            return data_room["source"] == "WEB"
-        else:
-            raise Exception(f"Unable to find data room with id '{data_room_id}'")
-
-    @property
-    def platform(self) -> SessionPlatformFeatures:
-        """
-        Provider of a list of convenience methods to interact with the
-        Decentriq platform.
-
-        This field exposes an object that provides a set of convenience features
-        known from the Decentriq web platform. These include, for example,
-        getting the list of data sets that are also visible in the browser-based
-        platform UI.
-        """
-        if self._platform:
-            return self._platform
-        else:
-            raise Exception(
-                "This field is not set as the client from wich this session has"
-                " been derived has not been configured with integration to the web"
-                " platform."
-            )
-
-    @property
-    def is_integrated_with_platform(self):
-        return self._platform is not None

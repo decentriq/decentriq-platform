@@ -41,7 +41,7 @@ class StaticContainerCompute(Node):
             This setting controls the environment in which the given `command`
             will be run, i.e. what programs and libraries are available.
             This identifier corresponds to the worker name without the version suffix,
-            i.e. `"decentriq.python-ml-worker"`.
+            i.e. `"decentriq.python-ml-worker-32-64"`.
         - `include_container_logs_on_error`: Whether to report the internal
             container logs to the outside in case of an error. These logs
             could contain sensitive data and therefore this setting should

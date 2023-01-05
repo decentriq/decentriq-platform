@@ -1,63 +1,34 @@
 import requests
 from enum import Enum
 
+
 class Endpoints(str, Enum):
-    # System
-    SYSTEM_ENCLAVE_IDENTIFIERS = "/system/enclave-identifiers",
-    SYSTEM_ATTESTATION_SPECS = "/system/attestation-specs",
-    SYSTEM_CERTIFICATE_AUTHORITY = "/system/certificate-authority",
-    # Session
-    SESSIONS = "/sessions",
-    SESSION = "/session/:sessionId",
-    SESSION_FATQUOTE = "/session/:sessionId/fatquote",
-    SESSION_MESSAGES = "/session/:sessionId/messages",
-    # User
-    USERS_COLLECTION = "/users",
-    USER = "/user/:userId",
-    USER_UPLOADS_COLLECTION = "/user/:userId/uploads",
-    USER_UPLOAD = "/user/:userId/upload/:uploadId",
-    USER_UPLOAD_CHUNKS = "/user/:userId/upload/:uploadId/chunks",
-    USER_CERTIFICATE = "/user/:userId/certificate",
-    USER_SCOPES_COLLECTION = "/user/:userId/scopes",
-    USER_SCOPE = "/user/:userId/scope/:scopeId",
-    USER_FILES = "/user/:userId/files",
-    USER_FILE = "/user/:userId/file/:manifestHash",
+    GRAPHQL = "/graphql",
+    SESSION_MESSAGES = "/sessions/:sessionId/messages",
+    USER_UPLOAD_CHUNKS = "/uploads/:uploadId/chunks/:chunkHash",
 
 
-class APIError(Exception):
-    def __init__(self, body):
-        self.body = body
-
-class AuthorizationError(APIError):
-    """ """
-
+class ApiError(Exception):
     pass
 
 
-class NotFoundError(APIError):
-    """ """
-
+class AuthorizationError(ApiError):
     pass
 
 
-class BadRequestError(APIError):
-    """ """
-
+class NotFoundError(ApiError):
     pass
 
 
-class ServerError(APIError):
-    """ """
-
+class BadRequestError(ApiError):
     pass
 
 
-class UnknownError(APIError):
-    """ """
-
+class ServerError(ApiError):
     pass
 
-class API:
+
+class Api:
     def __init__(
         self,
         api_token,
@@ -87,25 +58,35 @@ class API:
 
     @staticmethod
     def __check_response_status_code(response):
+        body = response.content
+        try:
+            payload = response.json()
+            if "errors" in payload:
+                errors = payload["errors"]
+                message = ",".join([error["message"] for error in errors])
+                body = message
+        except:
+            pass
+
         if response.status_code >= 200 and response.status_code <= 204:
             pass
         elif response.status_code == 400:
-            raise BadRequestError(response.content)
+            raise BadRequestError(body)
         elif response.status_code == 401 or response.status_code == 403:
-            raise AuthorizationError(response.content)
+            raise AuthorizationError(body)
         elif response.status_code == 404:
-            raise NotFoundError(response.content)
+            raise NotFoundError(body)
         elif response.status_code >= 500 and response.status_code <= 504:
-            raise ServerError(response.content)
+            raise ServerError(body)
         else:
-            raise UnknownError(response.content)
+            raise ApiError(body)
 
     def post(self, endpoint, req_body=None, headers={}):
         url = self.base_url + endpoint
         response = self.session.post(
             url, data=req_body, headers={**headers}, timeout=self.timeout, stream=True
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response
 
     def post_multipart(self, endpoint, parts=None, headers={}):
@@ -113,7 +94,7 @@ class API:
         response = self.session.post(
             url, files=parts, headers={**headers}, timeout=self.timeout
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response
 
     def put(self, endpoint, req_body=None, headers={}):
@@ -121,7 +102,7 @@ class API:
         response = self.session.put(
             url, data=req_body, headers={**headers}, timeout=self.timeout
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response
 
     def patch(self, endpoint, req_body=None, headers={}):
@@ -129,7 +110,7 @@ class API:
         response = self.session.patch(
             url, data=req_body, headers={**headers}, timeout=self.timeout
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response
 
     def get(self, endpoint, params={}, headers={}):
@@ -137,7 +118,7 @@ class API:
         response = self.session.get(
             url, params={**params}, headers={**headers}, timeout=self.timeout
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response
 
     def head(self, endpoint, headers={}):
@@ -145,7 +126,7 @@ class API:
         response = self.session.head(
             url, headers={**headers}, timeout=self.timeout
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response
 
     def delete(self, endpoint, headers={}):
@@ -153,5 +134,5 @@ class API:
         response = self.session.delete(
             url, headers={**headers}, timeout=self.timeout
         )
-        API.__check_response_status_code(response)
+        Api.__check_response_status_code(response)
         return response

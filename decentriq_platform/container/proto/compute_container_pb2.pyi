@@ -3,63 +3,82 @@
 isort:skip_file
 """
 import builtins
+import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
-import typing
-import typing_extensions
+import sys
 
-DESCRIPTOR: google.protobuf.descriptor.FileDescriptor = ...
+if sys.version_info >= (3, 8):
+    import typing as typing_extensions
+else:
+    import typing_extensions
+
+DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class ContainerWorkerConfiguration(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     STATIC_FIELD_NUMBER: builtins.int
     @property
     def static(self) -> global___StaticImage: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        static : typing.Optional[global___StaticImage] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal[u"configuration",b"configuration",u"static",b"static"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"configuration",b"configuration",u"static",b"static"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal[u"configuration",b"configuration"]) -> typing.Optional[typing_extensions.Literal["static"]]: ...
+        static: global___StaticImage | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["configuration", b"configuration", "static", b"static"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["configuration", b"configuration", "static", b"static"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["configuration", b"configuration"]) -> typing_extensions.Literal["static"] | None: ...
+
 global___ContainerWorkerConfiguration = ContainerWorkerConfiguration
 
 class StaticImage(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMMAND_FIELD_NUMBER: builtins.int
     MOUNTPOINTS_FIELD_NUMBER: builtins.int
     OUTPUTPATH_FIELD_NUMBER: builtins.int
     INCLUDECONTAINERLOGSONERROR_FIELD_NUMBER: builtins.int
     INCLUDECONTAINERLOGSONSUCCESS_FIELD_NUMBER: builtins.int
     @property
-    def command(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
+    def command(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     @property
     def mountPoints(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___MountPoint]: ...
-    outputPath: typing.Text = ...
-    includeContainerLogsOnError: builtins.bool = ...
-    includeContainerLogsOnSuccess: builtins.bool = ...
-    def __init__(self,
+    outputPath: builtins.str
+    includeContainerLogsOnError: builtins.bool
+    includeContainerLogsOnSuccess: builtins.bool
+    def __init__(
+        self,
         *,
-        command : typing.Optional[typing.Iterable[typing.Text]] = ...,
-        mountPoints : typing.Optional[typing.Iterable[global___MountPoint]] = ...,
-        outputPath : typing.Text = ...,
-        includeContainerLogsOnError : builtins.bool = ...,
-        includeContainerLogsOnSuccess : builtins.bool = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"command",b"command",u"includeContainerLogsOnError",b"includeContainerLogsOnError",u"includeContainerLogsOnSuccess",b"includeContainerLogsOnSuccess",u"mountPoints",b"mountPoints",u"outputPath",b"outputPath"]) -> None: ...
+        command: collections.abc.Iterable[builtins.str] | None = ...,
+        mountPoints: collections.abc.Iterable[global___MountPoint] | None = ...,
+        outputPath: builtins.str = ...,
+        includeContainerLogsOnError: builtins.bool = ...,
+        includeContainerLogsOnSuccess: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["command", b"command", "includeContainerLogsOnError", b"includeContainerLogsOnError", "includeContainerLogsOnSuccess", b"includeContainerLogsOnSuccess", "mountPoints", b"mountPoints", "outputPath", b"outputPath"]) -> None: ...
+
 global___StaticImage = StaticImage
 
 class MountPoint(google.protobuf.message.Message):
-    DESCRIPTOR: google.protobuf.descriptor.Descriptor = ...
+    """Dependencies are mounted under the `/input` directory
+    For example for a mount point entry { path: "/data", dependency: "dep" }
+    the worker will mount the dependency `dep` at path `/input/data`
+    """
+
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     PATH_FIELD_NUMBER: builtins.int
     DEPENDENCY_FIELD_NUMBER: builtins.int
-    path: typing.Text = ...
-    dependency: typing.Text = ...
-    def __init__(self,
+    path: builtins.str
+    dependency: builtins.str
+    def __init__(
+        self,
         *,
-        path : typing.Text = ...,
-        dependency : typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal[u"dependency",b"dependency",u"path",b"path"]) -> None: ...
+        path: builtins.str = ...,
+        dependency: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dependency", b"dependency", "path", b"path"]) -> None: ...
+
 global___MountPoint = MountPoint
