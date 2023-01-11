@@ -94,15 +94,16 @@ def generate_key(bit_size: int = 4096) -> PKey:
 
 def generate_self_signed_certificate(user_email: str, key: PKey) -> bytes:
     cert_builder = x509.CertificateBuilder()
+    now = datetime.datetime.utcnow()
     cert: Certificate = cert_builder.subject_name(x509.Name([
         x509.NameAttribute(NameOID.COMMON_NAME, user_email)])
     ).issuer_name(x509.Name([
         x509.NameAttribute(NameOID.COMMON_NAME, user_email)]) 
     ).serial_number(1
     ).not_valid_before(
-        datetime.datetime.utcnow()
+        now - datetime.timedelta(days=1)
     ).not_valid_after(
-        datetime.datetime.utcnow() + datetime.timedelta(days=10)
+        now + datetime.timedelta(days=10)
     ).add_extension(
         x509.BasicConstraints(ca=False, path_length=None), critical=True
     ).public_key(key.public_key()
