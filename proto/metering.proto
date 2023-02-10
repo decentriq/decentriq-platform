@@ -45,6 +45,7 @@ enum CreateDcrPurpose {
 enum CreateDcrKind {
     EXPERT = 0;
     DATASCIENCE = 1;
+    MEDIA = 2;
 }
 
 message DcrMetadata {
