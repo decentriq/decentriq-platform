@@ -7,6 +7,7 @@ import os
 from threading import BoundedSemaphore
 from concurrent import futures
 from base64 import b64encode
+
 from .api import Api
 from .authentication import Auth, generate_key, generate_self_signed_certificate
 from .config import (
@@ -32,6 +33,7 @@ from .proto import (
 )
 from .api import (
     Endpoints,
+    retry
 )
 from .graphql import GqlClient
 
@@ -360,7 +362,12 @@ class Client:
             .replace(":uploadId", upload_id) \
             .replace(":chunkHash", chunk_hash.hex())
         try:
-            self._api.put(url, chunk_data_encrypted, {"Content-type": "application/octet-stream"})
+            self._api.put(
+                url,
+                chunk_data_encrypted,
+                {"Content-type": "application/octet-stream"},
+                retry=retry,
+            )
         except Exception as e:
             print(e)
             raise e
@@ -412,7 +419,8 @@ class Client:
                     "chunkHashes": chunks,
                     "scopeId": scope_id
                 }
-            }
+            },
+            retry=retry
         )
 
         dataset = data["upload"]["finalizeUploadAndCreateDataset"]["record"]

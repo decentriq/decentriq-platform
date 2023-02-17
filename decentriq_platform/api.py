@@ -1,11 +1,21 @@
 import requests
 from enum import Enum
+from urllib3.util import Retry
+from .config import (
+    DECENTRIQ_REQUEST_RETRY_TOTAL,
+    DECENTRIQ_REQUEST_RETRY_BACKOFF_FACTOR,
+)
+
+retry = Retry(
+    total=DECENTRIQ_REQUEST_RETRY_TOTAL,
+    backoff_factor=DECENTRIQ_REQUEST_RETRY_BACKOFF_FACTOR,
+)
 
 
 class Endpoints(str, Enum):
-    GRAPHQL = "/graphql",
-    SESSION_MESSAGES = "/sessions/:sessionId/messages",
-    USER_UPLOAD_CHUNKS = "/uploads/:uploadId/chunks/:chunkHash",
+    GRAPHQL = "/graphql"
+    SESSION_MESSAGES = "/sessions/:sessionId/messages"
+    USER_UPLOAD_CHUNKS = "/uploads/:uploadId/chunks/:chunkHash"
 
 
 class ApiError(Exception):
@@ -47,9 +57,9 @@ class Api:
             protocol = "http"
         self.base_url = f"{protocol}://{host}:{port}{api_prefix}"
         auth_headers = {
-                "Authorization": "Bearer " + api_token,
-                "Authorization-Type": "app",
-                "Authorization-Client": client_id
+            "Authorization": "Bearer " + api_token,
+            "Authorization-Type": "app",
+            "Authorization-Client": client_id,
         }
         auth_headers.update(additional_auth_headers)
         session.headers.update(auth_headers)
@@ -81,58 +91,69 @@ class Api:
         else:
             raise ApiError(body)
 
-    def post(self, endpoint, req_body=None, headers={}):
+    def _request(self, method, endpoint, **kwargs):
+        retry = kwargs.pop("retry", None)
+
         url = self.base_url + endpoint
-        response = self.session.post(
-            url, data=req_body, headers={**headers}, timeout=self.timeout, stream=True
-        )
+        try:
+            response = self.session.request(method, url, timeout=self.timeout, **kwargs)
+        except Exception as e:
+            if retry is None:
+                raise
+
+            retry = retry.increment(method=method, url=url)
+            retry.sleep()
+            response = self._request(method, endpoint, retry=retry, **kwargs)
         Api.__check_response_status_code(response)
         return response
 
-    def post_multipart(self, endpoint, parts=None, headers={}):
-        url = self.base_url + endpoint
-        response = self.session.post(
-            url, files=parts, headers={**headers}, timeout=self.timeout
+    def post(self, endpoint, req_body=None, headers=None, retry=None):
+        response = self._request(
+            method="POST",
+            endpoint=endpoint,
+            data=req_body,
+            headers=headers,
+            stream=True,
+            retry=retry,
         )
-        Api.__check_response_status_code(response)
         return response
 
-    def put(self, endpoint, req_body=None, headers={}):
-        url = self.base_url + endpoint
-        response = self.session.put(
-            url, data=req_body, headers={**headers}, timeout=self.timeout
+    def post_multipart(self, endpoint, parts=None, headers=None, retry=None):
+        response = self._request(
+            method="POST", endpoint=endpoint, files=parts, headers=headers, retry=retry
         )
-        Api.__check_response_status_code(response)
         return response
 
-    def patch(self, endpoint, req_body=None, headers={}):
-        url = self.base_url + endpoint
-        response = self.session.patch(
-            url, data=req_body, headers={**headers}, timeout=self.timeout
+    def put(self, endpoint, req_body=None, headers=None, retry=None):
+        response = self._request(
+            method="PUT", endpoint=endpoint, data=req_body, headers=headers, retry=retry
         )
-        Api.__check_response_status_code(response)
         return response
 
-    def get(self, endpoint, params={}, headers={}):
-        url = self.base_url + endpoint
-        response = self.session.get(
-            url, params={**params}, headers={**headers}, timeout=self.timeout
+    def patch(self, endpoint, req_body=None, headers=None, retry=None):
+        response = self._request(
+            method="PATCH",
+            endpoint=endpoint,
+            data=req_body,
+            headers=headers,
+            retry=retry,
         )
-        Api.__check_response_status_code(response)
         return response
 
-    def head(self, endpoint, headers={}):
-        url = self.base_url + endpoint
-        response = self.session.head(
-            url, headers={**headers}, timeout=self.timeout
+    def get(self, endpoint, params=None, headers=None, retry=None):
+        response = self._request(
+            method="GET", endpoint=endpoint, params=params, headers=headers, retry=retry
         )
-        Api.__check_response_status_code(response)
         return response
 
-    def delete(self, endpoint, headers={}):
-        url = self.base_url + endpoint
-        response = self.session.delete(
-            url, headers={**headers}, timeout=self.timeout
+    def head(self, endpoint, headers=None, retry=None):
+        response = self._request(
+            method="HEAD", endpoint=endpoint, headers=headers, retry=retry
         )
-        Api.__check_response_status_code(response)
+        return response
+
+    def delete(self, endpoint, headers=None, retry=None):
+        response = self._request(
+            method="DELETE", endpoint=endpoint, headers=headers, retry=retry
+        )
         return response
