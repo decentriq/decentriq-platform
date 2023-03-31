@@ -6,7 +6,7 @@ import json
 import os
 from threading import BoundedSemaphore
 from concurrent import futures
-from base64 import b64encode
+from base64 import b64decode, b64encode
 
 from .api import Api
 from .authentication import Auth, generate_key, generate_self_signed_certificate
@@ -22,6 +22,7 @@ from .types import (
     EnclaveSpecification,
     DatasetDescription,
     DataRoomDescription,
+    KeychainInstance,
 )
 from .api import NotFoundError
 from .proto import (
@@ -572,7 +573,7 @@ class Client:
 
     def create_auth(self) -> Auth:
         """
-        Creates a `decentriq_platform.authentication.Auth` object which can be attached 
+        Creates a `decentriq_platform.authentication.Auth` object which can be attached
         to `decentriq_platform.session.Session`.
         """
         keypair = generate_key()
@@ -739,6 +740,88 @@ class Client:
             }
         )
         return data["scope"]
+
+    def get_keychain_instance(self) -> Optional[KeychainInstance]:
+        data = self._graphql.post(
+            """
+            query GetKeychain {
+                myself {
+                    keychain {
+                        userId
+                        salt
+                        encrypted
+                        casIndex
+                    }
+                }
+            }
+            """
+        )
+        keychain = data["myself"]["keychain"]
+        if keychain:
+            keychain["encrypted"] = b64decode(keychain["encrypted"])
+        return keychain
+
+
+    def create_keychain_instance(self, salt: str, encrypted: bytes) -> KeychainInstance:
+        data = self._graphql.post(
+            """
+            mutation CreateKeychain($inner: CreateKeychainInput!) {
+                keychain {
+                    create(inner: $inner) {
+                    userId
+                    salt
+                    encrypted
+                    casIndex
+                    }
+                }
+            }
+            """,
+            {
+                "inner": {
+                    "salt": salt,
+                    "encrypted": b64encode(encrypted).decode('ascii')
+                }
+            }
+        )
+        keychain = data["keychain"]["create"]
+        keychain["encrypted"] = b64decode(keychain["encrypted"])
+        return keychain
+
+    def compare_and_swap_keychain(
+            self,
+            cas_index: int,
+            salt: Optional[str] = None,
+            encrypted: Optional[bytes] = None,
+    ) -> KeychainInstance:
+        data = self._graphql.post(
+            """
+            mutation CompareAndSwapKeychain($inner: CompareAndSwapKeychainInput!) {
+                keychain {
+                    compareAndSwap(inner: $inner)
+                }
+            }
+            """,
+            {
+                "inner": {
+                    "salt": salt,
+                    "encrypted": b64encode(encrypted).decode('ascii'),
+                    "casIndex": cas_index,
+                }
+            }
+        )
+        return data["keychain"]["compareAndSwap"]
+
+    def reset_keychain(self):
+        _ = self._graphql.post(
+            """
+            mutation ResetKeychain {
+                keychain {
+                    reset
+                }
+            }
+            """
+        )
+        return
 
 
 def create_client(
