@@ -63,5 +63,5 @@ __all__ = [
     "session",
     "node",
     "Endorser",
-    "Vault",
+    "Keychain",
 ]
