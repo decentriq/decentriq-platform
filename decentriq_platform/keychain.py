@@ -186,8 +186,6 @@ class Keychain:
             raise Exception("Cannot insert new entry: an entry already exists for this (kind, key) pair")
         if entry.kind in ["dataset_key", "other_secret"]:
             self._store[ns_key] = entry.value
-        elif entry.kind in ["dcr_secret"]:
-            self._store[ns_key] = entry.value.encode("utf-8")
         else:
             raise Exception(f"Invalid entry kind: {entry.kind}")
         self._encrypt_store()
