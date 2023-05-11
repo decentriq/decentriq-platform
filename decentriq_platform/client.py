@@ -179,15 +179,11 @@ class Client:
 
     def _ensure_dataset_scope(
             self,
-            manifest_hash: str,
-            organization: Optional[str] = None
+            manifest_hash: Optional[str] = None,
     ) -> str:
         payload = {
             "manifestHash": manifest_hash,
         }
-        if organization:
-            payload["scopeContext"] = { "organizationName": organization }
-
         data = self._graphql.post(
             """
             mutation GetOrCreateDatasetScope($input: CreateDatasetScopeInput!) {
@@ -245,7 +241,6 @@ class Client:
             description: str = "",
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8,
-            organization: Optional[str] = None,
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -307,7 +302,6 @@ class Client:
         )
         scope_id = self._ensure_dataset_scope(
             manifest_hash.hex(),
-            organization
         )
         manifest_hash = self._finalize_upload(
             scope_id=scope_id,

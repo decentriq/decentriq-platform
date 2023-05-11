@@ -14,6 +14,7 @@ message MeteringRequest {
         WorkerMetadataRequest workerMetadata = 6;
         SubmitWorkerExecutionTimeRequest submitWorkerExecutionTime = 7;
         DcrInteractionRequest dcrInteraction = 8;
+        CreateDatasetRequest createDataset = 9;
     }
 }
 
@@ -27,6 +28,7 @@ message MeteringSuccessResponse {
         WorkerMetadataResponse workerMetadata = 6;
         SubmitWorkerExecutionTimeResponse submitWorkerExecutionTime = 7;
         DcrInteractionResponse dcrInteraction = 8;
+        CreateDatasetResponse createDataset = 9;
     }
 }
 
@@ -40,6 +42,7 @@ message MeteringResponse {
 enum CreateDcrPurpose {
     STANDARD = 0;
     VALIDATION = 1;
+    DATA_IMPORT = 2;
 }
 
 enum CreateDcrKind {
@@ -90,6 +93,25 @@ message PublishDatasetRequest {
     string driverAttestationHash = 4;
 }
 
+message CreateDatasetRequest {
+    /// The hex-encoded manifest hash of the dataset
+    string manifestHash = 1;
+    /// The hex-encoded manifest of the dataset
+    optional string manifest = 2;
+    /// The id scope of the scope to which this dataset should be linked
+    string scopeId = 3;
+    /// A human-readable name of the dataset that helps to identify it
+    string name = 4;
+    /// A human-readable description of the dataset that helps to identify it
+    optional string description = 5;
+    /// The size of this dataset in bytes
+    optional uint64 sizeBytes = 6;
+    /// Statistics associated with this dataset as a serialized JSON object
+    optional string statistics = 7;
+    /// An id identifying the dataset import as part of which this dataset was created
+    optional string datasetImportId = 8;
+}
+
 message UnpublishDatasetRequest {
     /// The UUID of the compute node to which this dataset is being published
     string computeNodeId = 1;
@@ -119,6 +141,10 @@ message CreateDcrCommitResponse {}
 message StopDcrResponse {}
 
 message PublishDatasetResponse {}
+
+message CreateDatasetResponse {
+    string id = 1;
+}
 
 message UnpublishDatasetResponse {}
 
