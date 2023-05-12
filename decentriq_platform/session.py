@@ -5,7 +5,7 @@ import hmac
 from base64 import b64decode
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
-from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional, Dict
+from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional, Dict, Mapping, Text
 from time import sleep
 from .api import Endpoints
 from .authentication import Auth, Sigma
@@ -869,6 +869,7 @@ class Session():
             compute_node_ids: List[str],
             /, *,
             dry_run: bool = False,
+            parameters: Optional[Mapping[Text, Text]] = None,
     ) -> ExecuteComputeResponse:
         """
         Submits a computation request which will generate an execution plan to
@@ -881,11 +882,13 @@ class Session():
             self.driver_attestation_specification_hash
         )
         scope_id_bytes = bytes.fromhex(scope_id)
+
         request = ExecuteComputeRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             computeNodeIds=compute_node_ids,
             isDryRun=dry_run,
             scope=scope_id_bytes,
+            parameters=parameters,
         )
         responses = self.send_request(
             GcgRequest(executeComputeRequest=request),
@@ -971,6 +974,7 @@ class Session():
             compute_node_id: str,
             /, *,
             dry_run: bool = False,
+            parameters: Optional[Mapping[Text, Text]] = None,
     ) -> JobId:
         """
         Run a specific computation within the data room with the given id.
@@ -978,7 +982,7 @@ class Session():
         The result will be an identifier object of the job executing the computation.
         This object is required for checking a job's status and retrieving its results.
         """
-        response = self._submit_compute(data_room_id, [compute_node_id], dry_run=dry_run)
+        response = self._submit_compute(data_room_id, [compute_node_id], dry_run=dry_run, parameters=parameters)
         return JobId(response.jobId.hex(), compute_node_id)
 
     def wait_until_computation_has_finished(
