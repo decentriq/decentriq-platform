@@ -4,51 +4,58 @@ isort:skip_file
 """
 import attestation_pb2
 import builtins
+import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
+import sys
 import typing
-import typing_extensions
+
+if sys.version_info >= (3, 10):
+    import typing as typing_extensions
+else:
+    import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 class _CreateDcrPurpose:
-    ValueType = typing.NewType('ValueType', builtins.int)
+    ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
-class _CreateDcrPurposeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrPurpose.ValueType], builtins.type):
+
+class _CreateDcrPurposeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrPurpose.ValueType], builtins.type):  # noqa: F821
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     STANDARD: _CreateDcrPurpose.ValueType  # 0
     VALIDATION: _CreateDcrPurpose.ValueType  # 1
     DATA_IMPORT: _CreateDcrPurpose.ValueType  # 2
-class CreateDcrPurpose(_CreateDcrPurpose, metaclass=_CreateDcrPurposeEnumTypeWrapper):
-    pass
+
+class CreateDcrPurpose(_CreateDcrPurpose, metaclass=_CreateDcrPurposeEnumTypeWrapper): ...
 
 STANDARD: CreateDcrPurpose.ValueType  # 0
 VALIDATION: CreateDcrPurpose.ValueType  # 1
 DATA_IMPORT: CreateDcrPurpose.ValueType  # 2
 global___CreateDcrPurpose = CreateDcrPurpose
 
-
 class _CreateDcrKind:
-    ValueType = typing.NewType('ValueType', builtins.int)
+    ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
-class _CreateDcrKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrKind.ValueType], builtins.type):
+
+class _CreateDcrKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrKind.ValueType], builtins.type):  # noqa: F821
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     EXPERT: _CreateDcrKind.ValueType  # 0
     DATASCIENCE: _CreateDcrKind.ValueType  # 1
     MEDIA: _CreateDcrKind.ValueType  # 2
-class CreateDcrKind(_CreateDcrKind, metaclass=_CreateDcrKindEnumTypeWrapper):
-    pass
+
+class CreateDcrKind(_CreateDcrKind, metaclass=_CreateDcrKindEnumTypeWrapper): ...
 
 EXPERT: CreateDcrKind.ValueType  # 0
 DATASCIENCE: CreateDcrKind.ValueType  # 1
 MEDIA: CreateDcrKind.ValueType  # 2
 global___CreateDcrKind = CreateDcrKind
 
-
 class MeteringRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     CREATEDCR_FIELD_NUMBER: builtins.int
     CREATEDCRCOMMIT_FIELD_NUMBER: builtins.int
     STOPDCR_FIELD_NUMBER: builtins.int
@@ -76,25 +83,28 @@ class MeteringRequest(google.protobuf.message.Message):
     def dcrInteraction(self) -> global___DcrInteractionRequest: ...
     @property
     def createDataset(self) -> global___CreateDatasetRequest: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        createDcr: typing.Optional[global___CreateDcrRequest] = ...,
-        createDcrCommit: typing.Optional[global___CreateDcrCommitRequest] = ...,
-        stopDcr: typing.Optional[global___StopDcrRequest] = ...,
-        publishDataset: typing.Optional[global___PublishDatasetRequest] = ...,
-        unpublishDataset: typing.Optional[global___UnpublishDatasetRequest] = ...,
-        workerMetadata: typing.Optional[global___WorkerMetadataRequest] = ...,
-        submitWorkerExecutionTime: typing.Optional[global___SubmitWorkerExecutionTimeRequest] = ...,
-        dcrInteraction: typing.Optional[global___DcrInteractionRequest] = ...,
-        createDataset: typing.Optional[global___CreateDatasetRequest] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createDataset",b"createDataset","createDcr",b"createDcr","createDcrCommit",b"createDcrCommit","dcrInteraction",b"dcrInteraction","publishDataset",b"publishDataset","request",b"request","stopDcr",b"stopDcr","submitWorkerExecutionTime",b"submitWorkerExecutionTime","unpublishDataset",b"unpublishDataset","workerMetadata",b"workerMetadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createDataset",b"createDataset","createDcr",b"createDcr","createDcrCommit",b"createDcrCommit","dcrInteraction",b"dcrInteraction","publishDataset",b"publishDataset","request",b"request","stopDcr",b"stopDcr","submitWorkerExecutionTime",b"submitWorkerExecutionTime","unpublishDataset",b"unpublishDataset","workerMetadata",b"workerMetadata"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["request",b"request"]) -> typing.Optional[typing_extensions.Literal["createDcr","createDcrCommit","stopDcr","publishDataset","unpublishDataset","workerMetadata","submitWorkerExecutionTime","dcrInteraction","createDataset"]]: ...
+        createDcr: global___CreateDcrRequest | None = ...,
+        createDcrCommit: global___CreateDcrCommitRequest | None = ...,
+        stopDcr: global___StopDcrRequest | None = ...,
+        publishDataset: global___PublishDatasetRequest | None = ...,
+        unpublishDataset: global___UnpublishDatasetRequest | None = ...,
+        workerMetadata: global___WorkerMetadataRequest | None = ...,
+        submitWorkerExecutionTime: global___SubmitWorkerExecutionTimeRequest | None = ...,
+        dcrInteraction: global___DcrInteractionRequest | None = ...,
+        createDataset: global___CreateDatasetRequest | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset"] | None: ...
+
 global___MeteringRequest = MeteringRequest
 
 class MeteringSuccessResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     CREATEDCR_FIELD_NUMBER: builtins.int
     CREATEDCRCOMMIT_FIELD_NUMBER: builtins.int
     STOPDCR_FIELD_NUMBER: builtins.int
@@ -122,153 +132,157 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
     def dcrInteraction(self) -> global___DcrInteractionResponse: ...
     @property
     def createDataset(self) -> global___CreateDatasetResponse: ...
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        createDcr: typing.Optional[global___CreateDcrResponse] = ...,
-        createDcrCommit: typing.Optional[global___CreateDcrCommitResponse] = ...,
-        stopDcr: typing.Optional[global___StopDcrResponse] = ...,
-        publishDataset: typing.Optional[global___PublishDatasetResponse] = ...,
-        unpublishDataset: typing.Optional[global___UnpublishDatasetResponse] = ...,
-        workerMetadata: typing.Optional[global___WorkerMetadataResponse] = ...,
-        submitWorkerExecutionTime: typing.Optional[global___SubmitWorkerExecutionTimeResponse] = ...,
-        dcrInteraction: typing.Optional[global___DcrInteractionResponse] = ...,
-        createDataset: typing.Optional[global___CreateDatasetResponse] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createDataset",b"createDataset","createDcr",b"createDcr","createDcrCommit",b"createDcrCommit","dcrInteraction",b"dcrInteraction","publishDataset",b"publishDataset","response",b"response","stopDcr",b"stopDcr","submitWorkerExecutionTime",b"submitWorkerExecutionTime","unpublishDataset",b"unpublishDataset","workerMetadata",b"workerMetadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createDataset",b"createDataset","createDcr",b"createDcr","createDcrCommit",b"createDcrCommit","dcrInteraction",b"dcrInteraction","publishDataset",b"publishDataset","response",b"response","stopDcr",b"stopDcr","submitWorkerExecutionTime",b"submitWorkerExecutionTime","unpublishDataset",b"unpublishDataset","workerMetadata",b"workerMetadata"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["response",b"response"]) -> typing.Optional[typing_extensions.Literal["createDcr","createDcrCommit","stopDcr","publishDataset","unpublishDataset","workerMetadata","submitWorkerExecutionTime","dcrInteraction","createDataset"]]: ...
+        createDcr: global___CreateDcrResponse | None = ...,
+        createDcrCommit: global___CreateDcrCommitResponse | None = ...,
+        stopDcr: global___StopDcrResponse | None = ...,
+        publishDataset: global___PublishDatasetResponse | None = ...,
+        unpublishDataset: global___UnpublishDatasetResponse | None = ...,
+        workerMetadata: global___WorkerMetadataResponse | None = ...,
+        submitWorkerExecutionTime: global___SubmitWorkerExecutionTimeResponse | None = ...,
+        dcrInteraction: global___DcrInteractionResponse | None = ...,
+        createDataset: global___CreateDatasetResponse | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset"] | None: ...
+
 global___MeteringSuccessResponse = MeteringSuccessResponse
 
 class MeteringResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     SUCCESS_FIELD_NUMBER: builtins.int
     FAILURE_FIELD_NUMBER: builtins.int
     @property
     def success(self) -> global___MeteringSuccessResponse: ...
-    failure: typing.Text
-    def __init__(self,
+    failure: builtins.str
+    def __init__(
+        self,
         *,
-        success: typing.Optional[global___MeteringSuccessResponse] = ...,
-        failure: typing.Text = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["failure",b"failure","response",b"response","success",b"success"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["failure",b"failure","response",b"response","success",b"success"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["response",b"response"]) -> typing.Optional[typing_extensions.Literal["success","failure"]]: ...
+        success: global___MeteringSuccessResponse | None = ...,
+        failure: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["failure", b"failure", "response", b"response", "success", b"success"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["failure", b"failure", "response", b"response", "success", b"success"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["success", "failure"] | None: ...
+
 global___MeteringResponse = MeteringResponse
 
 class DcrMetadata(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     PURPOSE_FIELD_NUMBER: builtins.int
     SHOWORGANIZATIONLOGO_FIELD_NUMBER: builtins.int
     REQUIREPASSWORD_FIELD_NUMBER: builtins.int
     KIND_FIELD_NUMBER: builtins.int
     purpose: global___CreateDcrPurpose.ValueType
     """/ Why this data room is being created (allows for purpose-based filtering of data rooms)"""
-
     showOrganizationLogo: builtins.bool
     """/ Whether to show the organization logo"""
-
     requirePassword: builtins.bool
     """/ Whether the DCR requires a password"""
-
     kind: global___CreateDcrKind.ValueType
     """/ The dcr type"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
         purpose: global___CreateDcrPurpose.ValueType = ...,
         showOrganizationLogo: builtins.bool = ...,
         requirePassword: builtins.bool = ...,
         kind: global___CreateDcrKind.ValueType = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["kind",b"kind","purpose",b"purpose","requirePassword",b"requirePassword","showOrganizationLogo",b"showOrganizationLogo"]) -> None: ...
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["kind", b"kind", "purpose", b"purpose", "requirePassword", b"requirePassword", "showOrganizationLogo", b"showOrganizationLogo"]) -> None: ...
+
 global___DcrMetadata = DcrMetadata
 
 class CreateDcrRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     IDHEX_FIELD_NUMBER: builtins.int
     NAME_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
     PARTICIPANTEMAILS_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
-    idHex: typing.Text
+    idHex: builtins.str
     """/ The DCR hash to be used for the published data room"""
-
-    name: typing.Text
-    driverAttestationHash: typing.Text
+    name: builtins.str
+    driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
-
     @property
-    def participantEmails(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[typing.Text]: ...
+    def participantEmails(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     metadata: builtins.bytes
     """/ Optional metadata that will be persisted to the database"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        idHex: typing.Text = ...,
-        name: typing.Text = ...,
-        driverAttestationHash: typing.Text = ...,
-        participantEmails: typing.Optional[typing.Iterable[typing.Text]] = ...,
-        metadata: typing.Optional[builtins.bytes] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_metadata",b"_metadata","metadata",b"metadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_metadata",b"_metadata","driverAttestationHash",b"driverAttestationHash","idHex",b"idHex","metadata",b"metadata","name",b"name","participantEmails",b"participantEmails"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_metadata",b"_metadata"]) -> typing.Optional[typing_extensions.Literal["metadata"]]: ...
+        idHex: builtins.str = ...,
+        name: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
+        participantEmails: collections.abc.Iterable[builtins.str] | None = ...,
+        metadata: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "metadata", b"metadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_metadata", b"_metadata"]) -> typing_extensions.Literal["metadata"] | None: ...
+
 global___CreateDcrRequest = CreateDcrRequest
 
 class DcrInteractionRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMHASH_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
     SCOPEID_FIELD_NUMBER: builtins.int
-    dataRoomHash: typing.Text
+    dataRoomHash: builtins.str
     """/ The hex-encoded hash of the data room"""
-
-    driverAttestationHash: typing.Text
+    driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
-
-    scopeId: typing.Text
+    scopeId: builtins.str
     """Id of the scope to check"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        dataRoomHash: typing.Text = ...,
-        driverAttestationHash: typing.Text = ...,
-        scopeId: typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["dataRoomHash",b"dataRoomHash","driverAttestationHash",b"driverAttestationHash","scopeId",b"scopeId"]) -> None: ...
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
+        scopeId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash", "scopeId", b"scopeId"]) -> None: ...
+
 global___DcrInteractionRequest = DcrInteractionRequest
 
 class PublishDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMPUTENODEID_FIELD_NUMBER: builtins.int
     MANIFESTHASH_FIELD_NUMBER: builtins.int
     DATAROOMHASH_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
-    computeNodeId: typing.Text
+    computeNodeId: builtins.str
     """/ The UUID of the compute node to which this dataset is being published"""
-
-    manifestHash: typing.Text
+    manifestHash: builtins.str
     """/ The hex-encoded manifest hash of the dataset"""
-
-    dataRoomHash: typing.Text
+    dataRoomHash: builtins.str
     """/ The hex-encoded hash of the data room"""
-
-    driverAttestationHash: typing.Text
+    driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        computeNodeId: typing.Text = ...,
-        manifestHash: typing.Text = ...,
-        dataRoomHash: typing.Text = ...,
-        driverAttestationHash: typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId",b"computeNodeId","dataRoomHash",b"dataRoomHash","driverAttestationHash",b"driverAttestationHash","manifestHash",b"manifestHash"]) -> None: ...
+        computeNodeId: builtins.str = ...,
+        manifestHash: builtins.str = ...,
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash", "manifestHash", b"manifestHash"]) -> None: ...
+
 global___PublishDatasetRequest = PublishDatasetRequest
 
 class CreateDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     MANIFESTHASH_FIELD_NUMBER: builtins.int
     MANIFEST_FIELD_NUMBER: builtins.int
     SCOPEID_FIELD_NUMBER: builtins.int
@@ -277,208 +291,236 @@ class CreateDatasetRequest(google.protobuf.message.Message):
     SIZEBYTES_FIELD_NUMBER: builtins.int
     STATISTICS_FIELD_NUMBER: builtins.int
     DATASETIMPORTID_FIELD_NUMBER: builtins.int
-    manifestHash: typing.Text
+    manifestHash: builtins.str
     """/ The hex-encoded manifest hash of the dataset"""
-
-    manifest: typing.Text
+    manifest: builtins.str
     """/ The hex-encoded manifest of the dataset"""
-
-    scopeId: typing.Text
+    scopeId: builtins.str
     """/ The id scope of the scope to which this dataset should be linked"""
-
-    name: typing.Text
+    name: builtins.str
     """/ A human-readable name of the dataset that helps to identify it"""
-
-    description: typing.Text
+    description: builtins.str
     """/ A human-readable description of the dataset that helps to identify it"""
-
     sizeBytes: builtins.int
     """/ The size of this dataset in bytes"""
-
-    statistics: typing.Text
+    statistics: builtins.str
     """/ Statistics associated with this dataset as a serialized JSON object"""
-
-    datasetImportId: typing.Text
+    datasetImportId: builtins.str
     """/ An id identifying the dataset import as part of which this dataset was created"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        manifestHash: typing.Text = ...,
-        manifest: typing.Optional[typing.Text] = ...,
-        scopeId: typing.Text = ...,
-        name: typing.Text = ...,
-        description: typing.Optional[typing.Text] = ...,
-        sizeBytes: typing.Optional[builtins.int] = ...,
-        statistics: typing.Optional[typing.Text] = ...,
-        datasetImportId: typing.Optional[typing.Text] = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_datasetImportId",b"_datasetImportId","_description",b"_description","_manifest",b"_manifest","_sizeBytes",b"_sizeBytes","_statistics",b"_statistics","datasetImportId",b"datasetImportId","description",b"description","manifest",b"manifest","sizeBytes",b"sizeBytes","statistics",b"statistics"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_datasetImportId",b"_datasetImportId","_description",b"_description","_manifest",b"_manifest","_sizeBytes",b"_sizeBytes","_statistics",b"_statistics","datasetImportId",b"datasetImportId","description",b"description","manifest",b"manifest","manifestHash",b"manifestHash","name",b"name","scopeId",b"scopeId","sizeBytes",b"sizeBytes","statistics",b"statistics"]) -> None: ...
+        manifestHash: builtins.str = ...,
+        manifest: builtins.str | None = ...,
+        scopeId: builtins.str = ...,
+        name: builtins.str = ...,
+        description: builtins.str | None = ...,
+        sizeBytes: builtins.int | None = ...,
+        statistics: builtins.str | None = ...,
+        datasetImportId: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_datasetImportId", b"_datasetImportId", "_description", b"_description", "_manifest", b"_manifest", "_sizeBytes", b"_sizeBytes", "_statistics", b"_statistics", "datasetImportId", b"datasetImportId", "description", b"description", "manifest", b"manifest", "sizeBytes", b"sizeBytes", "statistics", b"statistics"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_datasetImportId", b"_datasetImportId", "_description", b"_description", "_manifest", b"_manifest", "_sizeBytes", b"_sizeBytes", "_statistics", b"_statistics", "datasetImportId", b"datasetImportId", "description", b"description", "manifest", b"manifest", "manifestHash", b"manifestHash", "name", b"name", "scopeId", b"scopeId", "sizeBytes", b"sizeBytes", "statistics", b"statistics"]) -> None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_datasetImportId",b"_datasetImportId"]) -> typing.Optional[typing_extensions.Literal["datasetImportId"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_datasetImportId", b"_datasetImportId"]) -> typing_extensions.Literal["datasetImportId"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_description",b"_description"]) -> typing.Optional[typing_extensions.Literal["description"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_description", b"_description"]) -> typing_extensions.Literal["description"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_manifest",b"_manifest"]) -> typing.Optional[typing_extensions.Literal["manifest"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_manifest", b"_manifest"]) -> typing_extensions.Literal["manifest"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_sizeBytes",b"_sizeBytes"]) -> typing.Optional[typing_extensions.Literal["sizeBytes"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_sizeBytes", b"_sizeBytes"]) -> typing_extensions.Literal["sizeBytes"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["_statistics",b"_statistics"]) -> typing.Optional[typing_extensions.Literal["statistics"]]: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_statistics", b"_statistics"]) -> typing_extensions.Literal["statistics"] | None: ...
+
 global___CreateDatasetRequest = CreateDatasetRequest
 
 class UnpublishDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     COMPUTENODEID_FIELD_NUMBER: builtins.int
     DATAROOMHASH_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
-    computeNodeId: typing.Text
+    computeNodeId: builtins.str
     """/ The UUID of the compute node to which this dataset is being published"""
-
-    dataRoomHash: typing.Text
+    dataRoomHash: builtins.str
     """/ The hex-encoded hash of the data room"""
-
-    driverAttestationHash: typing.Text
+    driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        computeNodeId: typing.Text = ...,
-        dataRoomHash: typing.Text = ...,
-        driverAttestationHash: typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId",b"computeNodeId","dataRoomHash",b"dataRoomHash","driverAttestationHash",b"driverAttestationHash"]) -> None: ...
+        computeNodeId: builtins.str = ...,
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash"]) -> None: ...
+
 global___UnpublishDatasetRequest = UnpublishDatasetRequest
 
 class StopDcrRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     DATAROOMHASH_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
-    dataRoomHash: typing.Text
+    dataRoomHash: builtins.str
     """/ The hex-encoded data room hash"""
-
-    driverAttestationHash: typing.Text
+    driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        dataRoomHash: typing.Text = ...,
-        driverAttestationHash: typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["dataRoomHash",b"dataRoomHash","driverAttestationHash",b"driverAttestationHash"]) -> None: ...
+        dataRoomHash: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomHash", b"dataRoomHash", "driverAttestationHash", b"driverAttestationHash"]) -> None: ...
+
 global___StopDcrRequest = StopDcrRequest
 
 class CreateDcrCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ID_FIELD_NUMBER: builtins.int
-    id: typing.Text
-    def __init__(self,
+    id: builtins.str
+    def __init__(
+        self,
         *,
-        id: typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["id",b"id"]) -> None: ...
+        id: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
+
 global___CreateDcrCommitRequest = CreateDcrCommitRequest
 
 class CreateDcrResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___CreateDcrResponse = CreateDcrResponse
 
 class DcrInteractionResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___DcrInteractionResponse = DcrInteractionResponse
 
 class CreateDcrCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___CreateDcrCommitResponse = CreateDcrCommitResponse
 
 class StopDcrResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___StopDcrResponse = StopDcrResponse
 
 class PublishDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___PublishDatasetResponse = PublishDatasetResponse
 
 class CreateDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ID_FIELD_NUMBER: builtins.int
-    id: typing.Text
-    def __init__(self,
+    id: builtins.str
+    def __init__(
+        self,
         *,
-        id: typing.Text = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["id",b"id"]) -> None: ...
+        id: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
+
 global___CreateDatasetResponse = CreateDatasetResponse
 
 class UnpublishDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___UnpublishDatasetResponse = UnpublishDatasetResponse
 
 class WorkerMetadataRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     ATTESTATIONSPEC_FIELD_NUMBER: builtins.int
     SCOPEID_FIELD_NUMBER: builtins.int
     @property
     def attestationSpec(self) -> attestation_pb2.AttestationSpecification:
         """/ Attestation spec of the worker for which to perform the metadata lookup"""
-        pass
-    scopeId: typing.Text
+    scopeId: builtins.str
     """/ Id of the scope in the context of which a computation is performed"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
-        attestationSpec: typing.Optional[attestation_pb2.AttestationSpecification] = ...,
-        scopeId: typing.Text = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["attestationSpec",b"attestationSpec"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["attestationSpec",b"attestationSpec","scopeId",b"scopeId"]) -> None: ...
+        attestationSpec: attestation_pb2.AttestationSpecification | None = ...,
+        scopeId: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec", "scopeId", b"scopeId"]) -> None: ...
+
 global___WorkerMetadataRequest = WorkerMetadataRequest
 
 class WorkerMetadataResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     MAXEXECUTIONSECONDS_FIELD_NUMBER: builtins.int
     maxExecutionSeconds: builtins.int
-    def __init__(self,
+    def __init__(
+        self,
         *,
         maxExecutionSeconds: builtins.int = ...,
-        ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["maxExecutionSeconds",b"maxExecutionSeconds"]) -> None: ...
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["maxExecutionSeconds", b"maxExecutionSeconds"]) -> None: ...
+
 global___WorkerMetadataResponse = WorkerMetadataResponse
 
 class SubmitWorkerExecutionTimeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
     EXECUTIONTIMESECONDS_FIELD_NUMBER: builtins.int
     ATTESTATIONSPEC_FIELD_NUMBER: builtins.int
     SCOPEID_FIELD_NUMBER: builtins.int
     executionTimeSeconds: builtins.int
     @property
     def attestationSpec(self) -> attestation_pb2.AttestationSpecification: ...
-    scopeId: typing.Text
+    scopeId: builtins.str
     """/ Id of the scope in the context of which a computation is performed"""
-
-    def __init__(self,
+    def __init__(
+        self,
         *,
         executionTimeSeconds: builtins.int = ...,
-        attestationSpec: typing.Optional[attestation_pb2.AttestationSpecification] = ...,
-        scopeId: typing.Text = ...,
-        ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["attestationSpec",b"attestationSpec"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["attestationSpec",b"attestationSpec","executionTimeSeconds",b"executionTimeSeconds","scopeId",b"scopeId"]) -> None: ...
+        attestationSpec: attestation_pb2.AttestationSpecification | None = ...,
+        scopeId: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["attestationSpec", b"attestationSpec", "executionTimeSeconds", b"executionTimeSeconds", "scopeId", b"scopeId"]) -> None: ...
+
 global___SubmitWorkerExecutionTimeRequest = SubmitWorkerExecutionTimeRequest
 
 class SubmitWorkerExecutionTimeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
-    def __init__(self,
-        ) -> None: ...
+
+    def __init__(
+        self,
+    ) -> None: ...
+
 global___SubmitWorkerExecutionTimeResponse = SubmitWorkerExecutionTimeResponse
