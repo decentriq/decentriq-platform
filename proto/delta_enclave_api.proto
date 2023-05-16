@@ -133,5 +133,11 @@ message VersionHeader {
 
 // Data format header (encrypted)
 message ChunkHeader {
+    // Additional entropy to ensure low-entropy content is not bruteforce-able.
     bytes extraEntropy = 1;
+    // A field indicating the size of the underlying data. Currently this should only be set for manifest chunks where
+    // it indicates the size of the overall underlying dataset.
+    // WARNING: This field, should be treated as a potential attack vector. Ideally a potential mismatch between this
+    // size and the actual size should be handled in common low-level code such as `ChunkReader`.
+    optional uint64 untrustedContentSize = 2;
 }

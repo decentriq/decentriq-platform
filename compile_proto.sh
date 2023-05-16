@@ -17,6 +17,7 @@ function compile_pb() {
         protoc -I=proto \
         --python_out=$OUTPUT_DIR\
         --mypy_out=$OUTPUT_DIR\
+        --experimental_allow_proto3_optional\
         $proto_file
     done
     # See https://github.com/protocolbuffers/protobuf/issues/1491

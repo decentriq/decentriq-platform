@@ -296,9 +296,10 @@ class Client:
 
         # create manifest and upload
         manifest_hash, manifest_encrypted = create_encrypted_chunk(
-                key.material,
-                os.urandom(16),
-                json.dumps(chunk_hashes).encode("utf-8")
+            key.material,
+            os.urandom(16),
+            json.dumps(chunk_hashes).encode("utf-8"),
+            content_size=chunker.content_size
         )
         scope_id = self._ensure_dataset_scope(
             manifest_hash.hex(),

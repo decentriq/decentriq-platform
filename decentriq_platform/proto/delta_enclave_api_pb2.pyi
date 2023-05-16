@@ -257,12 +257,23 @@ class ChunkHeader(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     EXTRAENTROPY_FIELD_NUMBER: builtins.int
+    UNTRUSTEDCONTENTSIZE_FIELD_NUMBER: builtins.int
     extraEntropy: builtins.bytes
+    """Additional entropy to ensure low-entropy content is not bruteforce-able."""
+    untrustedContentSize: builtins.int
+    """A field indicating the size of the underlying data. Currently this should only be set for manifest chunks where
+    it indicates the size of the overall underlying dataset.
+    WARNING: This field, should be treated as a potential attack vector. Ideally a potential mismatch between this
+    size and the actual size should be handled in common low-level code such as `ChunkReader`.
+    """
     def __init__(
         self,
         *,
         extraEntropy: builtins.bytes = ...,
+        untrustedContentSize: builtins.int | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["extraEntropy", b"extraEntropy"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_untrustedContentSize", b"_untrustedContentSize", "untrustedContentSize", b"untrustedContentSize"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_untrustedContentSize", b"_untrustedContentSize", "extraEntropy", b"extraEntropy", "untrustedContentSize", b"untrustedContentSize"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_untrustedContentSize", b"_untrustedContentSize"]) -> typing_extensions.Literal["untrustedContentSize"] | None: ...
 
 global___ChunkHeader = ChunkHeader

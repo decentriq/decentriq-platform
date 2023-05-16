@@ -29,9 +29,11 @@ class Key():
             key_bytes = material
         self.material = key_bytes
 
-def create_chunk_header(extra_entropy: bytes) -> bytes:
+def create_chunk_header(extra_entropy: bytes, content_size: Optional[int]) -> bytes:
     chunk_header = ChunkHeader()
     chunk_header.extraEntropy = extra_entropy
+    if content_size is not None:
+        chunk_header.untrustedContentSize = content_size
 
     chunk_header_bytes = serialize_length_delimited(chunk_header)
     return chunk_header_bytes
@@ -46,14 +48,15 @@ def create_version_header() -> bytes:
 def create_encrypted_chunk(
         key: bytes,
         extra_entropy: bytes,
-        data: bytes
+        data: bytes,
+        content_size: Optional[int],
 ) -> Tuple[bytes, bytes]:
     chunk_bytes = []
 
     version_header = create_version_header()
     chunk_bytes.append(version_header)
 
-    chunk_header = create_chunk_header(extra_entropy)
+    chunk_header = create_chunk_header(extra_entropy, content_size)
     chunk_bytes.append(chunk_header)
 
     chunk_bytes.append(data)
@@ -71,6 +74,7 @@ def create_encrypted_chunk(
 class Chunker(Iterator):
     def __init__(self, input_stream: BinaryIO, chunk_size: int):
         self.chunk_size = chunk_size
+        self.content_size = 0
         self.input_stream = input_stream
 
     def __iter__(self) -> Iterator[Tuple[bytes, bytes]]:
@@ -80,13 +84,13 @@ class Chunker(Iterator):
     # returns (hash, chunk)
     def __next__(self) -> Tuple[bytes, bytes]:
         version_header_bytes = create_version_header()
-        chunk_header_bytes = create_chunk_header(os.urandom(16))
+        chunk_header_bytes = create_chunk_header(os.urandom(16), content_size=None)
 
         # Does not account for header size
-        current_chunk_size = 0
         chunk_bytes = [version_header_bytes, chunk_header_bytes]
 
         input_chunk_bytes = self.input_stream.read(self.chunk_size)
+        self.content_size += len(input_chunk_bytes)
         if len(input_chunk_bytes) == 0:
             raise StopIteration
         chunk_bytes.append(input_chunk_bytes)
