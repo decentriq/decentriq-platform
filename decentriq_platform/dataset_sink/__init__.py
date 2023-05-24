@@ -1,4 +1,5 @@
-from ..proto import serialize_length_delimited, ComputeNodeFormat
+from google.protobuf.json_format import MessageToDict
+from ..proto import serialize_length_delimited, ComputeNodeFormat, parse_length_delimited
 from ..node import Node
 from typing import Optional
 from .proto import (
@@ -43,7 +44,13 @@ class DatasetSink(Node):
             output_format=ComputeNodeFormat.ZIP
         )
 
+
+class DatasetSinkWorkerDecoder:
+    def decode(self, config: bytes):
+        config_decoded = DatasetSinkWorkerConfiguration()
+        parse_length_delimited(config, config_decoded)
+        return MessageToDict(config_decoded)
+
 __all__ = [
     "DatasetSink",
 ]
-

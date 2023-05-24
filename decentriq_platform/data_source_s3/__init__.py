@@ -1,3 +1,4 @@
+from google.protobuf.json_format import MessageToDict
 from ..proto import serialize_length_delimited, ComputeNodeFormat, parse_length_delimited
 from ..node import Node
 from typing import List, Optional, Set, Tuple
@@ -42,6 +43,12 @@ class DataSourceS3(Node):
             dependencies=[credentials_dependency],
             output_format=ComputeNodeFormat.RAW
         )
+
+class DataSourceS3WorkerDecoder:
+    def decode(self, config: bytes):
+        config_decoded = DataSourceS3WorkerConfiguration()
+        parse_length_delimited(config, config_decoded)
+        return MessageToDict(config_decoded)
 
 __all__ = [
     "DataSourceS3",
