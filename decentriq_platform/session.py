@@ -309,6 +309,7 @@ class Session():
             kind: CreateDcrKind.V = CreateDcrKind.EXPERT,
             show_organization_logo: bool = False,
             require_password: bool = False,
+            high_level_representation: Optional[bytes] = None
     ) -> CreateDataRoomResponse:
         endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
@@ -321,6 +322,7 @@ class Session():
         )
         request = CreateDataRoomRequest(
             dataRoom=data_room_definition,
+            highLevelRepresentation=high_level_representation,
             dataRoomMetadata=serialize_length_delimited(metadata),
         )
         responses = self.send_request(GcgRequest(createDataRoomRequest=request), protocol)
@@ -353,6 +355,7 @@ class Session():
             require_password: bool = False,
             purpose: CreateDcrPurpose.V = CreateDcrPurpose.STANDARD,
             kind: CreateDcrKind.V = CreateDcrKind.EXPERT,
+            high_level_representation: Optional[bytes] = None,
     ) -> str:
         """
         Create a data room with the provided protobuf configuration object
@@ -368,7 +371,8 @@ class Session():
             purpose,
             kind,
             show_organization_logo,
-            require_password
+            require_password,
+            high_level_representation,
         )
         return _get_data_room_id(response).hex()
 
