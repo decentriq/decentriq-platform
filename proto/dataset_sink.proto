@@ -1,0 +1,11 @@
+syntax = "proto3";
+package dataset_sink;
+
+message DatasetSinkWorkerConfiguration {
+    string inputDependency = 1;
+    string encryptionKeyDependency = 2;
+    string datasetName = 3;
+    string datasetScopeId = 4;
+    optional string datasetDescription = 5;
+    optional string datasetImportId = 6;
+}

@@ -206,3 +206,10 @@ class TcbInfoContainer(TypedDict):
 class IasResponse(TypedDict):
     isvEnclaveQuoteBody: str
     isvEnclaveQuoteStatus: str
+
+
+class KeychainInstance(TypedDict):
+    userId: str
+    salt: str
+    encrypted: bytes
+    casIndex: int

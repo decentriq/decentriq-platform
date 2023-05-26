@@ -17,6 +17,7 @@ function compile_pb() {
         protoc -I=proto \
         --python_out=$OUTPUT_DIR\
         --mypy_out=$OUTPUT_DIR\
+        --experimental_allow_proto3_optional\
         $proto_file
     done
     # See https://github.com/protocolbuffers/protobuf/issues/1491
@@ -29,8 +30,12 @@ MAIN_PACKAGE_PROTO=(gcg.proto data_room.proto attestation.proto delta_enclave_ap
 SQL_PACKAGE_PROTO=(compute_sql.proto)
 CONTAINER_PACKAGE_PROTO=(compute_container.proto)
 S3_SINK_PACKAGE_PROTO=(compute_s3_sink.proto)
+DATA_SOURCE_S3_PACKAGE_PROTO=(data_source_s3.proto)
+DATASET_SINK_PACKAGE_PROTO=(dataset_sink.proto)
 
 compile_pb "decentriq_platform/proto" "${MAIN_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/sql/proto" "${SQL_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/container/proto" "${CONTAINER_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/s3_sink/proto" "${S3_SINK_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/data_source_s3/proto" "${DATA_SOURCE_S3_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/dataset_sink/proto" "${DATASET_SINK_PACKAGE_PROTO[@]}"

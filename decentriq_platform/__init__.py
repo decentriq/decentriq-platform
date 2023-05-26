@@ -19,6 +19,8 @@ __pdoc__ = {
     "permission": False,
     "proto": False,
     "s3_sink": True,
+    "data_source_s3": True,
+    "dataset_sink": True,
     "session": True,
     "sql": True,
     "storage": True,
@@ -38,6 +40,7 @@ from .storage import Key
 from .attestation import enclave_specifications, EnclaveSpecifications
 
 from .endorsement import Endorser
+from .keychain import Keychain
 
 __all__ = [
     "create_client",
@@ -55,11 +58,14 @@ __all__ = [
     "sql",
     "container",
     "s3_sink",
+    "data_source_s3",
+    "dataset_sink",
     "storage",
     "attestation",
     "types",
     "authentication",
     "session",
     "node",
-    "Endorser"
+    "Endorser",
+    "Keychain",
 ]

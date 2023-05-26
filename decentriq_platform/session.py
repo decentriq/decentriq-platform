@@ -5,7 +5,7 @@ import hmac
 from base64 import b64decode
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives import hashes
-from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional, Dict
+from typing import Any, List, Tuple, TYPE_CHECKING, Iterator, Optional, Dict, Mapping, Text
 from time import sleep
 from .api import Endpoints
 from .authentication import Auth, Sigma
@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 __all__ = [ "Session", "LATEST_GCG_PROTOCOL_VERSION", "LATEST_WORKER_PROTOCOL_VERSION" ]
 
 
-LATEST_GCG_PROTOCOL_VERSION = 3
+LATEST_GCG_PROTOCOL_VERSION = 4
 LATEST_WORKER_PROTOCOL_VERSION = 1
 
 
@@ -216,7 +216,7 @@ class Session():
             self,
             certificate_chain_pem: bytes,
     ) -> PkiEndorsementResponse:
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = PkiEndorsementRequest(
             certificateChainPem=certificate_chain_pem
@@ -234,7 +234,7 @@ class Session():
         self,
         dcr_secret: str,
     ) -> DcrSecretEndorsementResponse:
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = DcrSecretEndorsementRequest(
             dcrSecret=dcr_secret,
@@ -310,7 +310,7 @@ class Session():
             show_organization_logo: bool = False,
             require_password: bool = False,
     ) -> CreateDataRoomResponse:
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
 
         metadata = DcrMetadata(
@@ -385,7 +385,7 @@ class Session():
         computations or when trying to merge this commit into the main
         data room configuration.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = CreateConfigurationCommitRequest(
             commit=configuration_commit,
@@ -416,7 +416,7 @@ class Session():
         **Returns**:
         A `ConfigurationCommit`.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveConfigurationCommitRequest(
             commitId=bytes.fromhex(configuration_commit_id),
@@ -449,7 +449,7 @@ class Session():
         A list of ids belonging to the users that need to approve the
         configuration commit.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveConfigurationCommitApproversRequest(
             commitId=bytes.fromhex(configuration_commit_id),
@@ -483,7 +483,7 @@ class Session():
         of ids returned by `retrieveConfigurationCommitApprovers` needs to
         generate an approval signature using this method.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = GenerateMergeApprovalSignatureRequest(
             commitId=bytes.fromhex(configuration_commit_id),
@@ -518,7 +518,7 @@ class Session():
         - `approval_signatures`: A dictionary containing the approval signature for
             each of the required approvers, e.g. `{ "some@email.com": signature }`.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = MergeConfigurationCommitRequest(
             commitId=bytes.fromhex(configuration_commit_id),
@@ -554,7 +554,7 @@ class Session():
         to extend an existing data room (for example by adding new compute nodes).
         Extending an existing data room is done using the `DataRoomCommitBuilder` class.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveCurrentDataRoomConfigurationRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -593,7 +593,7 @@ class Session():
         For the special case of stopping a data room, the method
         `stop_data_room` can be used.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = UpdateDataRoomStatusRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -623,7 +623,7 @@ class Session():
         """
         Returns the status of the data room. Valid values are `"Active"` or `"Stopped"`.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomStatusRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -650,7 +650,7 @@ class Session():
         """
         Returns the underlying protobuf object for the data room.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveDataRoomRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -677,7 +677,7 @@ class Session():
         """
         Returns the audit log for the data room.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrieveAuditLogRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -726,7 +726,7 @@ class Session():
         the name of the data node.
         """
 
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         dataset = self.client.get_dataset(manifest_hash)
         if not dataset and not force:
@@ -777,7 +777,7 @@ class Session():
             (where `UUID` corresponds to the value that you see when hovering your mouse pointer over
             the name of the data node).
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RemovePublishedDatasetRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -805,7 +805,7 @@ class Session():
         """
         Returns the datasets published to the given data room.
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = RetrievePublishedDatasetsRequest(
             dataRoomId=bytes.fromhex(data_room_id),
@@ -836,7 +836,7 @@ class Session():
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_dcr_data_scope(
             data_room_id,
@@ -869,23 +869,26 @@ class Session():
             compute_node_ids: List[str],
             /, *,
             dry_run: bool = False,
+            parameters: Optional[Mapping[Text, Text]] = None,
     ) -> ExecuteComputeResponse:
         """
         Submits a computation request which will generate an execution plan to
         perform the computation of the goal nodes
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_dcr_data_scope(
             data_room_id,
             self.driver_attestation_specification_hash
         )
         scope_id_bytes = bytes.fromhex(scope_id)
+
         request = ExecuteComputeRequest(
             dataRoomId=bytes.fromhex(data_room_id),
             computeNodeIds=compute_node_ids,
             isDryRun=dry_run,
             scope=scope_id_bytes,
+            parameters=parameters,
         )
         responses = self.send_request(
             GcgRequest(executeComputeRequest=request),
@@ -906,7 +909,7 @@ class Session():
         Returns the status of the provided `job_id` which will include the names
         of the nodes that completed their execution
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = JobStatusRequest(
             jobId=bytes.fromhex(job_id),
@@ -933,7 +936,7 @@ class Session():
         """
         Streams the results of the provided `job_id`
         """
-        endpoint_protocols = [3]
+        endpoint_protocols = [3, 4]
         protocol = self._get_client_protocol(endpoint_protocols)
         request = GetResultsRequest(
             jobId=job_id,
@@ -971,6 +974,7 @@ class Session():
             compute_node_id: str,
             /, *,
             dry_run: bool = False,
+            parameters: Optional[Mapping[Text, Text]] = None,
     ) -> JobId:
         """
         Run a specific computation within the data room with the given id.
@@ -978,7 +982,7 @@ class Session():
         The result will be an identifier object of the job executing the computation.
         This object is required for checking a job's status and retrieving its results.
         """
-        response = self._submit_compute(data_room_id, [compute_node_id], dry_run=dry_run)
+        response = self._submit_compute(data_room_id, [compute_node_id], dry_run=dry_run, parameters=parameters)
         return JobId(response.jobId.hex(), compute_node_id)
 
     def wait_until_computation_has_finished(

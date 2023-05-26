@@ -1,0 +1,13 @@
+syntax = "proto3";
+package data_source_s3;
+
+message S3Source {
+    string bucket = 1;
+    string region = 2;
+    string objectKey = 3;
+}
+
+message DataSourceS3WorkerConfiguration {
+    S3Source source = 1;
+    string credentialsDependency = 2;
+}
