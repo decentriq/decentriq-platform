@@ -8,4 +8,5 @@ message DatasetSinkWorkerConfiguration {
     string datasetScopeId = 4;
     optional string datasetDescription = 5;
     optional string datasetImportId = 6;
+    bool isKeyHexEncoded = 7;
 }

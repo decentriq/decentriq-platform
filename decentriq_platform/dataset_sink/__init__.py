@@ -6,10 +6,12 @@ from .proto import (
     DatasetSinkWorkerConfiguration,
 )
 
+
 __docformat__ = "restructuredtext"
 __pdoc__ = {
     "proto": False,
 }
+
 
 class DatasetSink(Node):
     """
@@ -26,6 +28,7 @@ class DatasetSink(Node):
             dataset_scope_id,
             dataset_description: Optional[str],
             dataset_import_id: Optional[str] = None,
+            is_key_hex_encoded: bool = False,
     ) -> None:
         config = DatasetSinkWorkerConfiguration(
             inputDependency=input_dependency,
@@ -34,6 +37,7 @@ class DatasetSink(Node):
             datasetDescription=dataset_description,
             datasetScopeId=dataset_scope_id,
             datasetImportId=dataset_import_id,
+            isKeyHexEncoded=is_key_hex_encoded,
         )
         config_serialized = serialize_length_delimited(config)
         super().__init__(
@@ -51,6 +55,11 @@ class DatasetSinkWorkerDecoder:
         parse_length_delimited(config, config_decoded)
         return MessageToDict(config_decoded)
 
+
+from .helpers import store_computation_result_as_dataset
+
+
 __all__ = [
     "DatasetSink",
+    "store_computation_result_as_dataset"
 ]

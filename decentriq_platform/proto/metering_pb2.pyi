@@ -28,12 +28,14 @@ class _CreateDcrPurposeEnumTypeWrapper(google.protobuf.internal.enum_type_wrappe
     STANDARD: _CreateDcrPurpose.ValueType  # 0
     VALIDATION: _CreateDcrPurpose.ValueType  # 1
     DATA_IMPORT: _CreateDcrPurpose.ValueType  # 2
+    DATA_EXPORT: _CreateDcrPurpose.ValueType  # 3
 
 class CreateDcrPurpose(_CreateDcrPurpose, metaclass=_CreateDcrPurposeEnumTypeWrapper): ...
 
 STANDARD: CreateDcrPurpose.ValueType  # 0
 VALIDATION: CreateDcrPurpose.ValueType  # 1
 DATA_IMPORT: CreateDcrPurpose.ValueType  # 2
+DATA_EXPORT: CreateDcrPurpose.ValueType  # 3
 global___CreateDcrPurpose = CreateDcrPurpose
 
 class _CreateDcrKind:

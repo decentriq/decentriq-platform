@@ -14,6 +14,7 @@ from .data_room_pb2 import (
     DryRunPermission,
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, DataRoom,
+    ComputeNodeParameter,
     ComputeNodeFormat,
     ComputeNodeProtocol,
     ConfigurationModification,

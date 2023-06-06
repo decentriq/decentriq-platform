@@ -43,6 +43,7 @@ enum CreateDcrPurpose {
     STANDARD = 0;
     VALIDATION = 1;
     DATA_IMPORT = 2;
+    DATA_EXPORT = 3;
 }
 
 enum CreateDcrKind {

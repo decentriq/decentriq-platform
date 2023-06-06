@@ -4,6 +4,7 @@ from typing import List, Any, Optional, Callable, Dict, Tuple
 from .proto import (
     AuthenticationMethod, UserPermission, ComputeNode,
     ComputeNodeLeaf, ComputeNodeBranch, Permission, DataRoom,
+    ComputeNodeParameter,
     AttestationSpecification,
     StaticDataRoomPolicy, AffectedDataOwnersApprovePolicy,
     ConfigurationModification, AddModification, ChangeModification, ConfigurationElement,
@@ -385,6 +386,36 @@ class DataRoomModificationsBuilder():
         node = ComputeNode(
             nodeName=name,
             leaf=ComputeNodeLeaf(isRequired=is_required)
+        )
+        self.new_compute_nodes.append((node_id, node))
+        return node_id
+
+    def add_parameter_node(
+            self,
+            name: str,
+            is_required: bool = False,
+            node_id: Optional[str] = None
+    ) -> str:
+        """
+        Add a new parameter node. If the node is marked as required, any computation
+        which includes it as a dependency will not start in case no data has
+        been provided yet.
+
+        **Parameters**:
+        - `name`: Name of the parameter node.
+        - `is_required`: If true, any computation which depends on this parameter node
+            can only be run if the compute request also provides data for the parameter.
+        - `node_id`: A custom identifier for this node.
+            If not specified, the identifier is generated automatically.
+
+        **Returns**:
+        The id that was assigned to the added parameter node.
+        """
+        node_id = DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        bla = ComputeNodeParameter(isRequired=is_required)
+        node = ComputeNode(
+            nodeName=name,
+            parameter=ComputeNodeParameter(isRequired=is_required)
         )
         self.new_compute_nodes.append((node_id, node))
         return node_id
@@ -778,6 +809,33 @@ class DataRoomCommitBuilder:
         this node are defined.
         """
         return self.modifications_builder.add_data_node(
+            name,
+            is_required=is_required,
+            node_id=node_id
+        )
+
+    def add_parameter_node(
+            self,
+            name: str,
+            is_required: bool = False,
+            node_id: Optional[str] = None
+    ) -> str:
+        """
+        Add a new parameter node. If the node is marked as required, any computation
+        which includes it as a dependency will not start in case no data has
+        been provided yet.
+
+        **Parameters**:
+        - `name`: Name of the parameter node.
+        - `is_required`: If true, any computation which depends on this parameter node
+            can only be run if the compute request also provides data for the parameter.
+        - `node_id`: A custom identifier for this node.
+            If not specified, the identifier is generated automatically.
+
+        **Returns**:
+        The id that was assigned to the added parameter node.
+        """
+        return self.modifications_builder.add_parameter_node(
             name,
             is_required=is_required,
             node_id=node_id

@@ -179,13 +179,13 @@ class Session():
         cipher = chily.Cipher(
             self.keypair.secret, self._get_enclave_pubkey()
         )
-        enc_data = cipher.encrypt("client sent session data", data, nonce)        
+        enc_data = cipher.encrypt("client sent session data", data, nonce)
         data_nonce_pubkey = datanoncepubkey_to_message(
             bytes(enc_data),
             bytes(nonce.bytes),
             bytes(self.keypair.public_key.bytes),
         )
-        return data_nonce_pubkey 
+        return data_nonce_pubkey
 
     def _decode_and_decrypt_data(self, data: bytes) -> bytes:
         dec_data, nonceB, _ = message_to_datanoncepubkey(data)
@@ -240,7 +240,7 @@ class Session():
             dcrSecret=dcr_secret,
         )
         response = self._send_endorsement_request(EndorsementRequest(dcrSecretEndorsementRequest=request), protocol)
-        
+
         if not response.HasField("dcrSecretEndorsementResponse"):
             raise Exception(
                 "Expected dcrSecretEndorsementResponse, got "
@@ -835,6 +835,7 @@ class Session():
             compute_node_ids: List[str],
             /, *,
             dry_run: bool = False,
+            parameters: Optional[Mapping[Text, Text]] = None,
     ) -> ExecuteComputeResponse:
         """
         Submits a computation request which will generate an execution plan to
@@ -852,6 +853,7 @@ class Session():
             computeNodeIds=compute_node_ids,
             isDryRun=dry_run,
             scope=scope_id_bytes,
+            parameters=parameters,
         )
         responses = self.send_request(
             GcgRequest(executeDevelopmentComputeRequest=request),
@@ -1022,6 +1024,7 @@ class Session():
             compute_node_id: str,
             /, *,
             dry_run: bool = False,
+            parameters: Optional[Mapping[Text, Text]] = None,
     ) -> JobId:
         """
         Run a specific computation within the context of the data room configuration
@@ -1036,7 +1039,8 @@ class Session():
             data_room_id,
             configuration_commit_id,
             [compute_node_id],
-            dry_run=dry_run
+            dry_run=dry_run,
+            parameters=parameters
         )
         return JobId(response.jobId.hex(), compute_node_id)
 

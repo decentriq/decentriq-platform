@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x64\x61taset_sink.proto\x12\x0c\x64\x61taset_sink\"\xf1\x01\n\x1e\x44\x61tasetSinkWorkerConfiguration\x12\x17\n\x0finputDependency\x18\x01 \x01(\t\x12\x1f\n\x17\x65ncryptionKeyDependency\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61tasetName\x18\x03 \x01(\t\x12\x16\n\x0e\x64\x61tasetScopeId\x18\x04 \x01(\t\x12\x1f\n\x12\x64\x61tasetDescription\x18\x05 \x01(\tH\x00\x88\x01\x01\x12\x1c\n\x0f\x64\x61tasetImportId\x18\x06 \x01(\tH\x01\x88\x01\x01\x42\x15\n\x13_datasetDescriptionB\x12\n\x10_datasetImportIdb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x64\x61taset_sink.proto\x12\x0c\x64\x61taset_sink\"\x8a\x02\n\x1e\x44\x61tasetSinkWorkerConfiguration\x12\x17\n\x0finputDependency\x18\x01 \x01(\t\x12\x1f\n\x17\x65ncryptionKeyDependency\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61tasetName\x18\x03 \x01(\t\x12\x16\n\x0e\x64\x61tasetScopeId\x18\x04 \x01(\t\x12\x1f\n\x12\x64\x61tasetDescription\x18\x05 \x01(\tH\x00\x88\x01\x01\x12\x1c\n\x0f\x64\x61tasetImportId\x18\x06 \x01(\tH\x01\x88\x01\x01\x12\x17\n\x0fisKeyHexEncoded\x18\x07 \x01(\x08\x42\x15\n\x13_datasetDescriptionB\x12\n\x10_datasetImportIdb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'dataset_sink_pb2', globals())
@@ -21,5 +21,5 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _DATASETSINKWORKERCONFIGURATION._serialized_start=37
-  _DATASETSINKWORKERCONFIGURATION._serialized_end=278
+  _DATASETSINKWORKERCONFIGURATION._serialized_end=303
 # @@protoc_insertion_point(module_scope)

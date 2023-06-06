@@ -24,12 +24,14 @@ class DatasetSinkWorkerConfiguration(google.protobuf.message.Message):
     DATASETSCOPEID_FIELD_NUMBER: builtins.int
     DATASETDESCRIPTION_FIELD_NUMBER: builtins.int
     DATASETIMPORTID_FIELD_NUMBER: builtins.int
+    ISKEYHEXENCODED_FIELD_NUMBER: builtins.int
     inputDependency: builtins.str
     encryptionKeyDependency: builtins.str
     datasetName: builtins.str
     datasetScopeId: builtins.str
     datasetDescription: builtins.str
     datasetImportId: builtins.str
+    isKeyHexEncoded: builtins.bool
     def __init__(
         self,
         *,
@@ -39,9 +41,10 @@ class DatasetSinkWorkerConfiguration(google.protobuf.message.Message):
         datasetScopeId: builtins.str = ...,
         datasetDescription: builtins.str | None = ...,
         datasetImportId: builtins.str | None = ...,
+        isKeyHexEncoded: builtins.bool = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_datasetDescription", b"_datasetDescription", "_datasetImportId", b"_datasetImportId", "datasetDescription", b"datasetDescription", "datasetImportId", b"datasetImportId"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_datasetDescription", b"_datasetDescription", "_datasetImportId", b"_datasetImportId", "datasetDescription", b"datasetDescription", "datasetImportId", b"datasetImportId", "datasetName", b"datasetName", "datasetScopeId", b"datasetScopeId", "encryptionKeyDependency", b"encryptionKeyDependency", "inputDependency", b"inputDependency"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_datasetDescription", b"_datasetDescription", "_datasetImportId", b"_datasetImportId", "datasetDescription", b"datasetDescription", "datasetImportId", b"datasetImportId", "datasetName", b"datasetName", "datasetScopeId", b"datasetScopeId", "encryptionKeyDependency", b"encryptionKeyDependency", "inputDependency", b"inputDependency", "isKeyHexEncoded", b"isKeyHexEncoded"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_datasetDescription", b"_datasetDescription"]) -> typing_extensions.Literal["datasetDescription"] | None: ...
     @typing.overload
