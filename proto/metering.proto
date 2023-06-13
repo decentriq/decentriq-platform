@@ -130,7 +130,12 @@ message StopDcrRequest {
 }
 
 message CreateDcrCommitRequest {
+    /// The commit id
     string id = 1;
+    /// The DCR hash the commit refers to
+    string dcrIdHex = 2;
+    /// The driver attestation hash
+    string driverAttestationHash = 3;
 }
 
 message CreateDcrResponse {}

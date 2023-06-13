@@ -382,13 +382,22 @@ class CreateDcrCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     ID_FIELD_NUMBER: builtins.int
+    DCRIDHEX_FIELD_NUMBER: builtins.int
+    DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
     id: builtins.str
+    """/ The commit id"""
+    dcrIdHex: builtins.str
+    """/ The DCR hash the commit refers to"""
+    driverAttestationHash: builtins.str
+    """/ The driver attestation hash"""
     def __init__(
         self,
         *,
         id: builtins.str = ...,
+        dcrIdHex: builtins.str = ...,
+        driverAttestationHash: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrIdHex", b"dcrIdHex", "driverAttestationHash", b"driverAttestationHash", "id", b"id"]) -> None: ...
 
 global___CreateDcrCommitRequest = CreateDcrCommitRequest
 
