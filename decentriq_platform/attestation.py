@@ -81,6 +81,23 @@ SPECIFICATIONS = {
         decoder=GcgDriverDecoder(),
         clientProtocols=[4],
     ),
+    "decentriq.driver:v12": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "b24067659124bebeb3e83d15733a50ad72669a162484c3bb5488dba8e743a1d7"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[4],
+    ),
     "decentriq.sql-worker:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
