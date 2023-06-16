@@ -114,6 +114,7 @@ message ExecuteComputeRequest {
   bool isDryRun = 3;
   bytes scope = 4;
   map<string, string> parameters = 5;
+  map<string, TestDataset> testDatasets = 6;
 }
 
 message ExecuteDevelopmentComputeRequest {
@@ -122,6 +123,12 @@ message ExecuteDevelopmentComputeRequest {
   bool isDryRun = 3;
   bytes scope = 4;
   map<string, string> parameters = 5;
+  map<string, TestDataset> testDatasets = 6;
+}
+
+message TestDataset {
+  bytes encryptionKey = 1;
+  bytes manifestHash = 2;
 }
 
 message ExecuteComputeResponse { bytes jobId = 1; }

@@ -1,4 +1,6 @@
 from google.protobuf.json_format import MessageToDict
+
+from .storage import Key
 from .proto import AttestationSpecification, ComputeNodeProtocol, DriverTaskConfig
 from typing import List, Dict, Optional, Any
 from typing_extensions import TypedDict
@@ -103,6 +105,11 @@ class DataRoomDescription(TypedDict):
     updatedAt: str
 
 
+class DatasetUsage(str, Enum):
+    PUBLISHED = "PUBLISHED",
+    TEST = "TEST"
+
+
 class DatasetDescription(TypedDict):
     """
     This class includes information about an uploaded dataset
@@ -117,6 +124,10 @@ class DatasetDescription(TypedDict):
     """An optional description"""
     createdAt: str
     """When the dataset was uploaded"""
+    size: int
+    """Size of the dataset"""
+    usage: DatasetUsage
+    """Usage"""
 
 
 class SignatureResponse(TypedDict):
@@ -213,3 +224,10 @@ class KeychainInstance(TypedDict):
     salt: str
     encrypted: bytes
     casIndex: int
+
+class TestDataset(TypedDict):
+    manifest_hash: str
+    key: Key
+
+class DryRunOptions(TypedDict):
+    test_datasets: Dict[str, TestDataset]

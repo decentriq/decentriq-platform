@@ -19,6 +19,7 @@ from .config import (
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
 from .types import (
+    DatasetUsage,
     EnclaveSpecification,
     DatasetDescription,
     DataRoomDescription,
@@ -241,6 +242,7 @@ class Client:
             description: str = "",
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8,
+            usage: DatasetUsage = DatasetUsage.PUBLISHED
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -312,6 +314,7 @@ class Client:
             manifest_encrypted=manifest_encrypted,
             chunks=chunk_hashes,
             description=description,
+            usage=usage,
         )
 
         return manifest_hash
@@ -390,7 +393,8 @@ class Client:
             manifest_hash: bytes,
             manifest_encrypted: bytes,
             chunks: List[str],
-            description: Optional[str] = None
+            description: Optional[str] = None,
+            usage: Optional[DatasetUsage] = None,
     ) -> str:
         data = self._graphql.post(
             """
@@ -412,6 +416,7 @@ class Client:
                     "manifestHash": manifest_hash.hex(),
                     "name": name,
                     "description": description,
+                    "usage": usage,
                     "chunkHashes": chunks,
                     "scopeId": scope_id
                 }
@@ -468,8 +473,11 @@ class Client:
                             id
                             name
                             manifestHash
+                            statistics
+                            size
                             description
                             createdAt
+                            usage
                         }
                     }
                 }

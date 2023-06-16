@@ -56,7 +56,7 @@ from .gcg_pb2 import (
     RetrieveCurrentDataRoomConfigurationRequest, RetrieveCurrentDataRoomConfigurationResponse,
     RetrieveConfigurationCommitRequest, RetrieveConfigurationCommitResponse, StaticContentConfig,
     CreateConfigurationCommitRequest, RetrieveConfigurationCommitApproversRequest,
-    UserAuth, Pki
+    UserAuth, Pki, TestDataset
 )
 from .length_delimited import parse_length_delimited, serialize_length_delimited
 from .delta_enclave_api_pb2 import (

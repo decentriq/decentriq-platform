@@ -415,11 +415,29 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    class TestDatasetsEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        @property
+        def value(self) -> global___TestDataset: ...
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: global___TestDataset | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing_extensions.Literal["value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     DATAROOMID_FIELD_NUMBER: builtins.int
     COMPUTENODEIDS_FIELD_NUMBER: builtins.int
     ISDRYRUN_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
     PARAMETERS_FIELD_NUMBER: builtins.int
+    TESTDATASETS_FIELD_NUMBER: builtins.int
     dataRoomId: builtins.bytes
     @property
     def computeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
@@ -427,6 +445,8 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
     scope: builtins.bytes
     @property
     def parameters(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def testDatasets(self) -> google.protobuf.internal.containers.MessageMap[builtins.str, global___TestDataset]: ...
     def __init__(
         self,
         *,
@@ -435,8 +455,9 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
         isDryRun: builtins.bool = ...,
         scope: builtins.bytes = ...,
         parameters: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        testDatasets: collections.abc.Mapping[builtins.str, global___TestDataset] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "dataRoomId", b"dataRoomId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "dataRoomId", b"dataRoomId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope", "testDatasets", b"testDatasets"]) -> None: ...
 
 global___ExecuteComputeRequest = ExecuteComputeRequest
 
@@ -458,11 +479,29 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    class TestDatasetsEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        @property
+        def value(self) -> global___TestDataset: ...
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: global___TestDataset | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing_extensions.Literal["value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     CONFIGURATIONCOMMITID_FIELD_NUMBER: builtins.int
     COMPUTENODEIDS_FIELD_NUMBER: builtins.int
     ISDRYRUN_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
     PARAMETERS_FIELD_NUMBER: builtins.int
+    TESTDATASETS_FIELD_NUMBER: builtins.int
     configurationCommitId: builtins.bytes
     @property
     def computeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
@@ -470,6 +509,8 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
     scope: builtins.bytes
     @property
     def parameters(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def testDatasets(self) -> google.protobuf.internal.containers.MessageMap[builtins.str, global___TestDataset]: ...
     def __init__(
         self,
         *,
@@ -478,10 +519,28 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
         isDryRun: builtins.bool = ...,
         scope: builtins.bytes = ...,
         parameters: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        testDatasets: collections.abc.Mapping[builtins.str, global___TestDataset] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "configurationCommitId", b"configurationCommitId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "configurationCommitId", b"configurationCommitId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope", "testDatasets", b"testDatasets"]) -> None: ...
 
 global___ExecuteDevelopmentComputeRequest = ExecuteDevelopmentComputeRequest
+
+class TestDataset(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ENCRYPTIONKEY_FIELD_NUMBER: builtins.int
+    MANIFESTHASH_FIELD_NUMBER: builtins.int
+    encryptionKey: builtins.bytes
+    manifestHash: builtins.bytes
+    def __init__(
+        self,
+        *,
+        encryptionKey: builtins.bytes = ...,
+        manifestHash: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["encryptionKey", b"encryptionKey", "manifestHash", b"manifestHash"]) -> None: ...
+
+global___TestDataset = TestDataset
 
 class ExecuteComputeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
