@@ -67,6 +67,7 @@ class MeteringRequest(google.protobuf.message.Message):
     SUBMITWORKEREXECUTIONTIME_FIELD_NUMBER: builtins.int
     DCRINTERACTION_FIELD_NUMBER: builtins.int
     CREATEDATASET_FIELD_NUMBER: builtins.int
+    GETORCREATEDATASETSCOPE_FIELD_NUMBER: builtins.int
     @property
     def createDcr(self) -> global___CreateDcrRequest: ...
     @property
@@ -85,6 +86,8 @@ class MeteringRequest(google.protobuf.message.Message):
     def dcrInteraction(self) -> global___DcrInteractionRequest: ...
     @property
     def createDataset(self) -> global___CreateDatasetRequest: ...
+    @property
+    def getOrCreateDatasetScope(self) -> global___GetOrCreateDatasetScopeRequest: ...
     def __init__(
         self,
         *,
@@ -97,10 +100,11 @@ class MeteringRequest(google.protobuf.message.Message):
         submitWorkerExecutionTime: global___SubmitWorkerExecutionTimeRequest | None = ...,
         dcrInteraction: global___DcrInteractionRequest | None = ...,
         createDataset: global___CreateDatasetRequest | None = ...,
+        getOrCreateDatasetScope: global___GetOrCreateDatasetScopeRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset", "getOrCreateDatasetScope"] | None: ...
 
 global___MeteringRequest = MeteringRequest
 
@@ -116,6 +120,7 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
     SUBMITWORKEREXECUTIONTIME_FIELD_NUMBER: builtins.int
     DCRINTERACTION_FIELD_NUMBER: builtins.int
     CREATEDATASET_FIELD_NUMBER: builtins.int
+    GETORCREATEDATASETSCOPE_FIELD_NUMBER: builtins.int
     @property
     def createDcr(self) -> global___CreateDcrResponse: ...
     @property
@@ -134,6 +139,8 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
     def dcrInteraction(self) -> global___DcrInteractionResponse: ...
     @property
     def createDataset(self) -> global___CreateDatasetResponse: ...
+    @property
+    def getOrCreateDatasetScope(self) -> global___GetOrCreateDatasetScopeResponse: ...
     def __init__(
         self,
         *,
@@ -146,10 +153,11 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
         submitWorkerExecutionTime: global___SubmitWorkerExecutionTimeResponse | None = ...,
         dcrInteraction: global___DcrInteractionResponse | None = ...,
         createDataset: global___CreateDatasetResponse | None = ...,
+        getOrCreateDatasetScope: global___GetOrCreateDatasetScopeResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset", "getOrCreateDatasetScope"] | None: ...
 
 global___MeteringSuccessResponse = MeteringSuccessResponse
 
@@ -336,6 +344,22 @@ class CreateDatasetRequest(google.protobuf.message.Message):
 
 global___CreateDatasetRequest = CreateDatasetRequest
 
+class GetOrCreateDatasetScopeRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    MANIFESTHASH_FIELD_NUMBER: builtins.int
+    manifestHash: builtins.str
+    def __init__(
+        self,
+        *,
+        manifestHash: builtins.str | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_manifestHash", b"_manifestHash", "manifestHash", b"manifestHash"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_manifestHash", b"_manifestHash", "manifestHash", b"manifestHash"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_manifestHash", b"_manifestHash"]) -> typing_extensions.Literal["manifestHash"] | None: ...
+
+global___GetOrCreateDatasetScopeRequest = GetOrCreateDatasetScopeRequest
+
 class UnpublishDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -409,6 +433,20 @@ class CreateDcrResponse(google.protobuf.message.Message):
     ) -> None: ...
 
 global___CreateDcrResponse = CreateDcrResponse
+
+class GetOrCreateDatasetScopeResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    id: builtins.str
+    def __init__(
+        self,
+        *,
+        id: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id"]) -> None: ...
+
+global___GetOrCreateDatasetScopeResponse = GetOrCreateDatasetScopeResponse
 
 class DcrInteractionResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor

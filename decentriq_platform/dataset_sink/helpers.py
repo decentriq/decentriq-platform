@@ -1,9 +1,10 @@
-from typing import Dict, Optional
+from typing import Dict
 from ..storage import Key
 from ..session import Session
 from ..builders import DataRoomCommitBuilder
 from ..types import EnclaveSpecification
 from . import DatasetSink
+from .proto import SinkInput, ZipFile, SingleFile, FileSelection
 from .. import Permissions
 from ..container import read_result_as_zipfile
 import json
@@ -16,9 +17,7 @@ def store_computation_result_as_dataset(
     dataset_name: str,
     data_room_id: str,
     compute_node_id: str,
-    dataset_description: Optional[str] = None,
 ):
-    dataset_scope_id = session.client._ensure_dataset_scope()
     current_config, history_pin = (
         session.retrieve_current_data_room_configuration(data_room_id)
     )
@@ -32,13 +31,22 @@ def store_computation_result_as_dataset(
     sink_node_id = f"{compute_node_id}_sink"
     key_node_id = f"{sink_node_id}_key"
 
+    inputs = [
+        SinkInput(
+            name=dataset_name,
+            dependency=compute_node_id,
+            zip=ZipFile(
+                files=FileSelection(
+                    names=[SingleFile(name="hello.txt")]
+                )
+            )
+        )
+    ]
+
     sink = DatasetSink(
         name=sink_node_id,
-        input_dependency=compute_node_id,
+        inputs=inputs,
         encryption_key_dependency=f"{compute_node_id}_sink_key",
-        dataset_name=dataset_name,
-        dataset_scope_id=dataset_scope_id,
-        dataset_description=dataset_description,
         is_key_hex_encoded=True
     )
     builder.add_compute_node(sink, node_id=sink_node_id)
@@ -67,7 +75,7 @@ def store_computation_result_as_dataset(
     )
     results = session.get_computation_result(job_id)
     results_zip = read_result_as_zipfile(results)
-    results_meta_str = results_zip.read("dataset_meta.json").decode()
-    results_meta_json = json.loads(results_meta_str)
+    datasets_meta_str = results_zip.read("datasets.json").decode()
+    datasets_meta = json.loads(datasets_meta_str)
 
-    return results_meta_json["manifestHash"]
+    return datasets_meta["datasets"][0]["manifestHash"]

@@ -15,6 +15,7 @@ message MeteringRequest {
         SubmitWorkerExecutionTimeRequest submitWorkerExecutionTime = 7;
         DcrInteractionRequest dcrInteraction = 8;
         CreateDatasetRequest createDataset = 9;
+        GetOrCreateDatasetScopeRequest getOrCreateDatasetScope = 10;
     }
 }
 
@@ -29,6 +30,7 @@ message MeteringSuccessResponse {
         SubmitWorkerExecutionTimeResponse submitWorkerExecutionTime = 7;
         DcrInteractionResponse dcrInteraction = 8;
         CreateDatasetResponse createDataset = 9;
+        GetOrCreateDatasetScopeResponse getOrCreateDatasetScope = 10;
     }
 }
 
@@ -113,6 +115,10 @@ message CreateDatasetRequest {
     optional string datasetImportId = 8;
 }
 
+message GetOrCreateDatasetScopeRequest {
+    optional string manifestHash = 1;
+}
+
 message UnpublishDatasetRequest {
     /// The UUID of the compute node to which this dataset is being published
     string computeNodeId = 1;
@@ -139,6 +145,10 @@ message CreateDcrCommitRequest {
 }
 
 message CreateDcrResponse {}
+
+message GetOrCreateDatasetScopeResponse {
+    string id = 1;
+}
 
 message DcrInteractionResponse {}
 

@@ -1,12 +1,40 @@
 syntax = "proto3";
 package dataset_sink;
 
+message RawFile {}
+
+message AllFiles {}
+
+message SingleFile {
+    string name = 1;
+    optional string renameAs = 2;
+}
+
+message FileSelection {
+    repeated SingleFile names = 1;
+}
+
+message ZipFile {
+    oneof selection {
+        AllFiles all = 1;
+        FileSelection files = 2;
+    }
+}
+
+message SinkInput {
+    string dependency = 1;
+    string name = 2;
+    oneof file {
+        RawFile raw = 3;
+        ZipFile zip = 4;
+    }
+}
+
 message DatasetSinkWorkerConfiguration {
-    string inputDependency = 1;
+    repeated SinkInput inputs = 1;
+    // The id of the leaf node that contains the encryption key
     string encryptionKeyDependency = 2;
-    string datasetName = 3;
-    string datasetScopeId = 4;
-    optional string datasetDescription = 5;
-    optional string datasetImportId = 6;
-    bool isKeyHexEncoded = 7;
+    optional string datasetImportId = 3;
+    // Whether the key provided in `encryptionKeyDependency` is hex encoded or binary
+    bool isKeyHexEncoded = 4;
 }

@@ -1,9 +1,10 @@
 from google.protobuf.json_format import MessageToDict
 from ..proto import serialize_length_delimited, ComputeNodeFormat, parse_length_delimited
 from ..node import Node
-from typing import Optional
+from typing import Optional, List
 from .proto import (
     DatasetSinkWorkerConfiguration,
+    SinkInput
 )
 
 
@@ -22,29 +23,27 @@ class DatasetSink(Node):
     def __init__(
             self,
             name: str,
-            input_dependency: str,
+            inputs: List[SinkInput],
             encryption_key_dependency: str,
-            dataset_name: str,
-            dataset_scope_id,
-            dataset_description: Optional[str],
             dataset_import_id: Optional[str] = None,
             is_key_hex_encoded: bool = False,
     ) -> None:
         config = DatasetSinkWorkerConfiguration(
-            inputDependency=input_dependency,
+            inputs=inputs,
             encryptionKeyDependency=encryption_key_dependency,
-            datasetName=dataset_name,
-            datasetDescription=dataset_description,
-            datasetScopeId=dataset_scope_id,
             datasetImportId=dataset_import_id,
             isKeyHexEncoded=is_key_hex_encoded,
         )
         config_serialized = serialize_length_delimited(config)
+        dependencies = (
+            [input.dependency for input in inputs] +
+            [encryption_key_dependency]
+        )
         super().__init__(
             name,
             config=config_serialized,
             enclave_type="decentriq.dataset-sink-worker",
-            dependencies=[input_dependency, encryption_key_dependency],
+            dependencies=dependencies,
             output_format=ComputeNodeFormat.ZIP
         )
 
