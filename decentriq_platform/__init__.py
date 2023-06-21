@@ -60,6 +60,7 @@ __all__ = [
     "s3_sink",
     "data_source_s3",
     "dataset_sink",
+    "meta_sink",
     "storage",
     "attestation",
     "types",
