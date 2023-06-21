@@ -26,6 +26,7 @@ __pdoc__ = {
     "storage": True,
     "types": True,
     "verification": False,
+    "data_source_snowflake": True,
 }
 
 from .client import Client, create_client, Session
@@ -69,4 +70,5 @@ __all__ = [
     "node",
     "Endorser",
     "Keychain",
+    "data_source_snowflake",
 ]
