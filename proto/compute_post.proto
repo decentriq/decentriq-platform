@@ -1,0 +1,6 @@
+syntax = "proto3";
+package compute_post;
+
+message PostWorkerConfiguration {
+    bool useMockBackend = 1;
+}
