@@ -1099,8 +1099,8 @@ class Session():
         """
         Run a specific computation and return its results.
 
-        This method is simply a wrapper for running `run_computation` and `get_computation_result`
-        directly after each other
+        This method is simply a wrapper for running `run_computation` and
+        `get_computation_result` directly after each other
         """
         job_id = self.run_computation(data_room_id, compute_node_id)
         return self.get_computation_result(

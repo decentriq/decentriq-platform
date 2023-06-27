@@ -342,7 +342,7 @@ def upload_and_publish_tabular_dataset(
 def _read_sql_query_result(result: bytes) -> Tuple[str, TableSchema]:
     archive = zipfile.ZipFile(io.BytesIO(result), "r")
 
-    if set(archive.namelist()) != {"dataset.csv", "types"}:
+    if not {"dataset.csv", "types"}.issubset(archive.namelist()):
         raise Exception(
             "The given result cannot be read as it doesn't contain all the required files."
             " Expected files: 'dataset.csv' and 'types', only found: [{}]".format(
