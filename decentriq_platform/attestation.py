@@ -89,7 +89,7 @@ SPECIFICATIONS = {
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
-                    "05e97fd0454c50ffaf40504db035cd0c1fe46392039498a6483ec7af47852135"
+                    "0858710d10692cfd2f00c3f93cda35d125413beb5076b5ca2a7741d8260ed540"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 accept_debug=False,
