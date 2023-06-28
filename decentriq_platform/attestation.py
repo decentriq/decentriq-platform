@@ -2,6 +2,7 @@ import base64
 from typing import Dict, List, Tuple
 from .types import EnclaveSpecification
 from .compute import GcgDriverDecoder
+from .post.compute import PostWorkerDecoder
 from .sql.compute import SqlWorkerDecoder
 from .container.compute import ContainerWorkerDecoder
 from .s3_sink.compute import S3SinkWorkerDecoder
@@ -117,6 +118,23 @@ SPECIFICATIONS = {
         ),
         workerProtocols=[1],
         decoder=SqlWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.post-worker:v5": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "52e363142aaefdfbb27e4cb248c3a96743bd917dcc97b05eb42ac1aa6b019860"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=PostWorkerDecoder(),
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v10": EnclaveSpecification(
@@ -286,6 +304,23 @@ SPECIFICATIONS = {
         ),
         workerProtocols=[1],
         decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.s3-sink-worker:v2": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "963ca160598716c0c94722a8b376b5b647302cc369c0344b2f3bae3dfb1e8eb3"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=S3SinkWorkerDecoder(),
         clientProtocols=None,
     ),
     "decentriq.dataset-sink-worker:v1": EnclaveSpecification(
