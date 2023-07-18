@@ -26,6 +26,33 @@ class DataSourceS3(Node):
             object_key: str,
             credentials_dependency: str,
     ) -> None:
+        """
+        Create a S3 source node.
+
+        **Parameters**:
+        - `name`: A human-readable identifier of the node.
+        - `bucket`: The name of the AWS bucket within which the source
+            file is located.
+        - `region`: The region identifier, e.g. "eu-west-3".
+        - `object_key`: The path to the file within the specified bucket,
+            e.g. "my/directory/my_file.csv" (notice the lack of a leading slash).
+        - `credentials_dependency`: The id of the node that serves the credentials
+            for connecting to AWS.
+            This node should provide a single JSON with format:
+
+            ```
+            {
+                "accessKey": "xxxx",
+                "secretKey": "yyyy"
+            }
+            ```
+
+            In most cases this node will be a simple data node to which the
+            credentials JSON payload is published. Note that the credentials will
+            always be encrypted end-to-end and won't be readable by anyone, including
+            Decentriq. If using this node for a one-off import of a dataset,
+            the credentials file can be deleted after the import has finished.
+        """
         config = DataSourceS3WorkerConfiguration(
             source=S3Source(
                 bucket=bucket,
