@@ -35,6 +35,7 @@ DATASET_SINK_PACKAGE_PROTO=(dataset_sink.proto)
 META_SINK_PACKAGE_PROTO=(meta_sink.proto)
 POST_PACKAGE_PROTO=(compute_post.proto)
 DATA_SOURCE_SNOWFLAKE_PACKAGE_PROTO=(data_source_snowflake.proto)
+GOOGLE_DV_360_SINK_PACKAGE_PROTO=(google_dv_360_sink.proto)
 
 compile_pb "decentriq_platform/proto" "${MAIN_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/sql/proto" "${SQL_PACKAGE_PROTO[@]}"
@@ -45,3 +46,4 @@ compile_pb "decentriq_platform/dataset_sink/proto" "${DATASET_SINK_PACKAGE_PROTO
 compile_pb "decentriq_platform/meta_sink/proto" "${META_SINK_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/post/proto" "${POST_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/data_source_snowflake/proto" "${DATA_SOURCE_SNOWFLAKE_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/google_dv_360_sink/proto" "${GOOGLE_DV_360_SINK_PACKAGE_PROTO[@]}"
