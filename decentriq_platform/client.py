@@ -271,10 +271,11 @@ class Client:
         # create and upload chunks
         chunker = Chunker(data, chunk_size=chunk_size)
         chunk_hashes: List[str] = []
+        chunk_content_sizes: List[int] = []
         chunk_uploads_futures = []
         upload_id = self._create_upload()
 
-        for chunk_hash, chunk_data in chunker:
+        for chunk_hash, chunk_data, chunk_content_size in chunker:
             chunk_uploads_futures.append(
                 uploader.submit(
                     self._encrypt_and_upload_chunk,
@@ -285,6 +286,7 @@ class Client:
                 )
             )
             chunk_hashes.append(chunk_hash.hex())
+            chunk_content_sizes.append(chunk_content_size)
 
         # check chunks uploads were successful
         completed, pending = futures.wait(
@@ -301,7 +303,8 @@ class Client:
             key.material,
             os.urandom(16),
             json.dumps(chunk_hashes).encode("utf-8"),
-            content_size=chunker.content_size
+            content_size=chunker.content_size,
+            chunk_content_sizes=chunk_content_sizes,
         )
         scope_id = self._ensure_dataset_scope(
             manifest_hash.hex(),

@@ -3,7 +3,7 @@ import os
 from hashlib import sha256
 from .proto import serialize_length_delimited
 from .proto import ChunkHeader, EncryptionHeader, VersionHeader
-from typing import BinaryIO, Iterator, Tuple, Optional
+from typing import BinaryIO, Iterator, Tuple, Optional, List
 from io import TextIOWrapper
 
 __all__ = ["Key"]
@@ -29,11 +29,12 @@ class Key():
             key_bytes = material
         self.material = key_bytes
 
-def create_chunk_header(extra_entropy: bytes, content_size: Optional[int]) -> bytes:
+def create_chunk_header(extra_entropy: bytes, content_size: Optional[int], chunk_content_sizes: List[int]) -> bytes:
     chunk_header = ChunkHeader()
     chunk_header.extraEntropy = extra_entropy
     if content_size is not None:
         chunk_header.untrustedContentSize = content_size
+    chunk_header.untrustedChunkContentSizes.extend(chunk_content_sizes)
 
     chunk_header_bytes = serialize_length_delimited(chunk_header)
     return chunk_header_bytes
@@ -50,13 +51,14 @@ def create_encrypted_chunk(
         extra_entropy: bytes,
         data: bytes,
         content_size: Optional[int],
+        chunk_content_sizes: List[int],
 ) -> Tuple[bytes, bytes]:
     chunk_bytes = []
 
     version_header = create_version_header()
     chunk_bytes.append(version_header)
 
-    chunk_header = create_chunk_header(extra_entropy, content_size)
+    chunk_header = create_chunk_header(extra_entropy, content_size, chunk_content_sizes)
     chunk_bytes.append(chunk_header)
 
     chunk_bytes.append(data)
@@ -81,17 +83,18 @@ class Chunker(Iterator):
         self.input_stream.seek(0)
         return self
 
-    # returns (hash, chunk)
-    def __next__(self) -> Tuple[bytes, bytes]:
+    # returns (hash, chunk, chunk content size)
+    def __next__(self) -> Tuple[bytes, bytes, int]:
         version_header_bytes = create_version_header()
-        chunk_header_bytes = create_chunk_header(os.urandom(16), content_size=None)
+        chunk_header_bytes = create_chunk_header(os.urandom(16), content_size=None, chunk_content_sizes=[])
 
         # Does not account for header size
         chunk_bytes = [version_header_bytes, chunk_header_bytes]
 
         input_chunk_bytes = self.input_stream.read(self.chunk_size)
-        self.content_size += len(input_chunk_bytes)
-        if len(input_chunk_bytes) == 0:
+        chunk_content_size = len(input_chunk_bytes)
+        self.content_size += chunk_content_size
+        if chunk_content_size == 0:
             raise StopIteration
         chunk_bytes.append(input_chunk_bytes)
 
@@ -99,7 +102,7 @@ class Chunker(Iterator):
         chunk_hasher = sha256()
         chunk_hasher.update(chunk)
         chunk_hash = chunk_hasher.digest()
-        return chunk_hash, chunk
+        return chunk_hash, chunk, chunk_content_size
 
 
 class StorageCipher():

@@ -8,6 +8,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.message
 import sys
+import typing
 
 if sys.version_info >= (3, 8):
     import typing as typing_extensions
@@ -41,6 +42,8 @@ class StaticImage(google.protobuf.message.Message):
     OUTPUTPATH_FIELD_NUMBER: builtins.int
     INCLUDECONTAINERLOGSONERROR_FIELD_NUMBER: builtins.int
     INCLUDECONTAINERLOGSONSUCCESS_FIELD_NUMBER: builtins.int
+    MINIMUMCONTAINERMEMORYSIZE_FIELD_NUMBER: builtins.int
+    EXTRACHUNKCACHESIZETOAVAILABLEMEMORYRATIO_FIELD_NUMBER: builtins.int
     @property
     def command(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     @property
@@ -48,6 +51,8 @@ class StaticImage(google.protobuf.message.Message):
     outputPath: builtins.str
     includeContainerLogsOnError: builtins.bool
     includeContainerLogsOnSuccess: builtins.bool
+    minimumContainerMemorySize: builtins.int
+    extraChunkCacheSizeToAvailableMemoryRatio: builtins.float
     def __init__(
         self,
         *,
@@ -56,8 +61,15 @@ class StaticImage(google.protobuf.message.Message):
         outputPath: builtins.str = ...,
         includeContainerLogsOnError: builtins.bool = ...,
         includeContainerLogsOnSuccess: builtins.bool = ...,
+        minimumContainerMemorySize: builtins.int | None = ...,
+        extraChunkCacheSizeToAvailableMemoryRatio: builtins.float | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["command", b"command", "includeContainerLogsOnError", b"includeContainerLogsOnError", "includeContainerLogsOnSuccess", b"includeContainerLogsOnSuccess", "mountPoints", b"mountPoints", "outputPath", b"outputPath"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio", "_minimumContainerMemorySize", b"_minimumContainerMemorySize", "extraChunkCacheSizeToAvailableMemoryRatio", b"extraChunkCacheSizeToAvailableMemoryRatio", "minimumContainerMemorySize", b"minimumContainerMemorySize"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio", "_minimumContainerMemorySize", b"_minimumContainerMemorySize", "command", b"command", "extraChunkCacheSizeToAvailableMemoryRatio", b"extraChunkCacheSizeToAvailableMemoryRatio", "includeContainerLogsOnError", b"includeContainerLogsOnError", "includeContainerLogsOnSuccess", b"includeContainerLogsOnSuccess", "minimumContainerMemorySize", b"minimumContainerMemorySize", "mountPoints", b"mountPoints", "outputPath", b"outputPath"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio"]) -> typing_extensions.Literal["extraChunkCacheSizeToAvailableMemoryRatio"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_minimumContainerMemorySize", b"_minimumContainerMemorySize"]) -> typing_extensions.Literal["minimumContainerMemorySize"] | None: ...
 
 global___StaticImage = StaticImage
 

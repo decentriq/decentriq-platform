@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x63ompute_container.proto\x12\x11\x63ompute_container\"a\n\x1c\x43ontainerWorkerConfiguration\x12\x30\n\x06static\x18\x01 \x01(\x0b\x32\x1e.compute_container.StaticImageH\x00\x42\x0f\n\rconfiguration\"\xb2\x01\n\x0bStaticImage\x12\x0f\n\x07\x63ommand\x18\x01 \x03(\t\x12\x32\n\x0bmountPoints\x18\x02 \x03(\x0b\x32\x1d.compute_container.MountPoint\x12\x12\n\noutputPath\x18\x03 \x01(\t\x12#\n\x1bincludeContainerLogsOnError\x18\x04 \x01(\x08\x12%\n\x1dincludeContainerLogsOnSuccess\x18\x05 \x01(\x08\".\n\nMountPoint\x12\x0c\n\x04path\x18\x01 \x01(\t\x12\x12\n\ndependency\x18\x02 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x63ompute_container.proto\x12\x11\x63ompute_container\"a\n\x1c\x43ontainerWorkerConfiguration\x12\x30\n\x06static\x18\x01 \x01(\x0b\x32\x1e.compute_container.StaticImageH\x00\x42\x0f\n\rconfiguration\"\xe0\x02\n\x0bStaticImage\x12\x0f\n\x07\x63ommand\x18\x01 \x03(\t\x12\x32\n\x0bmountPoints\x18\x02 \x03(\x0b\x32\x1d.compute_container.MountPoint\x12\x12\n\noutputPath\x18\x03 \x01(\t\x12#\n\x1bincludeContainerLogsOnError\x18\x04 \x01(\x08\x12%\n\x1dincludeContainerLogsOnSuccess\x18\x05 \x01(\x08\x12\'\n\x1aminimumContainerMemorySize\x18\x06 \x01(\x04H\x00\x88\x01\x01\x12\x36\n)extraChunkCacheSizeToAvailableMemoryRatio\x18\x07 \x01(\x02H\x01\x88\x01\x01\x42\x1d\n\x1b_minimumContainerMemorySizeB,\n*_extraChunkCacheSizeToAvailableMemoryRatio\".\n\nMountPoint\x12\x0c\n\x04path\x18\x01 \x01(\t\x12\x12\n\ndependency\x18\x02 \x01(\tb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'compute_container_pb2', globals())
@@ -23,7 +23,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _CONTAINERWORKERCONFIGURATION._serialized_start=46
   _CONTAINERWORKERCONFIGURATION._serialized_end=143
   _STATICIMAGE._serialized_start=146
-  _STATICIMAGE._serialized_end=324
-  _MOUNTPOINT._serialized_start=326
-  _MOUNTPOINT._serialized_end=372
+  _STATICIMAGE._serialized_end=498
+  _MOUNTPOINT._serialized_start=500
+  _MOUNTPOINT._serialized_end=546
 # @@protoc_insertion_point(module_scope)
