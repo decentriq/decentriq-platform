@@ -122,17 +122,21 @@ class FatquoteSnp(google.protobuf.message.Message):
     AMDSEVDER_FIELD_NUMBER: builtins.int
     VCEKCRTDER_FIELD_NUMBER: builtins.int
     REPORTDATA_FIELD_NUMBER: builtins.int
-    ROUGHTIME_PUB_KEY_FIELD_NUMBER: builtins.int
-    ROUGHTIME_NONCE_FIELD_NUMBER: builtins.int
+    ROUGHTIMEPUBKEY_FIELD_NUMBER: builtins.int
+    ROUGHTIMENONCE_FIELD_NUMBER: builtins.int
     SIGNEDTIMESTAMP_FIELD_NUMBER: builtins.int
+    DECENTRIQDER_FIELD_NUMBER: builtins.int
+    CHIPDER_FIELD_NUMBER: builtins.int
     reportBin: builtins.bytes
     amdArkDer: builtins.bytes
     amdSevDer: builtins.bytes
     vcekCrtDer: builtins.bytes
     reportData: builtins.bytes
-    roughtime_pub_key: builtins.bytes
-    roughtime_nonce: builtins.bytes
+    roughtimePubKey: builtins.bytes
+    roughtimeNonce: builtins.bytes
     signedTimestamp: builtins.bytes
+    decentriqDer: builtins.bytes
+    chipDer: builtins.bytes
     def __init__(
         self,
         *,
@@ -141,11 +145,13 @@ class FatquoteSnp(google.protobuf.message.Message):
         amdSevDer: builtins.bytes = ...,
         vcekCrtDer: builtins.bytes = ...,
         reportData: builtins.bytes = ...,
-        roughtime_pub_key: builtins.bytes = ...,
-        roughtime_nonce: builtins.bytes = ...,
+        roughtimePubKey: builtins.bytes = ...,
+        roughtimeNonce: builtins.bytes = ...,
         signedTimestamp: builtins.bytes = ...,
+        decentriqDer: builtins.bytes = ...,
+        chipDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "amdSevDer", b"amdSevDer", "reportBin", b"reportBin", "reportData", b"reportData", "roughtime_nonce", b"roughtime_nonce", "roughtime_pub_key", b"roughtime_pub_key", "signedTimestamp", b"signedTimestamp", "vcekCrtDer", b"vcekCrtDer"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "amdSevDer", b"amdSevDer", "chipDer", b"chipDer", "decentriqDer", b"decentriqDer", "reportBin", b"reportBin", "reportData", b"reportData", "roughtimeNonce", b"roughtimeNonce", "roughtimePubKey", b"roughtimePubKey", "signedTimestamp", b"signedTimestamp", "vcekCrtDer", b"vcekCrtDer"]) -> None: ...
 
 global___FatquoteSnp = FatquoteSnp
 
@@ -266,11 +272,13 @@ class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
     MEASUREMENT_FIELD_NUMBER: builtins.int
     ROUGHTIMEPUBKEY_FIELD_NUMBER: builtins.int
     AUTHORIZEDCHIPIDS_FIELD_NUMBER: builtins.int
+    DECENTRIQDER_FIELD_NUMBER: builtins.int
     amdArkDer: builtins.bytes
     measurement: builtins.bytes
     roughtimePubKey: builtins.bytes
     @property
     def authorizedChipIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.bytes]: ...
+    decentriqDer: builtins.bytes
     def __init__(
         self,
         *,
@@ -278,7 +286,8 @@ class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
         measurement: builtins.bytes = ...,
         roughtimePubKey: builtins.bytes = ...,
         authorizedChipIds: collections.abc.Iterable[builtins.bytes] | None = ...,
+        decentriqDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "authorizedChipIds", b"authorizedChipIds", "measurement", b"measurement", "roughtimePubKey", b"roughtimePubKey"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "authorizedChipIds", b"authorizedChipIds", "decentriqDer", b"decentriqDer", "measurement", b"measurement", "roughtimePubKey", b"roughtimePubKey"]) -> None: ...
 
 global___AttestationSpecificationAmdSnp = AttestationSpecificationAmdSnp
