@@ -64,6 +64,7 @@ __all__ = [
     "data_source_s3",
     "dataset_sink",
     "meta_sink",
+    "google_dv_360_sink",
     "storage",
     "attestation",
     "types",
