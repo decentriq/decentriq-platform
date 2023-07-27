@@ -608,6 +608,21 @@ SPECIFICATIONS = {
         decoder=GoogleDv360SinkWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.sqlite-container-worker-32-64:v1": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "e7fbd9f884286e5c419bd13b6d1e91dfd4e93312b3f31461282b30674505d39641f4166f6e12dcdf8a61495cccc1c7a4"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
 }
 
 
