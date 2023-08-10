@@ -28,14 +28,12 @@ __pdoc__ = {
     "types": True,
     "verification": False,
     "data_source_snowflake": True,
+    "google_dv_360_sink": True,
+    "azure_blob_storage": True,
 }
 
 from .client import Client, create_client, Session
-from .builders import (
-    DataRoomBuilder,
-    DataRoomCommitBuilder,
-    GovernanceProtocol
-)
+from .builders import DataRoomBuilder, DataRoomCommitBuilder, GovernanceProtocol
 from .compute import Noop, StaticContent
 from .permission import Permissions
 from .storage import Key
@@ -74,4 +72,5 @@ __all__ = [
     "Endorser",
     "Keychain",
     "data_source_snowflake",
+    "azure_blob_storage",
 ]

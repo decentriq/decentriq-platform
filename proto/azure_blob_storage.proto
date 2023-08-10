@@ -1,0 +1,31 @@
+syntax = "proto3";
+package azure_blob_storage;
+
+message ImportRole {}
+
+message ExportRole { SinkInput input = 1; }
+
+message SingleFile { string name = 1; }
+
+message RawFile {}
+
+message ZipFile {
+  oneof selection { SingleFile singleFile = 1; }
+}
+
+message SinkInput {
+  string dependency = 1;
+  string name = 2;
+  oneof file {
+    RawFile raw = 3;
+    ZipFile zip = 4;
+  }
+}
+
+message AzureBlobStorageWorkerConfiguration {
+  string credentialsDependency = 1;
+  oneof role {
+    ImportRole importRole = 2;
+    ExportRole exportRole = 3;
+  }
+}
