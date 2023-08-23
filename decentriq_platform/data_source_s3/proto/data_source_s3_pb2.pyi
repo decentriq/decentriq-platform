@@ -4,15 +4,32 @@ isort:skip_file
 """
 import builtins
 import google.protobuf.descriptor
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 import sys
+import typing
 
-if sys.version_info >= (3, 8):
+if sys.version_info >= (3, 10):
     import typing as typing_extensions
 else:
     import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+
+class _S3Provider:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):  # noqa: F821
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    AWS: _S3Provider.ValueType  # 0
+    GCS: _S3Provider.ValueType  # 1
+
+class S3Provider(_S3Provider, metaclass=_S3ProviderEnumTypeWrapper): ...
+
+AWS: S3Provider.ValueType  # 0
+GCS: S3Provider.ValueType  # 1
+global___S3Provider = S3Provider
 
 class S3Source(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -22,6 +39,7 @@ class S3Source(google.protobuf.message.Message):
     OBJECTKEY_FIELD_NUMBER: builtins.int
     bucket: builtins.str
     region: builtins.str
+    """region is unused (thus, can be left empty) for GCS."""
     objectKey: builtins.str
     def __init__(
         self,
@@ -39,16 +57,19 @@ class DataSourceS3WorkerConfiguration(google.protobuf.message.Message):
 
     SOURCE_FIELD_NUMBER: builtins.int
     CREDENTIALSDEPENDENCY_FIELD_NUMBER: builtins.int
+    S3PROVIDER_FIELD_NUMBER: builtins.int
     @property
     def source(self) -> global___S3Source: ...
     credentialsDependency: builtins.str
+    s3Provider: global___S3Provider.ValueType
     def __init__(
         self,
         *,
         source: global___S3Source | None = ...,
         credentialsDependency: builtins.str = ...,
+        s3Provider: global___S3Provider.ValueType = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["source", b"source"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "source", b"source"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "s3Provider", b"s3Provider", "source", b"source"]) -> None: ...
 
 global___DataSourceS3WorkerConfiguration = DataSourceS3WorkerConfiguration

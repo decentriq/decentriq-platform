@@ -3,11 +3,18 @@ package data_source_s3;
 
 message S3Source {
     string bucket = 1;
+    // region is unused (thus, can be left empty) for GCS.
     string region = 2;
     string objectKey = 3;
+}
+
+enum S3Provider {
+    AWS = 0;
+    GCS = 1;
 }
 
 message DataSourceS3WorkerConfiguration {
     S3Source source = 1;
     string credentialsDependency = 2;
+    S3Provider s3Provider = 3;
 }

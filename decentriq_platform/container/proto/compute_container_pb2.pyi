@@ -52,7 +52,35 @@ class StaticImage(google.protobuf.message.Message):
     includeContainerLogsOnError: builtins.bool
     includeContainerLogsOnSuccess: builtins.bool
     minimumContainerMemorySize: builtins.int
+    """When executing a computation, the available VM memory is split into two:
+    1. One part given to the in-memory chunk cache (this is backing the /input and /output filesystems, analogous to
+        the kernel's pagecache).
+    2. The second part is given to the container itself.
+    The sizes are controlled by minimumContainerMemorySize and extraChunkCacheSizeToAvailableMemoryRatio.
+    First minimumContainerMemorySize and a hardcoded minimum chunk cache size is subtracted from the available memory,
+    then the rest is split according to extraChunkCacheSizeToAvailableMemoryRatio.
+    For example, given a 64G VM with 62G available memory for compute:
+    * minimumContainerMemorySize by default is 2G
+    * minimum chunk cache size is 256M
+    * extraChunkCacheSizeToAvailableMemoryRatio by default is 0.0625
+    * therefore 0.0625 * (62G - 2G - 256M) =~ 3730M further memory is given to the chunk cache
+    * so we end up with chunk_cache_size ~= 4G, container_memory ~=58G
+    Generally speaking the split should be determined by the computation itself:
+    * Example SQLite: SQLite is memory-bound generally speaking and does a lot of back-and-forth between its
+        in-memory cache and the db file. This means that high extraChunkCacheSizeToAvailableMemoryRatio(1.0) and low
+        minimumContainerMemorySize should be used because this will speed up the file backing, and SQLite doesn't use
+        the extra container memory efficiently.
+    * Example CHUV pipeline: this computation accesses sparse static input genome data in a fairly random manner,
+        meaning that the best course of action is to read all data into memory first instead of relying on the chunk
+        cache backed filesystem. This means low extraChunkCacheSizeToAvailableMemoryRatio(1.0) should be used.
+        A setting of 1.0 means that all available extra memory (aside from the minimum chunk cache size) will be
+        given to the container.
+    * Example default settings: by default most but not all of the memory is given to the container, assuming that
+        most applications tend to read the input files into memory as a first step instead of streaming through.
+    default 2G
+    """
     extraChunkCacheSizeToAvailableMemoryRatio: builtins.float
+    """default 0.0625"""
     def __init__(
         self,
         *,

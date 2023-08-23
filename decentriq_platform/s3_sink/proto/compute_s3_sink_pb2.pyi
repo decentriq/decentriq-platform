@@ -6,15 +6,32 @@ import builtins
 import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 import sys
+import typing
 
-if sys.version_info >= (3, 8):
+if sys.version_info >= (3, 10):
     import typing as typing_extensions
 else:
     import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
+
+class _S3Provider:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):  # noqa: F821
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    AWS: _S3Provider.ValueType  # 0
+    GCS: _S3Provider.ValueType  # 1
+
+class S3Provider(_S3Provider, metaclass=_S3ProviderEnumTypeWrapper): ...
+
+AWS: S3Provider.ValueType  # 0
+GCS: S3Provider.ValueType  # 1
+global___S3Provider = S3Provider
 
 class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -23,11 +40,14 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     REGION_FIELD_NUMBER: builtins.int
     CREDENTIALSDEPENDENCY_FIELD_NUMBER: builtins.int
     OBJECTS_FIELD_NUMBER: builtins.int
+    S3PROVIDER_FIELD_NUMBER: builtins.int
     endpoint: builtins.str
     region: builtins.str
+    """S3 region can be left empty for a GCS sink worker"""
     credentialsDependency: builtins.str
     @property
     def objects(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___S3Object]: ...
+    s3Provider: global___S3Provider.ValueType
     def __init__(
         self,
         *,
@@ -35,8 +55,9 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
         region: builtins.str = ...,
         credentialsDependency: builtins.str = ...,
         objects: collections.abc.Iterable[global___S3Object] | None = ...,
+        s3Provider: global___S3Provider.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "endpoint", b"endpoint", "objects", b"objects", "region", b"region"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "endpoint", b"endpoint", "objects", b"objects", "region", b"region", "s3Provider", b"s3Provider"]) -> None: ...
 
 global___S3SinkWorkerConfiguration = S3SinkWorkerConfiguration
 

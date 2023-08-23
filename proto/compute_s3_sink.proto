@@ -1,11 +1,18 @@
 syntax = "proto3";
 package compute_s3_sink;
 
+enum S3Provider {
+    AWS = 0;
+    GCS = 1;
+}
+
 message S3SinkWorkerConfiguration {
     string endpoint = 1;
+    // S3 region can be left empty for a GCS sink worker
     string region = 2;
     string credentialsDependency = 3;
     repeated S3Object objects = 4;
+    S3Provider s3Provider = 5;
 }
 
 message S3Object {

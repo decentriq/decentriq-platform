@@ -1,7 +1,8 @@
+from decentriq_platform.data_source_s3.proto.data_source_s3_pb2 import S3Provider
 from google.protobuf.json_format import MessageToDict
 from ..proto import serialize_length_delimited, ComputeNodeFormat, parse_length_delimited
 from ..node import Node
-from typing import List, Optional, Set, Tuple
+from typing import List, Literal, Optional, Set, Tuple
 from .proto import (
     DataSourceS3WorkerConfiguration,
     S3Source,
@@ -22,9 +23,10 @@ class DataSourceS3(Node):
             self,
             name: str,
             bucket: str,
-            region: str,
             object_key: str,
             credentials_dependency: str,
+            s3_provider: Literal["AWS", "GCS"],
+            region: Optional[str] = None,
     ) -> None:
         """
         Create a S3 source node.
@@ -39,12 +41,13 @@ class DataSourceS3(Node):
         - `credentials_dependency`: The id of the node that serves the credentials
             for connecting to AWS.
             This node should provide a single JSON with format:
-
+            - For AWS:
             ```
             {
                 "accessKey": "xxxx",
                 "secretKey": "yyyy"
             }
+            - For GCS, see [service account credentials](https://cloud.google.com/iam/docs/service-account-creds)
             ```
 
             In most cases this node will be a simple data node to which the
@@ -52,15 +55,25 @@ class DataSourceS3(Node):
             always be encrypted end-to-end and won't be readable by anyone, including
             Decentriq. If using this node for a one-off import of a dataset,
             the credentials file can be deleted after the import has finished.
+        - `s3_provider`: A Literal indicating the cloud provider for the S3 storage.
+            
+            Supported providers are Amazon Web Services S3 buckets (`"AWS"`) and Google Cloud Storage buckets (`"GCS"`).
         """
+        if s3_provider == "AWS":
+            s3Provider=S3Provider.AWS
+        elif s3_provider == "GCS":
+            s3Provider=S3Provider.GCS
+        else:
+            raise Exception(f"Unsupported S3 provider: {s3_provider}")
+        
         config = DataSourceS3WorkerConfiguration(
             source=S3Source(
                 bucket=bucket,
                 region=region,
                 objectKey=object_key,
-
             ),
             credentialsDependency=credentials_dependency,
+            s3Provider=s3Provider
         )
         config_serialized = serialize_length_delimited(config)
         super().__init__(
