@@ -122,6 +122,23 @@ SPECIFICATIONS = {
         decoder=GcgDriverDecoder(),
         clientProtocols=[5],
     ),
+    "decentriq.driver:v16": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "2e4fec5faa3fab558c8b6a248b97cba2824838329bd0a53e6014c14ed9026140"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[5],
+    ),
     "decentriq.sql-worker:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
@@ -178,6 +195,23 @@ SPECIFICATIONS = {
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
                     "95ff137db91d6ed5f187c9c69eed4e936c4200291ef65fd68bdf2dbe775958e3"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=PostWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.post-worker:v8": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "517096c140d10deb5a081c5b7492953e6ee06b3796c8f191cc48e2785758e596"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 accept_debug=False,
@@ -290,6 +324,21 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-ml-worker-32-64:v16": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "8a820d9e1ac5e37267efcc3a703fad82eb0c9fb33bd5ffe43fa548cbe885c142890e306858c491b795602ee977f4d5a7"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
@@ -338,6 +387,21 @@ SPECIFICATIONS = {
                 amdArkDer=amd_snp_ark_der,
                 measurement=bytes.fromhex(
                     "c817b0eefc1549b5a077b2a6ddb955bc233824d84301d782643598b48900cde52821b968fb9ab27ae831d4926ac641b7"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.python-synth-data-worker-32-64:v14": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "9b40ac320e2f142b707f65f055b9a4ef9f7fbe9e1cf2ba5d41cc782f3a614eefa324509b45a6df857dd383c8bb1297b5"
                 ),
                 roughtimePubKey=roughtime_public_key,
                 decentriqDer=decentriq_root_ca_der,
@@ -404,6 +468,21 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.r-latex-worker-32-32:v14": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "a0276c0d0e3ca7462e59e9c6243a3110e24f773cf23b4dae94ecc7bf2c6fb758b1f22443330430106f20a8b78e3c5ffe"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.s3-sink-worker:v2": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
@@ -426,6 +505,23 @@ SPECIFICATIONS = {
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
                     "09c34e9750a6e18ec7b18d633a5ffb5533c9d5be2bf896eb280717e3da4f2024"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=S3SinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.s3-sink-worker:v5": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "293b598b660a982bbf6dcc9db44f8c30fcb8a13d0150960434a5669a60d4cb43"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 accept_debug=False,
@@ -489,6 +585,23 @@ SPECIFICATIONS = {
         decoder=DatasetSinkWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.dataset-sink-worker:v5": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "effbd9945e6e2efcebbb657cd9a9b456e0d2c3171878472a45b7f3f949d060b2"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=DatasetSinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.data-source-s3-worker:v1": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
@@ -511,6 +624,23 @@ SPECIFICATIONS = {
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
                     "f3e7b026ecd80b766bf3073b0aabcae4f55f91611c8de9cba8e671f1b9597ad7"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=DataSourceS3WorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.data-source-s3-worker:v4": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "e42ddd0aa4a355582bc35128c7008ba8aa197604f3b6c1745c74701438ac5605"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 accept_debug=False,
@@ -557,6 +687,23 @@ SPECIFICATIONS = {
         decoder=DataSourceSnowflakeWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.data-source-snowflake-worker:v4": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "31642671f42befad424cdf7389bfa7fe0ca08dab454d4f2cac46fb34f618d1ae"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=DataSourceSnowflakeWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.meta-sink-worker:v1": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
@@ -591,11 +738,45 @@ SPECIFICATIONS = {
         decoder=MetaSinkWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.meta-sink-worker:v4": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "785c9f94e339ec07e92dd2f39859b587da16a5104c89b879eb8589ba590ae947"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=MetaSinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.google-dv-360-sink-worker:v1": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
                     "3a00807af2ec87b9de3760188d112c494dd1a41877fbae30ecebb607ceafa3e7"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GoogleDv360SinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.google-dv-360-sink-worker:v3": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "b035a0bdb2ea9522ac96efce0008fbc6aa60a01228c2bc377b3aa0a683920b4a"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 accept_debug=False,
@@ -629,6 +810,21 @@ SPECIFICATIONS = {
                 amdArkDer=amd_snp_ark_der,
                 measurement=bytes.fromhex(
                     "e984073ae4fe0f86cc57f6017c96e9b832ca28f33d595af1e21c9a03ad12717baca2e21fbb3209920e463fb9c321a5af"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.sqlite-container-worker-32-64:v4": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "6bcbeb7611f50f91d9c906cdda9aa5ad7439439ff7876343fb7b47aadd4b345aecc2b75208eb60f9cee424fd04412980"
                 ),
                 roughtimePubKey=roughtime_public_key,
                 decentriqDer=decentriq_root_ca_der,
