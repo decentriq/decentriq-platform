@@ -208,7 +208,6 @@ class Client:
     def _ensure_dcr_data_scope(
             self,
             data_room_hash: str,
-            driver_attestation_hash: str,
     ) -> str:
         data = self._graphql.post(
             """
@@ -226,7 +225,6 @@ class Client:
             {
                 "input": {
                     "dataRoomHash": data_room_hash,
-                    "driverAttestationHash": driver_attestation_hash,
                 }
             }
         )

@@ -740,7 +740,6 @@ class Session():
 
         scope_id = self.client._ensure_dcr_data_scope(
             data_room_id,
-            self.driver_attestation_specification_hash
         )
         scope_id_bytes = bytes.fromhex(scope_id)
         request = PublishDatasetToDataRoomRequest(
@@ -849,10 +848,9 @@ class Session():
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_dcr_data_scope(
             data_room_id,
-            self.driver_attestation_specification_hash
         )
         scope_id_bytes = bytes.fromhex(scope_id)
-        
+
         is_dry_run = dry_run is not None
         test_datasets_map = dry_run["test_datasets"] if dry_run and "test_datasets" in dry_run else {}
         test_datasets = {k: TestDatasetProto(manifestHash=bytes.fromhex(v["manifest_hash"]), encryptionKey=v["key"].material) for k, v in test_datasets_map.items()}
@@ -899,7 +897,6 @@ class Session():
         protocol = self._get_client_protocol(endpoint_protocols)
         scope_id = self.client._ensure_dcr_data_scope(
             data_room_id,
-            self.driver_attestation_specification_hash
         )
         scope_id_bytes = bytes.fromhex(scope_id)
 
