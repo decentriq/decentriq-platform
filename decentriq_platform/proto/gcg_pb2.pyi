@@ -24,7 +24,7 @@ class _DataRoomStatus:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _DataRoomStatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataRoomStatus.ValueType], builtins.type):  # noqa: F821
+class _DataRoomStatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataRoomStatus.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     Active: _DataRoomStatus.ValueType  # 0
     Stopped: _DataRoomStatus.ValueType  # 1
@@ -35,6 +35,7 @@ Active: DataRoomStatus.ValueType  # 0
 Stopped: DataRoomStatus.ValueType  # 1
 global___DataRoomStatus = DataRoomStatus
 
+@typing_extensions.final
 class GcgRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -136,6 +137,7 @@ class GcgRequest(google.protobuf.message.Message):
 
 global___GcgRequest = GcgRequest
 
+@typing_extensions.final
 class GcgResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -236,6 +238,7 @@ class GcgResponse(google.protobuf.message.Message):
 
 global___GcgResponse = GcgResponse
 
+@typing_extensions.final
 class UserAuth(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -256,6 +259,7 @@ class UserAuth(google.protobuf.message.Message):
 
 global___UserAuth = UserAuth
 
+@typing_extensions.final
 class Pki(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -276,6 +280,7 @@ class Pki(google.protobuf.message.Message):
 
 global___Pki = Pki
 
+@typing_extensions.final
 class CreateDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -302,6 +307,7 @@ class CreateDataRoomRequest(google.protobuf.message.Message):
 
 global___CreateDataRoomRequest = CreateDataRoomRequest
 
+@typing_extensions.final
 class CreateDataRoomResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -322,6 +328,7 @@ class CreateDataRoomResponse(google.protobuf.message.Message):
 
 global___CreateDataRoomResponse = CreateDataRoomResponse
 
+@typing_extensions.final
 class DataRoomValidationError(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -362,6 +369,7 @@ class DataRoomValidationError(google.protobuf.message.Message):
 
 global___DataRoomValidationError = DataRoomValidationError
 
+@typing_extensions.final
 class PublishDatasetToDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -388,6 +396,7 @@ class PublishDatasetToDataRoomRequest(google.protobuf.message.Message):
 
 global___PublishDatasetToDataRoomRequest = PublishDatasetToDataRoomRequest
 
+@typing_extensions.final
 class PublishDatasetToDataRoomResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -397,9 +406,11 @@ class PublishDatasetToDataRoomResponse(google.protobuf.message.Message):
 
 global___PublishDatasetToDataRoomResponse = PublishDatasetToDataRoomResponse
 
+@typing_extensions.final
 class ExecuteComputeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing_extensions.final
     class ParametersEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -415,6 +426,7 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    @typing_extensions.final
     class TestDatasetsEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -461,9 +473,11 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
 
 global___ExecuteComputeRequest = ExecuteComputeRequest
 
+@typing_extensions.final
 class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing_extensions.final
     class ParametersEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -479,6 +493,7 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    @typing_extensions.final
     class TestDatasetsEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -525,6 +540,7 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
 
 global___ExecuteDevelopmentComputeRequest = ExecuteDevelopmentComputeRequest
 
+@typing_extensions.final
 class TestDataset(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -542,6 +558,7 @@ class TestDataset(google.protobuf.message.Message):
 
 global___TestDataset = TestDataset
 
+@typing_extensions.final
 class ExecuteComputeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -556,6 +573,7 @@ class ExecuteComputeResponse(google.protobuf.message.Message):
 
 global___ExecuteComputeResponse = ExecuteComputeResponse
 
+@typing_extensions.final
 class JobStatusRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -570,6 +588,7 @@ class JobStatusRequest(google.protobuf.message.Message):
 
 global___JobStatusRequest = JobStatusRequest
 
+@typing_extensions.final
 class JobStatusResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -585,6 +604,7 @@ class JobStatusResponse(google.protobuf.message.Message):
 
 global___JobStatusResponse = JobStatusResponse
 
+@typing_extensions.final
 class GetResultsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -602,6 +622,7 @@ class GetResultsRequest(google.protobuf.message.Message):
 
 global___GetResultsRequest = GetResultsRequest
 
+@typing_extensions.final
 class GetResultsResponseChunk(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -616,6 +637,7 @@ class GetResultsResponseChunk(google.protobuf.message.Message):
 
 global___GetResultsResponseChunk = GetResultsResponseChunk
 
+@typing_extensions.final
 class GetResultsResponseFooter(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -625,6 +647,7 @@ class GetResultsResponseFooter(google.protobuf.message.Message):
 
 global___GetResultsResponseFooter = GetResultsResponseFooter
 
+@typing_extensions.final
 class RetrieveDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -639,6 +662,7 @@ class RetrieveDataRoomRequest(google.protobuf.message.Message):
 
 global___RetrieveDataRoomRequest = RetrieveDataRoomRequest
 
+@typing_extensions.final
 class RetrieveDataRoomResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -663,6 +687,7 @@ class RetrieveDataRoomResponse(google.protobuf.message.Message):
 
 global___RetrieveDataRoomResponse = RetrieveDataRoomResponse
 
+@typing_extensions.final
 class RetrieveAuditLogRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -677,6 +702,7 @@ class RetrieveAuditLogRequest(google.protobuf.message.Message):
 
 global___RetrieveAuditLogRequest = RetrieveAuditLogRequest
 
+@typing_extensions.final
 class RetrieveAuditLogResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -691,6 +717,7 @@ class RetrieveAuditLogResponse(google.protobuf.message.Message):
 
 global___RetrieveAuditLogResponse = RetrieveAuditLogResponse
 
+@typing_extensions.final
 class RetrieveDataRoomStatusRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -705,6 +732,7 @@ class RetrieveDataRoomStatusRequest(google.protobuf.message.Message):
 
 global___RetrieveDataRoomStatusRequest = RetrieveDataRoomStatusRequest
 
+@typing_extensions.final
 class RetrieveDataRoomStatusResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -719,6 +747,7 @@ class RetrieveDataRoomStatusResponse(google.protobuf.message.Message):
 
 global___RetrieveDataRoomStatusResponse = RetrieveDataRoomStatusResponse
 
+@typing_extensions.final
 class UpdateDataRoomStatusRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -736,6 +765,7 @@ class UpdateDataRoomStatusRequest(google.protobuf.message.Message):
 
 global___UpdateDataRoomStatusRequest = UpdateDataRoomStatusRequest
 
+@typing_extensions.final
 class UpdateDataRoomStatusResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -745,6 +775,7 @@ class UpdateDataRoomStatusResponse(google.protobuf.message.Message):
 
 global___UpdateDataRoomStatusResponse = UpdateDataRoomStatusResponse
 
+@typing_extensions.final
 class RetrievePublishedDatasetsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -759,6 +790,7 @@ class RetrievePublishedDatasetsRequest(google.protobuf.message.Message):
 
 global___RetrievePublishedDatasetsRequest = RetrievePublishedDatasetsRequest
 
+@typing_extensions.final
 class PublishedDataset(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -782,6 +814,7 @@ class PublishedDataset(google.protobuf.message.Message):
 
 global___PublishedDataset = PublishedDataset
 
+@typing_extensions.final
 class RetrievePublishedDatasetsResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -797,6 +830,7 @@ class RetrievePublishedDatasetsResponse(google.protobuf.message.Message):
 
 global___RetrievePublishedDatasetsResponse = RetrievePublishedDatasetsResponse
 
+@typing_extensions.final
 class RemovePublishedDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -814,6 +848,7 @@ class RemovePublishedDatasetRequest(google.protobuf.message.Message):
 
 global___RemovePublishedDatasetRequest = RemovePublishedDatasetRequest
 
+@typing_extensions.final
 class RemovePublishedDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -823,6 +858,7 @@ class RemovePublishedDatasetResponse(google.protobuf.message.Message):
 
 global___RemovePublishedDatasetResponse = RemovePublishedDatasetResponse
 
+@typing_extensions.final
 class CreateConfigurationCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -843,6 +879,7 @@ class CreateConfigurationCommitRequest(google.protobuf.message.Message):
 
 global___CreateConfigurationCommitRequest = CreateConfigurationCommitRequest
 
+@typing_extensions.final
 class CreateConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -857,6 +894,7 @@ class CreateConfigurationCommitResponse(google.protobuf.message.Message):
 
 global___CreateConfigurationCommitResponse = CreateConfigurationCommitResponse
 
+@typing_extensions.final
 class GenerateMergeApprovalSignatureRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -871,6 +909,7 @@ class GenerateMergeApprovalSignatureRequest(google.protobuf.message.Message):
 
 global___GenerateMergeApprovalSignatureRequest = GenerateMergeApprovalSignatureRequest
 
+@typing_extensions.final
 class GenerateMergeApprovalSignatureResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -885,9 +924,11 @@ class GenerateMergeApprovalSignatureResponse(google.protobuf.message.Message):
 
 global___GenerateMergeApprovalSignatureResponse = GenerateMergeApprovalSignatureResponse
 
+@typing_extensions.final
 class MergeConfigurationCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing_extensions.final
     class ApprovalSignaturesEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -923,6 +964,7 @@ class MergeConfigurationCommitRequest(google.protobuf.message.Message):
 
 global___MergeConfigurationCommitRequest = MergeConfigurationCommitRequest
 
+@typing_extensions.final
 class RetrieveCurrentDataRoomConfigurationRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -937,6 +979,7 @@ class RetrieveCurrentDataRoomConfigurationRequest(google.protobuf.message.Messag
 
 global___RetrieveCurrentDataRoomConfigurationRequest = RetrieveCurrentDataRoomConfigurationRequest
 
+@typing_extensions.final
 class RetrieveCurrentDataRoomConfigurationResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -956,6 +999,7 @@ class RetrieveCurrentDataRoomConfigurationResponse(google.protobuf.message.Messa
 
 global___RetrieveCurrentDataRoomConfigurationResponse = RetrieveCurrentDataRoomConfigurationResponse
 
+@typing_extensions.final
 class RetrieveConfigurationCommitApproversRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -970,6 +1014,7 @@ class RetrieveConfigurationCommitApproversRequest(google.protobuf.message.Messag
 
 global___RetrieveConfigurationCommitApproversRequest = RetrieveConfigurationCommitApproversRequest
 
+@typing_extensions.final
 class RetrieveConfigurationCommitApproversResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -985,6 +1030,7 @@ class RetrieveConfigurationCommitApproversResponse(google.protobuf.message.Messa
 
 global___RetrieveConfigurationCommitApproversResponse = RetrieveConfigurationCommitApproversResponse
 
+@typing_extensions.final
 class RetrieveConfigurationCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -999,6 +1045,7 @@ class RetrieveConfigurationCommitRequest(google.protobuf.message.Message):
 
 global___RetrieveConfigurationCommitRequest = RetrieveConfigurationCommitRequest
 
+@typing_extensions.final
 class RetrieveConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1019,6 +1066,7 @@ class RetrieveConfigurationCommitResponse(google.protobuf.message.Message):
 
 global___RetrieveConfigurationCommitResponse = RetrieveConfigurationCommitResponse
 
+@typing_extensions.final
 class CasAuxiliaryStateRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1045,6 +1093,7 @@ class CasAuxiliaryStateRequest(google.protobuf.message.Message):
 
 global___CasAuxiliaryStateRequest = CasAuxiliaryStateRequest
 
+@typing_extensions.final
 class CasAuxiliaryStateResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1076,6 +1125,7 @@ class CasAuxiliaryStateResponse(google.protobuf.message.Message):
 
 global___CasAuxiliaryStateResponse = CasAuxiliaryStateResponse
 
+@typing_extensions.final
 class ReadAuxiliaryStateRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1090,6 +1140,7 @@ class ReadAuxiliaryStateRequest(google.protobuf.message.Message):
 
 global___ReadAuxiliaryStateRequest = ReadAuxiliaryStateRequest
 
+@typing_extensions.final
 class ReadAuxiliaryStateResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1105,6 +1156,7 @@ class ReadAuxiliaryStateResponse(google.protobuf.message.Message):
 
 global___ReadAuxiliaryStateResponse = ReadAuxiliaryStateResponse
 
+@typing_extensions.final
 class AuxiliaryStateValue(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1125,6 +1177,7 @@ class AuxiliaryStateValue(google.protobuf.message.Message):
 
 global___AuxiliaryStateValue = AuxiliaryStateValue
 
+@typing_extensions.final
 class MergeConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1134,6 +1187,7 @@ class MergeConfigurationCommitResponse(google.protobuf.message.Message):
 
 global___MergeConfigurationCommitResponse = MergeConfigurationCommitResponse
 
+@typing_extensions.final
 class DriverTaskConfig(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1155,6 +1209,7 @@ class DriverTaskConfig(google.protobuf.message.Message):
 
 global___DriverTaskConfig = DriverTaskConfig
 
+@typing_extensions.final
 class NoopConfig(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1164,6 +1219,7 @@ class NoopConfig(google.protobuf.message.Message):
 
 global___NoopConfig = NoopConfig
 
+@typing_extensions.final
 class StaticContentConfig(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

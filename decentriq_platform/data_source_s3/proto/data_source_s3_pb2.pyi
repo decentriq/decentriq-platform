@@ -20,7 +20,7 @@ class _S3Provider:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):  # noqa: F821
+class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     AWS: _S3Provider.ValueType  # 0
     GCS: _S3Provider.ValueType  # 1
@@ -31,6 +31,7 @@ AWS: S3Provider.ValueType  # 0
 GCS: S3Provider.ValueType  # 1
 global___S3Provider = S3Provider
 
+@typing_extensions.final
 class S3Source(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -52,6 +53,7 @@ class S3Source(google.protobuf.message.Message):
 
 global___S3Source = S3Source
 
+@typing_extensions.final
 class DataSourceS3WorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

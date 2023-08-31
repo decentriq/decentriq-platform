@@ -16,6 +16,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class Fatquote(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -39,42 +40,13 @@ class Fatquote(google.protobuf.message.Message):
         nitro: global___FatquoteNitro | None = ...,
         snp: global___FatquoteSnp | None = ...,
     ) -> None: ...
-    def HasField(
-        self,
-        field_name: typing_extensions.Literal[
-            "dcap",
-            b"dcap",
-            "epid",
-            b"epid",
-            "fatquote",
-            b"fatquote",
-            "nitro",
-            b"nitro",
-            "snp",
-            b"snp",
-        ],
-    ) -> builtins.bool: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "dcap",
-            b"dcap",
-            "epid",
-            b"epid",
-            "fatquote",
-            b"fatquote",
-            "nitro",
-            b"nitro",
-            "snp",
-            b"snp",
-        ],
-    ) -> None: ...
-    def WhichOneof(
-        self, oneof_group: typing_extensions.Literal["fatquote", b"fatquote"]
-    ) -> typing_extensions.Literal["epid", "dcap", "nitro", "snp"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["dcap", b"dcap", "epid", b"epid", "fatquote", b"fatquote", "nitro", b"nitro", "snp", b"snp"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcap", b"dcap", "epid", b"epid", "fatquote", b"fatquote", "nitro", b"nitro", "snp", b"snp"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["fatquote", b"fatquote"]) -> typing_extensions.Literal["epid", "dcap", "nitro", "snp"] | None: ...
 
 global___Fatquote = Fatquote
 
+@typing_extensions.final
 class FatquoteEpid(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -94,22 +66,11 @@ class FatquoteEpid(google.protobuf.message.Message):
         iasSignature: builtins.bytes = ...,
         iasRootCaDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "iasCertificate",
-            b"iasCertificate",
-            "iasResponseBody",
-            b"iasResponseBody",
-            "iasRootCaDer",
-            b"iasRootCaDer",
-            "iasSignature",
-            b"iasSignature",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["iasCertificate", b"iasCertificate", "iasResponseBody", b"iasResponseBody", "iasRootCaDer", b"iasRootCaDer", "iasSignature", b"iasSignature"]) -> None: ...
 
 global___FatquoteEpid = FatquoteEpid
 
+@typing_extensions.final
 class FatquoteDcap(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -135,26 +96,11 @@ class FatquoteDcap(google.protobuf.message.Message):
         qeSignCert: builtins.bytes = ...,
         dcapRootCaDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "dcapQuote",
-            b"dcapQuote",
-            "dcapRootCaDer",
-            b"dcapRootCaDer",
-            "qeIdentity",
-            b"qeIdentity",
-            "qeSignCert",
-            b"qeSignCert",
-            "tcbInfo",
-            b"tcbInfo",
-            "tcbSignCert",
-            b"tcbSignCert",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcapQuote", b"dcapQuote", "dcapRootCaDer", b"dcapRootCaDer", "qeIdentity", b"qeIdentity", "qeSignCert", b"qeSignCert", "tcbInfo", b"tcbInfo", "tcbSignCert", b"tcbSignCert"]) -> None: ...
 
 global___FatquoteDcap = FatquoteDcap
 
+@typing_extensions.final
 class FatquoteNitro(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -168,15 +114,11 @@ class FatquoteNitro(google.protobuf.message.Message):
         cose: builtins.bytes = ...,
         nitroRootCaDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "cose", b"cose", "nitroRootCaDer", b"nitroRootCaDer"
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["cose", b"cose", "nitroRootCaDer", b"nitroRootCaDer"]) -> None: ...
 
 global___FatquoteNitro = FatquoteNitro
 
+@typing_extensions.final
 class FatquoteSnp(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -214,34 +156,11 @@ class FatquoteSnp(google.protobuf.message.Message):
         decentriqDer: builtins.bytes = ...,
         chipDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "amdArkDer",
-            b"amdArkDer",
-            "amdSevDer",
-            b"amdSevDer",
-            "chipDer",
-            b"chipDer",
-            "decentriqDer",
-            b"decentriqDer",
-            "reportBin",
-            b"reportBin",
-            "reportData",
-            b"reportData",
-            "roughtimeNonce",
-            b"roughtimeNonce",
-            "roughtimePubKey",
-            b"roughtimePubKey",
-            "signedTimestamp",
-            b"signedTimestamp",
-            "vcekCrtDer",
-            b"vcekCrtDer",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "amdSevDer", b"amdSevDer", "chipDer", b"chipDer", "decentriqDer", b"decentriqDer", "reportBin", b"reportBin", "reportData", b"reportData", "roughtimeNonce", b"roughtimeNonce", "roughtimePubKey", b"roughtimePubKey", "signedTimestamp", b"signedTimestamp", "vcekCrtDer", b"vcekCrtDer"]) -> None: ...
 
 global___FatquoteSnp = FatquoteSnp
 
+@typing_extensions.final
 class AttestationSpecification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -265,47 +184,13 @@ class AttestationSpecification(google.protobuf.message.Message):
         awsNitro: global___AttestationSpecificationAwsNitro | None = ...,
         amdSnp: global___AttestationSpecificationAmdSnp | None = ...,
     ) -> None: ...
-    def HasField(
-        self,
-        field_name: typing_extensions.Literal[
-            "amdSnp",
-            b"amdSnp",
-            "attestation_specification",
-            b"attestation_specification",
-            "awsNitro",
-            b"awsNitro",
-            "intelDcap",
-            b"intelDcap",
-            "intelEpid",
-            b"intelEpid",
-        ],
-    ) -> builtins.bool: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "amdSnp",
-            b"amdSnp",
-            "attestation_specification",
-            b"attestation_specification",
-            "awsNitro",
-            b"awsNitro",
-            "intelDcap",
-            b"intelDcap",
-            "intelEpid",
-            b"intelEpid",
-        ],
-    ) -> None: ...
-    def WhichOneof(
-        self,
-        oneof_group: typing_extensions.Literal[
-            "attestation_specification", b"attestation_specification"
-        ],
-    ) -> (
-        typing_extensions.Literal["intelEpid", "intelDcap", "awsNitro", "amdSnp"] | None
-    ): ...
+    def HasField(self, field_name: typing_extensions.Literal["amdSnp", b"amdSnp", "attestation_specification", b"attestation_specification", "awsNitro", b"awsNitro", "intelDcap", b"intelDcap", "intelEpid", b"intelEpid"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdSnp", b"amdSnp", "attestation_specification", b"attestation_specification", "awsNitro", b"awsNitro", "intelDcap", b"intelDcap", "intelEpid", b"intelEpid"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["attestation_specification", b"attestation_specification"]) -> typing_extensions.Literal["intelEpid", "intelDcap", "awsNitro", "amdSnp"] | None: ...
 
 global___AttestationSpecification = AttestationSpecification
 
+@typing_extensions.final
 class AttestationSpecificationIntelEpid(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -328,24 +213,11 @@ class AttestationSpecificationIntelEpid(google.protobuf.message.Message):
         accept_group_out_of_date: builtins.bool = ...,
         accept_configuration_needed: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "accept_configuration_needed",
-            b"accept_configuration_needed",
-            "accept_debug",
-            b"accept_debug",
-            "accept_group_out_of_date",
-            b"accept_group_out_of_date",
-            "iasRootCaDer",
-            b"iasRootCaDer",
-            "mrenclave",
-            b"mrenclave",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["accept_configuration_needed", b"accept_configuration_needed", "accept_debug", b"accept_debug", "accept_group_out_of_date", b"accept_group_out_of_date", "iasRootCaDer", b"iasRootCaDer", "mrenclave", b"mrenclave"]) -> None: ...
 
 global___AttestationSpecificationIntelEpid = AttestationSpecificationIntelEpid
 
+@typing_extensions.final
 class AttestationSpecificationIntelDcap(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -371,26 +243,11 @@ class AttestationSpecificationIntelDcap(google.protobuf.message.Message):
         accept_configuration_needed: builtins.bool = ...,
         accept_revoked: builtins.bool = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "accept_configuration_needed",
-            b"accept_configuration_needed",
-            "accept_debug",
-            b"accept_debug",
-            "accept_out_of_date",
-            b"accept_out_of_date",
-            "accept_revoked",
-            b"accept_revoked",
-            "dcapRootCaDer",
-            b"dcapRootCaDer",
-            "mrenclave",
-            b"mrenclave",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["accept_configuration_needed", b"accept_configuration_needed", "accept_debug", b"accept_debug", "accept_out_of_date", b"accept_out_of_date", "accept_revoked", b"accept_revoked", "dcapRootCaDer", b"dcapRootCaDer", "mrenclave", b"mrenclave"]) -> None: ...
 
 global___AttestationSpecificationIntelDcap = AttestationSpecificationIntelDcap
 
+@typing_extensions.final
 class AttestationSpecificationAwsNitro(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -413,24 +270,11 @@ class AttestationSpecificationAwsNitro(google.protobuf.message.Message):
         pcr2: builtins.bytes = ...,
         pcr8: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "nitroRootCaDer",
-            b"nitroRootCaDer",
-            "pcr0",
-            b"pcr0",
-            "pcr1",
-            b"pcr1",
-            "pcr2",
-            b"pcr2",
-            "pcr8",
-            b"pcr8",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["nitroRootCaDer", b"nitroRootCaDer", "pcr0", b"pcr0", "pcr1", b"pcr1", "pcr2", b"pcr2", "pcr8", b"pcr8"]) -> None: ...
 
 global___AttestationSpecificationAwsNitro = AttestationSpecificationAwsNitro
 
+@typing_extensions.final
 class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -443,11 +287,7 @@ class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
     measurement: builtins.bytes
     roughtimePubKey: builtins.bytes
     @property
-    def authorizedChipIds(
-        self,
-    ) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[
-        builtins.bytes
-    ]: ...
+    def authorizedChipIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.bytes]: ...
     decentriqDer: builtins.bytes
     def __init__(
         self,
@@ -458,20 +298,6 @@ class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
         authorizedChipIds: collections.abc.Iterable[builtins.bytes] | None = ...,
         decentriqDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions.Literal[
-            "amdArkDer",
-            b"amdArkDer",
-            "authorizedChipIds",
-            b"authorizedChipIds",
-            "decentriqDer",
-            b"decentriqDer",
-            "measurement",
-            b"measurement",
-            "roughtimePubKey",
-            b"roughtimePubKey",
-        ],
-    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "authorizedChipIds", b"authorizedChipIds", "decentriqDer", b"decentriqDer", "measurement", b"measurement", "roughtimePubKey", b"roughtimePubKey"]) -> None: ...
 
 global___AttestationSpecificationAmdSnp = AttestationSpecificationAmdSnp

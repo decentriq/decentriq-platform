@@ -46,12 +46,14 @@ enum CreateDcrPurpose {
     VALIDATION = 1;
     DATA_IMPORT = 2;
     DATA_EXPORT = 3;
+    DATA_LAB = 4;
 }
 
 enum CreateDcrKind {
     EXPERT = 0;
     DATASCIENCE = 1;
     MEDIA = 2;
+    LOOKALIKE_MEDIA = 3;
 }
 
 message DcrMetadata {

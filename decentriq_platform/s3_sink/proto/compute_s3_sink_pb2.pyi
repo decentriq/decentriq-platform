@@ -22,7 +22,7 @@ class _S3Provider:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):  # noqa: F821
+class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     AWS: _S3Provider.ValueType  # 0
     GCS: _S3Provider.ValueType  # 1
@@ -33,6 +33,7 @@ AWS: S3Provider.ValueType  # 0
 GCS: S3Provider.ValueType  # 1
 global___S3Provider = S3Provider
 
+@typing_extensions.final
 class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -61,6 +62,7 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
 
 global___S3SinkWorkerConfiguration = S3SinkWorkerConfiguration
 
+@typing_extensions.final
 class S3Object(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -85,6 +87,7 @@ class S3Object(google.protobuf.message.Message):
 
 global___S3Object = S3Object
 
+@typing_extensions.final
 class RawObject(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -99,6 +102,7 @@ class RawObject(google.protobuf.message.Message):
 
 global___RawObject = RawObject
 
+@typing_extensions.final
 class ZipObject(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -120,6 +124,7 @@ class ZipObject(google.protobuf.message.Message):
 
 global___ZipObject = ZipObject
 
+@typing_extensions.final
 class SingleFile(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -137,6 +142,7 @@ class SingleFile(google.protobuf.message.Message):
 
 global___SingleFile = SingleFile
 
+@typing_extensions.final
 class FullContent(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -146,6 +152,7 @@ class FullContent(google.protobuf.message.Message):
 
 global___FullContent = FullContent
 
+@typing_extensions.final
 class S3Credentials(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

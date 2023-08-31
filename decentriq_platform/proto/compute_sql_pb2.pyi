@@ -22,7 +22,7 @@ class _PrimitiveType:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _PrimitiveTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_PrimitiveType.ValueType], builtins.type):  # noqa: F821
+class _PrimitiveTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_PrimitiveType.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     INT64: _PrimitiveType.ValueType  # 0
     STRING: _PrimitiveType.ValueType  # 1
@@ -35,6 +35,7 @@ STRING: PrimitiveType.ValueType  # 1
 FLOAT64: PrimitiveType.ValueType  # 2
 global___PrimitiveType = PrimitiveType
 
+@typing_extensions.final
 class SqlWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -56,6 +57,7 @@ class SqlWorkerConfiguration(google.protobuf.message.Message):
 
 global___SqlWorkerConfiguration = SqlWorkerConfiguration
 
+@typing_extensions.final
 class ValidationConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -72,6 +74,7 @@ class ValidationConfiguration(google.protobuf.message.Message):
 
 global___ValidationConfiguration = ValidationConfiguration
 
+@typing_extensions.final
 class TableSchema(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -87,6 +90,7 @@ class TableSchema(google.protobuf.message.Message):
 
 global___TableSchema = TableSchema
 
+@typing_extensions.final
 class NamedColumn(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -107,6 +111,7 @@ class NamedColumn(google.protobuf.message.Message):
 
 global___NamedColumn = NamedColumn
 
+@typing_extensions.final
 class ColumnType(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -124,6 +129,7 @@ class ColumnType(google.protobuf.message.Message):
 
 global___ColumnType = ColumnType
 
+@typing_extensions.final
 class TableDependencyMapping(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -143,6 +149,7 @@ class TableDependencyMapping(google.protobuf.message.Message):
 
 global___TableDependencyMapping = TableDependencyMapping
 
+@typing_extensions.final
 class ComputationConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -170,6 +177,7 @@ class ComputationConfiguration(google.protobuf.message.Message):
 
 global___ComputationConfiguration = ComputationConfiguration
 
+@typing_extensions.final
 class PrivacySettings(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -184,6 +192,7 @@ class PrivacySettings(google.protobuf.message.Message):
 
 global___PrivacySettings = PrivacySettings
 
+@typing_extensions.final
 class Constraint(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

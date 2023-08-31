@@ -14,6 +14,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class SnowflakeSource(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -40,6 +41,7 @@ class SnowflakeSource(google.protobuf.message.Message):
 
 global___SnowflakeSource = SnowflakeSource
 
+@typing_extensions.final
 class DataSourceSnowflakeWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

@@ -21,6 +21,8 @@ __pdoc__ = {
     "proto": False,
     "s3_sink": True,
     "data_source_s3": True,
+    "data_science": True,
+    "lookalike_media": True,
     "dataset_sink": True,
     "session": True,
     "sql": True,
@@ -41,6 +43,9 @@ from .attestation import enclave_specifications, EnclaveSpecifications
 
 from .endorsement import Endorser
 from .keychain import Keychain
+
+from . import data_science
+from . import lookalike_media
 
 __all__ = [
     "create_client",
@@ -63,6 +68,8 @@ __all__ = [
     "dataset_sink",
     "meta_sink",
     "google_dv_360_sink",
+    "data_science",
+    "lookalike_media",
     "storage",
     "attestation",
     "types",

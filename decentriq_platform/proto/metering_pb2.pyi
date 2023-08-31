@@ -23,12 +23,13 @@ class _CreateDcrPurpose:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _CreateDcrPurposeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrPurpose.ValueType], builtins.type):  # noqa: F821
+class _CreateDcrPurposeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrPurpose.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     STANDARD: _CreateDcrPurpose.ValueType  # 0
     VALIDATION: _CreateDcrPurpose.ValueType  # 1
     DATA_IMPORT: _CreateDcrPurpose.ValueType  # 2
     DATA_EXPORT: _CreateDcrPurpose.ValueType  # 3
+    DATA_LAB: _CreateDcrPurpose.ValueType  # 4
 
 class CreateDcrPurpose(_CreateDcrPurpose, metaclass=_CreateDcrPurposeEnumTypeWrapper): ...
 
@@ -36,25 +37,29 @@ STANDARD: CreateDcrPurpose.ValueType  # 0
 VALIDATION: CreateDcrPurpose.ValueType  # 1
 DATA_IMPORT: CreateDcrPurpose.ValueType  # 2
 DATA_EXPORT: CreateDcrPurpose.ValueType  # 3
+DATA_LAB: CreateDcrPurpose.ValueType  # 4
 global___CreateDcrPurpose = CreateDcrPurpose
 
 class _CreateDcrKind:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _CreateDcrKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrKind.ValueType], builtins.type):  # noqa: F821
+class _CreateDcrKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_CreateDcrKind.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     EXPERT: _CreateDcrKind.ValueType  # 0
     DATASCIENCE: _CreateDcrKind.ValueType  # 1
     MEDIA: _CreateDcrKind.ValueType  # 2
+    LOOKALIKE_MEDIA: _CreateDcrKind.ValueType  # 3
 
 class CreateDcrKind(_CreateDcrKind, metaclass=_CreateDcrKindEnumTypeWrapper): ...
 
 EXPERT: CreateDcrKind.ValueType  # 0
 DATASCIENCE: CreateDcrKind.ValueType  # 1
 MEDIA: CreateDcrKind.ValueType  # 2
+LOOKALIKE_MEDIA: CreateDcrKind.ValueType  # 3
 global___CreateDcrKind = CreateDcrKind
 
+@typing_extensions.final
 class MeteringRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -108,6 +113,7 @@ class MeteringRequest(google.protobuf.message.Message):
 
 global___MeteringRequest = MeteringRequest
 
+@typing_extensions.final
 class MeteringSuccessResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -161,6 +167,7 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
 
 global___MeteringSuccessResponse = MeteringSuccessResponse
 
+@typing_extensions.final
 class MeteringResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -181,6 +188,7 @@ class MeteringResponse(google.protobuf.message.Message):
 
 global___MeteringResponse = MeteringResponse
 
+@typing_extensions.final
 class DcrMetadata(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -208,6 +216,7 @@ class DcrMetadata(google.protobuf.message.Message):
 
 global___DcrMetadata = DcrMetadata
 
+@typing_extensions.final
 class CreateDcrRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -240,6 +249,7 @@ class CreateDcrRequest(google.protobuf.message.Message):
 
 global___CreateDcrRequest = CreateDcrRequest
 
+@typing_extensions.final
 class DcrInteractionRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -263,6 +273,7 @@ class DcrInteractionRequest(google.protobuf.message.Message):
 
 global___DcrInteractionRequest = DcrInteractionRequest
 
+@typing_extensions.final
 class PublishDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -290,6 +301,7 @@ class PublishDatasetRequest(google.protobuf.message.Message):
 
 global___PublishDatasetRequest = PublishDatasetRequest
 
+@typing_extensions.final
 class CreateDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -344,6 +356,7 @@ class CreateDatasetRequest(google.protobuf.message.Message):
 
 global___CreateDatasetRequest = CreateDatasetRequest
 
+@typing_extensions.final
 class GetOrCreateDatasetScopeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -360,6 +373,7 @@ class GetOrCreateDatasetScopeRequest(google.protobuf.message.Message):
 
 global___GetOrCreateDatasetScopeRequest = GetOrCreateDatasetScopeRequest
 
+@typing_extensions.final
 class UnpublishDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -383,6 +397,7 @@ class UnpublishDatasetRequest(google.protobuf.message.Message):
 
 global___UnpublishDatasetRequest = UnpublishDatasetRequest
 
+@typing_extensions.final
 class StopDcrRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -402,6 +417,7 @@ class StopDcrRequest(google.protobuf.message.Message):
 
 global___StopDcrRequest = StopDcrRequest
 
+@typing_extensions.final
 class CreateDcrCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -425,6 +441,7 @@ class CreateDcrCommitRequest(google.protobuf.message.Message):
 
 global___CreateDcrCommitRequest = CreateDcrCommitRequest
 
+@typing_extensions.final
 class CreateDcrResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -434,6 +451,7 @@ class CreateDcrResponse(google.protobuf.message.Message):
 
 global___CreateDcrResponse = CreateDcrResponse
 
+@typing_extensions.final
 class GetOrCreateDatasetScopeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -448,6 +466,7 @@ class GetOrCreateDatasetScopeResponse(google.protobuf.message.Message):
 
 global___GetOrCreateDatasetScopeResponse = GetOrCreateDatasetScopeResponse
 
+@typing_extensions.final
 class DcrInteractionResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -457,6 +476,7 @@ class DcrInteractionResponse(google.protobuf.message.Message):
 
 global___DcrInteractionResponse = DcrInteractionResponse
 
+@typing_extensions.final
 class CreateDcrCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -466,6 +486,7 @@ class CreateDcrCommitResponse(google.protobuf.message.Message):
 
 global___CreateDcrCommitResponse = CreateDcrCommitResponse
 
+@typing_extensions.final
 class StopDcrResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -475,6 +496,7 @@ class StopDcrResponse(google.protobuf.message.Message):
 
 global___StopDcrResponse = StopDcrResponse
 
+@typing_extensions.final
 class PublishDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -484,6 +506,7 @@ class PublishDatasetResponse(google.protobuf.message.Message):
 
 global___PublishDatasetResponse = PublishDatasetResponse
 
+@typing_extensions.final
 class CreateDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -498,6 +521,7 @@ class CreateDatasetResponse(google.protobuf.message.Message):
 
 global___CreateDatasetResponse = CreateDatasetResponse
 
+@typing_extensions.final
 class UnpublishDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -507,6 +531,7 @@ class UnpublishDatasetResponse(google.protobuf.message.Message):
 
 global___UnpublishDatasetResponse = UnpublishDatasetResponse
 
+@typing_extensions.final
 class WorkerMetadataRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -528,6 +553,7 @@ class WorkerMetadataRequest(google.protobuf.message.Message):
 
 global___WorkerMetadataRequest = WorkerMetadataRequest
 
+@typing_extensions.final
 class WorkerMetadataResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -542,6 +568,7 @@ class WorkerMetadataResponse(google.protobuf.message.Message):
 
 global___WorkerMetadataResponse = WorkerMetadataResponse
 
+@typing_extensions.final
 class SubmitWorkerExecutionTimeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -565,6 +592,7 @@ class SubmitWorkerExecutionTimeRequest(google.protobuf.message.Message):
 
 global___SubmitWorkerExecutionTimeRequest = SubmitWorkerExecutionTimeRequest
 
+@typing_extensions.final
 class SubmitWorkerExecutionTimeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

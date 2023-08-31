@@ -1,4 +1,11 @@
-from typing import BinaryIO, List, Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import BinaryIO, List, Dict, Optional, Tuple, TYPE_CHECKING
+
+# Avoid circular import client -> keychain -> client outside of typechecking
+if TYPE_CHECKING:
+    from .keychain import Keychain
+
 from .endorsement import Endorser
 
 import hashlib
@@ -240,7 +247,8 @@ class Client:
             description: str = "",
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8,
-            usage: DatasetUsage = DatasetUsage.PUBLISHED
+            usage: DatasetUsage = DatasetUsage.PUBLISHED,
+            store_in_keychain: Optional[Keychain] = None,
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -255,12 +263,7 @@ class Client:
         - `description`: An optional file description.
         - `chunk_size`: Size of the chunks into which the stream is split in bytes.
         - `parallel_uploads`: Whether to upload chunks in parallel.
-        - `organization`: The name of the organization under which this dataset
-            should be uploaded. This option is useful if the current user's own parent
-            organization does not currently have a license with Decentriq and therefore
-            is not able to provide resources for user-uploaded datasets.
-            Note that even using this feature, the specified organization will not be
-            able to read the uploaded dataset.
+        - `store_in_keychain`: An optional keychain in which to store the dataset key.
         """
         uploader = BoundedExecutor(
                 bound=parallel_uploads * 2,
@@ -317,6 +320,11 @@ class Client:
             description=description,
             usage=usage,
         )
+
+        if store_in_keychain:
+            from .keychain import KeychainEntry
+            store_in_keychain.insert(
+                KeychainEntry("dataset_key", manifest_hash, key.material))
 
         return manifest_hash
 

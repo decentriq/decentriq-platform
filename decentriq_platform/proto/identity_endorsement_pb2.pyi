@@ -14,6 +14,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class EndorsementRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -35,6 +36,7 @@ class EndorsementRequest(google.protobuf.message.Message):
 
 global___EndorsementRequest = EndorsementRequest
 
+@typing_extensions.final
 class EndorsementResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -56,6 +58,7 @@ class EndorsementResponse(google.protobuf.message.Message):
 
 global___EndorsementResponse = EndorsementResponse
 
+@typing_extensions.final
 class PkiEndorsementRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -70,6 +73,7 @@ class PkiEndorsementRequest(google.protobuf.message.Message):
 
 global___PkiEndorsementRequest = PkiEndorsementRequest
 
+@typing_extensions.final
 class PkiEndorsementResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -86,6 +90,7 @@ class PkiEndorsementResponse(google.protobuf.message.Message):
 
 global___PkiEndorsementResponse = PkiEndorsementResponse
 
+@typing_extensions.final
 class DcrSecretEndorsementRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -100,6 +105,7 @@ class DcrSecretEndorsementRequest(google.protobuf.message.Message):
 
 global___DcrSecretEndorsementRequest = DcrSecretEndorsementRequest
 
+@typing_extensions.final
 class DcrSecretEndorsementResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -119,6 +125,7 @@ class DcrSecretEndorsementResponse(google.protobuf.message.Message):
 
 global___DcrSecretEndorsementResponse = DcrSecretEndorsementResponse
 
+@typing_extensions.final
 class EnclaveEndorsements(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -143,6 +150,7 @@ class EnclaveEndorsements(google.protobuf.message.Message):
 
 global___EnclaveEndorsements = EnclaveEndorsements
 
+@typing_extensions.final
 class EnclaveEndorsement(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -157,6 +165,7 @@ class EnclaveEndorsement(google.protobuf.message.Message):
 
 global___EnclaveEndorsement = EnclaveEndorsement
 
+@typing_extensions.final
 class PkiClaim(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -171,6 +180,7 @@ class PkiClaim(google.protobuf.message.Message):
 
 global___PkiClaim = PkiClaim
 
+@typing_extensions.final
 class DcrSecretClaim(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

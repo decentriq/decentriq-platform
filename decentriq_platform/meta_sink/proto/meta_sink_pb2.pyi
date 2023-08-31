@@ -14,6 +14,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class SingleFile(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -28,6 +29,7 @@ class SingleFile(google.protobuf.message.Message):
 
 global___SingleFile = SingleFile
 
+@typing_extensions.final
 class RawFile(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -37,6 +39,7 @@ class RawFile(google.protobuf.message.Message):
 
 global___RawFile = RawFile
 
+@typing_extensions.final
 class ZipFile(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -54,6 +57,7 @@ class ZipFile(google.protobuf.message.Message):
 
 global___ZipFile = ZipFile
 
+@typing_extensions.final
 class SinkInput(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -81,6 +85,7 @@ class SinkInput(google.protobuf.message.Message):
 
 global___SinkInput = SinkInput
 
+@typing_extensions.final
 class MetaSinkWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

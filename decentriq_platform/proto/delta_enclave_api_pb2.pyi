@@ -16,6 +16,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class Request(google.protobuf.message.Message):
     """=========================================================================================================
     CONTAINER
@@ -41,6 +42,7 @@ class Request(google.protobuf.message.Message):
 
 global___Request = Request
 
+@typing_extensions.final
 class ExtensionMessage(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -58,6 +60,7 @@ class ExtensionMessage(google.protobuf.message.Message):
 
 global___ExtensionMessage = ExtensionMessage
 
+@typing_extensions.final
 class Response(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -77,6 +80,7 @@ class Response(google.protobuf.message.Message):
 
 global___Response = Response
 
+@typing_extensions.final
 class DataNoncePubkey(google.protobuf.message.Message):
     """=========================================================================================================
     ENCRYPTED MESSAGE FORMAT
@@ -101,6 +105,7 @@ class DataNoncePubkey(google.protobuf.message.Message):
 
 global___DataNoncePubkey = DataNoncePubkey
 
+@typing_extensions.final
 class DataNonce(google.protobuf.message.Message):
     """=========================================================================================================
     ENCRYPTED SEALED MESSAGED FORMAT
@@ -122,6 +127,7 @@ class DataNonce(google.protobuf.message.Message):
 
 global___DataNonce = DataNonce
 
+@typing_extensions.final
 class SealedEncryptedMessage(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -141,6 +147,7 @@ class SealedEncryptedMessage(google.protobuf.message.Message):
 
 global___SealedEncryptedMessage = SealedEncryptedMessage
 
+@typing_extensions.final
 class EncryptionHeader(google.protobuf.message.Message):
     """* LAYOUT
       Every stored file has the following layout: (EH || Enc(VH || CH || CB))
@@ -223,6 +230,7 @@ class EncryptionHeader(google.protobuf.message.Message):
 
 global___EncryptionHeader = EncryptionHeader
 
+@typing_extensions.final
 class ChilyKey(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -237,6 +245,7 @@ class ChilyKey(google.protobuf.message.Message):
 
 global___ChilyKey = ChilyKey
 
+@typing_extensions.final
 class VersionHeader(google.protobuf.message.Message):
     """Version header (encrypted)"""
 
@@ -253,6 +262,7 @@ class VersionHeader(google.protobuf.message.Message):
 
 global___VersionHeader = VersionHeader
 
+@typing_extensions.final
 class ChunkHeader(google.protobuf.message.Message):
     """Data format header (encrypted)"""
 

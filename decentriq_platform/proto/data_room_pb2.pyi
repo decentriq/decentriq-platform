@@ -23,7 +23,7 @@ class _ComputeNodeFormat:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _ComputeNodeFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ComputeNodeFormat.ValueType], builtins.type):  # noqa: F821
+class _ComputeNodeFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ComputeNodeFormat.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     RAW: _ComputeNodeFormat.ValueType  # 0
     ZIP: _ComputeNodeFormat.ValueType  # 1
@@ -34,6 +34,7 @@ RAW: ComputeNodeFormat.ValueType  # 0
 ZIP: ComputeNodeFormat.ValueType  # 1
 global___ComputeNodeFormat = ComputeNodeFormat
 
+@typing_extensions.final
 class DataRoom(google.protobuf.message.Message):
     """/ To create a dataroom the user need to specify the `GovernanceProtocol`
     / and the list of `ConfigurationModification`.
@@ -213,6 +214,7 @@ class DataRoom(google.protobuf.message.Message):
 
 global___DataRoom = DataRoom
 
+@typing_extensions.final
 class GovernanceProtocol(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -234,6 +236,7 @@ class GovernanceProtocol(google.protobuf.message.Message):
 
 global___GovernanceProtocol = GovernanceProtocol
 
+@typing_extensions.final
 class StaticDataRoomPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -243,6 +246,7 @@ class StaticDataRoomPolicy(google.protobuf.message.Message):
 
 global___StaticDataRoomPolicy = StaticDataRoomPolicy
 
+@typing_extensions.final
 class AffectedDataOwnersApprovePolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -252,6 +256,7 @@ class AffectedDataOwnersApprovePolicy(google.protobuf.message.Message):
 
 global___AffectedDataOwnersApprovePolicy = AffectedDataOwnersApprovePolicy
 
+@typing_extensions.final
 class DataRoomConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -267,6 +272,7 @@ class DataRoomConfiguration(google.protobuf.message.Message):
 
 global___DataRoomConfiguration = DataRoomConfiguration
 
+@typing_extensions.final
 class ConfigurationElement(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -299,6 +305,7 @@ class ConfigurationElement(google.protobuf.message.Message):
 
 global___ConfigurationElement = ConfigurationElement
 
+@typing_extensions.final
 class ConfigurationModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -324,6 +331,7 @@ class ConfigurationModification(google.protobuf.message.Message):
 
 global___ConfigurationModification = ConfigurationModification
 
+@typing_extensions.final
 class AddModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -340,6 +348,7 @@ class AddModification(google.protobuf.message.Message):
 
 global___AddModification = AddModification
 
+@typing_extensions.final
 class ChangeModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -356,6 +365,7 @@ class ChangeModification(google.protobuf.message.Message):
 
 global___ChangeModification = ChangeModification
 
+@typing_extensions.final
 class DeleteModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -370,6 +380,7 @@ class DeleteModification(google.protobuf.message.Message):
 
 global___DeleteModification = DeleteModification
 
+@typing_extensions.final
 class ConfigurationCommit(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -397,6 +408,7 @@ class ConfigurationCommit(google.protobuf.message.Message):
 
 global___ConfigurationCommit = ConfigurationCommit
 
+@typing_extensions.final
 class ComputeNode(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -425,6 +437,7 @@ class ComputeNode(google.protobuf.message.Message):
 
 global___ComputeNode = ComputeNode
 
+@typing_extensions.final
 class ComputeNodeLeaf(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -439,6 +452,7 @@ class ComputeNodeLeaf(google.protobuf.message.Message):
 
 global___ComputeNodeLeaf = ComputeNodeLeaf
 
+@typing_extensions.final
 class ComputeNodeParameter(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -453,6 +467,7 @@ class ComputeNodeParameter(google.protobuf.message.Message):
 
 global___ComputeNodeParameter = ComputeNodeParameter
 
+@typing_extensions.final
 class ComputeNodeProtocol(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -467,6 +482,7 @@ class ComputeNodeProtocol(google.protobuf.message.Message):
 
 global___ComputeNodeProtocol = ComputeNodeProtocol
 
+@typing_extensions.final
 class ComputeNodeBranch(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -496,6 +512,7 @@ class ComputeNodeBranch(google.protobuf.message.Message):
 
 global___ComputeNodeBranch = ComputeNodeBranch
 
+@typing_extensions.final
 class UserPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -517,6 +534,7 @@ class UserPermission(google.protobuf.message.Message):
 
 global___UserPermission = UserPermission
 
+@typing_extensions.final
 class AuthenticationMethod(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -546,6 +564,7 @@ class AuthenticationMethod(google.protobuf.message.Message):
 
 global___AuthenticationMethod = AuthenticationMethod
 
+@typing_extensions.final
 class PkiPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -560,6 +579,7 @@ class PkiPolicy(google.protobuf.message.Message):
 
 global___PkiPolicy = PkiPolicy
 
+@typing_extensions.final
 class DcrSecretPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -574,6 +594,7 @@ class DcrSecretPolicy(google.protobuf.message.Message):
 
 global___DcrSecretPolicy = DcrSecretPolicy
 
+@typing_extensions.final
 class Permission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -643,6 +664,7 @@ class Permission(google.protobuf.message.Message):
 
 global___Permission = Permission
 
+@typing_extensions.final
 class ExecuteComputePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -657,6 +679,7 @@ class ExecuteComputePermission(google.protobuf.message.Message):
 
 global___ExecuteComputePermission = ExecuteComputePermission
 
+@typing_extensions.final
 class LeafCrudPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -671,6 +694,7 @@ class LeafCrudPermission(google.protobuf.message.Message):
 
 global___LeafCrudPermission = LeafCrudPermission
 
+@typing_extensions.final
 class RetrieveDataRoomPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -680,6 +704,7 @@ class RetrieveDataRoomPermission(google.protobuf.message.Message):
 
 global___RetrieveDataRoomPermission = RetrieveDataRoomPermission
 
+@typing_extensions.final
 class RetrieveAuditLogPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -689,6 +714,7 @@ class RetrieveAuditLogPermission(google.protobuf.message.Message):
 
 global___RetrieveAuditLogPermission = RetrieveAuditLogPermission
 
+@typing_extensions.final
 class RetrieveDataRoomStatusPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -698,6 +724,7 @@ class RetrieveDataRoomStatusPermission(google.protobuf.message.Message):
 
 global___RetrieveDataRoomStatusPermission = RetrieveDataRoomStatusPermission
 
+@typing_extensions.final
 class UpdateDataRoomStatusPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -707,6 +734,7 @@ class UpdateDataRoomStatusPermission(google.protobuf.message.Message):
 
 global___UpdateDataRoomStatusPermission = UpdateDataRoomStatusPermission
 
+@typing_extensions.final
 class RetrievePublishedDatasetsPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -716,6 +744,7 @@ class RetrievePublishedDatasetsPermission(google.protobuf.message.Message):
 
 global___RetrievePublishedDatasetsPermission = RetrievePublishedDatasetsPermission
 
+@typing_extensions.final
 class DryRunPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -725,6 +754,7 @@ class DryRunPermission(google.protobuf.message.Message):
 
 global___DryRunPermission = DryRunPermission
 
+@typing_extensions.final
 class GenerateMergeSignaturePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -734,6 +764,7 @@ class GenerateMergeSignaturePermission(google.protobuf.message.Message):
 
 global___GenerateMergeSignaturePermission = GenerateMergeSignaturePermission
 
+@typing_extensions.final
 class ExecuteDevelopmentComputePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -743,6 +774,7 @@ class ExecuteDevelopmentComputePermission(google.protobuf.message.Message):
 
 global___ExecuteDevelopmentComputePermission = ExecuteDevelopmentComputePermission
 
+@typing_extensions.final
 class MergeConfigurationCommitPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -752,6 +784,7 @@ class MergeConfigurationCommitPermission(google.protobuf.message.Message):
 
 global___MergeConfigurationCommitPermission = MergeConfigurationCommitPermission
 
+@typing_extensions.final
 class RetrieveComputeResultPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -766,6 +799,7 @@ class RetrieveComputeResultPermission(google.protobuf.message.Message):
 
 global___RetrieveComputeResultPermission = RetrieveComputeResultPermission
 
+@typing_extensions.final
 class CasAuxiliaryStatePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -775,6 +809,7 @@ class CasAuxiliaryStatePermission(google.protobuf.message.Message):
 
 global___CasAuxiliaryStatePermission = CasAuxiliaryStatePermission
 
+@typing_extensions.final
 class ReadAuxiliaryStatePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

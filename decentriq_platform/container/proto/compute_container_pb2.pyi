@@ -17,6 +17,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class ContainerWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -34,6 +35,7 @@ class ContainerWorkerConfiguration(google.protobuf.message.Message):
 
 global___ContainerWorkerConfiguration = ContainerWorkerConfiguration
 
+@typing_extensions.final
 class StaticImage(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -101,6 +103,7 @@ class StaticImage(google.protobuf.message.Message):
 
 global___StaticImage = StaticImage
 
+@typing_extensions.final
 class MountPoint(google.protobuf.message.Message):
     """Dependencies are mounted under the `/input` directory
     For example for a mount point entry { path: "/data", dependency: "dep" }

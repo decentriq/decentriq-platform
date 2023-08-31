@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "decentriq-platform"
-version = "0.19.0"
+version = "0.21.0rc1"
 description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.com>"]
 readme = 'README.md'
