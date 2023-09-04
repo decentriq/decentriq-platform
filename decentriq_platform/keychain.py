@@ -236,7 +236,7 @@ class Keychain:
             new_keychain = Keychain(self._client, new_secret_wrapper, self._keychain_instance, self._store)
             new_keychain._encrypt_store()
             if new_keychain._compare_and_swap():
-                self = new_keychain
+                self.__dict__.update(new_keychain.__dict__)
                 return
             self._download()
 
