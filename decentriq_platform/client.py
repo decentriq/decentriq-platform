@@ -324,7 +324,8 @@ class Client:
         if store_in_keychain:
             from .keychain import KeychainEntry
             store_in_keychain.insert(
-                KeychainEntry("dataset_key", manifest_hash, key.material))
+                KeychainEntry("dataset_key", manifest_hash, key.material)
+            )
 
         return manifest_hash
 
