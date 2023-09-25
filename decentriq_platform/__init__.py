@@ -32,6 +32,7 @@ __pdoc__ = {
     "data_source_snowflake": True,
     "google_dv_360_sink": True,
     "azure_blob_storage": True,
+    "salesforce": True,
 }
 
 from .client import Client, create_client, Session
@@ -80,4 +81,5 @@ __all__ = [
     "Keychain",
     "data_source_snowflake",
     "azure_blob_storage",
+    "salesforce",
 ]

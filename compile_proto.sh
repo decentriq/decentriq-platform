@@ -38,6 +38,7 @@ DATA_SOURCE_SNOWFLAKE_PACKAGE_PROTO=(data_source_snowflake.proto)
 GOOGLE_DV_360_SINK_PACKAGE_PROTO=(google_dv_360_sink.proto)
 AZURE_BLOB_STORAGE_PACKAGE_PROTO=(azure_blob_storage.proto)
 GOOGLE_AD_MANAGER_PACKAGE_PROTO=(google_ad_manager.proto)
+SALESFORCE_PACKAGE_PROTO=(salesforce.proto)
 
 compile_pb "decentriq_platform/proto" "${MAIN_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/sql/proto" "${SQL_PACKAGE_PROTO[@]}"
@@ -51,3 +52,4 @@ compile_pb "decentriq_platform/data_source_snowflake/proto" "${DATA_SOURCE_SNOWF
 compile_pb "decentriq_platform/google_dv_360_sink/proto" "${GOOGLE_DV_360_SINK_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/azure_blob_storage/proto" "${AZURE_BLOB_STORAGE_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/google_ad_manager/proto" "${GOOGLE_AD_MANAGER_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/salesforce/proto" "${SALESFORCE_PACKAGE_PROTO[@]}"
