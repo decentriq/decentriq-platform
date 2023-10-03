@@ -125,6 +125,9 @@ class Session():
         fatquote_bytes_encoded = b64decode(data["session"]["fatquote"])
         parse_length_delimited(fatquote_bytes_encoded, fatquote)
         verification = Verification(attestation_specification=driver_attestation_specification)
+        if client.unsafe_disable_known_root_ca_check == True:
+            verification.disable_known_root_ca_check()
+
         report_data = verification.verify(fatquote)
         self.client = client
         self.session_id = session_id

@@ -22,6 +22,7 @@ from .config import (
         DECENTRIQ_HOST,
         DECENTRIQ_PORT,
         DECENTRIQ_USE_TLS,
+        _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
 )
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
@@ -69,7 +70,8 @@ class Client:
             user_email: str,
             api: Api,
             graphql: GqlClient,
-            request_timeout: int = None
+            request_timeout: int = None,
+            unsafe_disable_known_root_ca_check: Bool = False,
     ):
         """
         Create a client instance.
@@ -81,6 +83,7 @@ class Client:
         self._api = api
         self._graphql = graphql
         self.request_timeout = request_timeout
+        self.unsafe_disable_known_root_ca_check = unsafe_disable_known_root_ca_check
 
     def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
@@ -845,7 +848,8 @@ def create_client(
         api_host: str = DECENTRIQ_HOST,
         api_port: int = DECENTRIQ_PORT,
         api_use_tls: bool = DECENTRIQ_USE_TLS,
-        request_timeout: Optional[int] = None
+        request_timeout: Optional[int] = None,
+        unsafe_disable_known_root_ca_check: Bool = _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK
 ) -> Client:
     """
     The primary way to create a `Client` object.
@@ -872,7 +876,8 @@ def create_client(
         user_email,
         api,
         graphql,
-        request_timeout=request_timeout
+        request_timeout=request_timeout,
+        unsafe_disable_known_root_ca_check=unsafe_disable_known_root_ca_check
     )
 
 
