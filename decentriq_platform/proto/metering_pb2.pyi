@@ -225,6 +225,7 @@ class CreateDcrRequest(google.protobuf.message.Message):
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
     PARTICIPANTEMAILS_FIELD_NUMBER: builtins.int
     METADATA_FIELD_NUMBER: builtins.int
+    WORKERATTESTATIONHASHES_FIELD_NUMBER: builtins.int
     idHex: builtins.str
     """/ The DCR hash to be used for the published data room"""
     name: builtins.str
@@ -234,6 +235,9 @@ class CreateDcrRequest(google.protobuf.message.Message):
     def participantEmails(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     metadata: builtins.bytes
     """/ Optional metadata that will be persisted to the database"""
+    @property
+    def workerAttestationHashes(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """/ The hashes of the worker enclaves used within this DCR"""
     def __init__(
         self,
         *,
@@ -242,9 +246,10 @@ class CreateDcrRequest(google.protobuf.message.Message):
         driverAttestationHash: builtins.str = ...,
         participantEmails: collections.abc.Iterable[builtins.str] | None = ...,
         metadata: builtins.bytes | None = ...,
+        workerAttestationHashes: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "metadata", b"metadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_metadata", b"_metadata", "driverAttestationHash", b"driverAttestationHash", "idHex", b"idHex", "metadata", b"metadata", "name", b"name", "participantEmails", b"participantEmails", "workerAttestationHashes", b"workerAttestationHashes"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_metadata", b"_metadata"]) -> typing_extensions.Literal["metadata"] | None: ...
 
 global___CreateDcrRequest = CreateDcrRequest
@@ -424,20 +429,25 @@ class CreateDcrCommitRequest(google.protobuf.message.Message):
     ID_FIELD_NUMBER: builtins.int
     DCRIDHEX_FIELD_NUMBER: builtins.int
     DRIVERATTESTATIONHASH_FIELD_NUMBER: builtins.int
+    WORKERATTESTATIONHASHES_FIELD_NUMBER: builtins.int
     id: builtins.str
     """/ The commit id"""
     dcrIdHex: builtins.str
     """/ The DCR hash the commit refers to"""
     driverAttestationHash: builtins.str
     """/ The driver attestation hash"""
+    @property
+    def workerAttestationHashes(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]:
+        """/ The hashes of the worker enclaves used within this commit"""
     def __init__(
         self,
         *,
         id: builtins.str = ...,
         dcrIdHex: builtins.str = ...,
         driverAttestationHash: builtins.str = ...,
+        workerAttestationHashes: collections.abc.Iterable[builtins.str] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["dcrIdHex", b"dcrIdHex", "driverAttestationHash", b"driverAttestationHash", "id", b"id"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dcrIdHex", b"dcrIdHex", "driverAttestationHash", b"driverAttestationHash", "id", b"id", "workerAttestationHashes", b"workerAttestationHashes"]) -> None: ...
 
 global___CreateDcrCommitRequest = CreateDcrCommitRequest
 
