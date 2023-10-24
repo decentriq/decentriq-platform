@@ -33,6 +33,7 @@ __pdoc__ = {
     "google_dv_360_sink": True,
     "azure_blob_storage": True,
     "salesforce": True,
+    "permutive": True,
 }
 
 from .client import Client, create_client, Session
@@ -82,4 +83,5 @@ __all__ = [
     "data_source_snowflake",
     "azure_blob_storage",
     "salesforce",
+    "permutive",
 ]

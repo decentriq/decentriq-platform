@@ -1,0 +1,47 @@
+syntax = "proto3";
+package permutive;
+
+message ImportRole {}
+
+message ExportRole { SinkInput input = 1; }
+
+message SingleFile {
+    string name = 1;
+}
+
+message RawFile {}
+
+message ZipFile {
+    oneof selection {
+        SingleFile singleFile = 1;
+    }
+}
+
+message SinkInput {
+    string dependency = 1;
+    string name = 2;
+    oneof file {
+        RawFile raw = 3;
+        ZipFile zip = 4;
+    }
+}
+
+message PermutiveWorkerConfiguration {
+  string credentialsDependency = 1;
+  oneof role {
+    ImportRole importRole = 2;
+    ExportRole exportRole = 3;
+  }
+  /*
+    importId, segmentName and segmentCode are required when
+    creating a segment for an import via the Permutive API. 
+    These fields are not well documented by Permutive and as
+    such they are required to be provided by the client.
+  */
+  string importId = 4;
+  string segmentName = 5;
+  string segmentCode = 6;
+  bool inputHasHeaders = 7;
+}
+
+
