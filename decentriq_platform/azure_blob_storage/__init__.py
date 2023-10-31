@@ -30,16 +30,6 @@ class DataSourceAzureBlobStorage(Node):
             output_format=ComputeNodeFormat.RAW
         )
 
-class DataSourceAzureBlobStorageWorkerDecoder:
-    def decode(self, config: bytes):
-        config_decoded = AzureBlobStorageWorkerConfiguration()
-        parse_length_delimited(config, config_decoded)
-        return MessageToDict(config_decoded)
-
-__all__ = [
-    "DataSourceAzureBlobStorage",
-]
-
 class DataSinkAzureBlobStorage(Node):
     """
     Compute node that exports data to Azure blob storage.
@@ -64,12 +54,14 @@ class DataSinkAzureBlobStorage(Node):
             output_format=ComputeNodeFormat.RAW
         )
 
-class DataSinkAzureBlobStorageWorkerDecoder:
+class AzureBlobStorageWorkerDecoder:
     def decode(self, config: bytes):
         config_decoded = AzureBlobStorageWorkerConfiguration()
         parse_length_delimited(config, config_decoded)
         return MessageToDict(config_decoded)
 
 __all__ = [
+    "DataSourceAzureBlobStorage",
     "DataSinkAzureBlobStorage",
+    "AzureBlobStorageWorkerDecoder"
 ]

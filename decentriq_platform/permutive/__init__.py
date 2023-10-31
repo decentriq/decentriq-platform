@@ -30,16 +30,6 @@ class DataSourcePermutive(Node):
             output_format=ComputeNodeFormat.RAW
         )
 
-class DataSourcePermutiveWorkerDecoder:
-    def decode(self, config: bytes):
-        config_decoded = PermutiveWorkerConfiguration()
-        parse_length_delimited(config, config_decoded)
-        return MessageToDict(config_decoded)
-
-__all__ = [
-    "DataSourcePermutive",
-]
-
 class PermutiveDataTransformer(Node):
     """
     Compute node that transforms data into a Permutive compliant form.
@@ -72,12 +62,14 @@ class PermutiveDataTransformer(Node):
             output_format=ComputeNodeFormat.RAW
         )
 
-class PermutiveDataTransformerWorkerDecoder:
+class PermutiveWorkerDecoder:
     def decode(self, config: bytes):
         config_decoded = PermutiveWorkerConfiguration()
         parse_length_delimited(config, config_decoded)
         return MessageToDict(config_decoded)
 
 __all__ = [
+    "DataSourcePermutive",
     "PermutiveDataTransformer",
+    "PermutiveWorkerDecoder"
 ]
