@@ -35,7 +35,7 @@ from .proto import (
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
-from .types import DryRunOptions, JobId, TestDataset
+from .types import DryRunOptions, JobId
 from .verification import QuoteBody, Verification
 if TYPE_CHECKING:
     from .client import Client
@@ -702,7 +702,7 @@ class Session():
                 + str(response.WhichOneof("gcg_response"))
             )
         return response.retrieveAuditLogResponse
-
+    
     def publish_dataset(
             self,
             data_room_id: str,
@@ -1030,6 +1030,36 @@ class Session():
                     f" {job_id.compute_node_id} (waited {timeout} seconds)"
                 )
             elif job_id.compute_node_id in self.get_computation_status(job_id.id).completeComputeNodeIds:
+                break
+            else:
+                sleep(interval)
+                elapsed += interval
+
+    def wait_until_computation_has_finished_for_all_compute_nodes(
+        self,
+        job_id: str,
+        compute_node_ids: List[str],
+        /, *,
+        interval: int = 5,
+        timeout: int = None
+    ):
+        """
+        Wait for the given job to complete for all of the given compute nodes.
+
+        The method will check for the job's completeness every `interval` seconds and up to
+        an optional `timeout` seconds after which the method will raise an exception.
+        """
+        elapsed = 0
+        while True:
+            if timeout is not None and elapsed > timeout:
+                raise Exception(
+                    f"Timeout when trying to get result for job {job_id} (waited {timeout} seconds)"
+                )
+            elif set(compute_node_ids).issubset(
+                self.get_computation_status(
+                    job_id
+                ).completeComputeNodeIds
+            ):
                 break
             else:
                 sleep(interval)

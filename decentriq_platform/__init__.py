@@ -33,21 +33,24 @@ __pdoc__ = {
     "google_dv_360_sink": True,
     "azure_blob_storage": True,
     "salesforce": True,
+    "data_lab": True,
     "permutive": True,
 }
 
 from .client import Client, create_client, Session
-from .builders import DataRoomBuilder, DataRoomCommitBuilder, GovernanceProtocol
+from .builders import DataRoomBuilder, DataRoomCommitBuilder, DataLabBuilder, GovernanceProtocol
 from .compute import Noop, StaticContent
 from .permission import Permissions
 from .storage import Key
 from .attestation import enclave_specifications, EnclaveSpecifications
 
 from .endorsement import Endorser
-from .keychain import Keychain
+from .keychain import Keychain, KeychainEntry
+from .types import DataLabDatasetType
 
 from . import data_science
 from . import lookalike_media
+
 
 __all__ = [
     "create_client",
@@ -55,11 +58,14 @@ __all__ = [
     "Session",
     "DataRoomBuilder",
     "DataRoomCommitBuilder",
+    "DataLabBuilder",
+    "DataLabDatasetType",
     "Permissions",
     "GovernanceProtocol",
     "enclave_specifications",
     "EnclaveSpecifications",
     "Key",
+    "KeychainEntry",
     "StaticContent",
     "Noop",
     "post",
@@ -83,5 +89,6 @@ __all__ = [
     "data_source_snowflake",
     "azure_blob_storage",
     "salesforce",
+    "data_lab",
     "permutive",
 ]

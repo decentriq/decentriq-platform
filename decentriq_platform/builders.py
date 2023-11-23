@@ -1,23 +1,53 @@
 from __future__ import annotations
-from typing import List, Any, Optional, Callable, Dict, Tuple
+import io
+import json
+from typing import BinaryIO, List, Any, Optional, Callable, Dict, Tuple
+import zipfile
 
 from .proto import (
-    AuthenticationMethod, UserPermission, ComputeNode,
-    ComputeNodeLeaf, ComputeNodeBranch, Permission, DataRoom,
+    AuthenticationMethod,
+    UserPermission,
+    ComputeNode,
+    ComputeNodeLeaf,
+    ComputeNodeBranch,
+    Permission,
+    DataRoom,
     ComputeNodeParameter,
     AttestationSpecification,
-    StaticDataRoomPolicy, AffectedDataOwnersApprovePolicy,
-    ConfigurationModification, AddModification, ChangeModification, ConfigurationElement,
+    StaticDataRoomPolicy,
+    AffectedDataOwnersApprovePolicy,
+    ConfigurationModification,
+    AddModification,
+    ChangeModification,
+    ConfigurationElement,
     ConfigurationCommit,
-    DataRoomConfiguration, ComputeNodeProtocol
+    DataRoomConfiguration,
+    ComputeNodeProtocol,
 )
 from .proto import GovernanceProtocol as GovernanceProtocolProto
 from .node import Node
 from .permission import Permissions
-from .types import EnclaveSpecification
+from .types import (
+    EnclaveSpecification,
+    MatchingIdFormat,
+    DataLabDefinition,
+    DataLabDatasetType,
+)
 from .session import Session
+from .client import Client
+from .storage import Key
+from .keychain import Keychain, KeychainEntry
+from enum import Enum
 import uuid
+from datetime import datetime
 
+from decentriq_dcr_compiler.schemas.data_lab import (
+    DataLab,
+)
+from .proto import parse_length_delimited, serialize_length_delimited
+from .session import LATEST_GCG_PROTOCOL_VERSION, LATEST_WORKER_PROTOCOL_VERSION
+import base64
+from .data_lab import DataLab, DataLabConfig, ExistingDataLab
 
 __all__ = [
     "DataRoomBuilder",
@@ -28,12 +58,12 @@ __all__ = [
 
 
 def _extract_configuration_elements(
-        config: Optional[DataRoomConfiguration]
+    config: Optional[DataRoomConfiguration],
 ) -> Tuple[
-        List[Tuple[str, AttestationSpecification]],
-        List[Tuple[str, AuthenticationMethod]],
-        List[Tuple[str, UserPermission]]
-    ]:
+    List[Tuple[str, AttestationSpecification]],
+    List[Tuple[str, AuthenticationMethod]],
+    List[Tuple[str, UserPermission]],
+]:
     attestation_specs = {}
     authentication_methods = {}
     user_permissions = {}
@@ -51,19 +81,20 @@ def _extract_configuration_elements(
     return (
         list(attestation_specs.items()),
         list(authentication_methods.items()),
-        list(user_permissions.items())
+        list(user_permissions.items()),
     )
 
 
 def _find_matching_proto_object(
-        proto_object: Any,
-        other_proto_objects: List[Tuple[str, Any]]
+    proto_object: Any, other_proto_objects: List[Tuple[str, Any]]
 ) -> Optional[str]:
     existing_node_id = next(
-        (node_id
+        (
+            node_id
             for node_id, other_proto_object in other_proto_objects
-            if proto_object == other_proto_object),
-        None
+            if proto_object == other_proto_object
+        ),
+        None,
     )
     return existing_node_id
 
@@ -81,9 +112,7 @@ class GovernanceProtocol:
         Participants are still allowed to execute development computations
         as long as the required permissions have been granted.
         """
-        return GovernanceProtocolProto(
-            staticDataRoomPolicy=StaticDataRoomPolicy()
-        )
+        return GovernanceProtocolProto(staticDataRoomPolicy=StaticDataRoomPolicy())
 
     @staticmethod
     def affected_data_owners_approve():
@@ -102,7 +131,7 @@ def _deduplicate_proto_objects(protos):
     keeping their original order.
     """
     # Python dicts for Python >= 3.7 keep insertion order
-    protos_map = { proto.SerializeToString(): proto for proto in protos }
+    protos_map = {proto.SerializeToString(): proto for proto in protos}
     return [proto for proto in protos_map.values()]
 
 
@@ -111,7 +140,7 @@ def _extend_repeated_field(repeated_field, new_protos) -> bool:
     Helper function for extending a repeated field, making sure
     not to insert any duplicates while keeping insertion order.
     """
-    repeated_field_map = { proto.SerializeToString(): proto for proto in repeated_field }
+    repeated_field_map = {proto.SerializeToString(): proto for proto in repeated_field}
     did_append_something = False
     for proto in new_protos:
         proto_key = proto.SerializeToString()
@@ -122,10 +151,11 @@ def _extend_repeated_field(repeated_field, new_protos) -> bool:
     return did_append_something
 
 
-class DataRoomBuilder():
+class DataRoomBuilder:
     """
     A helper class to ease the building process of a data clean room.
     """
+
     name: str
     governance_protocol: GovernanceProtocolProto
     description: Optional[str]
@@ -133,15 +163,15 @@ class DataRoomBuilder():
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
-            self,
-            name: str,
-            enclave_specs: Dict[str, EnclaveSpecification],
-            governance_protocol: GovernanceProtocolProto = GovernanceProtocol.static(),
-            *,
-            add_basic_user_permissions: bool = True,
-            description: str = None,
-            dcr_secret_id: bytes = None,
-        ) -> None:
+        self,
+        name: str,
+        enclave_specs: Dict[str, EnclaveSpecification],
+        governance_protocol: GovernanceProtocolProto = GovernanceProtocol.static(),
+        *,
+        add_basic_user_permissions: bool = True,
+        description: str = None,
+        dcr_secret_id: bytes = None,
+    ) -> None:
         """
         Create a data room builder object.
 
@@ -165,8 +195,7 @@ class DataRoomBuilder():
         assert name, "The DCR must have a non-empty name"
 
         self.modifications_builder = DataRoomModificationsBuilder(
-            enclave_specs,
-            add_basic_user_permissions=add_basic_user_permissions
+            enclave_specs, add_basic_user_permissions=add_basic_user_permissions
         )
         self.name = name
         self.description = description
@@ -178,10 +207,7 @@ class DataRoomBuilder():
             self.add_description(description)
 
     def add_data_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new data node. If the node is marked as required, any computation
@@ -201,16 +227,14 @@ class DataRoomBuilder():
         this node are defined.
         """
         return self.modifications_builder.add_data_node(
-            name,
-            is_required=is_required,
-            node_id=node_id
+            name, is_required=is_required, node_id=node_id
         )
 
     def add_compute_node(
-            self,
-            node: Node,
-            node_id: Optional[str] = None,
-            attestation_id: Optional[str] = None
+        self,
+        node: Node,
+        node_id: Optional[str] = None,
+        attestation_id: Optional[str] = None,
     ) -> str:
         """
         Add a new compute node. Specific compute node classes are provided either
@@ -230,25 +254,21 @@ class DataRoomBuilder():
         concerning this node.
         """
         return self.modifications_builder.add_compute_node(
-            node,
-            node_id=node_id,
-            attestation_id=attestation_id
+            node, node_id=node_id, attestation_id=attestation_id
         )
 
     def add_user_permission(
-            self,
-            email: str,
-            authentication_method: AuthenticationMethod,
-            permissions: List[Permission],
+        self,
+        email: str,
+        authentication_method: AuthenticationMethod,
+        permissions: List[Permission],
     ):
         """
         Add permissions for a user.
         The authentication is performed on the enclave side based on the method supplied.
         """
         return self.modifications_builder.add_user_permission(
-            email,
-            authentication_method,
-            permissions
+            email, authentication_method, permissions
         )
 
     def add_description(self, description: str):
@@ -285,11 +305,12 @@ class DataRoomBuilder():
         return str(uuid.uuid4())
 
 
-class DataRoomModificationsBuilder():
+class DataRoomModificationsBuilder:
     """
     Builder class for constructing lists of modifications that can be
     applied to existing data room configurations.
     """
+
     data_room_id: Optional[str]
     history_pin: Optional[str]
 
@@ -309,14 +330,14 @@ class DataRoomModificationsBuilder():
     add_basic_user_permissions: bool
 
     def __init__(
-            self,
-            enclave_specs: Dict[str, EnclaveSpecification],
-            *,
-            data_room_id: Optional[str] = None,
-            data_room_configuration: Optional[DataRoomConfiguration] = None,
-            history_pin: Optional[str] = None,
-            add_basic_user_permissions: bool = True,
-        ) -> None:
+        self,
+        enclave_specs: Dict[str, EnclaveSpecification],
+        *,
+        data_room_id: Optional[str] = None,
+        data_room_configuration: Optional[DataRoomConfiguration] = None,
+        history_pin: Optional[str] = None,
+        add_basic_user_permissions: bool = True,
+    ) -> None:
         """
         Construct a builder object for constructing lists of modifications that
         can be applied to existing data room configurations.
@@ -353,17 +374,17 @@ class DataRoomModificationsBuilder():
         self.change_user_permissions = []
         self.change_attestation_specs = []
 
-        extracted_conf_elements =\
-            _extract_configuration_elements(data_room_configuration)
-        self.existing_attestation_specs, \
-            self.existing_authentication_methods, \
-            self.existing_user_permissions = extracted_conf_elements
+        extracted_conf_elements = _extract_configuration_elements(
+            data_room_configuration
+        )
+        (
+            self.existing_attestation_specs,
+            self.existing_authentication_methods,
+            self.existing_user_permissions,
+        ) = extracted_conf_elements
 
     def add_data_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new data node. If the node is marked as required, any computation
@@ -382,19 +403,15 @@ class DataRoomModificationsBuilder():
         This id will be needed when connecting a dataset or when permissions condering
         this node are defined.
         """
-        node_id = DataRoomModificationsBuilder._generate_id() if not node_id else node_id
-        node = ComputeNode(
-            nodeName=name,
-            leaf=ComputeNodeLeaf(isRequired=is_required)
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
         )
+        node = ComputeNode(nodeName=name, leaf=ComputeNodeLeaf(isRequired=is_required))
         self.new_compute_nodes.append((node_id, node))
         return node_id
 
     def add_parameter_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new parameter node. If the node is marked as required, any computation
@@ -411,36 +428,32 @@ class DataRoomModificationsBuilder():
         **Returns**:
         The id that was assigned to the added parameter node.
         """
-        node_id = DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
         bla = ComputeNodeParameter(isRequired=is_required)
         node = ComputeNode(
-            nodeName=name,
-            parameter=ComputeNodeParameter(isRequired=is_required)
+            nodeName=name, parameter=ComputeNodeParameter(isRequired=is_required)
         )
         self.new_compute_nodes.append((node_id, node))
         return node_id
 
     def _add_attestation_specification(
-            self,
-            attestation_specification: AttestationSpecification
+        self, attestation_specification: AttestationSpecification
     ) -> str:
         existing_id = _find_matching_proto_object(
             attestation_specification,
-            self.existing_attestation_specs + self.new_attestation_specs
+            self.existing_attestation_specs + self.new_attestation_specs,
         )
         if not existing_id:
             new_id = DataRoomModificationsBuilder._generate_id()
-            self.new_attestation_specs.append(
-                (new_id, attestation_specification)
-            )
+            self.new_attestation_specs.append((new_id, attestation_specification))
             return new_id
         else:
             return existing_id
 
     def change_attestation_specification(
-            self,
-            attestation_id: str,
-            attestation_specification: AttestationSpecification
+        self, attestation_id: str, attestation_specification: AttestationSpecification
     ) -> None:
         """
         Change a particular attestation specification within an existing data room
@@ -460,7 +473,10 @@ class DataRoomModificationsBuilder():
 
         if existing_spec_ix:
             old_spec_id, old_spec = self.new_attestation_specs[existing_spec_ix]
-            self.new_attestation_specs[existing_spec_ix] = old_spec_id, attestation_specification
+            self.new_attestation_specs[existing_spec_ix] = (
+                old_spec_id,
+                attestation_specification,
+            )
         elif attestation_id in dict(self.existing_attestation_specs):
             self.change_attestation_specs.append(
                 (attestation_id, attestation_specification)
@@ -471,10 +487,10 @@ class DataRoomModificationsBuilder():
             )
 
     def add_compute_node(
-            self,
-            node: Node,
-            node_id: Optional[str] = None,
-            attestation_id: Optional[str] = None
+        self,
+        node: Node,
+        node_id: Optional[str] = None,
+        attestation_id: Optional[str] = None,
     ) -> str:
         """
         Add a new compute node. Specific compute node classes are provided either
@@ -514,10 +530,13 @@ class DataRoomModificationsBuilder():
         if attestation_id:
             final_attestation_id = attestation_id
         else:
-            final_attestation_id =\
-                self._add_attestation_specification(attestation_proto)
+            final_attestation_id = self._add_attestation_specification(
+                attestation_proto
+            )
 
-        node_id = DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
         proto_node = ComputeNode(
             nodeName=node.name,
             branch=ComputeNodeBranch(
@@ -526,69 +545,72 @@ class DataRoomModificationsBuilder():
                 dependencies=node.dependencies,
                 outputFormat=node.output_format,
                 protocol=node_protocol,
-            )
+            ),
         )
         self.new_compute_nodes.append((node_id, proto_node))
         return node_id
 
     def _add_authentication_method(
-        self,
-        authentication_method: AuthenticationMethod
+        self, authentication_method: AuthenticationMethod
     ) -> str:
         existing_id = _find_matching_proto_object(
             authentication_method,
-            self.existing_authentication_methods + self.new_authentication_methods
+            self.existing_authentication_methods + self.new_authentication_methods,
         )
         if existing_id:
             return existing_id
         else:
             new_id = DataRoomModificationsBuilder._generate_id()
-            self.new_authentication_methods.append(
-                (new_id, authentication_method)
-            )
+            self.new_authentication_methods.append((new_id, authentication_method))
             return new_id
 
     def add_user_permission(
-            self,
-            email: str,
-            authentication_method: AuthenticationMethod,
-            permissions: List[Permission],
+        self,
+        email: str,
+        authentication_method: AuthenticationMethod,
+        permissions: List[Permission],
     ):
         """
         Add permissions for a user.
         The authentication is performed on the enclave side based on the method supplied.
         """
-        authentication_method_id =\
-            self._add_authentication_method(authentication_method)
+        authentication_method_id = self._add_authentication_method(
+            authentication_method
+        )
 
         if self.add_basic_user_permissions:
-            permissions.extend([
-                Permissions.retrieve_data_room_status(),
-                Permissions.retrieve_audit_log(),
-                Permissions.retrieve_data_room(),
-                Permissions.retrieve_published_datasets(),
-                Permissions.execute_development_compute()
-            ])
+            permissions.extend(
+                [
+                    Permissions.retrieve_data_room_status(),
+                    Permissions.retrieve_audit_log(),
+                    Permissions.retrieve_data_room(),
+                    Permissions.retrieve_published_datasets(),
+                    Permissions.execute_development_compute(),
+                ]
+            )
 
         # Check whether a set of permissions has already been added in a previous
         # call, and extend the permissions in case the authentication method matches.
         # This is required because helper functions might add permissions
         # to the builder before this method is called.
         existing_permission_old = [
-            permission for permission in self.existing_user_permissions
-                if email == permission[1].email and
-                    authentication_method_id == permission[1].authenticationMethodId
+            permission
+            for permission in self.existing_user_permissions
+            if email == permission[1].email
+            and authentication_method_id == permission[1].authenticationMethodId
         ]
         existing_permission_new = [
-            permission for permission in self.new_user_permissions
-                if email == permission[1].email and
-                    authentication_method_id == permission[1].authenticationMethodId
+            permission
+            for permission in self.new_user_permissions
+            if email == permission[1].email
+            and authentication_method_id == permission[1].authenticationMethodId
         ]
 
         if existing_permission_old:
             existing_id, existing_permission = existing_permission_old[0]
-            did_append_something =\
-                _extend_repeated_field(existing_permission.permissions, permissions)
+            did_append_something = _extend_repeated_field(
+                existing_permission.permissions, permissions
+            )
             # Do not add a change modification if none is necessary
             if did_append_something:
                 self.change_user_permissions.append((existing_id, existing_permission))
@@ -599,7 +621,7 @@ class DataRoomModificationsBuilder():
             permission = UserPermission(
                 email=email,
                 authenticationMethodId=authentication_method_id,
-                permissions=_deduplicate_proto_objects(permissions)
+                permissions=_deduplicate_proto_objects(permissions),
             )
             self.new_user_permissions.append(
                 (DataRoomModificationsBuilder._generate_id(), permission)
@@ -611,33 +633,23 @@ class DataRoomModificationsBuilder():
         for spec_id, attestation_spec in self.new_attestation_specs:
             configuration_elements.append(
                 ConfigurationElement(
-                    id=spec_id,
-                    attestationSpecification=attestation_spec
+                    id=spec_id, attestationSpecification=attestation_spec
                 )
             )
 
         for node_id, compute_node in self.new_compute_nodes:
             configuration_elements.append(
-                ConfigurationElement(
-                    id=node_id,
-                    computeNode=compute_node
-                )
+                ConfigurationElement(id=node_id, computeNode=compute_node)
             )
 
         for auth_id, auth_method in self.new_authentication_methods:
             configuration_elements.append(
-                ConfigurationElement(
-                    id=auth_id,
-                    authenticationMethod=auth_method
-                )
+                ConfigurationElement(id=auth_id, authenticationMethod=auth_method)
             )
 
         for perm_id, permission in self.new_user_permissions:
             configuration_elements.append(
-                ConfigurationElement(
-                    id=perm_id,
-                    userPermission=permission
-                )
+                ConfigurationElement(id=perm_id, userPermission=permission)
             )
 
         configuration = DataRoomConfiguration(elements=configuration_elements)
@@ -654,8 +666,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=spec_id,
-                            attestationSpecification=attestation_spec
+                            id=spec_id, attestationSpecification=attestation_spec
                         )
                     )
                 )
@@ -666,8 +677,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=node_id,
-                            computeNode=compute_node
+                            id=node_id, computeNode=compute_node
                         )
                     )
                 )
@@ -678,8 +688,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=auth_id,
-                            authenticationMethod=auth_method
+                            id=auth_id, authenticationMethod=auth_method
                         )
                     )
                 ),
@@ -690,8 +699,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=perm_id,
-                            userPermission=permission
+                            id=perm_id, userPermission=permission
                         )
                     )
                 )
@@ -702,8 +710,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     change=ChangeModification(
                         element=ConfigurationElement(
-                            id=perm_id,
-                            userPermission=permission
+                            id=perm_id, userPermission=permission
                         )
                     )
                 )
@@ -714,8 +721,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     change=ChangeModification(
                         element=ConfigurationElement(
-                            id=attestation_id,
-                            attestationSpecification=attestation_spec
+                            id=attestation_id, attestationSpecification=attestation_spec
                         )
                     )
                 )
@@ -734,20 +740,21 @@ class DataRoomCommitBuilder:
     i.e. a list of modifications that are to be applied to the configuration
     of an existing data room.
     """
+
     name: str
     data_room_id: str
     history_pin: str
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
-            self,
-            name: str,
-            data_room_id: str,
-            current_configuration: DataRoomConfiguration,
-            history_pin: str,
-            enclave_specs: Dict[str, EnclaveSpecification],
-            *,
-            add_basic_user_permissions: bool = False,
+        self,
+        name: str,
+        data_room_id: str,
+        current_configuration: DataRoomConfiguration,
+        history_pin: str,
+        enclave_specs: Dict[str, EnclaveSpecification],
+        *,
+        add_basic_user_permissions: bool = False,
     ):
         """
         Construct a builder object for constructing new data room
@@ -786,10 +793,7 @@ class DataRoomCommitBuilder:
         )
 
     def add_data_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new data node. If the node is marked as required, any computation
@@ -809,16 +813,11 @@ class DataRoomCommitBuilder:
         this node are defined.
         """
         return self.modifications_builder.add_data_node(
-            name,
-            is_required=is_required,
-            node_id=node_id
+            name, is_required=is_required, node_id=node_id
         )
 
     def add_parameter_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new parameter node. If the node is marked as required, any computation
@@ -836,25 +835,21 @@ class DataRoomCommitBuilder:
         The id that was assigned to the added parameter node.
         """
         return self.modifications_builder.add_parameter_node(
-            name,
-            is_required=is_required,
-            node_id=node_id
+            name, is_required=is_required, node_id=node_id
         )
 
     def change_attestation_specification(
-            self,
-            attestation_id: str,
-            attestation_specification: AttestationSpecification
+        self, attestation_id: str, attestation_specification: AttestationSpecification
     ) -> None:
         self.modifications_builder.change_attestation_specification(
             attestation_id, attestation_specification
         )
 
     def add_compute_node(
-            self,
-            node: Node,
-            node_id: Optional[str] = None,
-            attestation_id: Optional[str] = None
+        self,
+        node: Node,
+        node_id: Optional[str] = None,
+        attestation_id: Optional[str] = None,
     ) -> str:
         """
         Add a new compute node. Specific compute node classes are provided either
@@ -874,25 +869,21 @@ class DataRoomCommitBuilder:
         concerning this node.
         """
         return self.modifications_builder.add_compute_node(
-            node,
-            node_id=node_id,
-            attestation_id=attestation_id
+            node, node_id=node_id, attestation_id=attestation_id
         )
 
     def add_user_permission(
-            self,
-            email: str,
-            authentication_method: AuthenticationMethod,
-            permissions: List[Permission],
+        self,
+        email: str,
+        authentication_method: AuthenticationMethod,
+        permissions: List[Permission],
     ):
         """
         Add permissions for a user.
         The authentication is performed on the enclave side based on the method supplied.
         """
         return self.modifications_builder.add_user_permission(
-            email,
-            authentication_method,
-            permissions
+            email, authentication_method, permissions
         )
 
     @staticmethod
@@ -911,5 +902,99 @@ class DataRoomCommitBuilder:
             name=self.name,
             dataRoomId=bytes.fromhex(self.data_room_id),
             dataRoomHistoryPin=bytes.fromhex(self.history_pin),
-            modifications=self.modifications_builder.build()
+            modifications=self.modifications_builder.build(),
         )
+
+
+class DataLabBuilder:
+    """
+    A helper class to build a Data Lab.
+    """
+
+    def __init__(
+        self,
+        client: Client,
+    ):
+        self.name = None
+        self.has_demographics = False
+        self.has_embeddings = False
+        self.num_embeddings = 0
+        self.matching_id_format = MatchingIdFormat.STRING
+        self.validation_id = None
+        self.client = client
+        self.existing = False
+        self.data_lab_id = None
+
+    def with_name(self, name: str):
+        """
+        Set the name of the DataLab.
+
+        **Parameters**:
+        - `name`: Name to be used for the DataLab.
+        """
+        self.name = name
+
+    def with_matching_id_format(self, matching_id_format: MatchingIdFormat):
+        """
+        Set the matching ID format.
+
+        **Parameters**:
+        - `matching_id_format`: The format of the matching ID.
+        """
+        self.matching_id_format = matching_id_format
+
+    def with_demographics(self):
+        """
+        Enable demographics in the DataLab.
+        """
+        self.has_demographics = True
+
+    def with_embeddings(self, num_embeddings: int):
+        """
+        Enable embeddings in the DataLab.
+
+        **Parameters**:
+        - `num_embeddings`: The number of embeddings the DataLab should use.
+        """
+        self.has_embeddings = True
+        self.num_embeddings = num_embeddings
+
+    def from_existing(self, data_lab_id: str, keychain: Keychain):
+        """
+        Construct a new DataLab from an existing DataLab with the given ID.
+
+        **Parameters**:
+        - `data_lab_id`: The ID of the existing DataLab.
+        - `keychain`: The keychain to use to provision datasets from the old DataLab to the new DataLab.
+        """
+        self.existing = True
+        self.data_lab_id = data_lab_id
+        self.keychain = keychain
+
+    def build(self) -> DataLab:
+        """
+        Build the DataLab.
+        """
+        if self.existing:
+            # Build a new DataLab from an existing one.
+            # The new DataLab will have the same configuration as the existing one.
+            data_lab_definition = self.client.get_data_lab(self.data_lab_id)
+            cfg = DataLabConfig(
+                data_lab_definition["name"],
+                data_lab_definition["requireDemographicsDataset"],
+                data_lab_definition["requireEmbeddingsDataset"],
+                data_lab_definition["numEmbeddings"],
+                data_lab_definition["matchingIdFormat"],
+            )
+            existing_data_lab = ExistingDataLab(data_lab_definition, self.keychain)
+            return DataLab(self.client, cfg, existing_data_lab)
+        else:
+            # Build a new DataLab using the specified enclave specifications.
+            cfg = DataLabConfig(
+                self.name,
+                self.has_demographics,
+                self.has_embeddings,
+                self.num_embeddings,
+                self.matching_id_format,
+            )
+            return DataLab(self.client, cfg)

@@ -15,6 +15,7 @@ __all__ = [
     "JobId",
     "DataRoomDescription",
     "DatasetDescription",
+    "DatasetType",
 ]
 
 
@@ -231,3 +232,51 @@ class TestDataset(TypedDict):
 
 class DryRunOptions(TypedDict):
     test_datasets: Dict[str, TestDataset]
+
+class MatchingIdFormat(str, Enum):
+    STRING = "STRING"
+    EMAIL = "EMAIL"
+    HASH_SHA256_HEX = "HASH_SHA256_HEX"
+    PHONE_NUMBER_E164 = "PHONE_NUMBER_E164"
+
+class TableColumnHashingAlgorithm(str, Enum):
+	SHA256_HEX = "SHA256_HEX"
+
+class DataLabDatasetType(Enum):
+    EMBEDDINGS = 1
+    DEMOGRAPHICS = 2
+    MATCH = 3
+    SEGMENTS = 4
+
+class Dataset(TypedDict):
+    id: str
+    manifestHash: str
+    name: str
+
+class DataLabDataset(TypedDict): 
+    name: str
+    dataset: Dataset
+
+class DataLabDefinition(TypedDict):
+    id: str
+    name: str
+    datasets: List[DataLabDataset]
+    usersDataset: Dataset
+    segmentsDataset: Dataset
+    demographicsDataset: Dataset
+    embeddingsDataset: Dataset
+    statistics: str
+    requireDemographicsDataset: bool
+    requireEmbeddingsDataset: bool
+    isValidated: bool
+    numEmbeddings: int
+    matchingIdFormat: MatchingIdFormat
+    matchingIdHashingAlgorithm: TableColumnHashingAlgorithm
+    validationComputeJobId: str
+    statisticsComputeJobId: str
+    jobsDriverAttestationHash: str
+    highLevelRepresentationAsString: str
+
+class DataLabListFilter(Enum):
+    VALIDATED = 1   # List validated DataLabs
+    UNVALIDATED = 2 # List un-validated DataLabs
