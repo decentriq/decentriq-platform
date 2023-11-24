@@ -276,6 +276,8 @@ class DataLabDefinition(TypedDict):
     statisticsComputeJobId: str
     jobsDriverAttestationHash: str
     highLevelRepresentationAsString: str
+    createdAt: str
+    updatedAt: str
 
 class DataLabListFilter(Enum):
     VALIDATED = 1   # List validated DataLabs

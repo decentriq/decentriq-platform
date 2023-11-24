@@ -1096,6 +1096,8 @@ class Client:
                         statisticsComputeJobId
                         jobsDriverAttestationHash
                         highLevelRepresentationAsString
+                        createdAt
+                        updatedAt
                     }
                 }
             }
