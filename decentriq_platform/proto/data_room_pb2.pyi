@@ -409,6 +409,42 @@ class ConfigurationCommit(google.protobuf.message.Message):
 global___ConfigurationCommit = ConfigurationCommit
 
 @typing_extensions.final
+class WindowRateLimitingConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TIMEWINDOWSECONDS_FIELD_NUMBER: builtins.int
+    NUMMAXEXECUTIONS_FIELD_NUMBER: builtins.int
+    timeWindowSeconds: builtins.int
+    numMaxExecutions: builtins.int
+    def __init__(
+        self,
+        *,
+        timeWindowSeconds: builtins.int = ...,
+        numMaxExecutions: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["numMaxExecutions", b"numMaxExecutions", "timeWindowSeconds", b"timeWindowSeconds"]) -> None: ...
+
+global___WindowRateLimitingConfig = WindowRateLimitingConfig
+
+@typing_extensions.final
+class RateLimitingConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    WINDOW_FIELD_NUMBER: builtins.int
+    @property
+    def window(self) -> global___WindowRateLimitingConfig: ...
+    def __init__(
+        self,
+        *,
+        window: global___WindowRateLimitingConfig | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["method", b"method", "window", b"window"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["method", b"method", "window", b"window"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["method", b"method"]) -> typing_extensions.Literal["window"] | None: ...
+
+global___RateLimitingConfig = RateLimitingConfig
+
+@typing_extensions.final
 class ComputeNode(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -416,6 +452,7 @@ class ComputeNode(google.protobuf.message.Message):
     LEAF_FIELD_NUMBER: builtins.int
     PARAMETER_FIELD_NUMBER: builtins.int
     BRANCH_FIELD_NUMBER: builtins.int
+    RATELIMITING_FIELD_NUMBER: builtins.int
     nodeName: builtins.str
     @property
     def leaf(self) -> global___ComputeNodeLeaf: ...
@@ -423,6 +460,8 @@ class ComputeNode(google.protobuf.message.Message):
     def parameter(self) -> global___ComputeNodeParameter: ...
     @property
     def branch(self) -> global___ComputeNodeBranch: ...
+    @property
+    def rateLimiting(self) -> global___RateLimitingConfig: ...
     def __init__(
         self,
         *,
@@ -430,9 +469,13 @@ class ComputeNode(google.protobuf.message.Message):
         leaf: global___ComputeNodeLeaf | None = ...,
         parameter: global___ComputeNodeParameter | None = ...,
         branch: global___ComputeNodeBranch | None = ...,
+        rateLimiting: global___RateLimitingConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_rateLimiting", b"_rateLimiting"]) -> typing_extensions.Literal["rateLimiting"] | None: ...
+    @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["node", b"node"]) -> typing_extensions.Literal["leaf", "parameter", "branch"] | None: ...
 
 global___ComputeNode = ComputeNode

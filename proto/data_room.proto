@@ -204,6 +204,17 @@ message ConfigurationCommit {
   repeated ConfigurationModification modifications = 5;
 }
 
+message WindowRateLimitingConfig {
+  uint32 timeWindowSeconds = 1;
+  uint32 numMaxExecutions = 2;
+}
+
+message RateLimitingConfig {
+  oneof method {
+    WindowRateLimitingConfig window = 1;
+  }
+}
+
 message ComputeNode {
   string nodeName = 1;
   oneof node {
@@ -211,9 +222,12 @@ message ComputeNode {
     ComputeNodeParameter parameter = 4;
     ComputeNodeBranch branch = 3;
   }
+  optional RateLimitingConfig rateLimiting = 5;
 }
 
-message ComputeNodeLeaf { bool isRequired = 1; }
+message ComputeNodeLeaf {
+  bool isRequired = 1;
+}
 
 message ComputeNodeParameter { bool isRequired = 1; }
 
