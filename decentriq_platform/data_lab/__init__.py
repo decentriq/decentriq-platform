@@ -443,7 +443,7 @@ class DataLab:
                 raise Exception("Can't provision to DCR. DataLab not validated.")
 
         # Check DataLab and LMDCR are compatible.
-        lmdcr = self._get_lmdcr(data_room_id)
+        lmdcr, lmdcr_session = self._get_lmdcr(data_room_id)
         compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room(
             self.hl_data_lab, lmdcr
         )
@@ -467,7 +467,7 @@ class DataLab:
             lmdcr_node_name = self._get_lmdcr_node_name(required_dataset)
             manifest_hash = data_lab_datasets[required_dataset]["manifestHash"]
             retrieved_key = keychain.get("dataset_key", manifest_hash)
-            self.session.publish_dataset(
+            lmdcr_session.publish_dataset(
                 data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key.value)
             )
 
@@ -482,7 +482,7 @@ class DataLab:
             lmdcr_node_name = self._get_lmdcr_node_name(optional_dataset)
             manifest_hash = data_lab_datasets[optional_dataset]["manifestHash"]
             retrieved_key = keychain.get("dataset_key", manifest_hash)
-            self.session.publish_dataset(
+            lmdcr_session.publish_dataset(
                 data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key.value)
             )
 
@@ -506,7 +506,7 @@ class DataLab:
             datasets_dict[dataset["name"]] = dataset["dataset"]
         return datasets_dict
 
-    def _get_lmdcr(self, data_room_id) -> LookalikeMediaDataRoom:
+    def _get_lmdcr(self, data_room_id) -> (LookalikeMediaDataRoom, Session):
         # Get the high level representation of the LMDCR.
         lmdcr_driver_attestation_hash = self.client._get_lmdcr_driver_attestation_hash(
             data_room_id
@@ -530,7 +530,7 @@ class DataLab:
         parse_length_delimited(compiled_serialized, recompiled_low_level_dcr)
         if recompiled_low_level_dcr != existing_lmdcr.dataRoom:
             raise Exception("LMDCR failed verification")
-        return lmdcr
+        return (lmdcr, session)
 
     def _create_session_from_driver_spec(
         self, driver_spec: EnclaveSpecification
