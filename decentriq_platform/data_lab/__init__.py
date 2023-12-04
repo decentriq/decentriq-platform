@@ -88,7 +88,7 @@ class DataLab:
         existing_data_lab: ExistingDataLab = None,
     ):
         self.client = client
-        enclave_specs = self._get_enclave_specs_as_dictionary()
+        enclave_specs = self._get_latest_enclave_specs_as_dictionary()
         auth, _ = client.create_auth_using_decentriq_pki(enclave_specs)
         self.session = client.create_session(auth, enclave_specs)
         self.cfg = cfg
@@ -105,6 +105,7 @@ class DataLab:
         else:
             # Create a new DataLab.
             self.data_lab_id = f"DataLab-{str(uuid.uuid4())}"
+            enclave_specs = self._get_latest_enclave_specs_as_dictionary()
             create_data_lab = CreateDataLab(
                 __root__=CreateDataLabItem(
                     v0=CreateDataLabComputeV0(
@@ -556,7 +557,7 @@ class DataLab:
 
     # Updates the HL DataLab representation and the session object.
     def _update_enclave_specs(self):
-        enclave_specs = self._get_enclave_specs_as_dictionary()
+        enclave_specs = self._get_latest_enclave_specs_as_dictionary()
         (driver_spec, python_spec) = self._get_data_lab_enclave_specs(enclave_specs)
         # Update to the latest enclave specs
         root_certificate_pem = self.client.decentriq_ca_root_certificate.decode("utf-8")
@@ -567,15 +568,28 @@ class DataLab:
         auth, _ = self.client.create_auth_using_decentriq_pki(enclave_specs)
         self.session = self.client.create_session(auth, enclave_specs)
 
-    def _get_enclave_specs_as_dictionary(self):
+    def _get_latest_enclave_specs_as_dictionary(
+        self,
+    ) -> Dict[str, EnclaveSpecification]:
         enclave_specs = self.client._get_enclave_specifications()
+        latest_driver_version = 0
+        latest_python_worker_version = 0
+        latest_enclaves = {}
         for spec in enclave_specs:
             if spec["name"] == "decentriq.driver":
-                spec["clientProtocols"] = [LATEST_GCG_PROTOCOL_VERSION]
-        enclave_specs_dict = {
-            running_spec["name"]: running_spec for running_spec in enclave_specs
-        }
-        return enclave_specs_dict
+                version = int(spec["version"])
+                if version >= latest_driver_version:
+                    latest_driver_version = version
+                    latest_enclaves["decentriq.driver"] = spec
+            if spec["name"] == "decentriq.python-ml-worker-32-64":
+                version = int(spec["version"])
+                if version >= latest_python_worker_version:
+                    latest_python_worker_version = version
+                    latest_enclaves["decentriq.python-ml-worker-32-64"] = spec
+        latest_enclaves["decentriq.driver"]["clientProtocols"] = [
+            LATEST_GCG_PROTOCOL_VERSION
+        ]
+        return latest_enclaves
 
     def _get_data_lab_node_names(self, dataset_type: DataLabDatasetType):
         if dataset_type == DataLabDatasetType.EMBEDDINGS:
