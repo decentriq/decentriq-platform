@@ -1,8 +1,5 @@
 from __future__ import annotations
-import io
-import json
-from typing import BinaryIO, List, Any, Optional, Callable, Dict, Tuple
-import zipfile
+from typing import List, Any, Optional, Dict, Tuple
 
 from .proto import (
     AuthenticationMethod,
@@ -29,24 +26,15 @@ from .node import Node
 from .permission import Permissions
 from .types import (
     EnclaveSpecification,
-    MatchingIdFormat,
-    DataLabDefinition,
-    DataLabDatasetType,
+    MatchingId,
 )
-from .session import Session
 from .client import Client
-from .storage import Key
-from .keychain import Keychain, KeychainEntry
-from enum import Enum
+from .keychain import Keychain
 import uuid
-from datetime import datetime
 
 from decentriq_dcr_compiler.schemas.data_lab import (
     DataLab,
 )
-from .proto import parse_length_delimited, serialize_length_delimited
-from .session import LATEST_GCG_PROTOCOL_VERSION, LATEST_WORKER_PROTOCOL_VERSION
-import base64
 from .data_lab import DataLab, DataLabConfig, ExistingDataLab
 
 __all__ = [
@@ -919,7 +907,7 @@ class DataLabBuilder:
         self.has_demographics = False
         self.has_embeddings = False
         self.num_embeddings = 0
-        self.matching_id_format = MatchingIdFormat.STRING
+        self.matching_id = MatchingId.STRING
         self.validation_id = None
         self.client = client
         self.existing = False
@@ -934,14 +922,14 @@ class DataLabBuilder:
         """
         self.name = name
 
-    def with_matching_id_format(self, matching_id_format: MatchingIdFormat):
+    def with_matching_id_format(self, matching_id: MatchingId):
         """
         Set the matching ID format.
 
         **Parameters**:
-        - `matching_id_format`: The format of the matching ID.
+        - `matching_id`: The type of matching ID to use.
         """
-        self.matching_id_format = matching_id_format
+        self.matching_id = matching_id
 
     def with_demographics(self):
         """
@@ -995,6 +983,6 @@ class DataLabBuilder:
                 self.has_demographics,
                 self.has_embeddings,
                 self.num_embeddings,
-                self.matching_id_format,
+                self.matching_id,
             )
             return DataLab(self.client, cfg)

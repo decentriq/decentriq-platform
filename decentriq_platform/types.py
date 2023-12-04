@@ -25,6 +25,7 @@ class JobId:
 
     Objects of this class can be used to retrieve results for processed computations.
     """
+
     def __init__(self, job_id: str, compute_node_id: str):
         self.id = job_id
         """The identifier of the job that processed a particular computation."""
@@ -233,6 +234,19 @@ class TestDataset(TypedDict):
 class DryRunOptions(TypedDict):
     test_datasets: Dict[str, TestDataset]
 
+# The matching ID specified by the user.
+class MatchingId(str, Enum):
+    """
+    The type of Matching ID to use.
+    """
+    STRING = "STRING"
+    EMAIL = "EMAIL"
+    HASHED_EMAIL = "HASHED_EMAIL"
+    PHONE_NUMBER = "PHONE_NUMBER"
+    HASHED_PHONE_NUMBER = "HASHED_PHONE_NUMBER"
+
+# Internal Matching ID used by the SDK.
+# Maps to the above user specified `MatchingId`.
 class MatchingIdFormat(str, Enum):
     STRING = "STRING"
     EMAIL = "EMAIL"

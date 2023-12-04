@@ -12,18 +12,16 @@ from ..types import (
     DryRunOptions,
     EnclaveSpecification,
     JobId,
-    List,
+    MatchingId,
+    MatchingIdFormat,
+    TableColumnHashingAlgorithm,
 )
 from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.data_lab import (
-    DataLab as DataLabSchema,
-)
 from decentriq_dcr_compiler.schemas.lookalike_media_data_room import (
     LookalikeMediaDataRoom,
 )
 from decentriq_dcr_compiler.schemas.create_data_lab import (
     CreateDataLab,
-    HashingAlgorithm,
     CreateDataLab,
     CreateDataLabItem,
     CreateDataLabComputeV0,
@@ -31,11 +29,29 @@ from decentriq_dcr_compiler.schemas.create_data_lab import (
 from ..proto import DataRoom, CreateDcrPurpose
 from ..proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from ..storage import Key
-from time import sleep
 from ..keychain import Keychain, KeychainEntry
 from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
 from pathlib import Path
-from decentriq_platform.types import MatchingIdFormat
+
+__all__ = [
+    "MatchingId",
+]
+
+# Map the user specified matching ID to the corresponding internal
+# matching ID format and hashing algorithm.
+MATCHING_ID_INTERNAL_LOOKUP = {
+    MatchingId.STRING: (MatchingIdFormat.STRING, None),
+    MatchingId.EMAIL: (MatchingIdFormat.EMAIL, None),
+    MatchingId.HASHED_EMAIL: (
+        MatchingIdFormat.EMAIL,
+        TableColumnHashingAlgorithm.SHA256_HEX,
+    ),
+    MatchingId.PHONE_NUMBER: (MatchingIdFormat.PHONE_NUMBER_E164, None),
+    MatchingId.HASHED_PHONE_NUMBER: (
+        MatchingIdFormat.PHONE_NUMBER_E164,
+        TableColumnHashingAlgorithm.SHA256_HEX,
+    ),
+}
 
 
 class Dataset:
@@ -51,16 +67,13 @@ class DataLabConfig:
         has_demographics: bool,
         has_embeddings: bool,
         num_embeddings: int,
-        matching_id_format: MatchingIdFormat,
-        matching_id_hashing_algorithm: HashingAlgorithm = None,
+        matching_id: MatchingId,
     ):
         self.name = name
         self.has_demographics = has_demographics
         self.has_embeddings = has_embeddings
         self.num_embeddings = num_embeddings
-        self.matching_id_format = matching_id_format
-        if matching_id_hashing_algorithm:
-            self.matching_id_hashing_algorithm = matching_id_hashing_algorithm
+        self.matching_id = matching_id
 
 
 class ExistingDataLab:
@@ -105,7 +118,10 @@ class DataLab:
         else:
             # Create a new DataLab.
             self.data_lab_id = f"DataLab-{str(uuid.uuid4())}"
-            enclave_specs = self._get_latest_enclave_specs_as_dictionary()
+            (
+                matching_id_format,
+                matching_id_hashing_algorithm,
+            ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
                 __root__=CreateDataLabItem(
                     v0=CreateDataLabComputeV0(
@@ -118,7 +134,8 @@ class DataLab:
                         hasDemographics=self.cfg.has_demographics,
                         hasEmbeddings=self.cfg.has_embeddings,
                         id=self.data_lab_id,
-                        matchingIdFormat=self.cfg.matching_id_format,
+                        matchingIdFormat=matching_id_format,
+                        matchingIdHashingAlgorithm=matching_id_hashing_algorithm,
                         name=self.cfg.name,
                         numEmbeddings=self.cfg.num_embeddings,
                         publisherEmail=self.client.user_email,
