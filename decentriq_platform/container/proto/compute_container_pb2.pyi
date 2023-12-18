@@ -46,6 +46,7 @@ class StaticImage(google.protobuf.message.Message):
     INCLUDECONTAINERLOGSONSUCCESS_FIELD_NUMBER: builtins.int
     MINIMUMCONTAINERMEMORYSIZE_FIELD_NUMBER: builtins.int
     EXTRACHUNKCACHESIZETOAVAILABLEMEMORYRATIO_FIELD_NUMBER: builtins.int
+    PROXYCONFIGURATION_FIELD_NUMBER: builtins.int
     @property
     def command(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
     @property
@@ -74,8 +75,8 @@ class StaticImage(google.protobuf.message.Message):
         the extra container memory efficiently.
     * Example CHUV pipeline: this computation accesses sparse static input genome data in a fairly random manner,
         meaning that the best course of action is to read all data into memory first instead of relying on the chunk
-        cache backed filesystem. This means low extraChunkCacheSizeToAvailableMemoryRatio(1.0) should be used.
-        A setting of 1.0 means that all available extra memory (aside from the minimum chunk cache size) will be
+        cache backed filesystem. This means low extraChunkCacheSizeToAvailableMemoryRatio(0.0) should be used.
+        A setting of 0.0 means that all available extra memory (aside from the minimum chunk cache size) will be
         given to the container.
     * Example default settings: by default most but not all of the memory is given to the container, assuming that
         most applications tend to read the input files into memory as a first step instead of streaming through.
@@ -83,6 +84,16 @@ class StaticImage(google.protobuf.message.Message):
     """
     extraChunkCacheSizeToAvailableMemoryRatio: builtins.float
     """default 0.0625"""
+    @property
+    def proxyConfiguration(self) -> global___ProxyConfiguration:
+        """Configure internet connectivity for the container. The VM starts a proxy (see delta-vm-proxy) which sets up
+        networking that appears as if the container had direct internet access. However, all traffic is routed through
+        this proxy, including DNS which returns fake IP addresses. The proxy is responsible for enforcing restrictive
+        measures on how the internet can be accessed.
+        null = disabled
+        liberal = all traffic is allowed
+        domain allowlist = only domains listed here can be accessed
+        """
     def __init__(
         self,
         *,
@@ -93,15 +104,66 @@ class StaticImage(google.protobuf.message.Message):
         includeContainerLogsOnSuccess: builtins.bool = ...,
         minimumContainerMemorySize: builtins.int | None = ...,
         extraChunkCacheSizeToAvailableMemoryRatio: builtins.float | None = ...,
+        proxyConfiguration: global___ProxyConfiguration | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio", "_minimumContainerMemorySize", b"_minimumContainerMemorySize", "extraChunkCacheSizeToAvailableMemoryRatio", b"extraChunkCacheSizeToAvailableMemoryRatio", "minimumContainerMemorySize", b"minimumContainerMemorySize"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio", "_minimumContainerMemorySize", b"_minimumContainerMemorySize", "command", b"command", "extraChunkCacheSizeToAvailableMemoryRatio", b"extraChunkCacheSizeToAvailableMemoryRatio", "includeContainerLogsOnError", b"includeContainerLogsOnError", "includeContainerLogsOnSuccess", b"includeContainerLogsOnSuccess", "minimumContainerMemorySize", b"minimumContainerMemorySize", "mountPoints", b"mountPoints", "outputPath", b"outputPath"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio", "_minimumContainerMemorySize", b"_minimumContainerMemorySize", "_proxyConfiguration", b"_proxyConfiguration", "extraChunkCacheSizeToAvailableMemoryRatio", b"extraChunkCacheSizeToAvailableMemoryRatio", "minimumContainerMemorySize", b"minimumContainerMemorySize", "proxyConfiguration", b"proxyConfiguration"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio", "_minimumContainerMemorySize", b"_minimumContainerMemorySize", "_proxyConfiguration", b"_proxyConfiguration", "command", b"command", "extraChunkCacheSizeToAvailableMemoryRatio", b"extraChunkCacheSizeToAvailableMemoryRatio", "includeContainerLogsOnError", b"includeContainerLogsOnError", "includeContainerLogsOnSuccess", b"includeContainerLogsOnSuccess", "minimumContainerMemorySize", b"minimumContainerMemorySize", "mountPoints", b"mountPoints", "outputPath", b"outputPath", "proxyConfiguration", b"proxyConfiguration"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_extraChunkCacheSizeToAvailableMemoryRatio", b"_extraChunkCacheSizeToAvailableMemoryRatio"]) -> typing_extensions.Literal["extraChunkCacheSizeToAvailableMemoryRatio"] | None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_minimumContainerMemorySize", b"_minimumContainerMemorySize"]) -> typing_extensions.Literal["minimumContainerMemorySize"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_proxyConfiguration", b"_proxyConfiguration"]) -> typing_extensions.Literal["proxyConfiguration"] | None: ...
 
 global___StaticImage = StaticImage
+
+@typing_extensions.final
+class ProxyConfiguration(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    LIBERAL_FIELD_NUMBER: builtins.int
+    DOMAINALLOWLIST_FIELD_NUMBER: builtins.int
+    @property
+    def liberal(self) -> global___ProxyConfigurationLiberal: ...
+    @property
+    def domainAllowlist(self) -> global___ProxyConfigurationDomainAllowlist: ...
+    def __init__(
+        self,
+        *,
+        liberal: global___ProxyConfigurationLiberal | None = ...,
+        domainAllowlist: global___ProxyConfigurationDomainAllowlist | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["configuration", b"configuration", "domainAllowlist", b"domainAllowlist", "liberal", b"liberal"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["configuration", b"configuration", "domainAllowlist", b"domainAllowlist", "liberal", b"liberal"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["configuration", b"configuration"]) -> typing_extensions.Literal["liberal", "domainAllowlist"] | None: ...
+
+global___ProxyConfiguration = ProxyConfiguration
+
+@typing_extensions.final
+class ProxyConfigurationLiberal(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___ProxyConfigurationLiberal = ProxyConfigurationLiberal
+
+@typing_extensions.final
+class ProxyConfigurationDomainAllowlist(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DOMAIN_FIELD_NUMBER: builtins.int
+    @property
+    def domain(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
+    def __init__(
+        self,
+        *,
+        domain: collections.abc.Iterable[builtins.str] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["domain", b"domain"]) -> None: ...
+
+global___ProxyConfigurationDomainAllowlist = ProxyConfigurationDomainAllowlist
 
 @typing_extensions.final
 class MountPoint(google.protobuf.message.Message):
