@@ -452,6 +452,7 @@ class ComputeNode(google.protobuf.message.Message):
     LEAF_FIELD_NUMBER: builtins.int
     PARAMETER_FIELD_NUMBER: builtins.int
     BRANCH_FIELD_NUMBER: builtins.int
+    AIRLOCK_FIELD_NUMBER: builtins.int
     RATELIMITING_FIELD_NUMBER: builtins.int
     nodeName: builtins.str
     @property
@@ -460,6 +461,8 @@ class ComputeNode(google.protobuf.message.Message):
     def parameter(self) -> global___ComputeNodeParameter: ...
     @property
     def branch(self) -> global___ComputeNodeBranch: ...
+    @property
+    def airlock(self) -> global___ComputeNodeAirlock: ...
     @property
     def rateLimiting(self) -> global___RateLimitingConfig:
         """/ Control how often this node can be interacted with
@@ -480,14 +483,15 @@ class ComputeNode(google.protobuf.message.Message):
         leaf: global___ComputeNodeLeaf | None = ...,
         parameter: global___ComputeNodeParameter | None = ...,
         branch: global___ComputeNodeBranch | None = ...,
+        airlock: global___ComputeNodeAirlock | None = ...,
         rateLimiting: global___RateLimitingConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "airlock", b"airlock", "branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "airlock", b"airlock", "branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> None: ...
     @typing.overload
     def WhichOneof(self, oneof_group: typing_extensions.Literal["_rateLimiting", b"_rateLimiting"]) -> typing_extensions.Literal["rateLimiting"] | None: ...
     @typing.overload
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["node", b"node"]) -> typing_extensions.Literal["leaf", "parameter", "branch"] | None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["node", b"node"]) -> typing_extensions.Literal["leaf", "parameter", "branch", "airlock"] | None: ...
 
 global___ComputeNode = ComputeNode
 
@@ -520,6 +524,24 @@ class ComputeNodeParameter(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["isRequired", b"isRequired"]) -> None: ...
 
 global___ComputeNodeParameter = ComputeNodeParameter
+
+@typing_extensions.final
+class ComputeNodeAirlock(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    QUOTABYTES_FIELD_NUMBER: builtins.int
+    AIRLOCKEDDEPENDENCY_FIELD_NUMBER: builtins.int
+    quotaBytes: builtins.int
+    airlockedDependency: builtins.str
+    def __init__(
+        self,
+        *,
+        quotaBytes: builtins.int = ...,
+        airlockedDependency: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["airlockedDependency", b"airlockedDependency", "quotaBytes", b"quotaBytes"]) -> None: ...
+
+global___ComputeNodeAirlock = ComputeNodeAirlock
 
 @typing_extensions.final
 class ComputeNodeProtocol(google.protobuf.message.Message):

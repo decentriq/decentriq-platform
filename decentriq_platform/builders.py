@@ -20,6 +20,7 @@ from .proto import (
     ConfigurationCommit,
     DataRoomConfiguration,
     ComputeNodeProtocol,
+    ComputeNodeAirlock,
 )
 from .proto import GovernanceProtocol as GovernanceProtocolProto
 from .node import Node
@@ -51,10 +52,12 @@ def _extract_configuration_elements(
     List[Tuple[str, AttestationSpecification]],
     List[Tuple[str, AuthenticationMethod]],
     List[Tuple[str, UserPermission]],
+    List[Tuple[str, ComputeNode]],
 ]:
     attestation_specs = {}
     authentication_methods = {}
     user_permissions = {}
+    compute_nodes = {}
 
     items = config.elements if config else []
 
@@ -65,11 +68,14 @@ def _extract_configuration_elements(
             authentication_methods[element.id] = element.authenticationMethod
         elif element.HasField("userPermission"):
             user_permissions[element.id] = element.userPermission
+        elif element.HasField("computeNode"):
+            compute_nodes[element.id] = element.computeNode
 
     return (
         list(attestation_specs.items()),
         list(authentication_methods.items()),
         list(user_permissions.items()),
+        list(compute_nodes.items()),
     )
 
 
@@ -242,7 +248,38 @@ class DataRoomBuilder:
         concerning this node.
         """
         return self.modifications_builder.add_compute_node(
-            node, node_id=node_id, attestation_id=attestation_id
+            node,
+            node_id=node_id,
+            attestation_id=attestation_id,
+        )
+
+    def add_airlock_node(
+        self,
+        quota_bytes: int,
+        airlocked_dependency: str,
+        node_name: str = "",
+        node_id: Optional[str] = None,
+    ) -> str:
+        """
+        Add a new airlock node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
+
+        **Parameters**:
+        - `quota_bytes`: The maximum quota each participant can use in bytes.
+        - `airlocked_dependencies`: the id of the branch or leaf nodes that this airlock can pull data
+          from.
+        - `node_id`: A custom identifier for this node. If not specified,
+            the identifier is generated automatically.
+        **Returns**:
+        The id that was assigned to the added compute node.
+        This id is needed when running computations or when adding permissions
+        concerning this node.
+        """
+        return self.modifications_builder.add_airlock_node(
+            quota_bytes,
+            airlocked_dependency,
+            node_name,
+            node_id,
         )
 
     def add_user_permission(
@@ -361,6 +398,7 @@ class DataRoomModificationsBuilder:
 
         self.change_user_permissions = []
         self.change_attestation_specs = []
+        self.change_compute_nodes = []
 
         extracted_conf_elements = _extract_configuration_elements(
             data_room_configuration
@@ -369,6 +407,7 @@ class DataRoomModificationsBuilder:
             self.existing_attestation_specs,
             self.existing_authentication_methods,
             self.existing_user_permissions,
+            self.existing_compute_nodes,
         ) = extracted_conf_elements
 
     def add_data_node(
@@ -538,6 +577,77 @@ class DataRoomModificationsBuilder:
         self.new_compute_nodes.append((node_id, proto_node))
         return node_id
 
+    def add_airlock_node(
+        self,
+        quota_bytes: int,
+        airlocked_dependency: str,
+        node_name: str = "",
+        node_id: Optional[str] = None,
+    ) -> str:
+        """
+        Add a new airlock node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
+
+        **Parameters**:
+        - `quota_bytes`: The maximum quota each participant can use in bytes.
+        - `airlocked_dependency`: the id of the branch or leaf node that this airlock can pull data
+          from.
+        - `node_id`: A custom identifier for this node. If not specified,
+            the identifier is generated automatically.
+        **Returns**:
+        The id that was assigned to the added compute node.
+        This id is needed when running computations or when adding permissions
+        concerning this node.
+        """
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
+        proto_node = ComputeNode(
+            nodeName=node_name,
+            airlock=ComputeNodeAirlock(
+                quotaBytes=quota_bytes,
+                airlockedDependency=airlocked_dependency,
+            ),
+        )
+        self.new_compute_nodes.append((node_id, proto_node))
+        return node_id
+
+    def change_airlock_node(
+        self,
+        airlock_node_id: str,
+        quota_bytes: int,
+    ) -> None:
+        """
+        **Parameters:**
+        - `airlock_node_id`: Id of the airlock node to be changed.
+        - `quota_bytes`: New quota for the airlock id.
+        """
+        existing_airlock_ix = None
+        for ix, (c_id, compute_node) in enumerate(self.new_compute_nodes):
+            if c_id == airlock_node_id:
+                existing_airlock_ix = ix
+                break
+
+        if existing_airlock_ix:
+            old_node_id, old_node = self.new_compute_nodes[existing_airlock_ix]
+            old_node.airlock.quotaBytes = quota_bytes
+            self.new_compute_nodes[existing_airlock_ix] = (
+                old_node_id,
+                old_node,
+            )
+        else:
+            previous_compute_node = dict(self.existing_compute_nodes).get(
+                airlock_node_id
+            )
+            if not previous_compute_node or not previous_compute_node.HasField(
+                "airlock"
+            ):
+                raise Exception(f"There is no airlock node with id {airlock_node_id}")
+            changed_compute_node = ComputeNode()
+            changed_compute_node.CopyFrom(previous_compute_node)
+            changed_compute_node.airlock.quotaBytes = quota_bytes
+            self.change_compute_nodes.append((airlock_node_id, changed_compute_node))
+
     def _add_authentication_method(
         self, authentication_method: AuthenticationMethod
     ) -> str:
@@ -688,6 +798,18 @@ class DataRoomModificationsBuilder:
                     add=AddModification(
                         element=ConfigurationElement(
                             id=perm_id, userPermission=permission
+                        )
+                    )
+                )
+            )
+
+        for node_id, compute_node in self.change_compute_nodes:
+            modifications.append(
+                ConfigurationModification(
+                    change=ChangeModification(
+                        element=ConfigurationElement(
+                            id=node_id,
+                            computeNode=compute_node,
                         )
                     )
                 )
@@ -872,6 +994,44 @@ class DataRoomCommitBuilder:
         """
         return self.modifications_builder.add_user_permission(
             email, authentication_method, permissions
+        )
+
+    def add_airlock_node(
+        self,
+        quota_bytes: int,
+        airlocked_dependency: str,
+        node_name: str = "",
+        node_id: Optional[str] = None,
+    ) -> str:
+        """
+        Add a new airlock node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
+
+        **Parameters**:
+        - `quota_bytes`: The maximum quota each participant can use in bytes.
+        - `airlocked_dependency`: the id of the branch or leaf nodes that this airlock can pull data
+          from.
+        - `node_id`: A custom identifier for this node. If not specified,
+            the identifier is generated automatically.
+        **Returns**:
+        The id that was assigned to the added compute node.
+        This id is needed when running computations or when adding permissions
+        concerning this node.
+        """
+        return self.modifications_builder.add_airlock_node(
+            quota_bytes,
+            airlocked_dependency,
+            node_name,
+            node_id,
+        )
+
+    def change_airlock_node(
+        self,
+        airlock_node_id: str,
+        quota_bytes: int,
+    ) -> None:
+        return self.modifications_builder.change_airlock_node(
+            airlock_node_id, quota_bytes
         )
 
     @staticmethod

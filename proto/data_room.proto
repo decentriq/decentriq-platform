@@ -221,6 +221,7 @@ message ComputeNode {
     ComputeNodeLeaf leaf = 2;
     ComputeNodeParameter parameter = 4;
     ComputeNodeBranch branch = 3;
+    ComputeNodeAirlock airlock = 6;
   }
   /// Control how often this node can be interacted with
   /// in the defined time interval.
@@ -240,6 +241,12 @@ message ComputeNodeLeaf {
 }
 
 message ComputeNodeParameter { bool isRequired = 1; }
+
+message ComputeNodeAirlock {
+  uint64 quotaBytes = 1;
+  string airlockedDependency = 2;
+}
+
 
 enum ComputeNodeFormat {
   RAW = 0;
