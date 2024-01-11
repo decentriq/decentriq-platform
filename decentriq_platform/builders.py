@@ -1,4 +1,5 @@
 from __future__ import annotations
+import uuid
 import base64
 import json
 from typing import List, Any, Optional, Dict, Tuple
@@ -36,7 +37,6 @@ from .types import (
 )
 from .client import Client
 from .keychain import Keychain
-import uuid
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas.data_lab import (
     DataLab,

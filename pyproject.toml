@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "decentriq-platform"
-version = "0.23.3rc0"
+version = "0.23.1"
 description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.com>"]
 readme = 'README.md'
@@ -22,8 +22,9 @@ certvalidator = "^0.11.1"
 ecdsa = "^0.18.0"
 pem = "^21.2.0"
 certifi = "^2023.7.22"
+sqloxide = "^0.1.26"
 cbor2 = "^5.4.6"
-decentriq_dcr_compiler = "0.2.0-dev4"
+decentriq-dcr-compiler = "0.3.0.dev1"
 
 [tool.poetry.dev-dependencies]
 mypy-protobuf = "^3.4.0"
