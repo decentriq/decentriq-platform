@@ -27,6 +27,8 @@ from .config import (
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
 from .types import (
+    CreateMediaComputeJobInput,
+    DataRoom,
     DatasetUsage,
     EnclaveSpecification,
     DatasetDescription,
@@ -34,6 +36,8 @@ from .types import (
     KeychainInstance,
     DataLabDefinition,
     DataLabListFilter,
+    MediaComputeJob,
+    MediaComputeJobFilterInput,
 )
 from .api import NotFoundError
 from .proto import (
@@ -48,8 +52,6 @@ from .api import (
     retry
 )
 from .graphql import GqlClient
-
-from decentriq_dcr_compiler.schemas.data_lab import DataLab
 
 import base64
 
@@ -1238,6 +1240,237 @@ class Client:
             }
         )
         return data["publishedLookalikeMediaDataRoom"]["driverAttestationHash"]
+
+    def get_lookalike_media_data_rooms(
+            self,
+    ) -> List[DataRoom]:
+        """
+        Get all Lookalike Media data clean rooms.
+        """
+        data = self._graphql.post(
+            """
+            query GetAllLookalikeMediaDcrs($filter: DataRoomFilter, $sortBy: DataRoomSortBy) {
+                dataRooms(filter: $filter, sortBy: $sortBy) {
+                    nodes {
+                        id
+                        title
+                        kind
+                        createdAt
+                        updatedAt
+                        owner {
+                            id
+                            email
+                        }
+                    }
+                    totalCount
+                }
+            }
+            """,
+            { 
+                "filter": None, 
+                "sortBy": None 
+            }
+        )
+        data_rooms = data["dataRooms"]["nodes"]
+        lookalike_media_data_rooms = [data_room for data_room in data_rooms if data_room["kind"] == "LOOKALIKE_MEDIA"]
+        return lookalike_media_data_rooms
+
+    def _create_media_compute_job(
+            self,
+            input: CreateMediaComputeJobInput,
+    ) -> MediaComputeJob:
+        """
+        Create a compute job for the Lookalike Media DCR.
+        """
+        data = self._graphql.post(
+            """
+            mutation CreateMediaComputeJob($input: CreateMediaComputeJobInput!) {
+                mediaComputeJob {
+                    create(input: $input) {
+                        record {
+                            jobIdHex
+                            publishedDataRoomId
+                            computeNodeName
+                            jobType
+                            cacheKey
+                            createdAt
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": input
+            }
+        )
+        return data["mediaComputeJob"]["create"]["record"]
+
+    def _get_media_compute_job(
+            self,
+            input: MediaComputeJobFilterInput,
+    ) -> MediaComputeJob:
+        """
+        Get a compute job for the Lookalike Media DCR.
+        """
+        data = self._graphql.post(
+            """
+            query GetMediaComputeJob($input: MediaComputeJobFilterInput!) {
+                mediaComputeJob (input: $input) {
+                    jobIdHex
+                    publishedDataRoomId
+                    computeNodeName
+                    jobType
+                    cacheKey
+                    createdAt
+                }
+            }
+            """,
+            {
+                "input": input
+            }
+        )
+        return data["mediaComputeJob"]
+
+    def _provision_data_lab(
+            self,
+            data_room_id: str,
+            data_lab_id: str,
+    ) -> DataLabDefinition:
+        """
+        Provision a DataLab to a DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision to.
+        - `data_lab_id`: ID of the DataLab to be provisioned.
+        """
+        data = self._graphql.post(
+            """
+            mutation ProvisionDataLab($input: ProvisionDataLabInput!) {
+                dataLab {
+                    provisionDataLab(input: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "dataRoomId": data_room_id,
+                    "dataLabId": data_lab_id, 
+                }
+            }
+        )
+        return data["dataLab"]["provisionDataLab"]["publishedDataLab"]
+
+    def _deprovision_data_lab(
+            self,
+            data_room_id: str
+    ) -> DataLabDefinition:
+        """
+        Deprovision a DataLab from a DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to deprovision from.
+        """
+        data = self._graphql.post(
+            """
+            mutation DeprovisionDataLab($input: String!) {
+                dataLab {
+                    deprovisionDataLab(lookalikeMediaDcrId: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": data_room_id,
+            }
+        )
+        return data["dataLab"]["deprovisionDataLab"]["publishedDataLab"]
 
 
 def create_client(

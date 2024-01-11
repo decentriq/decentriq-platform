@@ -31,27 +31,21 @@ from ..proto.length_delimited import parse_length_delimited, serialize_length_de
 from ..storage import Key
 from ..keychain import Keychain, KeychainEntry
 from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
+from ..helpers import (
+    get_latest_enclave_specs_as_dictionary,
+    create_session_from_driver_spec,
+)
+from ..lookup_tables import MATCHING_ID_INTERNAL_LOOKUP
 from pathlib import Path
 
 __all__ = [
     "MatchingId",
+    "provision_local_datasets",
+    "run",
+    "get_validation_report",
+    "get_statistics_report",
+    "provision_to_lookalike_media_data_room",
 ]
-
-# Map the user specified matching ID to the corresponding internal
-# matching ID format and hashing algorithm.
-MATCHING_ID_INTERNAL_LOOKUP = {
-    MatchingId.STRING: (MatchingIdFormat.STRING, None),
-    MatchingId.EMAIL: (MatchingIdFormat.EMAIL, None),
-    MatchingId.HASHED_EMAIL: (
-        MatchingIdFormat.EMAIL,
-        TableColumnHashingAlgorithm.SHA256_HEX,
-    ),
-    MatchingId.PHONE_NUMBER: (MatchingIdFormat.PHONE_NUMBER_E164, None),
-    MatchingId.HASHED_PHONE_NUMBER: (
-        MatchingIdFormat.PHONE_NUMBER_E164,
-        TableColumnHashingAlgorithm.SHA256_HEX,
-    ),
-}
 
 
 class Dataset:
@@ -101,7 +95,7 @@ class DataLab:
         existing_data_lab: ExistingDataLab = None,
     ):
         self.client = client
-        enclave_specs = self._get_latest_enclave_specs_as_dictionary()
+        enclave_specs = get_latest_enclave_specs_as_dictionary(self.client)
         auth, _ = client.create_auth_using_decentriq_pki(enclave_specs)
         self.session = client.create_session(auth, enclave_specs)
         self.cfg = cfg
@@ -321,7 +315,9 @@ class DataLab:
         parameters: Optional[Mapping[Text, Text]] = None,
     ):
         """
-        Running the DataLab results in the validation jobs and statistics job being kicked off. This function does not block waiting for the results. Instead the user should call the `get_validation_report` or `get_statistics_report` function.
+        Running the DataLab results in the validation jobs and statistics job being kicked off. 
+        This function does not block waiting for the results. Instead the user should call the 
+        `get_validation_report` or `get_statistics_report` function.
         """
         features = self._get_features()
         if "COMPUTE_STATISTICS" not in features:
@@ -382,7 +378,7 @@ class DataLab:
         if not driver_spec:
             raise Exception(f"Failed to find driver for data lab {self.data_lab_id}")
 
-        session = self._create_session_from_driver_spec(driver_spec)
+        session = create_session_from_driver_spec(self.client, driver_spec)
         validation_nodes = self._get_validation_nodes()
         session.wait_until_computation_has_finished_for_all_compute_nodes(
             validation_compute_job_id, validation_nodes, timeout=timeout
@@ -429,7 +425,7 @@ class DataLab:
         if not driver_spec:
             raise Exception(f"Failed to find driver for data lab {self.data_lab_id}")
 
-        session = self._create_session_from_driver_spec(driver_spec)
+        session = create_session_from_driver_spec(self.client, driver_spec)
         job_id = JobId(statistics_compute_job_id, "publisher_data_statistics")
         results = session.get_computation_result(job_id, interval=5, timeout=timeout)
         zip = zipfile.ZipFile(io.BytesIO(results), "r")
@@ -535,7 +531,7 @@ class DataLab:
         if lmdcr_driver_spec == None:
             raise Exception(f"Failed to find driver for data room {data_room_id}")
 
-        session = self._create_session_from_driver_spec(lmdcr_driver_spec)
+        session = create_session_from_driver_spec(self.client, lmdcr_driver_spec)
         existing_lmdcr = session.retrieve_data_room(data_room_id)
         lmdcr_hl = json.loads(existing_lmdcr.highLevelRepresentation.decode())
         lmdcr = LookalikeMediaDataRoom.parse_obj(lmdcr_hl)
@@ -549,15 +545,6 @@ class DataLab:
         if recompiled_low_level_dcr != existing_lmdcr.dataRoom:
             raise Exception("LMDCR failed verification")
         return (lmdcr, session)
-
-    def _create_session_from_driver_spec(
-        self, driver_spec: EnclaveSpecification
-    ) -> Session:
-        driver_spec["clientProtocols"] = [LATEST_GCG_PROTOCOL_VERSION]
-        enclave_specs = {driver_spec["name"]: driver_spec}
-        auth, _ = self.client.create_auth_using_decentriq_pki(enclave_specs)
-        session = self.client.create_session(auth, enclave_specs)
-        return session
 
     # Construct the actual DCR that implements the DataLab functionality.
     def _construct_backing_dcr(self, session: Session) -> str:
@@ -574,7 +561,7 @@ class DataLab:
 
     # Updates the HL DataLab representation and the session object.
     def _update_enclave_specs(self):
-        enclave_specs = self._get_latest_enclave_specs_as_dictionary()
+        enclave_specs = get_latest_enclave_specs_as_dictionary(self.client)
         (driver_spec, python_spec) = self._get_data_lab_enclave_specs(enclave_specs)
         # Update to the latest enclave specs
         root_certificate_pem = self.client.decentriq_ca_root_certificate.decode("utf-8")
@@ -584,29 +571,6 @@ class DataLab:
         )
         auth, _ = self.client.create_auth_using_decentriq_pki(enclave_specs)
         self.session = self.client.create_session(auth, enclave_specs)
-
-    def _get_latest_enclave_specs_as_dictionary(
-        self,
-    ) -> Dict[str, EnclaveSpecification]:
-        enclave_specs = self.client._get_enclave_specifications()
-        latest_driver_version = 0
-        latest_python_worker_version = 0
-        latest_enclaves = {}
-        for spec in enclave_specs:
-            if spec["name"] == "decentriq.driver":
-                version = int(spec["version"])
-                if version >= latest_driver_version:
-                    latest_driver_version = version
-                    latest_enclaves["decentriq.driver"] = spec
-            if spec["name"] == "decentriq.python-ml-worker-32-64":
-                version = int(spec["version"])
-                if version >= latest_python_worker_version:
-                    latest_python_worker_version = version
-                    latest_enclaves["decentriq.python-ml-worker-32-64"] = spec
-        latest_enclaves["decentriq.driver"]["clientProtocols"] = [
-            LATEST_GCG_PROTOCOL_VERSION
-        ]
-        return latest_enclaves
 
     def _get_data_lab_node_names(self, dataset_type: DataLabDatasetType):
         if dataset_type == DataLabDatasetType.EMBEDDINGS:
