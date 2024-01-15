@@ -23,8 +23,8 @@ from decentriq_dcr_compiler.schemas.lookalike_media_data_room import (
 from decentriq_dcr_compiler.schemas.create_data_lab import (
     CreateDataLab,
     CreateDataLab,
-    CreateDataLabItem,
-    CreateDataLabComputeV0,
+    CreateDataLabItem1,
+    CreateDataLabComputeV1,
 )
 from ..proto import DataRoom, CreateDcrPurpose
 from ..proto.length_delimited import parse_length_delimited, serialize_length_delimited
@@ -117,8 +117,8 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                __root__=CreateDataLabItem(
-                    v0=CreateDataLabComputeV0(
+                __root__=CreateDataLabItem1(
+                    v1=CreateDataLabComputeV1(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
                         driverEnclaveSpecification=EnclaveSpecification(
                             attestationProtoBase64="",
