@@ -41,6 +41,7 @@ from .attestation_pb2 import (
     FatquoteEpid,
     FatquoteDcap,
     AttestationSpecificationIntelDcap,
+    AttestationSpecificationIntelDcapMrsigner,
     AttestationSpecificationAwsNitro,
     AttestationSpecificationAmdSnp,
 )

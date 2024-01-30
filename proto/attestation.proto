@@ -8,6 +8,7 @@ message Fatquote {
         FatquoteDcap dcap = 2;
         FatquoteNitro nitro = 3;
         FatquoteSnp snp = 4;
+        FatquoteDcap dcapMrsigner = 5;
     }
 };
 
@@ -51,6 +52,7 @@ message AttestationSpecification {
         AttestationSpecificationIntelDcap intelDcap = 2;
         AttestationSpecificationAwsNitro awsNitro = 3;
         AttestationSpecificationAmdSnp amdSnp = 4;
+        AttestationSpecificationIntelDcapMrsigner intelDcapMrsigner = 5;
     }
 }
 
@@ -85,4 +87,14 @@ message AttestationSpecificationAmdSnp {
     bytes roughtimePubKey = 3;
     repeated bytes authorizedChipIds = 4;
     bytes decentriqDer = 5;
+}
+
+message AttestationSpecificationIntelDcapMrsigner {
+    bytes mrsigner = 1;
+    uint32 isvprodid = 7;
+    bytes dcapRootCaDer = 2;
+    bool accept_debug = 3;
+    bool accept_out_of_date = 4;
+    bool accept_configuration_needed = 5;
+    bool accept_revoked = 6;
 }

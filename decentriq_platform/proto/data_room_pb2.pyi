@@ -470,7 +470,7 @@ class ComputeNode(google.protobuf.message.Message):
         / Imporatant: this is currently checked in the metering extension
         / as implementing it in the driver would not give us additional
         / security due to replay/reset attacks.
-        / In this implementation, it only checks direct interactions with a
+        / In this implementation, it only checks direct interactions wit a
         / node, it won't check indirect executions (if the node was a dependency
         / of another node). This issue is even bigger in DCRs with interactivity
         / where someone could simply add a new node on top that doesn't have
