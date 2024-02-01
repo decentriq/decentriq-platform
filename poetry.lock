@@ -375,54 +375,54 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "decentriq-dcr-compiler"
-version = "0.3.0rc3"
+version = "0.3.0"
 description = ""
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:4000b50e4552d111b8e6e63b2ab2d9ed08f76c3a9c0495422168d0cf80b72b91"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:1c4b2b169abf1b1bc957d913abcc4d6d4069f35fe744c54f1eb86cefa6be46a7"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:239a92cdb7fd2137ab038755443947f54efc0a47e1d32319b8a33059ed28e510"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f57561243a6fddb3bdc4a80faf785abf3ca868626d4533be8288d1e3929a0a5f"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:d6ead8bbfd511624c09f317f273b4360edc949c3076f5a583280e9bd88230037"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-none-win32.whl", hash = "sha256:e6cf9fd89af349c01610ae98615cf423dcf812e345ca54126f9250878a8b02b2"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp310-none-win_amd64.whl", hash = "sha256:b96651eb16ba963f7027fcb7749fe5b18d3640acdef8e3dfb5079da6defe16fd"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-cp311-macosx_10_7_x86_64.whl", hash = "sha256:b7a8e57161e4d15a7541973e248642494286130d010b3f39e068bf365bc792d3"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-cp311-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:54ca901b307ba96d7766b73fded1ec60e5bd3e1f9e3d1b986e533ea02cccb1cf"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:270c3c1cc6f7bda8b6dd1dd7592bf114a3f6bb2cb5737e1f381078a9e7c88c1d"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3231d74fa80edd09081e9df2d30cbf7a5090294a2698aaeb6593d0aadb07bad7"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:98895e3d40350dc23c16bd43d2fff92d139fe3832b58f1091b41ba14daaa2522"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-none-win32.whl", hash = "sha256:a52b406d077fef36c8be00f5b3e45cdf0f6431222c84675509942b76eb595a46"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp311-none-win_amd64.whl", hash = "sha256:ee7e5597d054fd5fea870358892bddf76ecbf2f1ec1ad727860509114505016e"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-cp312-macosx_10_7_x86_64.whl", hash = "sha256:8fba15e846ea9fc2a793782d0ec944f816074d29e071f8bcfd82a3ba9f558b4f"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-cp312-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:c6d7775f921d098051d4d9274e98591add0a42cd3f0aa720b00166756efd5203"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:00aac5d146cea767adda422f18233aebd318e8bc1f350756ebd55e0ac82f4ee8"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6ef3e08f75098e120c478ab23ab998269630880cacd599fccbc875671c06b690"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:21e11fbe1deca45b717aa70d4c9f04fac9c98264e52730f3c2ffb92c5c93c104"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-none-win32.whl", hash = "sha256:f0f27fb87fa1454179f761eb2d02332d17795df49c7d2550f158ef12c441b66f"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp312-none-win_amd64.whl", hash = "sha256:81a47fae68082e8b1a9bfa8d8b3a3ecd2d68795bf4fa3114e74b2caf28cd32ee"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:3dcc5d5b1fe81a5fde9e6cb10657cfd7340e949f1294d19c6fd4250aa588612b"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-cp37m-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:2a41e7d77266e9da056bdb52ecb02a30bd7553521dbb952ee4e087874b2cc8fb"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:08d6550db8b0a74caf4d246e51663472e2cfc7eef66d702de92ef5c8d6f49b5b"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:237afbeda9997404b59425f981f8c8c87a7e847ddcdf1644f0129a404fc718d4"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:af3c0743eadf1fdf71a282febd3893de8c54d75652767f4d0873de67e5fa54b2"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-none-win32.whl", hash = "sha256:d73b99001877d062120835ae568baa95eeb4defc8d3106772daf56703f2d0aef"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp37-none-win_amd64.whl", hash = "sha256:3635720ebc1f90376c21c835819bf806c4661b176e8fa70856b1bc77a8a3db8d"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-cp38-macosx_10_7_x86_64.whl", hash = "sha256:ea13da70429eade44ecca63be1f28c993cc83d14b066e3235b0ea3582a335e53"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:5b165db59d00ea5f46b0f668a661b13269e64298cef842bf76f352d203d2cf93"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2a444998addff335dfe8db1c6194a9d81f5ba1ae836f863279a28b4760808698"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8dfcc4e3163219cbcdfc3f731b8d408afd6df438d1a15ef1c03ceb3199071330"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-cp38-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:0bcdaa442c7389b21a8cba2fcf93c005f77c95661d1ce0ec2848694543198c98"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-none-win32.whl", hash = "sha256:75c85a19757331799534ab5b33049bf06a568506a42bf50aea570cca3efc692d"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp38-none-win_amd64.whl", hash = "sha256:046789d9240fad42a5ec10bcb821447bd4b7e2f71a1a484a0e66349a040c6045"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-cp39-macosx_10_7_x86_64.whl", hash = "sha256:f1d3bab999477889c966943eab969c1ae11973833b226947bb9bd93b1bf6f055"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:7a08aaee8755e790582e2473c2543ee14c9e4364c2c93791ebb883d3c2f3a979"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5a611fee357e6b3d56130bbe81294f450474c06f7ec3db2badfc87ba13d5ab51"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8716cd92369c5173354f665fd5f4f3af075bed918be1faaf8fa66f7adef565f0"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:9273190d3c275e2644d26e75e74dc72a90388f52b46f81d3706b49e7d4abaa55"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-none-win32.whl", hash = "sha256:35eea0bb4a51c47f6923589db9503b2c8e3dc59b270c664649e0498015e8c531"},
-    {file = "decentriq_dcr_compiler-0.3.0rc3-cp39-none-win_amd64.whl", hash = "sha256:7f4ed65c76db9ac6c89692c6e7eb693f844276055c2d71700edb7c4098431e3f"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:cb6dd58259de690a996910d161103f26490e1277292d1dd80fd1925a869718a9"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:cd0c899dcdbaa48a3093ca653e14470b93b3fee8440a2cf63f4021ee581ffa8e"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a2e95dac41cdd387c60dd4884650645df687a96c2b929aeb86fb5d5d6f675da9"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:097f2a9bdffeee47fcfb899bc68e7043d40496a73b501c757f7f32872dd7eab1"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:a46e360c3fe59b20bc3bf30d5a3fe5753016e59f9ff02325c0444a49f61d3143"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-none-win32.whl", hash = "sha256:1377fdae5dfe307ca872f9b5efa4c16225523b0d2b6abfe5e4db5c455bc4f132"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp310-none-win_amd64.whl", hash = "sha256:b0f1a623ef4aad9da21c71f3933bfe5ed2cee2c813df98536b2db3db996fe247"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-cp311-macosx_10_7_x86_64.whl", hash = "sha256:8b526f96eb90b2e9c3c7a416aca1d4050f3f749ac9855475104f7e9e94e1a83a"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-cp311-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:a428420abbebda65850bf485b4f1de5614c87b16c8ed40610e80a3b1174a6612"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a8ca9148598db5878f33245f04a14d0133ae497ce2d0397e1de7d35a628d72ef"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:29c77847739547fc29d460d45819cb5008d2b3d3026ace4621a0b6dff22ae3ed"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:35e5f5ad8b33ae22b42e905943a4bfa35e11e547e128330498ab93943b74eff5"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-none-win32.whl", hash = "sha256:f5c719d398e45a3b140bf683f5098393524ef44517b0c2b180f6ccd10fec408f"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp311-none-win_amd64.whl", hash = "sha256:b90d2c3b86712376bc34192c3d98a494a90f72bd41a0863a8eecaa6865e64de9"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-cp312-macosx_10_7_x86_64.whl", hash = "sha256:9eaffe5006bb88ff514018335831eee9310835651bb13044f990100c1c7ff933"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-cp312-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:ca5ffe0e458888369d4fd72eba27e697ffced5788a457b322fadcdf081e03ff3"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f238ba1a7a38a2328bdd03eeecda6d8b8ba87b08d4529b7f53e81757175dac34"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:08f0c0da1ce2ab4cf8778d8f332da63f7245d7c561e168c4ab7f18402f78a792"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:3e39d875594164bcd72b83180fd2623f160265ce9912ea993ed1293b70eda16f"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-none-win32.whl", hash = "sha256:05c64c642874f5626b76ed602b9c794622e0dfbaf679acb04a547c4c5f4e28a9"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp312-none-win_amd64.whl", hash = "sha256:bb1ee32b39d1cf8f9f2dccbefa9f936abb297c2e2382d3b35afb95e562cd63c7"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-cp37m-macosx_10_7_x86_64.whl", hash = "sha256:289f3db990d9689490a39dd223cbcd0a0ecab4aeac002ebae72a9c097a8c09c4"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-cp37m-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:e0e24378a86f6f0f8fe9922d74d81585fb633d6c1a913491a8161d4883589e03"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:14cfa625b19ef15adc5defbf61c1d1b9e39338cc918b4b9504e307c12ff78c05"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:809c2d103ca89c781cb8e01cdc69c6472077df47e3e718a63606f76d5bb45b48"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:1fe7365ea30d259a13f7f93da17a4a71f4f5a4c384090b9131635f58d2e716fb"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-none-win32.whl", hash = "sha256:eb70da5c2c1025fa6cc2a38536b529f8635e601160ab97cb295c4946cfcc3b62"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp37-none-win_amd64.whl", hash = "sha256:92e8e141ba0fba34877246c955415af0aba25128ac8505ffaf97e08570a6f0fe"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-cp38-macosx_10_7_x86_64.whl", hash = "sha256:44c25300ca1ade1d874bc1e7440db7d65ab7f4b3cb95490530606de32e9cc84f"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:5f37e6a47e65ac72e29acc77b74e0a6d9f22a237074ca3788110ce25da88b13c"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0dc98d1ea0dac73d622c3ac2b69d9bd6967137926338b00ea854ba128532a9dd"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d89d286305b0051f5e7a05dc11cadcf4af904327d55973e4fe571ef6b8196789"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-cp38-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:b51a712f9db65bc77b484b5bb267eb4c4e35874387a658a4be173e54e4438516"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-none-win32.whl", hash = "sha256:49351d255a66d031e5c649fa963f692950e6ea3237b759e718db06653e14971c"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp38-none-win_amd64.whl", hash = "sha256:bfe02c65d94becda0bd5ab61ad34249fba6fcbcf4409d8da71e4fe6a83c57bde"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-cp39-macosx_10_7_x86_64.whl", hash = "sha256:110c276742baae7a031f3f32434ef2cfed4799869af1d04a98912e76af90bd8f"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:8919d4351f4ab2b2472f89d0142e3d8fa9bbacb66f80d0f1af9a0b03b064b1f4"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1027d28071c8ec98e1a8a4f489bcf078fc7a2a2e6058ff7d2e170ef6bf49a275"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1f1ee059655f5dc7bb54fdd2e11a593f3004ea9eb32632eddddbfd2fad15c64d"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:5111362dba5c6e49b22acc86158adb97bc96fd74b506c3c041fe7ef5024bc983"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-none-win32.whl", hash = "sha256:fcac4b38bef16b7af16ad03661a105fec9da7f39b60655f198a12a621beaec4f"},
+    {file = "decentriq_dcr_compiler-0.3.0-cp39-none-win_amd64.whl", hash = "sha256:575be08d8393b6bf9f720f056e65dec92fb133ae869bb259e3073687d7ceabc6"},
 ]
 
 [package.dependencies]
@@ -850,4 +850,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "c4431cd661e61b4c333d7ecede7275759976e8bb94bc61b72097f35e02a3f147"
+content-hash = "c976b6c005b362d0020fe779cfd5a690400a9844ba94e11dde16782e4a16ffe6"
