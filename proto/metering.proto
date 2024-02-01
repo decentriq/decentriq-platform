@@ -3,6 +3,12 @@ syntax = "proto3";
 package metering;
 
 import "attestation.proto";
+import "data_room.proto";
+
+message EnclaveInfo {
+    string attestationSpecHashHex = 1;
+    optional string taskQueueName = 2;
+}
 
 message MeteringRequest {
     oneof request {
@@ -15,6 +21,8 @@ message MeteringRequest {
         SubmitWorkerExecutionTimeRequest submitWorkerExecutionTime = 7;
         DcrInteractionRequest dcrInteraction = 8;
         CreateDatasetRequest createDataset = 9;
+        GetOrCreateDatasetScopeRequest getOrCreateDatasetScope = 10;
+        MergeDcrCommitRequest mergeDcrCommit = 11;
     }
 }
 
@@ -29,6 +37,8 @@ message MeteringSuccessResponse {
         SubmitWorkerExecutionTimeResponse submitWorkerExecutionTime = 7;
         DcrInteractionResponse dcrInteraction = 8;
         CreateDatasetResponse createDataset = 9;
+        GetOrCreateDatasetScopeResponse getOrCreateDatasetScope = 10;
+        MergeDcrCommitResponse mergeDcrCommit = 11;
     }
 }
 
@@ -43,12 +53,15 @@ enum CreateDcrPurpose {
     STANDARD = 0;
     VALIDATION = 1;
     DATA_IMPORT = 2;
+    DATA_EXPORT = 3;
+    DATA_LAB = 4;
 }
 
 enum CreateDcrKind {
     EXPERT = 0;
     DATASCIENCE = 1;
     MEDIA = 2;
+    LOOKALIKE_MEDIA = 3;
 }
 
 message DcrMetadata {
@@ -71,6 +84,31 @@ message CreateDcrRequest {
     repeated string participantEmails = 4;
     /// Optional metadata that will be persisted to the database
     optional bytes metadata = 5;
+    /// Information about the enclaves used in this DCR
+    repeated EnclaveInfo enclaveInfo = 6;
+}
+
+message ExecuteComputationNodeInteraction {
+    string nodeId = 1;
+    // The rate limiting config that was defined within the DCR for this node (if any)
+    optional data_room.RateLimitingConfig rateLimiting = 2;
+}
+
+message ExecuteComputationInteraction {
+    repeated ExecuteComputationNodeInteraction nodes = 1;
+}
+
+message PublishDatasetInteraction {
+    string nodeId = 1;
+    // The rate limiting config that was defined within the DCR for this node (if any)
+    optional data_room.RateLimitingConfig rateLimiting = 2;
+}
+
+message DcrInteractionKind {
+    oneof kind {
+        ExecuteComputationInteraction executeComputation = 1;
+        PublishDatasetInteraction publishDataset = 2;
+    }
 }
 
 message DcrInteractionRequest {
@@ -80,6 +118,8 @@ message DcrInteractionRequest {
     string driverAttestationHash = 2;
     // Id of the scope to check
     string scopeId = 3;
+    // The type of interactions the user wants to perform
+    DcrInteractionKind interaction = 4;
 }
 
 message PublishDatasetRequest {
@@ -112,6 +152,10 @@ message CreateDatasetRequest {
     optional string datasetImportId = 8;
 }
 
+message GetOrCreateDatasetScopeRequest {
+    optional string manifestHash = 1;
+}
+
 message UnpublishDatasetRequest {
     /// The UUID of the compute node to which this dataset is being published
     string computeNodeId = 1;
@@ -129,14 +173,38 @@ message StopDcrRequest {
 }
 
 message CreateDcrCommitRequest {
+    /// The commit id
     string id = 1;
+    /// The DCR hash the commit refers to
+    string dcrIdHex = 2;
+    /// The driver attestation hash
+    string driverAttestationHash = 3;
+    /// Information about the enclaves used in this commit
+    repeated EnclaveInfo enclaveInfo = 6;
+}
+
+message MergeDcrCommitRequest {
+    /// The commit id
+    string id = 1;
+    /// The DCR hash the commit refers to
+    string dcrIdHex = 2;
+    /// The driver attestation hash
+    string driverAttestationHash = 3;
+    /// Information about the enclaves that were added to the DCR
+    repeated EnclaveInfo enclaveInfo = 6;
 }
 
 message CreateDcrResponse {}
 
+message GetOrCreateDatasetScopeResponse {
+    string id = 1;
+}
+
 message DcrInteractionResponse {}
 
 message CreateDcrCommitResponse {}
+
+message MergeDcrCommitResponse {}
 
 message StopDcrResponse {}
 

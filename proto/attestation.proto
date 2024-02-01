@@ -38,9 +38,11 @@ message FatquoteSnp {
     bytes amdSevDer = 3;
     bytes vcekCrtDer = 4;
     bytes reportData = 5;
-    bytes roughtime_pub_key = 6;
-    bytes roughtime_nonce = 7;
+    bytes roughtimePubKey = 6;
+    bytes roughtimeNonce = 7;
     bytes signedTimestamp = 8;
+    bytes decentriqDer = 9;
+    bytes chipDer = 10;
 }
 
 message AttestationSpecification {
@@ -82,4 +84,5 @@ message AttestationSpecificationAmdSnp {
     bytes measurement = 2;
     bytes roughtimePubKey = 3;
     repeated bytes authorizedChipIds = 4;
+    bytes decentriqDer = 5;
 }

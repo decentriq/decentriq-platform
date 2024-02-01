@@ -204,18 +204,49 @@ message ConfigurationCommit {
   repeated ConfigurationModification modifications = 5;
 }
 
+message WindowRateLimitingConfig {
+  uint32 timeWindowSeconds = 1;
+  uint32 numMaxExecutions = 2;
+}
+
+message RateLimitingConfig {
+  oneof method {
+    WindowRateLimitingConfig window = 1;
+  }
+}
+
 message ComputeNode {
   string nodeName = 1;
   oneof node {
     ComputeNodeLeaf leaf = 2;
     ComputeNodeParameter parameter = 4;
     ComputeNodeBranch branch = 3;
+    ComputeNodeAirlock airlock = 6;
   }
+  /// Control how often this node can be interacted with
+  /// in the defined time interval.
+  /// Imporatant: this is currently checked in the metering extension
+  /// as implementing it in the driver would not give us additional
+  /// security due to replay/reset attacks.
+  /// In this implementation, it only checks direct interactions with a
+  /// node, it won't check indirect executions (if the node was a dependency
+  /// of another node). This issue is even bigger in DCRs with interactivity
+  /// where someone could simply add a new node on top that doesn't have
+  /// the rate limit applied.
+  optional RateLimitingConfig rateLimiting = 5;
 }
 
-message ComputeNodeLeaf { bool isRequired = 1; }
+message ComputeNodeLeaf {
+  bool isRequired = 1;
+}
 
 message ComputeNodeParameter { bool isRequired = 1; }
+
+message ComputeNodeAirlock {
+  uint64 quotaBytes = 1;
+  string airlockedDependency = 2;
+}
+
 
 enum ComputeNodeFormat {
   RAW = 0;

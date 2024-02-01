@@ -137,7 +137,12 @@ message ChunkHeader {
     bytes extraEntropy = 1;
     // A field indicating the size of the underlying data. Currently this should only be set for manifest chunks where
     // it indicates the size of the overall underlying dataset.
-    // WARNING: This field, should be treated as a potential attack vector. Ideally a potential mismatch between this
+    // WARNING: This field should be treated as a potential attack vector. Ideally a potential mismatch between this
     // size and the actual size should be handled in common low-level code such as `ChunkReader`.
     optional uint64 untrustedContentSize = 2;
+    // A field indicating the size of the underlying chunks' contents, meant to speed up seeks. Should only be set for
+    // manifest chunks.
+    // WARNING: This field should be treated as a potential attack vector. Ideally a potential mismatch between these
+    // sizes and the actual chunk content sizes should be handled in common low-level code such as `ChunkReader`.
+    repeated uint64 untrustedChunkContentSizes = 3;
 }

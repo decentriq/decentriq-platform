@@ -1,21 +1,54 @@
 from __future__ import annotations
-from typing import List, Any, Optional, Callable, Dict, Tuple
+import uuid
+import base64
+import json
+from typing import List, Any, Optional, Dict, Tuple
 
 from .proto import (
-    AuthenticationMethod, UserPermission, ComputeNode,
-    ComputeNodeLeaf, ComputeNodeBranch, Permission, DataRoom,
+    AuthenticationMethod,
+    UserPermission,
+    ComputeNode,
+    ComputeNodeLeaf,
+    ComputeNodeBranch,
+    Permission,
+    DataRoom,
+    ComputeNodeParameter,
     AttestationSpecification,
-    StaticDataRoomPolicy, AffectedDataOwnersApprovePolicy,
-    ConfigurationModification, AddModification, ChangeModification, ConfigurationElement,
+    StaticDataRoomPolicy,
+    AffectedDataOwnersApprovePolicy,
+    ConfigurationModification,
+    AddModification,
+    ChangeModification,
+    ConfigurationElement,
     ConfigurationCommit,
-    DataRoomConfiguration, ComputeNodeProtocol
+    DataRoomConfiguration,
+    ComputeNodeProtocol,
+    ComputeNodeAirlock,
 )
-from .proto import GovernanceProtocol as GovernanceProtocolProto
+from .proto import (
+    GovernanceProtocol as GovernanceProtocolProto,
+    serialize_length_delimited,
+)
 from .node import Node
 from .permission import Permissions
-from .types import EnclaveSpecification
-from .session import Session
-import uuid
+from .types import (
+    EnclaveSpecification,
+    MatchingId,
+)
+from .client import Client
+from .keychain import Keychain
+from decentriq_dcr_compiler import compiler
+from decentriq_dcr_compiler.schemas.data_lab import (
+    DataLab,
+)
+from .data_lab import DataLab, DataLabConfig, ExistingDataLab
+from .lookalike_media import LookalikeMediaDcr, ExistingLookalikeMediaDcr
+from .lookup_tables import MATCHING_ID_INTERNAL_LOOKUP
+
+from .helpers import (
+    create_session_from_driver_spec,
+    get_latest_enclave_specs_as_dictionary,
+)
 
 
 __all__ = [
@@ -27,15 +60,17 @@ __all__ = [
 
 
 def _extract_configuration_elements(
-        config: Optional[DataRoomConfiguration]
+    config: Optional[DataRoomConfiguration],
 ) -> Tuple[
-        List[Tuple[str, AttestationSpecification]],
-        List[Tuple[str, AuthenticationMethod]],
-        List[Tuple[str, UserPermission]]
-    ]:
+    List[Tuple[str, AttestationSpecification]],
+    List[Tuple[str, AuthenticationMethod]],
+    List[Tuple[str, UserPermission]],
+    List[Tuple[str, ComputeNode]],
+]:
     attestation_specs = {}
     authentication_methods = {}
     user_permissions = {}
+    compute_nodes = {}
 
     items = config.elements if config else []
 
@@ -46,23 +81,27 @@ def _extract_configuration_elements(
             authentication_methods[element.id] = element.authenticationMethod
         elif element.HasField("userPermission"):
             user_permissions[element.id] = element.userPermission
+        elif element.HasField("computeNode"):
+            compute_nodes[element.id] = element.computeNode
 
     return (
         list(attestation_specs.items()),
         list(authentication_methods.items()),
-        list(user_permissions.items())
+        list(user_permissions.items()),
+        list(compute_nodes.items()),
     )
 
 
 def _find_matching_proto_object(
-        proto_object: Any,
-        other_proto_objects: List[Tuple[str, Any]]
+    proto_object: Any, other_proto_objects: List[Tuple[str, Any]]
 ) -> Optional[str]:
     existing_node_id = next(
-        (node_id
+        (
+            node_id
             for node_id, other_proto_object in other_proto_objects
-            if proto_object == other_proto_object),
-        None
+            if proto_object == other_proto_object
+        ),
+        None,
     )
     return existing_node_id
 
@@ -80,9 +119,7 @@ class GovernanceProtocol:
         Participants are still allowed to execute development computations
         as long as the required permissions have been granted.
         """
-        return GovernanceProtocolProto(
-            staticDataRoomPolicy=StaticDataRoomPolicy()
-        )
+        return GovernanceProtocolProto(staticDataRoomPolicy=StaticDataRoomPolicy())
 
     @staticmethod
     def affected_data_owners_approve():
@@ -101,7 +138,7 @@ def _deduplicate_proto_objects(protos):
     keeping their original order.
     """
     # Python dicts for Python >= 3.7 keep insertion order
-    protos_map = { proto.SerializeToString(): proto for proto in protos }
+    protos_map = {proto.SerializeToString(): proto for proto in protos}
     return [proto for proto in protos_map.values()]
 
 
@@ -110,7 +147,7 @@ def _extend_repeated_field(repeated_field, new_protos) -> bool:
     Helper function for extending a repeated field, making sure
     not to insert any duplicates while keeping insertion order.
     """
-    repeated_field_map = { proto.SerializeToString(): proto for proto in repeated_field }
+    repeated_field_map = {proto.SerializeToString(): proto for proto in repeated_field}
     did_append_something = False
     for proto in new_protos:
         proto_key = proto.SerializeToString()
@@ -121,10 +158,11 @@ def _extend_repeated_field(repeated_field, new_protos) -> bool:
     return did_append_something
 
 
-class DataRoomBuilder():
+class DataRoomBuilder:
     """
     A helper class to ease the building process of a data clean room.
     """
+
     name: str
     governance_protocol: GovernanceProtocolProto
     description: Optional[str]
@@ -132,15 +170,15 @@ class DataRoomBuilder():
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
-            self,
-            name: str,
-            enclave_specs: Dict[str, EnclaveSpecification],
-            governance_protocol: GovernanceProtocolProto = GovernanceProtocol.static(),
-            *,
-            add_basic_user_permissions: bool = True,
-            description: str = None,
-            dcr_secret_id: bytes = None,
-        ) -> None:
+        self,
+        name: str,
+        enclave_specs: Dict[str, EnclaveSpecification],
+        governance_protocol: GovernanceProtocolProto = GovernanceProtocol.static(),
+        *,
+        add_basic_user_permissions: bool = True,
+        description: str = None,
+        dcr_secret_id: bytes = None,
+    ) -> None:
         """
         Create a data room builder object.
 
@@ -164,8 +202,7 @@ class DataRoomBuilder():
         assert name, "The DCR must have a non-empty name"
 
         self.modifications_builder = DataRoomModificationsBuilder(
-            enclave_specs,
-            add_basic_user_permissions=add_basic_user_permissions
+            enclave_specs, add_basic_user_permissions=add_basic_user_permissions
         )
         self.name = name
         self.description = description
@@ -177,10 +214,7 @@ class DataRoomBuilder():
             self.add_description(description)
 
     def add_data_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new data node. If the node is marked as required, any computation
@@ -200,16 +234,14 @@ class DataRoomBuilder():
         this node are defined.
         """
         return self.modifications_builder.add_data_node(
-            name,
-            is_required=is_required,
-            node_id=node_id
+            name, is_required=is_required, node_id=node_id
         )
 
     def add_compute_node(
-            self,
-            node: Node,
-            node_id: Optional[str] = None,
-            attestation_id: Optional[str] = None
+        self,
+        node: Node,
+        node_id: Optional[str] = None,
+        attestation_id: Optional[str] = None,
     ) -> str:
         """
         Add a new compute node. Specific compute node classes are provided either
@@ -231,23 +263,50 @@ class DataRoomBuilder():
         return self.modifications_builder.add_compute_node(
             node,
             node_id=node_id,
-            attestation_id=attestation_id
+            attestation_id=attestation_id,
+        )
+
+    def add_airlock_node(
+        self,
+        quota_bytes: int,
+        airlocked_dependency: str,
+        node_name: str = "",
+        node_id: Optional[str] = None,
+    ) -> str:
+        """
+        Add a new airlock node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
+
+        **Parameters**:
+        - `quota_bytes`: The maximum quota each participant can use in bytes.
+        - `airlocked_dependencies`: the id of the branch or leaf nodes that this airlock can pull data
+          from.
+        - `node_id`: A custom identifier for this node. If not specified,
+            the identifier is generated automatically.
+        **Returns**:
+        The id that was assigned to the added compute node.
+        This id is needed when running computations or when adding permissions
+        concerning this node.
+        """
+        return self.modifications_builder.add_airlock_node(
+            quota_bytes,
+            airlocked_dependency,
+            node_name,
+            node_id,
         )
 
     def add_user_permission(
-            self,
-            email: str,
-            authentication_method: AuthenticationMethod,
-            permissions: List[Permission],
+        self,
+        email: str,
+        authentication_method: AuthenticationMethod,
+        permissions: List[Permission],
     ):
         """
         Add permissions for a user.
         The authentication is performed on the enclave side based on the method supplied.
         """
         return self.modifications_builder.add_user_permission(
-            email,
-            authentication_method,
-            permissions
+            email, authentication_method, permissions
         )
 
     def add_description(self, description: str):
@@ -284,11 +343,12 @@ class DataRoomBuilder():
         return str(uuid.uuid4())
 
 
-class DataRoomModificationsBuilder():
+class DataRoomModificationsBuilder:
     """
     Builder class for constructing lists of modifications that can be
     applied to existing data room configurations.
     """
+
     data_room_id: Optional[str]
     history_pin: Optional[str]
 
@@ -308,14 +368,14 @@ class DataRoomModificationsBuilder():
     add_basic_user_permissions: bool
 
     def __init__(
-            self,
-            enclave_specs: Dict[str, EnclaveSpecification],
-            *,
-            data_room_id: Optional[str] = None,
-            data_room_configuration: Optional[DataRoomConfiguration] = None,
-            history_pin: Optional[str] = None,
-            add_basic_user_permissions: bool = True,
-        ) -> None:
+        self,
+        enclave_specs: Dict[str, EnclaveSpecification],
+        *,
+        data_room_id: Optional[str] = None,
+        data_room_configuration: Optional[DataRoomConfiguration] = None,
+        history_pin: Optional[str] = None,
+        add_basic_user_permissions: bool = True,
+    ) -> None:
         """
         Construct a builder object for constructing lists of modifications that
         can be applied to existing data room configurations.
@@ -351,18 +411,20 @@ class DataRoomModificationsBuilder():
 
         self.change_user_permissions = []
         self.change_attestation_specs = []
+        self.change_compute_nodes = []
 
-        extracted_conf_elements =\
-            _extract_configuration_elements(data_room_configuration)
-        self.existing_attestation_specs, \
-            self.existing_authentication_methods, \
-            self.existing_user_permissions = extracted_conf_elements
+        extracted_conf_elements = _extract_configuration_elements(
+            data_room_configuration
+        )
+        (
+            self.existing_attestation_specs,
+            self.existing_authentication_methods,
+            self.existing_user_permissions,
+            self.existing_compute_nodes,
+        ) = extracted_conf_elements
 
     def add_data_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new data node. If the node is marked as required, any computation
@@ -381,35 +443,57 @@ class DataRoomModificationsBuilder():
         This id will be needed when connecting a dataset or when permissions condering
         this node are defined.
         """
-        node_id = DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
+        node = ComputeNode(nodeName=name, leaf=ComputeNodeLeaf(isRequired=is_required))
+        self.new_compute_nodes.append((node_id, node))
+        return node_id
+
+    def add_parameter_node(
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
+    ) -> str:
+        """
+        Add a new parameter node. If the node is marked as required, any computation
+        which includes it as a dependency will not start in case no data has
+        been provided yet.
+
+        **Parameters**:
+        - `name`: Name of the parameter node.
+        - `is_required`: If true, any computation which depends on this parameter node
+            can only be run if the compute request also provides data for the parameter.
+        - `node_id`: A custom identifier for this node.
+            If not specified, the identifier is generated automatically.
+
+        **Returns**:
+        The id that was assigned to the added parameter node.
+        """
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
+        bla = ComputeNodeParameter(isRequired=is_required)
         node = ComputeNode(
-            nodeName=name,
-            leaf=ComputeNodeLeaf(isRequired=is_required)
+            nodeName=name, parameter=ComputeNodeParameter(isRequired=is_required)
         )
         self.new_compute_nodes.append((node_id, node))
         return node_id
 
     def _add_attestation_specification(
-            self,
-            attestation_specification: AttestationSpecification
+        self, attestation_specification: AttestationSpecification
     ) -> str:
         existing_id = _find_matching_proto_object(
             attestation_specification,
-            self.existing_attestation_specs + self.new_attestation_specs
+            self.existing_attestation_specs + self.new_attestation_specs,
         )
         if not existing_id:
             new_id = DataRoomModificationsBuilder._generate_id()
-            self.new_attestation_specs.append(
-                (new_id, attestation_specification)
-            )
+            self.new_attestation_specs.append((new_id, attestation_specification))
             return new_id
         else:
             return existing_id
 
     def change_attestation_specification(
-            self,
-            attestation_id: str,
-            attestation_specification: AttestationSpecification
+        self, attestation_id: str, attestation_specification: AttestationSpecification
     ) -> None:
         """
         Change a particular attestation specification within an existing data room
@@ -429,7 +513,10 @@ class DataRoomModificationsBuilder():
 
         if existing_spec_ix:
             old_spec_id, old_spec = self.new_attestation_specs[existing_spec_ix]
-            self.new_attestation_specs[existing_spec_ix] = old_spec_id, attestation_specification
+            self.new_attestation_specs[existing_spec_ix] = (
+                old_spec_id,
+                attestation_specification,
+            )
         elif attestation_id in dict(self.existing_attestation_specs):
             self.change_attestation_specs.append(
                 (attestation_id, attestation_specification)
@@ -440,10 +527,10 @@ class DataRoomModificationsBuilder():
             )
 
     def add_compute_node(
-            self,
-            node: Node,
-            node_id: Optional[str] = None,
-            attestation_id: Optional[str] = None
+        self,
+        node: Node,
+        node_id: Optional[str] = None,
+        attestation_id: Optional[str] = None,
     ) -> str:
         """
         Add a new compute node. Specific compute node classes are provided either
@@ -483,10 +570,13 @@ class DataRoomModificationsBuilder():
         if attestation_id:
             final_attestation_id = attestation_id
         else:
-            final_attestation_id =\
-                self._add_attestation_specification(attestation_proto)
+            final_attestation_id = self._add_attestation_specification(
+                attestation_proto
+            )
 
-        node_id = DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
         proto_node = ComputeNode(
             nodeName=node.name,
             branch=ComputeNodeBranch(
@@ -495,69 +585,143 @@ class DataRoomModificationsBuilder():
                 dependencies=node.dependencies,
                 outputFormat=node.output_format,
                 protocol=node_protocol,
-            )
+            ),
         )
         self.new_compute_nodes.append((node_id, proto_node))
         return node_id
 
-    def _add_authentication_method(
+    def add_airlock_node(
         self,
-        authentication_method: AuthenticationMethod
+        quota_bytes: int,
+        airlocked_dependency: str,
+        node_name: str = "",
+        node_id: Optional[str] = None,
+    ) -> str:
+        """
+        Add a new airlock node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
+
+        **Parameters**:
+        - `quota_bytes`: The maximum quota each participant can use in bytes.
+        - `airlocked_dependency`: the id of the branch or leaf node that this airlock can pull data
+          from.
+        - `node_id`: A custom identifier for this node. If not specified,
+            the identifier is generated automatically.
+        **Returns**:
+        The id that was assigned to the added compute node.
+        This id is needed when running computations or when adding permissions
+        concerning this node.
+        """
+        node_id = (
+            DataRoomModificationsBuilder._generate_id() if not node_id else node_id
+        )
+        proto_node = ComputeNode(
+            nodeName=node_name,
+            airlock=ComputeNodeAirlock(
+                quotaBytes=quota_bytes,
+                airlockedDependency=airlocked_dependency,
+            ),
+        )
+        self.new_compute_nodes.append((node_id, proto_node))
+        return node_id
+
+    def change_airlock_node(
+        self,
+        airlock_node_id: str,
+        quota_bytes: int,
+    ) -> None:
+        """
+        **Parameters:**
+        - `airlock_node_id`: Id of the airlock node to be changed.
+        - `quota_bytes`: New quota for the airlock id.
+        """
+        existing_airlock_ix = None
+        for ix, (c_id, compute_node) in enumerate(self.new_compute_nodes):
+            if c_id == airlock_node_id:
+                existing_airlock_ix = ix
+                break
+
+        if existing_airlock_ix:
+            old_node_id, old_node = self.new_compute_nodes[existing_airlock_ix]
+            old_node.airlock.quotaBytes = quota_bytes
+            self.new_compute_nodes[existing_airlock_ix] = (
+                old_node_id,
+                old_node,
+            )
+        else:
+            previous_compute_node = dict(self.existing_compute_nodes).get(
+                airlock_node_id
+            )
+            if not previous_compute_node or not previous_compute_node.HasField(
+                "airlock"
+            ):
+                raise Exception(f"There is no airlock node with id {airlock_node_id}")
+            changed_compute_node = ComputeNode()
+            changed_compute_node.CopyFrom(previous_compute_node)
+            changed_compute_node.airlock.quotaBytes = quota_bytes
+            self.change_compute_nodes.append((airlock_node_id, changed_compute_node))
+
+    def _add_authentication_method(
+        self, authentication_method: AuthenticationMethod
     ) -> str:
         existing_id = _find_matching_proto_object(
             authentication_method,
-            self.existing_authentication_methods + self.new_authentication_methods
+            self.existing_authentication_methods + self.new_authentication_methods,
         )
         if existing_id:
             return existing_id
         else:
             new_id = DataRoomModificationsBuilder._generate_id()
-            self.new_authentication_methods.append(
-                (new_id, authentication_method)
-            )
+            self.new_authentication_methods.append((new_id, authentication_method))
             return new_id
 
     def add_user_permission(
-            self,
-            email: str,
-            authentication_method: AuthenticationMethod,
-            permissions: List[Permission],
+        self,
+        email: str,
+        authentication_method: AuthenticationMethod,
+        permissions: List[Permission],
     ):
         """
         Add permissions for a user.
         The authentication is performed on the enclave side based on the method supplied.
         """
-        authentication_method_id =\
-            self._add_authentication_method(authentication_method)
+        authentication_method_id = self._add_authentication_method(
+            authentication_method
+        )
 
         if self.add_basic_user_permissions:
-            permissions.extend([
-                Permissions.retrieve_data_room_status(),
-                Permissions.retrieve_audit_log(),
-                Permissions.retrieve_data_room(),
-                Permissions.retrieve_published_datasets(),
-                Permissions.execute_development_compute()
-            ])
+            permissions.extend(
+                [
+                    Permissions.retrieve_data_room_status(),
+                    Permissions.retrieve_audit_log(),
+                    Permissions.retrieve_data_room(),
+                    Permissions.retrieve_published_datasets(),
+                    Permissions.execute_development_compute(),
+                ]
+            )
 
         # Check whether a set of permissions has already been added in a previous
         # call, and extend the permissions in case the authentication method matches.
         # This is required because helper functions might add permissions
         # to the builder before this method is called.
         existing_permission_old = [
-            permission for permission in self.existing_user_permissions
-                if email == permission[1].email and
-                    authentication_method_id == permission[1].authenticationMethodId
+            permission
+            for permission in self.existing_user_permissions
+            if email == permission[1].email
+            and authentication_method_id == permission[1].authenticationMethodId
         ]
         existing_permission_new = [
-            permission for permission in self.new_user_permissions
-                if email == permission[1].email and
-                    authentication_method_id == permission[1].authenticationMethodId
+            permission
+            for permission in self.new_user_permissions
+            if email == permission[1].email
+            and authentication_method_id == permission[1].authenticationMethodId
         ]
 
         if existing_permission_old:
             existing_id, existing_permission = existing_permission_old[0]
-            did_append_something =\
-                _extend_repeated_field(existing_permission.permissions, permissions)
+            did_append_something = _extend_repeated_field(
+                existing_permission.permissions, permissions
+            )
             # Do not add a change modification if none is necessary
             if did_append_something:
                 self.change_user_permissions.append((existing_id, existing_permission))
@@ -568,7 +732,7 @@ class DataRoomModificationsBuilder():
             permission = UserPermission(
                 email=email,
                 authenticationMethodId=authentication_method_id,
-                permissions=_deduplicate_proto_objects(permissions)
+                permissions=_deduplicate_proto_objects(permissions),
             )
             self.new_user_permissions.append(
                 (DataRoomModificationsBuilder._generate_id(), permission)
@@ -580,33 +744,23 @@ class DataRoomModificationsBuilder():
         for spec_id, attestation_spec in self.new_attestation_specs:
             configuration_elements.append(
                 ConfigurationElement(
-                    id=spec_id,
-                    attestationSpecification=attestation_spec
+                    id=spec_id, attestationSpecification=attestation_spec
                 )
             )
 
         for node_id, compute_node in self.new_compute_nodes:
             configuration_elements.append(
-                ConfigurationElement(
-                    id=node_id,
-                    computeNode=compute_node
-                )
+                ConfigurationElement(id=node_id, computeNode=compute_node)
             )
 
         for auth_id, auth_method in self.new_authentication_methods:
             configuration_elements.append(
-                ConfigurationElement(
-                    id=auth_id,
-                    authenticationMethod=auth_method
-                )
+                ConfigurationElement(id=auth_id, authenticationMethod=auth_method)
             )
 
         for perm_id, permission in self.new_user_permissions:
             configuration_elements.append(
-                ConfigurationElement(
-                    id=perm_id,
-                    userPermission=permission
-                )
+                ConfigurationElement(id=perm_id, userPermission=permission)
             )
 
         configuration = DataRoomConfiguration(elements=configuration_elements)
@@ -623,8 +777,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=spec_id,
-                            attestationSpecification=attestation_spec
+                            id=spec_id, attestationSpecification=attestation_spec
                         )
                     )
                 )
@@ -635,8 +788,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=node_id,
-                            computeNode=compute_node
+                            id=node_id, computeNode=compute_node
                         )
                     )
                 )
@@ -647,8 +799,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=auth_id,
-                            authenticationMethod=auth_method
+                            id=auth_id, authenticationMethod=auth_method
                         )
                     )
                 ),
@@ -659,8 +810,19 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     add=AddModification(
                         element=ConfigurationElement(
-                            id=perm_id,
-                            userPermission=permission
+                            id=perm_id, userPermission=permission
+                        )
+                    )
+                )
+            )
+
+        for node_id, compute_node in self.change_compute_nodes:
+            modifications.append(
+                ConfigurationModification(
+                    change=ChangeModification(
+                        element=ConfigurationElement(
+                            id=node_id,
+                            computeNode=compute_node,
                         )
                     )
                 )
@@ -671,8 +833,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     change=ChangeModification(
                         element=ConfigurationElement(
-                            id=perm_id,
-                            userPermission=permission
+                            id=perm_id, userPermission=permission
                         )
                     )
                 )
@@ -683,8 +844,7 @@ class DataRoomModificationsBuilder():
                 ConfigurationModification(
                     change=ChangeModification(
                         element=ConfigurationElement(
-                            id=attestation_id,
-                            attestationSpecification=attestation_spec
+                            id=attestation_id, attestationSpecification=attestation_spec
                         )
                     )
                 )
@@ -703,20 +863,21 @@ class DataRoomCommitBuilder:
     i.e. a list of modifications that are to be applied to the configuration
     of an existing data room.
     """
+
     name: str
     data_room_id: str
     history_pin: str
     modifications_builder: DataRoomModificationsBuilder
 
     def __init__(
-            self,
-            name: str,
-            data_room_id: str,
-            current_configuration: DataRoomConfiguration,
-            history_pin: str,
-            enclave_specs: Dict[str, EnclaveSpecification],
-            *,
-            add_basic_user_permissions: bool = False,
+        self,
+        name: str,
+        data_room_id: str,
+        current_configuration: DataRoomConfiguration,
+        history_pin: str,
+        enclave_specs: Dict[str, EnclaveSpecification],
+        *,
+        add_basic_user_permissions: bool = False,
     ):
         """
         Construct a builder object for constructing new data room
@@ -755,10 +916,7 @@ class DataRoomCommitBuilder:
         )
 
     def add_data_node(
-            self,
-            name: str,
-            is_required: bool = False,
-            node_id: Optional[str] = None
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
     ) -> str:
         """
         Add a new data node. If the node is marked as required, any computation
@@ -778,25 +936,43 @@ class DataRoomCommitBuilder:
         this node are defined.
         """
         return self.modifications_builder.add_data_node(
-            name,
-            is_required=is_required,
-            node_id=node_id
+            name, is_required=is_required, node_id=node_id
+        )
+
+    def add_parameter_node(
+        self, name: str, is_required: bool = False, node_id: Optional[str] = None
+    ) -> str:
+        """
+        Add a new parameter node. If the node is marked as required, any computation
+        which includes it as a dependency will not start in case no data has
+        been provided yet.
+
+        **Parameters**:
+        - `name`: Name of the parameter node.
+        - `is_required`: If true, any computation which depends on this parameter node
+            can only be run if the compute request also provides data for the parameter.
+        - `node_id`: A custom identifier for this node.
+            If not specified, the identifier is generated automatically.
+
+        **Returns**:
+        The id that was assigned to the added parameter node.
+        """
+        return self.modifications_builder.add_parameter_node(
+            name, is_required=is_required, node_id=node_id
         )
 
     def change_attestation_specification(
-            self,
-            attestation_id: str,
-            attestation_specification: AttestationSpecification
+        self, attestation_id: str, attestation_specification: AttestationSpecification
     ) -> None:
         self.modifications_builder.change_attestation_specification(
             attestation_id, attestation_specification
         )
 
     def add_compute_node(
-            self,
-            node: Node,
-            node_id: Optional[str] = None,
-            attestation_id: Optional[str] = None
+        self,
+        node: Node,
+        node_id: Optional[str] = None,
+        attestation_id: Optional[str] = None,
     ) -> str:
         """
         Add a new compute node. Specific compute node classes are provided either
@@ -816,25 +992,59 @@ class DataRoomCommitBuilder:
         concerning this node.
         """
         return self.modifications_builder.add_compute_node(
-            node,
-            node_id=node_id,
-            attestation_id=attestation_id
+            node, node_id=node_id, attestation_id=attestation_id
         )
 
     def add_user_permission(
-            self,
-            email: str,
-            authentication_method: AuthenticationMethod,
-            permissions: List[Permission],
+        self,
+        email: str,
+        authentication_method: AuthenticationMethod,
+        permissions: List[Permission],
     ):
         """
         Add permissions for a user.
         The authentication is performed on the enclave side based on the method supplied.
         """
         return self.modifications_builder.add_user_permission(
-            email,
-            authentication_method,
-            permissions
+            email, authentication_method, permissions
+        )
+
+    def add_airlock_node(
+        self,
+        quota_bytes: int,
+        airlocked_dependency: str,
+        node_name: str = "",
+        node_id: Optional[str] = None,
+    ) -> str:
+        """
+        Add a new airlock node. Specific compute node classes are provided either
+        by the main package or by the respective compute submodules.
+
+        **Parameters**:
+        - `quota_bytes`: The maximum quota each participant can use in bytes.
+        - `airlocked_dependency`: the id of the branch or leaf nodes that this airlock can pull data
+          from.
+        - `node_id`: A custom identifier for this node. If not specified,
+            the identifier is generated automatically.
+        **Returns**:
+        The id that was assigned to the added compute node.
+        This id is needed when running computations or when adding permissions
+        concerning this node.
+        """
+        return self.modifications_builder.add_airlock_node(
+            quota_bytes,
+            airlocked_dependency,
+            node_name,
+            node_id,
+        )
+
+    def change_airlock_node(
+        self,
+        airlock_node_id: str,
+        quota_bytes: int,
+    ) -> None:
+        return self.modifications_builder.change_airlock_node(
+            airlock_node_id, quota_bytes
         )
 
     @staticmethod
@@ -853,5 +1063,298 @@ class DataRoomCommitBuilder:
             name=self.name,
             dataRoomId=bytes.fromhex(self.data_room_id),
             dataRoomHistoryPin=bytes.fromhex(self.history_pin),
-            modifications=self.modifications_builder.build()
+            modifications=self.modifications_builder.build(),
         )
+
+
+class DataLabBuilder:
+    """
+    A helper class to build a Data Lab.
+    """
+
+    def __init__(
+        self,
+        client: Client,
+    ):
+        self.name = None
+        self.has_demographics = False
+        self.has_embeddings = False
+        self.num_embeddings = 0
+        self.matching_id = MatchingId.STRING
+        self.validation_id = None
+        self.client = client
+        self.existing = False
+        self.data_lab_id = None
+
+    def with_name(self, name: str):
+        """
+        Set the name of the DataLab.
+
+        **Parameters**:
+        - `name`: Name to be used for the DataLab.
+        """
+        self.name = name
+
+    def with_matching_id_format(self, matching_id: MatchingId):
+        """
+        Set the matching ID format.
+
+        **Parameters**:
+        - `matching_id`: The type of matching ID to use.
+        """
+        self.matching_id = matching_id
+
+    def with_demographics(self):
+        """
+        Enable demographics in the DataLab.
+        """
+        self.has_demographics = True
+
+    def with_embeddings(self, num_embeddings: int):
+        """
+        Enable embeddings in the DataLab.
+
+        **Parameters**:
+        - `num_embeddings`: The number of embeddings the DataLab should use.
+        """
+        self.has_embeddings = True
+        self.num_embeddings = num_embeddings
+
+    def from_existing(self, data_lab_id: str, keychain: Keychain):
+        """
+        Construct a new DataLab from an existing DataLab with the given ID.
+
+        **Parameters**:
+        - `data_lab_id`: The ID of the existing DataLab.
+        - `keychain`: The keychain to use to provision datasets from the old DataLab to the new DataLab.
+        """
+        self.existing = True
+        self.data_lab_id = data_lab_id
+        self.keychain = keychain
+
+    def build(self) -> DataLab:
+        """
+        Build the DataLab.
+        """
+        if self.existing:
+            # Build a new DataLab from an existing one.
+            # The new DataLab will have the same configuration as the existing one.
+            data_lab_definition = self.client.get_data_lab(self.data_lab_id)
+            cfg = DataLabConfig(
+                data_lab_definition["name"],
+                data_lab_definition["requireDemographicsDataset"],
+                data_lab_definition["requireEmbeddingsDataset"],
+                data_lab_definition["numEmbeddings"],
+                data_lab_definition["matchingIdFormat"],
+            )
+            existing_data_lab = ExistingDataLab(data_lab_definition, self.keychain)
+            return DataLab(self.client, cfg, existing_data_lab)
+        else:
+            # Build a new DataLab using the specified enclave specifications.
+            cfg = DataLabConfig(
+                self.name,
+                self.has_demographics,
+                self.has_embeddings,
+                self.num_embeddings,
+                self.matching_id,
+            )
+            return DataLab(self.client, cfg)
+
+
+class LookalikeMediaDcrBuilder:
+    """
+    A helper class to build a Lookalike Media DCR
+    """
+
+    def __init__(
+        self,
+        client: Client,
+    ) -> None:
+        self.client = client
+        self.name = None
+        self.main_publisher_email = None
+        self.publisher_emails = []
+        self.main_advertiser_email = None
+        self.advertiser_emails = []
+        self.matching_id = None
+        self.audit_log_retrieval = True
+        self.dev_computations = True
+        self.agency_emails = []
+        self.observer_emails = []
+        self.existing = False
+
+    def with_name(self, name: str):
+        """
+        Set the name of the Lookalike Media DCR.
+        This is required when creating **new** Lookalike Media DCRs only.
+        When creating from an existing DCR, the existing name will be used.
+
+        **Parameters**:
+        - `name`: Name to be used for the Lookalike Media DCR.
+        """
+        self.name = name
+
+    def with_publisher_emails(self, main: str, additional: Optional[List[str]] = None):
+        """
+        Set the publisher email addresses.
+
+        **Parameters**:
+        - `main`: The main publisher email address.
+        - `additional`: Optional list of additional publisher email addresses.
+        """
+        self.main_publisher_email = main
+        if additional is not None:
+            self.publisher_emails = additional
+
+    def with_advertiser_emails(self, main: str, additional: Optional[List[str]] = None):
+        """
+        Set the advertiser email addresses.
+
+        **Parameters**:
+        - `main`: The main advertiser email address.
+        - `additional`: Optional list of additional advertiser email addresses.
+        """
+        self.main_advertiser_email = main
+        if additional is not None:
+            self.advertiser_emails = additional
+
+    def with_agency_emails(self, emails: List[str]):
+        """
+        Set the agency email addresses.
+
+        **Parameters**:
+        - `emails`: List of agency email addresses.
+        """
+        self.agency_emails = emails
+
+    def with_observer_emails(self, emails: List[str]):
+        """
+        Set the observer email addresses.
+
+        **Parameters**:
+        - `emails`: List of observer email addresses.
+        """
+        self.observer_emails = emails
+
+    def with_matching_id_format(self, matching_id: MatchingId):
+        """
+        Set the matching ID format.
+        This is required when creating **new** Lookalike Media DCRs only.
+        When creating from an existing DCR, the existing matching ID will be used.
+
+        **Parameters**:
+        - `matching_id`: The type of matching ID to use.
+        """
+        self.matching_id = matching_id
+
+    def from_existing(self, lmdcr_id: str, keychain: Keychain):
+        """
+        Construct a new Lookalike Media DCR from an existing Lookalike Media DCR with the given ID.
+
+        **Parameters**:
+        - `lmdcr_id`: The ID of the existing Lookalike Media DCR.
+        - `keychain`: The keychain to use to provision datasets from the old Lookalike Media DCR to the new Lookalike Media DCR.
+        """
+        self.existing = True
+        self.lmdcr_id = lmdcr_id
+        self.keychain = keychain
+
+    def build_and_publish(self) -> LookalikeMediaDcr:
+        """
+        Build and publish the Lookalike Media DCR.
+        """
+        self._check_required_fields_provided()
+
+        if self.existing:
+            # Get existing LMDCR (high level from the enclave).
+            driver_attestation_hash = self.client._get_lmdcr_driver_attestation_hash(
+                self.lmdcr_id
+            )
+            driver_enclave_spec = self.client._get_enclave_spec_from_hash(
+                driver_attestation_hash
+            )
+            if driver_enclave_spec == None:
+                raise Exception(
+                    f"Failed to find driver for data room {driver_enclave_spec}"
+                )
+            session = create_session_from_driver_spec(self.client, driver_enclave_spec)
+            existing_lmdcr = session.retrieve_data_room(self.lmdcr_id)
+            high_level_representation = json.loads(
+                existing_lmdcr.highLevelRepresentation.decode()
+            )
+            existing = ExistingLookalikeMediaDcr(self.lmdcr_id, driver_enclave_spec)
+            return LookalikeMediaDcr(self.client, high_level_representation, existing)
+        else:
+            id = f"Lookalike DCR {DataRoomBuilder._generate_id()}"
+            root_cert_pem = self.client.decentriq_ca_root_certificate.decode()
+            (driver_spec, python_spec) = self._get_lmdcr_enclave_specs(self.client)
+            (
+                matching_id_format,
+                matching_id_hashing_algorithm,
+            ) = MATCHING_ID_INTERNAL_LOOKUP[self.matching_id]
+            # The publisher and advertiser email lists need to contain all emails including the main one.
+            publisher_emails = [self.main_publisher_email] + self.publisher_emails
+            advertiser_emails = [self.main_advertiser_email] + self.advertiser_emails
+            lmdcr = {
+                "v3": {
+                    "v0": {
+                        "id": id,
+                        "name": self.name,
+                        "mainPublisherEmail": self.main_publisher_email,
+                        "mainAdvertiserEmail": self.main_advertiser_email,
+                        "matchingIdFormat": matching_id_format,
+                        "hashMatchingIdWith": matching_id_hashing_algorithm,
+                        "authenticationRootCertificatePem": root_cert_pem,
+                        "driverEnclaveSpecification": {
+                            "attestationProtoBase64": driver_spec.attestationProtoBase64,
+                            "id": driver_spec.id,
+                            "workerProtocol": driver_spec.workerProtocol,
+                        },
+                        "pythonEnclaveSpecification": {
+                            "attestationProtoBase64": python_spec.attestationProtoBase64,
+                            "id": python_spec.id,
+                            "workerProtocol": python_spec.workerProtocol,
+                        },
+                        "enableAuditLogRetrieval": self.audit_log_retrieval,
+                        "enableDevComputations": self.dev_computations,
+                        "advertiserEmails": advertiser_emails,
+                        "agencyEmails": self.agency_emails,
+                        "observerEmails": self.observer_emails,
+                        "publisherEmails": publisher_emails,
+                    }
+                }
+            }
+            return LookalikeMediaDcr(self.client, lmdcr)
+
+    # Check all necessary options have been provided.
+    def _check_required_fields_provided(self):
+        # Only perform check when creating new LMDCRs.
+        # If creating from existing, these options will be copied across from the existing LMDCR.
+        if not self.from_existing:
+            if self.name is None:
+                raise Exception("A name must be provided")
+            elif self.matching_id is None:
+                raise Exception("A matching ID must be provided")
+            elif self.main_publisher_email is None:
+                raise Exception("A publisher email address must be provided")
+
+    @staticmethod
+    def _get_lmdcr_enclave_specs(
+        client: Client,
+    ) -> (compiler.EnclaveSpecification, compiler.EnclaveSpecification):
+        enclave_specs = get_latest_enclave_specs_as_dictionary(client)
+        driver_spec = {}
+        python_spec = {}
+        for spec_id, spec in enclave_specs.items():
+            spec_payload = {
+                "attestationProtoBase64": base64.b64encode(
+                    serialize_length_delimited(spec["proto"])
+                ).decode(),
+                "id": spec_id,
+                "workerProtocol": spec["workerProtocols"][0],
+            }
+            if "decentriq.driver" in spec_id:
+                driver_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+            elif "decentriq.python-ml-worker" in spec_id:
+                python_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+        return (driver_spec, python_spec)

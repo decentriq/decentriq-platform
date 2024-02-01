@@ -30,6 +30,9 @@ message GcgRequest {
         retrieveConfigurationCommitApproversRequest = 19;
     CasAuxiliaryStateRequest casAuxiliaryStateRequest = 20;
     ReadAuxiliaryStateRequest readAuxiliaryStateRequest = 21;
+    RetrieveUsedAirlockQuotaRequest retrieveUsedAirlockQuotaRequest = 22;
+    GetResultsSizeRequest getResultsSizeRequest = 23;
+
     identity_endorsement.EndorsementRequest endorsementRequest = 101;
   }
 }
@@ -61,6 +64,9 @@ message GcgResponse {
         retrieveConfigurationCommitApproversResponse = 19;
     CasAuxiliaryStateResponse casAuxiliaryStateResponse = 20;
     ReadAuxiliaryStateResponse readAuxiliaryStateResponse = 21;
+    RetrieveUsedAirlockQuotaResponse retrieveUsedAirlockQuotaResponse = 22;
+    GetResultsSizeResponse getResultsSizeResponse = 23;
+
     identity_endorsement.EndorsementResponse endorsementResponse = 101;
   }
 }
@@ -114,6 +120,7 @@ message ExecuteComputeRequest {
   bool isDryRun = 3;
   bytes scope = 4;
   map<string, string> parameters = 5;
+  map<string, TestDataset> testDatasets = 6;
 }
 
 message ExecuteDevelopmentComputeRequest {
@@ -122,6 +129,12 @@ message ExecuteDevelopmentComputeRequest {
   bool isDryRun = 3;
   bytes scope = 4;
   map<string, string> parameters = 5;
+  map<string, TestDataset> testDatasets = 6;
+}
+
+message TestDataset {
+  bytes encryptionKey = 1;
+  bytes manifestHash = 2;
 }
 
 message ExecuteComputeResponse { bytes jobId = 1; }
@@ -131,6 +144,11 @@ message JobStatusRequest { bytes jobId = 1; }
 message JobStatusResponse { repeated string completeComputeNodeIds = 1; }
 
 message GetResultsRequest {
+  bytes jobId = 1;
+  string computeNodeId = 2;
+}
+
+message GetResultsSizeRequest {
   bytes jobId = 1;
   string computeNodeId = 2;
 }
@@ -271,3 +289,24 @@ message DriverTaskConfig {
 message NoopConfig {}
 
 message StaticContentConfig { bytes content = 1; }
+
+
+message RetrieveUsedAirlockQuotaRequest {
+  bytes dataRoomId = 1;
+}
+
+message RetrieveUsedAirlockQuotaResponse {
+  repeated AirlockQuotaInfo airlockQuotas = 1;
+}
+
+message AirlockQuotaInfo {
+  string airlockNodeId = 1;
+  uint64 quotaBytes = 2;
+  uint64 usedQuotaBytes = 3;
+}
+
+message GetResultsSizeResponse {
+  uint64 sizeBytes = 1;
+}
+
+

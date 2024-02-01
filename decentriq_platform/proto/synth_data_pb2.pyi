@@ -19,6 +19,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class SyntheticDataConf(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -40,6 +41,7 @@ class SyntheticDataConf(google.protobuf.message.Message):
 
 global___SyntheticDataConf = SyntheticDataConf
 
+@typing_extensions.final
 class Mask(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -85,6 +87,7 @@ class Mask(google.protobuf.message.Message):
 
 global___Mask = Mask
 
+@typing_extensions.final
 class Column(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

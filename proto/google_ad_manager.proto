@@ -1,0 +1,34 @@
+syntax = "proto3";
+package google_ad_manager;
+
+message SingleFile {
+    string name = 1;
+}
+
+message RawFile {}
+
+message ZipFile {
+    oneof selection {
+        SingleFile singleFile = 1;
+    }
+}
+
+message SinkInput {
+    string dependency = 1;
+    string name = 2;
+    oneof file {
+        RawFile raw = 3;
+        ZipFile zip = 4;
+    }
+}
+
+message GoogleAdManagerWorkerConfiguration {
+    SinkInput input = 1;
+    string credentialsDependency = 2;
+    string identifierKind = 3;
+    string listId = 4;
+    bool inputHasHeaders = 5;
+    // Google Cloud Storage configuration
+    string bucket = 6;
+    string objectName = 7;
+}

@@ -13,13 +13,25 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x64\x61taset_sink.proto\x12\x0c\x64\x61taset_sink\"\xf1\x01\n\x1e\x44\x61tasetSinkWorkerConfiguration\x12\x17\n\x0finputDependency\x18\x01 \x01(\t\x12\x1f\n\x17\x65ncryptionKeyDependency\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x61tasetName\x18\x03 \x01(\t\x12\x16\n\x0e\x64\x61tasetScopeId\x18\x04 \x01(\t\x12\x1f\n\x12\x64\x61tasetDescription\x18\x05 \x01(\tH\x00\x88\x01\x01\x12\x1c\n\x0f\x64\x61tasetImportId\x18\x06 \x01(\tH\x01\x88\x01\x01\x42\x15\n\x13_datasetDescriptionB\x12\n\x10_datasetImportIdb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x64\x61taset_sink.proto\x12\x0c\x64\x61taset_sink\"\t\n\x07RawFile\"\n\n\x08\x41llFiles\">\n\nSingleFile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x15\n\x08renameAs\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x0b\n\t_renameAs\"8\n\rFileSelection\x12\'\n\x05names\x18\x01 \x03(\x0b\x32\x18.dataset_sink.SingleFile\"k\n\x07ZipFile\x12%\n\x03\x61ll\x18\x01 \x01(\x0b\x32\x16.dataset_sink.AllFilesH\x00\x12,\n\x05\x66iles\x18\x02 \x01(\x0b\x32\x1b.dataset_sink.FileSelectionH\x00\x42\x0b\n\tselection\"\x81\x01\n\tSinkInput\x12\x12\n\ndependency\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12$\n\x03raw\x18\x03 \x01(\x0b\x32\x15.dataset_sink.RawFileH\x00\x12$\n\x03zip\x18\x04 \x01(\x0b\x32\x15.dataset_sink.ZipFileH\x00\x42\x06\n\x04\x66ile\"\xb5\x01\n\x1e\x44\x61tasetSinkWorkerConfiguration\x12\'\n\x06inputs\x18\x01 \x03(\x0b\x32\x17.dataset_sink.SinkInput\x12\x1f\n\x17\x65ncryptionKeyDependency\x18\x02 \x01(\t\x12\x1c\n\x0f\x64\x61tasetImportId\x18\x03 \x01(\tH\x00\x88\x01\x01\x12\x17\n\x0fisKeyHexEncoded\x18\x04 \x01(\x08\x42\x12\n\x10_datasetImportIdb\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'dataset_sink_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _DATASETSINKWORKERCONFIGURATION._serialized_start=37
-  _DATASETSINKWORKERCONFIGURATION._serialized_end=278
+  _RAWFILE._serialized_start=36
+  _RAWFILE._serialized_end=45
+  _ALLFILES._serialized_start=47
+  _ALLFILES._serialized_end=57
+  _SINGLEFILE._serialized_start=59
+  _SINGLEFILE._serialized_end=121
+  _FILESELECTION._serialized_start=123
+  _FILESELECTION._serialized_end=179
+  _ZIPFILE._serialized_start=181
+  _ZIPFILE._serialized_end=288
+  _SINKINPUT._serialized_start=291
+  _SINKINPUT._serialized_end=420
+  _DATASETSINKWORKERCONFIGURATION._serialized_start=423
+  _DATASETSINKWORKERCONFIGURATION._serialized_end=604
 # @@protoc_insertion_point(module_scope)

@@ -1,0 +1,32 @@
+syntax = "proto3";
+package google_dv_360_sink;
+
+message SingleFile {
+    string name = 1;
+}
+
+message RawFile {}
+
+message ZipFile {
+    oneof selection {
+        SingleFile singleFile = 1;
+    }
+}
+
+message SinkInput {
+    string dependency = 1;
+    string name = 2;
+    oneof file {
+        RawFile raw = 3;
+        ZipFile zip = 4;
+    }
+}
+
+message GoogleDv360SinkWorkerConfiguration {
+    SinkInput input = 1;
+    string credentialsDependency = 2;
+    string advertiserId = 3;
+    string displayName = 4;
+    string description = 5;
+    string membershipDurationDays = 6;
+}

@@ -20,7 +20,7 @@ class KeychainEntry:
 
 class KeychainDecryptException(Exception):
     def __init__(self) -> None:
-        super().__init__()    
+        super().__init__()
 
 class Keychain:
 
@@ -40,18 +40,18 @@ class Keychain:
         self._store = store
         self._secret_wrapper = secret_wrapper
         self._keychain_instance = keychain_instance
-    
+
     @staticmethod
     def _serialize_store(store: Dict[str, bytes]) -> bytes:
         return cbor2.dumps(store, value_sharing=False)
-    
+
     @staticmethod
     def _deserialize_store(plaintext: bytes) -> Dict[str, bytes]:
         return cbor2.loads(plaintext)
-    
+
     def _namespaced_key(self, kind: KeychainEntryKind, key: str) -> str:
         return f"{kind}/{key}"
-    
+
     @staticmethod
     def _parse_namespaced_key(ns_key: str) -> Tuple[KeychainEntryKind, str]:
         splitted = ns_key.split("/")
@@ -62,7 +62,7 @@ class Keychain:
         remainder = "/".join(splitted[1:])
         return [splitted[0], remainder]
 
-    @staticmethod    
+    @staticmethod
     def _encrypt_store_static(
             user_email: str,
             secret_wrapper: chily.SecretWrapper,
@@ -106,63 +106,156 @@ class Keychain:
         self._store = store
         self._encrypt_store()
 
+    @staticmethod
     def _init_keychain_instance(client: Client) -> KeychainInstance:
         keychain_instance = client.get_keychain_instance()
         if not keychain_instance:
             raise Exception("Cannot init Keychain, no instance exists in the server, create a new instance first")
         return keychain_instance
-    
+
+    @staticmethod
     def _has_keychain_instance(client: Client) -> bool:
         keychain_instance = client.get_keychain_instance()
         return bool(keychain_instance)
-    
+
+    @staticmethod
     def _create_new_keychain_with_secret_wrapper(
             client: Client,
-            secret_wrapper: chily.SecretWrapper
+            secret_wrapper: chily.SecretWrapper,
+            check_for_existing_keychain: bool = True
     ) -> Optional[Keychain]:
-        if (Keychain._has_keychain_instance(client)):
+        if check_for_existing_keychain and Keychain._has_keychain_instance(client):
             return None
         store: Dict[str, bytes] = {}
         encrypted = secret_wrapper.wrap_secret(client.user_email, Keychain._serialize_store(store))
         keychain_instance = client.create_keychain_instance(secret_wrapper.salt, encrypted)
         return Keychain(client, secret_wrapper, keychain_instance, store)
-    
-    def create_new_keychain(client: Client, password: bytes) -> Keychain:
+
+    @staticmethod
+    def create_new_keychain(
+            client: Client,
+            password: bytes,
+            check_for_existing_keychain: bool = True,
+    ) -> Optional[Keychain]:
+        """
+        Create a new keychain that is encrypted using the given password.
+
+        If the user already has a keychain setup (for example by already having
+        logged into the Decentriq UI), this method will return None.
+
+        See the method `get_or_create_unlocked_keychain` for a convenience
+        method that will not throw an error if the keychain already exists.
+        """
         secret_wrapper = chily.SecretWrapper.init(password)
-        return Keychain._create_new_keychain_with_secret_wrapper(client, secret_wrapper)
-    
+        return Keychain._create_new_keychain_with_secret_wrapper(
+            client, secret_wrapper, check_for_existing_keychain
+        )
+
+    @staticmethod
+    def get_or_create_unlocked_keychain(
+            client: Client,
+            password: bytes,
+    ) -> Keychain:
+        """
+        Get and unlock the user's keychain using the provided password.
+
+        If the user did not already create a keychain, a new keychain will
+        be created automatically.
+        If a keychain exists but the provided password does not match,
+        an exception will be thrown.
+
+        Note that the password must be given as a `bytes` object.
+        """
+        keychain_instance = client.get_keychain_instance()
+        if not keychain_instance:
+            keychain = Keychain.create_new_keychain(
+                client,
+                password,
+                check_for_existing_keychain=False,
+            )
+            if keychain:
+                keychain._decrypt_store()
+            else:
+                raise Exception(
+                    "Received an undefined keychain even though it should exist"
+                )
+            return keychain
+        else:
+            return Keychain._decrypt_store_with_password(
+                client, keychain_instance, password
+            )
+
+    @staticmethod
     def create_new_keychain_with_master_key(
             client: Client,
             master_key: bytes,
             salt: str,
     ) -> Optional[Keychain]:
+        """
+        Create a new keychain with the given master key.
+
+        If the user already has a keychain setup (for example by already having
+        logged into the Decentriq UI), this method will return None.
+        """
         secret_wrapper = chily.SecretWrapper.with_master_key(master_key, salt)
         return Keychain._create_new_keychain_with_secret_wrapper(client, secret_wrapper)
 
+    @staticmethod
     def init_with_master_key(client: Client, master_key: bytes) -> Keychain:
+        """
+        Decrypt an existing keychain with the given master key.
+
+        If no keychain has been created already or if the key
+        does not match the keychain, an error will be thrown.
+
+        See the method `get_or_create_unlocked_keychain` for a convenience
+        method that will create the keychain if it does not exist already.
+        """
         keychain_instance = Keychain._init_keychain_instance(client)
         secret_wrapper = chily.SecretWrapper.with_master_key(master_key, keychain_instance["salt"])
         store = Keychain._decrypt_store_static(client.user_email, secret_wrapper, keychain_instance["encrypted"])
         return Keychain(client, secret_wrapper, keychain_instance, store)
 
+    @staticmethod
     def init_with_password(client: Client, password: bytes) -> Keychain:
+        """
+        Decrypt an existing keychain with the given password.
+
+        If no keychain has been created already or if the password
+        does not match the keychain, an error will be thrown.
+
+        See the method `get_or_create_unlocked_keychain` for a convenience
+        method that will create the keychain if it does not exist already.
+        """
         keychain_instance = Keychain._init_keychain_instance(client)
-        secret_wrapper = chily.SecretWrapper.with_password(password, keychain_instance["salt"])
-        store = Keychain._decrypt_store_static(client.user_email, secret_wrapper, keychain_instance["encrypted"])
+        return Keychain._decrypt_store_with_password(client, keychain_instance, password)
+
+    @staticmethod
+    def _decrypt_store_with_password(
+            client: Client,
+            keychain_instance: KeychainInstance,
+            password: bytes
+    ) -> Keychain:
+        secret_wrapper = chily.SecretWrapper.with_password(
+            password, keychain_instance["salt"]
+        )
+        store = Keychain._decrypt_store_static(
+            client.user_email, secret_wrapper, keychain_instance["encrypted"]
+        )
         return Keychain(client, secret_wrapper, keychain_instance, store)
-    
+
     def _download(self):
         keychain_instance = self._client.get_keychain_instance()
         if not keychain_instance:
             raise Exception("Keychain instance has not been created yet")
-        
+
         if self._secret_wrapper.salt != keychain_instance["salt"]:
             raise Exception("Keychain salt has changed upstream. Reinitialize Keychain with password first")
-        
+
         if keychain_instance["casIndex"] != self._keychain_instance["casIndex"]:
             self._set_keychain_instance(keychain_instance)
         return
-        
+
     def get(self, kind: KeychainEntryKind, key: str) -> Optional[KeychainEntry]:
         self._download()
         ns_key = self._namespaced_key(kind, key)
@@ -171,7 +264,7 @@ class Keychain:
             return KeychainEntry(kind, key, value)
         else:
             return None
-        
+
     def items(self) -> List[KeychainEntry]:
         self._download()
         items = []
@@ -179,7 +272,7 @@ class Keychain:
             kind, key = Keychain._parse_namespaced_key(ns_key)
             items.append(KeychainEntry(kind, key, value))
         return items
-    
+
     def _insert_local(self, entry: KeychainEntry):
         ns_key = self._namespaced_key(entry.kind, entry.key)
         if self._store.get(ns_key):
@@ -197,14 +290,14 @@ class Keychain:
             self._keychain_instance["salt"],
             self._keychain_instance["encrypted"],
         )
-    
+
     def insert(self, entry: KeychainEntry):
         while True:
             self._insert_local(entry)
             if self._compare_and_swap():
                 return
             self._download()
-    
+
     def remove(self, kind: KeychainEntryKind, key: str):
         ns_key = self._namespaced_key(kind, key)
         while True:
@@ -215,10 +308,11 @@ class Keychain:
                 self._download()
             else:
                 raise Exception("Cannot delete entry: Entry does not exist")
-            
+
+    @staticmethod
     def reset(client: Client):
         return client.reset_keychain()
-    
+
     def clear(self):
         while True:
             self._set_store({})
@@ -229,14 +323,14 @@ class Keychain:
     def change_password(self, new_password: bytes):
         new_secret_wrapper = chily.SecretWrapper.with_password(new_password, self._secret_wrapper.salt)
         return self.change_master_key(new_secret_wrapper.master_key)
-    
+
     def change_master_key(self, new_master_key: bytes):
         new_secret_wrapper = chily.SecretWrapper.with_master_key(new_master_key, self._secret_wrapper.salt)
         while True:
             new_keychain = Keychain(self._client, new_secret_wrapper, self._keychain_instance, self._store)
             new_keychain._encrypt_store()
             if new_keychain._compare_and_swap():
-                self = new_keychain
+                self.__dict__.update(new_keychain.__dict__)
                 return
             self._download()
 

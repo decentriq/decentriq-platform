@@ -23,7 +23,7 @@ class _ComputeNodeFormat:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _ComputeNodeFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ComputeNodeFormat.ValueType], builtins.type):  # noqa: F821
+class _ComputeNodeFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_ComputeNodeFormat.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     RAW: _ComputeNodeFormat.ValueType  # 0
     ZIP: _ComputeNodeFormat.ValueType  # 1
@@ -34,6 +34,7 @@ RAW: ComputeNodeFormat.ValueType  # 0
 ZIP: ComputeNodeFormat.ValueType  # 1
 global___ComputeNodeFormat = ComputeNodeFormat
 
+@typing_extensions.final
 class DataRoom(google.protobuf.message.Message):
     """/ To create a dataroom the user need to specify the `GovernanceProtocol`
     / and the list of `ConfigurationModification`.
@@ -213,6 +214,7 @@ class DataRoom(google.protobuf.message.Message):
 
 global___DataRoom = DataRoom
 
+@typing_extensions.final
 class GovernanceProtocol(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -234,6 +236,7 @@ class GovernanceProtocol(google.protobuf.message.Message):
 
 global___GovernanceProtocol = GovernanceProtocol
 
+@typing_extensions.final
 class StaticDataRoomPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -243,6 +246,7 @@ class StaticDataRoomPolicy(google.protobuf.message.Message):
 
 global___StaticDataRoomPolicy = StaticDataRoomPolicy
 
+@typing_extensions.final
 class AffectedDataOwnersApprovePolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -252,6 +256,7 @@ class AffectedDataOwnersApprovePolicy(google.protobuf.message.Message):
 
 global___AffectedDataOwnersApprovePolicy = AffectedDataOwnersApprovePolicy
 
+@typing_extensions.final
 class DataRoomConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -267,6 +272,7 @@ class DataRoomConfiguration(google.protobuf.message.Message):
 
 global___DataRoomConfiguration = DataRoomConfiguration
 
+@typing_extensions.final
 class ConfigurationElement(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -299,6 +305,7 @@ class ConfigurationElement(google.protobuf.message.Message):
 
 global___ConfigurationElement = ConfigurationElement
 
+@typing_extensions.final
 class ConfigurationModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -324,6 +331,7 @@ class ConfigurationModification(google.protobuf.message.Message):
 
 global___ConfigurationModification = ConfigurationModification
 
+@typing_extensions.final
 class AddModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -340,6 +348,7 @@ class AddModification(google.protobuf.message.Message):
 
 global___AddModification = AddModification
 
+@typing_extensions.final
 class ChangeModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -356,6 +365,7 @@ class ChangeModification(google.protobuf.message.Message):
 
 global___ChangeModification = ChangeModification
 
+@typing_extensions.final
 class DeleteModification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -370,6 +380,7 @@ class DeleteModification(google.protobuf.message.Message):
 
 global___DeleteModification = DeleteModification
 
+@typing_extensions.final
 class ConfigurationCommit(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -397,6 +408,43 @@ class ConfigurationCommit(google.protobuf.message.Message):
 
 global___ConfigurationCommit = ConfigurationCommit
 
+@typing_extensions.final
+class WindowRateLimitingConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TIMEWINDOWSECONDS_FIELD_NUMBER: builtins.int
+    NUMMAXEXECUTIONS_FIELD_NUMBER: builtins.int
+    timeWindowSeconds: builtins.int
+    numMaxExecutions: builtins.int
+    def __init__(
+        self,
+        *,
+        timeWindowSeconds: builtins.int = ...,
+        numMaxExecutions: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["numMaxExecutions", b"numMaxExecutions", "timeWindowSeconds", b"timeWindowSeconds"]) -> None: ...
+
+global___WindowRateLimitingConfig = WindowRateLimitingConfig
+
+@typing_extensions.final
+class RateLimitingConfig(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    WINDOW_FIELD_NUMBER: builtins.int
+    @property
+    def window(self) -> global___WindowRateLimitingConfig: ...
+    def __init__(
+        self,
+        *,
+        window: global___WindowRateLimitingConfig | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["method", b"method", "window", b"window"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["method", b"method", "window", b"window"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["method", b"method"]) -> typing_extensions.Literal["window"] | None: ...
+
+global___RateLimitingConfig = RateLimitingConfig
+
+@typing_extensions.final
 class ComputeNode(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -404,6 +452,8 @@ class ComputeNode(google.protobuf.message.Message):
     LEAF_FIELD_NUMBER: builtins.int
     PARAMETER_FIELD_NUMBER: builtins.int
     BRANCH_FIELD_NUMBER: builtins.int
+    AIRLOCK_FIELD_NUMBER: builtins.int
+    RATELIMITING_FIELD_NUMBER: builtins.int
     nodeName: builtins.str
     @property
     def leaf(self) -> global___ComputeNodeLeaf: ...
@@ -411,6 +461,21 @@ class ComputeNode(google.protobuf.message.Message):
     def parameter(self) -> global___ComputeNodeParameter: ...
     @property
     def branch(self) -> global___ComputeNodeBranch: ...
+    @property
+    def airlock(self) -> global___ComputeNodeAirlock: ...
+    @property
+    def rateLimiting(self) -> global___RateLimitingConfig:
+        """/ Control how often this node can be interacted with
+        / in the defined time interval.
+        / Imporatant: this is currently checked in the metering extension
+        / as implementing it in the driver would not give us additional
+        / security due to replay/reset attacks.
+        / In this implementation, it only checks direct interactions with a
+        / node, it won't check indirect executions (if the node was a dependency
+        / of another node). This issue is even bigger in DCRs with interactivity
+        / where someone could simply add a new node on top that doesn't have
+        / the rate limit applied.
+        """
     def __init__(
         self,
         *,
@@ -418,13 +483,19 @@ class ComputeNode(google.protobuf.message.Message):
         leaf: global___ComputeNodeLeaf | None = ...,
         parameter: global___ComputeNodeParameter | None = ...,
         branch: global___ComputeNodeBranch | None = ...,
+        airlock: global___ComputeNodeAirlock | None = ...,
+        rateLimiting: global___RateLimitingConfig | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["node", b"node"]) -> typing_extensions.Literal["leaf", "parameter", "branch"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "airlock", b"airlock", "branch", b"branch", "leaf", b"leaf", "node", b"node", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_rateLimiting", b"_rateLimiting", "airlock", b"airlock", "branch", b"branch", "leaf", b"leaf", "node", b"node", "nodeName", b"nodeName", "parameter", b"parameter", "rateLimiting", b"rateLimiting"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_rateLimiting", b"_rateLimiting"]) -> typing_extensions.Literal["rateLimiting"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["node", b"node"]) -> typing_extensions.Literal["leaf", "parameter", "branch", "airlock"] | None: ...
 
 global___ComputeNode = ComputeNode
 
+@typing_extensions.final
 class ComputeNodeLeaf(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -439,6 +510,7 @@ class ComputeNodeLeaf(google.protobuf.message.Message):
 
 global___ComputeNodeLeaf = ComputeNodeLeaf
 
+@typing_extensions.final
 class ComputeNodeParameter(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -453,6 +525,25 @@ class ComputeNodeParameter(google.protobuf.message.Message):
 
 global___ComputeNodeParameter = ComputeNodeParameter
 
+@typing_extensions.final
+class ComputeNodeAirlock(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    QUOTABYTES_FIELD_NUMBER: builtins.int
+    AIRLOCKEDDEPENDENCY_FIELD_NUMBER: builtins.int
+    quotaBytes: builtins.int
+    airlockedDependency: builtins.str
+    def __init__(
+        self,
+        *,
+        quotaBytes: builtins.int = ...,
+        airlockedDependency: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["airlockedDependency", b"airlockedDependency", "quotaBytes", b"quotaBytes"]) -> None: ...
+
+global___ComputeNodeAirlock = ComputeNodeAirlock
+
+@typing_extensions.final
 class ComputeNodeProtocol(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -467,6 +558,7 @@ class ComputeNodeProtocol(google.protobuf.message.Message):
 
 global___ComputeNodeProtocol = ComputeNodeProtocol
 
+@typing_extensions.final
 class ComputeNodeBranch(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -496,6 +588,7 @@ class ComputeNodeBranch(google.protobuf.message.Message):
 
 global___ComputeNodeBranch = ComputeNodeBranch
 
+@typing_extensions.final
 class UserPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -517,6 +610,7 @@ class UserPermission(google.protobuf.message.Message):
 
 global___UserPermission = UserPermission
 
+@typing_extensions.final
 class AuthenticationMethod(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -546,6 +640,7 @@ class AuthenticationMethod(google.protobuf.message.Message):
 
 global___AuthenticationMethod = AuthenticationMethod
 
+@typing_extensions.final
 class PkiPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -560,6 +655,7 @@ class PkiPolicy(google.protobuf.message.Message):
 
 global___PkiPolicy = PkiPolicy
 
+@typing_extensions.final
 class DcrSecretPolicy(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -574,6 +670,7 @@ class DcrSecretPolicy(google.protobuf.message.Message):
 
 global___DcrSecretPolicy = DcrSecretPolicy
 
+@typing_extensions.final
 class Permission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -643,6 +740,7 @@ class Permission(google.protobuf.message.Message):
 
 global___Permission = Permission
 
+@typing_extensions.final
 class ExecuteComputePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -657,6 +755,7 @@ class ExecuteComputePermission(google.protobuf.message.Message):
 
 global___ExecuteComputePermission = ExecuteComputePermission
 
+@typing_extensions.final
 class LeafCrudPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -671,6 +770,7 @@ class LeafCrudPermission(google.protobuf.message.Message):
 
 global___LeafCrudPermission = LeafCrudPermission
 
+@typing_extensions.final
 class RetrieveDataRoomPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -680,6 +780,7 @@ class RetrieveDataRoomPermission(google.protobuf.message.Message):
 
 global___RetrieveDataRoomPermission = RetrieveDataRoomPermission
 
+@typing_extensions.final
 class RetrieveAuditLogPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -689,6 +790,7 @@ class RetrieveAuditLogPermission(google.protobuf.message.Message):
 
 global___RetrieveAuditLogPermission = RetrieveAuditLogPermission
 
+@typing_extensions.final
 class RetrieveDataRoomStatusPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -698,6 +800,7 @@ class RetrieveDataRoomStatusPermission(google.protobuf.message.Message):
 
 global___RetrieveDataRoomStatusPermission = RetrieveDataRoomStatusPermission
 
+@typing_extensions.final
 class UpdateDataRoomStatusPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -707,6 +810,7 @@ class UpdateDataRoomStatusPermission(google.protobuf.message.Message):
 
 global___UpdateDataRoomStatusPermission = UpdateDataRoomStatusPermission
 
+@typing_extensions.final
 class RetrievePublishedDatasetsPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -716,6 +820,7 @@ class RetrievePublishedDatasetsPermission(google.protobuf.message.Message):
 
 global___RetrievePublishedDatasetsPermission = RetrievePublishedDatasetsPermission
 
+@typing_extensions.final
 class DryRunPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -725,6 +830,7 @@ class DryRunPermission(google.protobuf.message.Message):
 
 global___DryRunPermission = DryRunPermission
 
+@typing_extensions.final
 class GenerateMergeSignaturePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -734,6 +840,7 @@ class GenerateMergeSignaturePermission(google.protobuf.message.Message):
 
 global___GenerateMergeSignaturePermission = GenerateMergeSignaturePermission
 
+@typing_extensions.final
 class ExecuteDevelopmentComputePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -743,6 +850,7 @@ class ExecuteDevelopmentComputePermission(google.protobuf.message.Message):
 
 global___ExecuteDevelopmentComputePermission = ExecuteDevelopmentComputePermission
 
+@typing_extensions.final
 class MergeConfigurationCommitPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -752,6 +860,7 @@ class MergeConfigurationCommitPermission(google.protobuf.message.Message):
 
 global___MergeConfigurationCommitPermission = MergeConfigurationCommitPermission
 
+@typing_extensions.final
 class RetrieveComputeResultPermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -766,6 +875,7 @@ class RetrieveComputeResultPermission(google.protobuf.message.Message):
 
 global___RetrieveComputeResultPermission = RetrieveComputeResultPermission
 
+@typing_extensions.final
 class CasAuxiliaryStatePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -775,6 +885,7 @@ class CasAuxiliaryStatePermission(google.protobuf.message.Message):
 
 global___CasAuxiliaryStatePermission = CasAuxiliaryStatePermission
 
+@typing_extensions.final
 class ReadAuxiliaryStatePermission(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

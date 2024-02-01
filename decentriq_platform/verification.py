@@ -8,6 +8,7 @@ from oscrypto import asymmetric
 from certvalidator import CertificateValidator, ValidationContext
 from enum import IntFlag
 
+
 from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
 from .proto import (
     AttestationSpecification, Fatquote, FatquoteEpid, FatquoteDcap,
@@ -341,6 +342,8 @@ class Verification:
                     raise Exception(f'Intel DCAP Root CA in fatquote does not match known value')
             else:
                 raise Exception(f'Unknown fatquote type')
+        else:
+            print("!!!WARNING!!! MOCKED QUOTE is being accepted, quote is NOT to be trusted !!!WARNING!!!")
 
         if fatquote.HasField("epid"):
             return self._verify_epid(fatquote.epid)

@@ -1,0 +1,15 @@
+syntax = "proto3";
+package data_source_snowflake;
+
+message SnowflakeSource {
+  string warehouseName = 1;
+  string databaseName = 2;
+  string schemaName = 3;
+  string tableName = 4;
+  string stageName = 5;
+}
+
+message DataSourceSnowflakeWorkerConfiguration {
+  SnowflakeSource source = 1;
+  string credentialsDependency = 2;
+}

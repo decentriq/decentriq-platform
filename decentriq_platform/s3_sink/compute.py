@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Literal
 from google.protobuf.json_format import MessageToDict
-from .proto.compute_s3_sink_pb2 import S3SinkWorkerConfiguration, S3Object
+from .proto.compute_s3_sink_pb2 import S3SinkWorkerConfiguration, S3Object, S3Provider
 from ..proto.length_delimited import serialize_length_delimited, parse_length_delimited
 from ..proto import ComputeNodeFormat
 from ..node import Node
@@ -15,9 +15,10 @@ class S3SinkCompute(Node):
             self,
             name: str,
             endpoint: str,
-            region: str,
             credentials_dependency: str,
+            s3_provider: Literal["AWS", "GCS"],
             objects: List[S3Object],
+            region: str = "",
     ) -> None:
         """
         Create a container compute node.
@@ -30,6 +31,14 @@ class S3SinkCompute(Node):
         - `region`: The S3 region used by the endpoint.
         - `credentials_dependency`: the id of the dependency that holds the credentials
             to access the S3 bucket
+            This node should provide a single JSON with format:
+            - For AWS:
+            ```
+            {
+                "accessKey": "xxxx",
+                "secretKey": "yyyy"
+            }
+            - For GCS, see [service account credentials](https://cloud.google.com/iam/docs/service-account-creds)
         - `objects`: The list of objects to upload to the S3 bucket
         """
         configuration = S3SinkWorkerConfiguration()
@@ -37,6 +46,13 @@ class S3SinkCompute(Node):
         configuration.region = region
         configuration.credentialsDependency = credentials_dependency
         configuration.objects.extend(objects)
+        if s3_provider == "AWS":
+            configuration.s3Provider = S3Provider.AWS
+        elif s3_provider == "GCS":
+            configuration.s3Provider = S3Provider.GCS
+        else:
+            raise Exception(f"Invalid s3_provider: got {s3_provider}")
+        
         config = serialize_length_delimited(configuration)
         dependencies = [credentials_dependency] + list(map(lambda a: a.dependency, objects))
 

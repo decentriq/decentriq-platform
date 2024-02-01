@@ -1,0 +1,33 @@
+syntax = "proto3";
+package meta_sink;
+
+message SingleFile {
+    string name = 1;
+}
+
+message RawFile {}
+
+message ZipFile {
+    oneof selection {
+        SingleFile singleFile = 1;
+    }
+}
+
+message SinkInput {
+    string dependency = 1;
+    string name = 2;
+    oneof file {
+        RawFile raw = 3;
+        ZipFile zip = 4;
+    }
+}
+
+message MetaSinkWorkerConfiguration {
+    SinkInput input = 1;
+    // https://graph.facebook.com/v17.0/act_<AD_ACCOUNT_ID>/customaudiences
+    //  Content-Type multipart/form-data
+    string accessTokenDependency = 2;
+    string adAccountId = 3;
+    string audienceName = 4;
+    optional string apiVersion = 5;
+}

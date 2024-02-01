@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 from google.protobuf.json_format import MessageToDict
-from .proto.compute_container_pb2 import ContainerWorkerConfiguration, MountPoint
+from .proto.compute_container_pb2 import ContainerWorkerConfiguration, MountPoint, ProxyConfiguration
 from ..proto.length_delimited import serialize_length_delimited, parse_length_delimited
 from ..proto import ComputeNodeFormat
 from ..node import Node
@@ -20,7 +20,8 @@ class StaticContainerCompute(Node):
             output_path: str,
             enclave_type: str,
             include_container_logs_on_error: bool = False,
-            include_container_logs_on_success: bool = False
+            include_container_logs_on_success: bool = False,
+            proxy_configuration: Optional[ProxyConfiguration] = None,
     ) -> None:
         """
         Create a container compute node.
@@ -57,6 +58,8 @@ class StaticContainerCompute(Node):
         configuration.static.outputPath = output_path
         configuration.static.includeContainerLogsOnError = include_container_logs_on_error
         configuration.static.includeContainerLogsOnSuccess = include_container_logs_on_success
+        if proxy_configuration is not None:
+            configuration.static.proxyConfiguration.MergeFrom(proxy_configuration)
         config = serialize_length_delimited(configuration)
         dependencies = list(map(lambda a: a.dependency, mount_points))
 

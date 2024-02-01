@@ -6,16 +6,34 @@ import builtins
 import collections.abc
 import google.protobuf.descriptor
 import google.protobuf.internal.containers
+import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 import sys
+import typing
 
-if sys.version_info >= (3, 8):
+if sys.version_info >= (3, 10):
     import typing as typing_extensions
 else:
     import typing_extensions
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+class _S3Provider:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _S3ProviderEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_S3Provider.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    AWS: _S3Provider.ValueType  # 0
+    GCS: _S3Provider.ValueType  # 1
+
+class S3Provider(_S3Provider, metaclass=_S3ProviderEnumTypeWrapper): ...
+
+AWS: S3Provider.ValueType  # 0
+GCS: S3Provider.ValueType  # 1
+global___S3Provider = S3Provider
+
+@typing_extensions.final
 class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -23,11 +41,14 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     REGION_FIELD_NUMBER: builtins.int
     CREDENTIALSDEPENDENCY_FIELD_NUMBER: builtins.int
     OBJECTS_FIELD_NUMBER: builtins.int
+    S3PROVIDER_FIELD_NUMBER: builtins.int
     endpoint: builtins.str
     region: builtins.str
+    """S3 region can be left empty for a GCS sink worker"""
     credentialsDependency: builtins.str
     @property
     def objects(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___S3Object]: ...
+    s3Provider: global___S3Provider.ValueType
     def __init__(
         self,
         *,
@@ -35,11 +56,13 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
         region: builtins.str = ...,
         credentialsDependency: builtins.str = ...,
         objects: collections.abc.Iterable[global___S3Object] | None = ...,
+        s3Provider: global___S3Provider.ValueType = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "endpoint", b"endpoint", "objects", b"objects", "region", b"region"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "endpoint", b"endpoint", "objects", b"objects", "region", b"region", "s3Provider", b"s3Provider"]) -> None: ...
 
 global___S3SinkWorkerConfiguration = S3SinkWorkerConfiguration
 
+@typing_extensions.final
 class S3Object(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -64,6 +87,7 @@ class S3Object(google.protobuf.message.Message):
 
 global___S3Object = S3Object
 
+@typing_extensions.final
 class RawObject(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -78,6 +102,7 @@ class RawObject(google.protobuf.message.Message):
 
 global___RawObject = RawObject
 
+@typing_extensions.final
 class ZipObject(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -99,6 +124,7 @@ class ZipObject(google.protobuf.message.Message):
 
 global___ZipObject = ZipObject
 
+@typing_extensions.final
 class SingleFile(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -116,6 +142,7 @@ class SingleFile(google.protobuf.message.Message):
 
 global___SingleFile = SingleFile
 
+@typing_extensions.final
 class FullContent(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -125,6 +152,7 @@ class FullContent(google.protobuf.message.Message):
 
 global___FullContent = FullContent
 
+@typing_extensions.final
 class S3Credentials(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

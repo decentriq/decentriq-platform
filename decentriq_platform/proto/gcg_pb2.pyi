@@ -24,7 +24,7 @@ class _DataRoomStatus:
     ValueType = typing.NewType("ValueType", builtins.int)
     V: typing_extensions.TypeAlias = ValueType
 
-class _DataRoomStatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataRoomStatus.ValueType], builtins.type):  # noqa: F821
+class _DataRoomStatusEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DataRoomStatus.ValueType], builtins.type):
     DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
     Active: _DataRoomStatus.ValueType  # 0
     Stopped: _DataRoomStatus.ValueType  # 1
@@ -35,6 +35,7 @@ Active: DataRoomStatus.ValueType  # 0
 Stopped: DataRoomStatus.ValueType  # 1
 global___DataRoomStatus = DataRoomStatus
 
+@typing_extensions.final
 class GcgRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -59,6 +60,8 @@ class GcgRequest(google.protobuf.message.Message):
     RETRIEVECONFIGURATIONCOMMITAPPROVERSREQUEST_FIELD_NUMBER: builtins.int
     CASAUXILIARYSTATEREQUEST_FIELD_NUMBER: builtins.int
     READAUXILIARYSTATEREQUEST_FIELD_NUMBER: builtins.int
+    RETRIEVEUSEDAIRLOCKQUOTAREQUEST_FIELD_NUMBER: builtins.int
+    GETRESULTSSIZEREQUEST_FIELD_NUMBER: builtins.int
     ENDORSEMENTREQUEST_FIELD_NUMBER: builtins.int
     @property
     def userAuth(self) -> global___UserAuth: ...
@@ -103,6 +106,10 @@ class GcgRequest(google.protobuf.message.Message):
     @property
     def readAuxiliaryStateRequest(self) -> global___ReadAuxiliaryStateRequest: ...
     @property
+    def retrieveUsedAirlockQuotaRequest(self) -> global___RetrieveUsedAirlockQuotaRequest: ...
+    @property
+    def getResultsSizeRequest(self) -> global___GetResultsSizeRequest: ...
+    @property
     def endorsementRequest(self) -> identity_endorsement_pb2.EndorsementRequest: ...
     def __init__(
         self,
@@ -128,14 +135,17 @@ class GcgRequest(google.protobuf.message.Message):
         retrieveConfigurationCommitApproversRequest: global___RetrieveConfigurationCommitApproversRequest | None = ...,
         casAuxiliaryStateRequest: global___CasAuxiliaryStateRequest | None = ...,
         readAuxiliaryStateRequest: global___ReadAuxiliaryStateRequest | None = ...,
+        retrieveUsedAirlockQuotaRequest: global___RetrieveUsedAirlockQuotaRequest | None = ...,
+        getResultsSizeRequest: global___GetResultsSizeRequest | None = ...,
         endorsementRequest: identity_endorsement_pb2.EndorsementRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "casAuxiliaryStateRequest", "readAuxiliaryStateRequest", "endorsementRequest"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "getResultsSizeRequest", b"getResultsSizeRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "retrieveUsedAirlockQuotaRequest", b"retrieveUsedAirlockQuotaRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateRequest", b"casAuxiliaryStateRequest", "createConfigurationCommitRequest", b"createConfigurationCommitRequest", "createDataRoomRequest", b"createDataRoomRequest", "endorsementRequest", b"endorsementRequest", "executeComputeRequest", b"executeComputeRequest", "executeDevelopmentComputeRequest", b"executeDevelopmentComputeRequest", "gcg_request", b"gcg_request", "generateMergeApprovalSignatureRequest", b"generateMergeApprovalSignatureRequest", "getResultsRequest", b"getResultsRequest", "getResultsSizeRequest", b"getResultsSizeRequest", "jobStatusRequest", b"jobStatusRequest", "mergeConfigurationCommitRequest", b"mergeConfigurationCommitRequest", "publishDatasetToDataRoomRequest", b"publishDatasetToDataRoomRequest", "readAuxiliaryStateRequest", b"readAuxiliaryStateRequest", "removePublishedDatasetRequest", b"removePublishedDatasetRequest", "retrieveAuditLogRequest", b"retrieveAuditLogRequest", "retrieveConfigurationCommitApproversRequest", b"retrieveConfigurationCommitApproversRequest", "retrieveConfigurationCommitRequest", b"retrieveConfigurationCommitRequest", "retrieveCurrentDataRoomConfigurationRequest", b"retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomRequest", b"retrieveDataRoomRequest", "retrieveDataRoomStatusRequest", b"retrieveDataRoomStatusRequest", "retrievePublishedDatasetsRequest", b"retrievePublishedDatasetsRequest", "retrieveUsedAirlockQuotaRequest", b"retrieveUsedAirlockQuotaRequest", "updateDataRoomStatusRequest", b"updateDataRoomStatusRequest", "userAuth", b"userAuth"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_request", b"gcg_request"]) -> typing_extensions.Literal["createDataRoomRequest", "retrieveDataRoomRequest", "retrieveCurrentDataRoomConfigurationRequest", "retrieveDataRoomStatusRequest", "updateDataRoomStatusRequest", "retrieveAuditLogRequest", "publishDatasetToDataRoomRequest", "retrievePublishedDatasetsRequest", "removePublishedDatasetRequest", "executeComputeRequest", "jobStatusRequest", "getResultsRequest", "createConfigurationCommitRequest", "retrieveConfigurationCommitRequest", "executeDevelopmentComputeRequest", "generateMergeApprovalSignatureRequest", "mergeConfigurationCommitRequest", "retrieveConfigurationCommitApproversRequest", "casAuxiliaryStateRequest", "readAuxiliaryStateRequest", "retrieveUsedAirlockQuotaRequest", "getResultsSizeRequest", "endorsementRequest"] | None: ...
 
 global___GcgRequest = GcgRequest
 
+@typing_extensions.final
 class GcgResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -160,6 +170,8 @@ class GcgResponse(google.protobuf.message.Message):
     RETRIEVECONFIGURATIONCOMMITAPPROVERSRESPONSE_FIELD_NUMBER: builtins.int
     CASAUXILIARYSTATERESPONSE_FIELD_NUMBER: builtins.int
     READAUXILIARYSTATERESPONSE_FIELD_NUMBER: builtins.int
+    RETRIEVEUSEDAIRLOCKQUOTARESPONSE_FIELD_NUMBER: builtins.int
+    GETRESULTSSIZERESPONSE_FIELD_NUMBER: builtins.int
     ENDORSEMENTRESPONSE_FIELD_NUMBER: builtins.int
     failure: builtins.str
     @property
@@ -203,6 +215,10 @@ class GcgResponse(google.protobuf.message.Message):
     @property
     def readAuxiliaryStateResponse(self) -> global___ReadAuxiliaryStateResponse: ...
     @property
+    def retrieveUsedAirlockQuotaResponse(self) -> global___RetrieveUsedAirlockQuotaResponse: ...
+    @property
+    def getResultsSizeResponse(self) -> global___GetResultsSizeResponse: ...
+    @property
     def endorsementResponse(self) -> identity_endorsement_pb2.EndorsementResponse: ...
     def __init__(
         self,
@@ -228,14 +244,17 @@ class GcgResponse(google.protobuf.message.Message):
         retrieveConfigurationCommitApproversResponse: global___RetrieveConfigurationCommitApproversResponse | None = ...,
         casAuxiliaryStateResponse: global___CasAuxiliaryStateResponse | None = ...,
         readAuxiliaryStateResponse: global___ReadAuxiliaryStateResponse | None = ...,
+        retrieveUsedAirlockQuotaResponse: global___RetrieveUsedAirlockQuotaResponse | None = ...,
+        getResultsSizeResponse: global___GetResultsSizeResponse | None = ...,
         endorsementResponse: identity_endorsement_pb2.EndorsementResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "casAuxiliaryStateResponse", "readAuxiliaryStateResponse", "endorsementResponse"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "getResultsSizeResponse", b"getResultsSizeResponse", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "retrieveUsedAirlockQuotaResponse", b"retrieveUsedAirlockQuotaResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["casAuxiliaryStateResponse", b"casAuxiliaryStateResponse", "createConfigurationCommitResponse", b"createConfigurationCommitResponse", "createDataRoomResponse", b"createDataRoomResponse", "endorsementResponse", b"endorsementResponse", "executeComputeResponse", b"executeComputeResponse", "failure", b"failure", "gcg_response", b"gcg_response", "generateMergeApprovalSignatureResponse", b"generateMergeApprovalSignatureResponse", "getResultsResponseChunk", b"getResultsResponseChunk", "getResultsResponseFooter", b"getResultsResponseFooter", "getResultsSizeResponse", b"getResultsSizeResponse", "jobStatusResponse", b"jobStatusResponse", "mergeConfigurationCommitResponse", b"mergeConfigurationCommitResponse", "publishDatasetToDataRoomResponse", b"publishDatasetToDataRoomResponse", "readAuxiliaryStateResponse", b"readAuxiliaryStateResponse", "removePublishedDatasetResponse", b"removePublishedDatasetResponse", "retrieveAuditLogResponse", b"retrieveAuditLogResponse", "retrieveConfigurationCommitApproversResponse", b"retrieveConfigurationCommitApproversResponse", "retrieveConfigurationCommitResponse", b"retrieveConfigurationCommitResponse", "retrieveCurrentDataRoomConfigurationResponse", b"retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomResponse", b"retrieveDataRoomResponse", "retrieveDataRoomStatusResponse", b"retrieveDataRoomStatusResponse", "retrievePublishedDatasetsResponse", b"retrievePublishedDatasetsResponse", "retrieveUsedAirlockQuotaResponse", b"retrieveUsedAirlockQuotaResponse", "updateDataRoomStatusResponse", b"updateDataRoomStatusResponse"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["gcg_response", b"gcg_response"]) -> typing_extensions.Literal["failure", "createDataRoomResponse", "retrieveDataRoomResponse", "retrieveCurrentDataRoomConfigurationResponse", "retrieveDataRoomStatusResponse", "updateDataRoomStatusResponse", "retrieveAuditLogResponse", "publishDatasetToDataRoomResponse", "retrievePublishedDatasetsResponse", "removePublishedDatasetResponse", "executeComputeResponse", "jobStatusResponse", "getResultsResponseChunk", "getResultsResponseFooter", "createConfigurationCommitResponse", "retrieveConfigurationCommitResponse", "generateMergeApprovalSignatureResponse", "mergeConfigurationCommitResponse", "retrieveConfigurationCommitApproversResponse", "casAuxiliaryStateResponse", "readAuxiliaryStateResponse", "retrieveUsedAirlockQuotaResponse", "getResultsSizeResponse", "endorsementResponse"] | None: ...
 
 global___GcgResponse = GcgResponse
 
+@typing_extensions.final
 class UserAuth(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -256,6 +275,7 @@ class UserAuth(google.protobuf.message.Message):
 
 global___UserAuth = UserAuth
 
+@typing_extensions.final
 class Pki(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -276,6 +296,7 @@ class Pki(google.protobuf.message.Message):
 
 global___Pki = Pki
 
+@typing_extensions.final
 class CreateDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -302,6 +323,7 @@ class CreateDataRoomRequest(google.protobuf.message.Message):
 
 global___CreateDataRoomRequest = CreateDataRoomRequest
 
+@typing_extensions.final
 class CreateDataRoomResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -322,6 +344,7 @@ class CreateDataRoomResponse(google.protobuf.message.Message):
 
 global___CreateDataRoomResponse = CreateDataRoomResponse
 
+@typing_extensions.final
 class DataRoomValidationError(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -362,6 +385,7 @@ class DataRoomValidationError(google.protobuf.message.Message):
 
 global___DataRoomValidationError = DataRoomValidationError
 
+@typing_extensions.final
 class PublishDatasetToDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -388,6 +412,7 @@ class PublishDatasetToDataRoomRequest(google.protobuf.message.Message):
 
 global___PublishDatasetToDataRoomRequest = PublishDatasetToDataRoomRequest
 
+@typing_extensions.final
 class PublishDatasetToDataRoomResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -397,9 +422,11 @@ class PublishDatasetToDataRoomResponse(google.protobuf.message.Message):
 
 global___PublishDatasetToDataRoomResponse = PublishDatasetToDataRoomResponse
 
+@typing_extensions.final
 class ExecuteComputeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing_extensions.final
     class ParametersEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -415,11 +442,30 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    @typing_extensions.final
+    class TestDatasetsEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        @property
+        def value(self) -> global___TestDataset: ...
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: global___TestDataset | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing_extensions.Literal["value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     DATAROOMID_FIELD_NUMBER: builtins.int
     COMPUTENODEIDS_FIELD_NUMBER: builtins.int
     ISDRYRUN_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
     PARAMETERS_FIELD_NUMBER: builtins.int
+    TESTDATASETS_FIELD_NUMBER: builtins.int
     dataRoomId: builtins.bytes
     @property
     def computeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
@@ -427,6 +473,8 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
     scope: builtins.bytes
     @property
     def parameters(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def testDatasets(self) -> google.protobuf.internal.containers.MessageMap[builtins.str, global___TestDataset]: ...
     def __init__(
         self,
         *,
@@ -435,14 +483,17 @@ class ExecuteComputeRequest(google.protobuf.message.Message):
         isDryRun: builtins.bool = ...,
         scope: builtins.bytes = ...,
         parameters: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        testDatasets: collections.abc.Mapping[builtins.str, global___TestDataset] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "dataRoomId", b"dataRoomId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "dataRoomId", b"dataRoomId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope", "testDatasets", b"testDatasets"]) -> None: ...
 
 global___ExecuteComputeRequest = ExecuteComputeRequest
 
+@typing_extensions.final
 class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing_extensions.final
     class ParametersEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -458,11 +509,30 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
         ) -> None: ...
         def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
 
+    @typing_extensions.final
+    class TestDatasetsEntry(google.protobuf.message.Message):
+        DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+        KEY_FIELD_NUMBER: builtins.int
+        VALUE_FIELD_NUMBER: builtins.int
+        key: builtins.str
+        @property
+        def value(self) -> global___TestDataset: ...
+        def __init__(
+            self,
+            *,
+            key: builtins.str = ...,
+            value: global___TestDataset | None = ...,
+        ) -> None: ...
+        def HasField(self, field_name: typing_extensions.Literal["value", b"value"]) -> builtins.bool: ...
+        def ClearField(self, field_name: typing_extensions.Literal["key", b"key", "value", b"value"]) -> None: ...
+
     CONFIGURATIONCOMMITID_FIELD_NUMBER: builtins.int
     COMPUTENODEIDS_FIELD_NUMBER: builtins.int
     ISDRYRUN_FIELD_NUMBER: builtins.int
     SCOPE_FIELD_NUMBER: builtins.int
     PARAMETERS_FIELD_NUMBER: builtins.int
+    TESTDATASETS_FIELD_NUMBER: builtins.int
     configurationCommitId: builtins.bytes
     @property
     def computeNodeIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.str]: ...
@@ -470,6 +540,8 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
     scope: builtins.bytes
     @property
     def parameters(self) -> google.protobuf.internal.containers.ScalarMap[builtins.str, builtins.str]: ...
+    @property
+    def testDatasets(self) -> google.protobuf.internal.containers.MessageMap[builtins.str, global___TestDataset]: ...
     def __init__(
         self,
         *,
@@ -478,11 +550,31 @@ class ExecuteDevelopmentComputeRequest(google.protobuf.message.Message):
         isDryRun: builtins.bool = ...,
         scope: builtins.bytes = ...,
         parameters: collections.abc.Mapping[builtins.str, builtins.str] | None = ...,
+        testDatasets: collections.abc.Mapping[builtins.str, global___TestDataset] | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "configurationCommitId", b"configurationCommitId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeIds", b"computeNodeIds", "configurationCommitId", b"configurationCommitId", "isDryRun", b"isDryRun", "parameters", b"parameters", "scope", b"scope", "testDatasets", b"testDatasets"]) -> None: ...
 
 global___ExecuteDevelopmentComputeRequest = ExecuteDevelopmentComputeRequest
 
+@typing_extensions.final
+class TestDataset(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ENCRYPTIONKEY_FIELD_NUMBER: builtins.int
+    MANIFESTHASH_FIELD_NUMBER: builtins.int
+    encryptionKey: builtins.bytes
+    manifestHash: builtins.bytes
+    def __init__(
+        self,
+        *,
+        encryptionKey: builtins.bytes = ...,
+        manifestHash: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["encryptionKey", b"encryptionKey", "manifestHash", b"manifestHash"]) -> None: ...
+
+global___TestDataset = TestDataset
+
+@typing_extensions.final
 class ExecuteComputeResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -497,6 +589,7 @@ class ExecuteComputeResponse(google.protobuf.message.Message):
 
 global___ExecuteComputeResponse = ExecuteComputeResponse
 
+@typing_extensions.final
 class JobStatusRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -511,6 +604,7 @@ class JobStatusRequest(google.protobuf.message.Message):
 
 global___JobStatusRequest = JobStatusRequest
 
+@typing_extensions.final
 class JobStatusResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -526,6 +620,7 @@ class JobStatusResponse(google.protobuf.message.Message):
 
 global___JobStatusResponse = JobStatusResponse
 
+@typing_extensions.final
 class GetResultsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -543,6 +638,25 @@ class GetResultsRequest(google.protobuf.message.Message):
 
 global___GetResultsRequest = GetResultsRequest
 
+@typing_extensions.final
+class GetResultsSizeRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    JOBID_FIELD_NUMBER: builtins.int
+    COMPUTENODEID_FIELD_NUMBER: builtins.int
+    jobId: builtins.bytes
+    computeNodeId: builtins.str
+    def __init__(
+        self,
+        *,
+        jobId: builtins.bytes = ...,
+        computeNodeId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["computeNodeId", b"computeNodeId", "jobId", b"jobId"]) -> None: ...
+
+global___GetResultsSizeRequest = GetResultsSizeRequest
+
+@typing_extensions.final
 class GetResultsResponseChunk(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -557,6 +671,7 @@ class GetResultsResponseChunk(google.protobuf.message.Message):
 
 global___GetResultsResponseChunk = GetResultsResponseChunk
 
+@typing_extensions.final
 class GetResultsResponseFooter(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -566,6 +681,7 @@ class GetResultsResponseFooter(google.protobuf.message.Message):
 
 global___GetResultsResponseFooter = GetResultsResponseFooter
 
+@typing_extensions.final
 class RetrieveDataRoomRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -580,6 +696,7 @@ class RetrieveDataRoomRequest(google.protobuf.message.Message):
 
 global___RetrieveDataRoomRequest = RetrieveDataRoomRequest
 
+@typing_extensions.final
 class RetrieveDataRoomResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -604,6 +721,7 @@ class RetrieveDataRoomResponse(google.protobuf.message.Message):
 
 global___RetrieveDataRoomResponse = RetrieveDataRoomResponse
 
+@typing_extensions.final
 class RetrieveAuditLogRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -618,6 +736,7 @@ class RetrieveAuditLogRequest(google.protobuf.message.Message):
 
 global___RetrieveAuditLogRequest = RetrieveAuditLogRequest
 
+@typing_extensions.final
 class RetrieveAuditLogResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -632,6 +751,7 @@ class RetrieveAuditLogResponse(google.protobuf.message.Message):
 
 global___RetrieveAuditLogResponse = RetrieveAuditLogResponse
 
+@typing_extensions.final
 class RetrieveDataRoomStatusRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -646,6 +766,7 @@ class RetrieveDataRoomStatusRequest(google.protobuf.message.Message):
 
 global___RetrieveDataRoomStatusRequest = RetrieveDataRoomStatusRequest
 
+@typing_extensions.final
 class RetrieveDataRoomStatusResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -660,6 +781,7 @@ class RetrieveDataRoomStatusResponse(google.protobuf.message.Message):
 
 global___RetrieveDataRoomStatusResponse = RetrieveDataRoomStatusResponse
 
+@typing_extensions.final
 class UpdateDataRoomStatusRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -677,6 +799,7 @@ class UpdateDataRoomStatusRequest(google.protobuf.message.Message):
 
 global___UpdateDataRoomStatusRequest = UpdateDataRoomStatusRequest
 
+@typing_extensions.final
 class UpdateDataRoomStatusResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -686,6 +809,7 @@ class UpdateDataRoomStatusResponse(google.protobuf.message.Message):
 
 global___UpdateDataRoomStatusResponse = UpdateDataRoomStatusResponse
 
+@typing_extensions.final
 class RetrievePublishedDatasetsRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -700,6 +824,7 @@ class RetrievePublishedDatasetsRequest(google.protobuf.message.Message):
 
 global___RetrievePublishedDatasetsRequest = RetrievePublishedDatasetsRequest
 
+@typing_extensions.final
 class PublishedDataset(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -723,6 +848,7 @@ class PublishedDataset(google.protobuf.message.Message):
 
 global___PublishedDataset = PublishedDataset
 
+@typing_extensions.final
 class RetrievePublishedDatasetsResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -738,6 +864,7 @@ class RetrievePublishedDatasetsResponse(google.protobuf.message.Message):
 
 global___RetrievePublishedDatasetsResponse = RetrievePublishedDatasetsResponse
 
+@typing_extensions.final
 class RemovePublishedDatasetRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -755,6 +882,7 @@ class RemovePublishedDatasetRequest(google.protobuf.message.Message):
 
 global___RemovePublishedDatasetRequest = RemovePublishedDatasetRequest
 
+@typing_extensions.final
 class RemovePublishedDatasetResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -764,6 +892,7 @@ class RemovePublishedDatasetResponse(google.protobuf.message.Message):
 
 global___RemovePublishedDatasetResponse = RemovePublishedDatasetResponse
 
+@typing_extensions.final
 class CreateConfigurationCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -784,6 +913,7 @@ class CreateConfigurationCommitRequest(google.protobuf.message.Message):
 
 global___CreateConfigurationCommitRequest = CreateConfigurationCommitRequest
 
+@typing_extensions.final
 class CreateConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -798,6 +928,7 @@ class CreateConfigurationCommitResponse(google.protobuf.message.Message):
 
 global___CreateConfigurationCommitResponse = CreateConfigurationCommitResponse
 
+@typing_extensions.final
 class GenerateMergeApprovalSignatureRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -812,6 +943,7 @@ class GenerateMergeApprovalSignatureRequest(google.protobuf.message.Message):
 
 global___GenerateMergeApprovalSignatureRequest = GenerateMergeApprovalSignatureRequest
 
+@typing_extensions.final
 class GenerateMergeApprovalSignatureResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -826,9 +958,11 @@ class GenerateMergeApprovalSignatureResponse(google.protobuf.message.Message):
 
 global___GenerateMergeApprovalSignatureResponse = GenerateMergeApprovalSignatureResponse
 
+@typing_extensions.final
 class MergeConfigurationCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
+    @typing_extensions.final
     class ApprovalSignaturesEntry(google.protobuf.message.Message):
         DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -864,6 +998,7 @@ class MergeConfigurationCommitRequest(google.protobuf.message.Message):
 
 global___MergeConfigurationCommitRequest = MergeConfigurationCommitRequest
 
+@typing_extensions.final
 class RetrieveCurrentDataRoomConfigurationRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -878,6 +1013,7 @@ class RetrieveCurrentDataRoomConfigurationRequest(google.protobuf.message.Messag
 
 global___RetrieveCurrentDataRoomConfigurationRequest = RetrieveCurrentDataRoomConfigurationRequest
 
+@typing_extensions.final
 class RetrieveCurrentDataRoomConfigurationResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -897,6 +1033,7 @@ class RetrieveCurrentDataRoomConfigurationResponse(google.protobuf.message.Messa
 
 global___RetrieveCurrentDataRoomConfigurationResponse = RetrieveCurrentDataRoomConfigurationResponse
 
+@typing_extensions.final
 class RetrieveConfigurationCommitApproversRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -911,6 +1048,7 @@ class RetrieveConfigurationCommitApproversRequest(google.protobuf.message.Messag
 
 global___RetrieveConfigurationCommitApproversRequest = RetrieveConfigurationCommitApproversRequest
 
+@typing_extensions.final
 class RetrieveConfigurationCommitApproversResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -926,6 +1064,7 @@ class RetrieveConfigurationCommitApproversResponse(google.protobuf.message.Messa
 
 global___RetrieveConfigurationCommitApproversResponse = RetrieveConfigurationCommitApproversResponse
 
+@typing_extensions.final
 class RetrieveConfigurationCommitRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -940,6 +1079,7 @@ class RetrieveConfigurationCommitRequest(google.protobuf.message.Message):
 
 global___RetrieveConfigurationCommitRequest = RetrieveConfigurationCommitRequest
 
+@typing_extensions.final
 class RetrieveConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -960,6 +1100,7 @@ class RetrieveConfigurationCommitResponse(google.protobuf.message.Message):
 
 global___RetrieveConfigurationCommitResponse = RetrieveConfigurationCommitResponse
 
+@typing_extensions.final
 class CasAuxiliaryStateRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -986,6 +1127,7 @@ class CasAuxiliaryStateRequest(google.protobuf.message.Message):
 
 global___CasAuxiliaryStateRequest = CasAuxiliaryStateRequest
 
+@typing_extensions.final
 class CasAuxiliaryStateResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1017,6 +1159,7 @@ class CasAuxiliaryStateResponse(google.protobuf.message.Message):
 
 global___CasAuxiliaryStateResponse = CasAuxiliaryStateResponse
 
+@typing_extensions.final
 class ReadAuxiliaryStateRequest(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1031,6 +1174,7 @@ class ReadAuxiliaryStateRequest(google.protobuf.message.Message):
 
 global___ReadAuxiliaryStateRequest = ReadAuxiliaryStateRequest
 
+@typing_extensions.final
 class ReadAuxiliaryStateResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1046,6 +1190,7 @@ class ReadAuxiliaryStateResponse(google.protobuf.message.Message):
 
 global___ReadAuxiliaryStateResponse = ReadAuxiliaryStateResponse
 
+@typing_extensions.final
 class AuxiliaryStateValue(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1066,6 +1211,7 @@ class AuxiliaryStateValue(google.protobuf.message.Message):
 
 global___AuxiliaryStateValue = AuxiliaryStateValue
 
+@typing_extensions.final
 class MergeConfigurationCommitResponse(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1075,6 +1221,7 @@ class MergeConfigurationCommitResponse(google.protobuf.message.Message):
 
 global___MergeConfigurationCommitResponse = MergeConfigurationCommitResponse
 
+@typing_extensions.final
 class DriverTaskConfig(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1096,6 +1243,7 @@ class DriverTaskConfig(google.protobuf.message.Message):
 
 global___DriverTaskConfig = DriverTaskConfig
 
+@typing_extensions.final
 class NoopConfig(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1105,6 +1253,7 @@ class NoopConfig(google.protobuf.message.Message):
 
 global___NoopConfig = NoopConfig
 
+@typing_extensions.final
 class StaticContentConfig(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -1118,3 +1267,70 @@ class StaticContentConfig(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["content", b"content"]) -> None: ...
 
 global___StaticContentConfig = StaticContentConfig
+
+@typing_extensions.final
+class RetrieveUsedAirlockQuotaRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dataRoomId", b"dataRoomId"]) -> None: ...
+
+global___RetrieveUsedAirlockQuotaRequest = RetrieveUsedAirlockQuotaRequest
+
+@typing_extensions.final
+class RetrieveUsedAirlockQuotaResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    AIRLOCKQUOTAS_FIELD_NUMBER: builtins.int
+    @property
+    def airlockQuotas(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___AirlockQuotaInfo]: ...
+    def __init__(
+        self,
+        *,
+        airlockQuotas: collections.abc.Iterable[global___AirlockQuotaInfo] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["airlockQuotas", b"airlockQuotas"]) -> None: ...
+
+global___RetrieveUsedAirlockQuotaResponse = RetrieveUsedAirlockQuotaResponse
+
+@typing_extensions.final
+class AirlockQuotaInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    AIRLOCKNODEID_FIELD_NUMBER: builtins.int
+    QUOTABYTES_FIELD_NUMBER: builtins.int
+    USEDQUOTABYTES_FIELD_NUMBER: builtins.int
+    airlockNodeId: builtins.str
+    quotaBytes: builtins.int
+    usedQuotaBytes: builtins.int
+    def __init__(
+        self,
+        *,
+        airlockNodeId: builtins.str = ...,
+        quotaBytes: builtins.int = ...,
+        usedQuotaBytes: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["airlockNodeId", b"airlockNodeId", "quotaBytes", b"quotaBytes", "usedQuotaBytes", b"usedQuotaBytes"]) -> None: ...
+
+global___AirlockQuotaInfo = AirlockQuotaInfo
+
+@typing_extensions.final
+class GetResultsSizeResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SIZEBYTES_FIELD_NUMBER: builtins.int
+    sizeBytes: builtins.int
+    def __init__(
+        self,
+        *,
+        sizeBytes: builtins.int = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["sizeBytes", b"sizeBytes"]) -> None: ...
+
+global___GetResultsSizeResponse = GetResultsSizeResponse

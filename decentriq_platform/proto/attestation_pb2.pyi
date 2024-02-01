@@ -16,6 +16,7 @@ else:
 
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
+@typing_extensions.final
 class Fatquote(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -45,6 +46,7 @@ class Fatquote(google.protobuf.message.Message):
 
 global___Fatquote = Fatquote
 
+@typing_extensions.final
 class FatquoteEpid(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -68,6 +70,7 @@ class FatquoteEpid(google.protobuf.message.Message):
 
 global___FatquoteEpid = FatquoteEpid
 
+@typing_extensions.final
 class FatquoteDcap(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -97,6 +100,7 @@ class FatquoteDcap(google.protobuf.message.Message):
 
 global___FatquoteDcap = FatquoteDcap
 
+@typing_extensions.final
 class FatquoteNitro(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -114,6 +118,7 @@ class FatquoteNitro(google.protobuf.message.Message):
 
 global___FatquoteNitro = FatquoteNitro
 
+@typing_extensions.final
 class FatquoteSnp(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -122,17 +127,21 @@ class FatquoteSnp(google.protobuf.message.Message):
     AMDSEVDER_FIELD_NUMBER: builtins.int
     VCEKCRTDER_FIELD_NUMBER: builtins.int
     REPORTDATA_FIELD_NUMBER: builtins.int
-    ROUGHTIME_PUB_KEY_FIELD_NUMBER: builtins.int
-    ROUGHTIME_NONCE_FIELD_NUMBER: builtins.int
+    ROUGHTIMEPUBKEY_FIELD_NUMBER: builtins.int
+    ROUGHTIMENONCE_FIELD_NUMBER: builtins.int
     SIGNEDTIMESTAMP_FIELD_NUMBER: builtins.int
+    DECENTRIQDER_FIELD_NUMBER: builtins.int
+    CHIPDER_FIELD_NUMBER: builtins.int
     reportBin: builtins.bytes
     amdArkDer: builtins.bytes
     amdSevDer: builtins.bytes
     vcekCrtDer: builtins.bytes
     reportData: builtins.bytes
-    roughtime_pub_key: builtins.bytes
-    roughtime_nonce: builtins.bytes
+    roughtimePubKey: builtins.bytes
+    roughtimeNonce: builtins.bytes
     signedTimestamp: builtins.bytes
+    decentriqDer: builtins.bytes
+    chipDer: builtins.bytes
     def __init__(
         self,
         *,
@@ -141,14 +150,17 @@ class FatquoteSnp(google.protobuf.message.Message):
         amdSevDer: builtins.bytes = ...,
         vcekCrtDer: builtins.bytes = ...,
         reportData: builtins.bytes = ...,
-        roughtime_pub_key: builtins.bytes = ...,
-        roughtime_nonce: builtins.bytes = ...,
+        roughtimePubKey: builtins.bytes = ...,
+        roughtimeNonce: builtins.bytes = ...,
         signedTimestamp: builtins.bytes = ...,
+        decentriqDer: builtins.bytes = ...,
+        chipDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "amdSevDer", b"amdSevDer", "reportBin", b"reportBin", "reportData", b"reportData", "roughtime_nonce", b"roughtime_nonce", "roughtime_pub_key", b"roughtime_pub_key", "signedTimestamp", b"signedTimestamp", "vcekCrtDer", b"vcekCrtDer"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "amdSevDer", b"amdSevDer", "chipDer", b"chipDer", "decentriqDer", b"decentriqDer", "reportBin", b"reportBin", "reportData", b"reportData", "roughtimeNonce", b"roughtimeNonce", "roughtimePubKey", b"roughtimePubKey", "signedTimestamp", b"signedTimestamp", "vcekCrtDer", b"vcekCrtDer"]) -> None: ...
 
 global___FatquoteSnp = FatquoteSnp
 
+@typing_extensions.final
 class AttestationSpecification(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -178,6 +190,7 @@ class AttestationSpecification(google.protobuf.message.Message):
 
 global___AttestationSpecification = AttestationSpecification
 
+@typing_extensions.final
 class AttestationSpecificationIntelEpid(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -204,6 +217,7 @@ class AttestationSpecificationIntelEpid(google.protobuf.message.Message):
 
 global___AttestationSpecificationIntelEpid = AttestationSpecificationIntelEpid
 
+@typing_extensions.final
 class AttestationSpecificationIntelDcap(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -233,6 +247,7 @@ class AttestationSpecificationIntelDcap(google.protobuf.message.Message):
 
 global___AttestationSpecificationIntelDcap = AttestationSpecificationIntelDcap
 
+@typing_extensions.final
 class AttestationSpecificationAwsNitro(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -259,6 +274,7 @@ class AttestationSpecificationAwsNitro(google.protobuf.message.Message):
 
 global___AttestationSpecificationAwsNitro = AttestationSpecificationAwsNitro
 
+@typing_extensions.final
 class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -266,11 +282,13 @@ class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
     MEASUREMENT_FIELD_NUMBER: builtins.int
     ROUGHTIMEPUBKEY_FIELD_NUMBER: builtins.int
     AUTHORIZEDCHIPIDS_FIELD_NUMBER: builtins.int
+    DECENTRIQDER_FIELD_NUMBER: builtins.int
     amdArkDer: builtins.bytes
     measurement: builtins.bytes
     roughtimePubKey: builtins.bytes
     @property
     def authorizedChipIds(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.bytes]: ...
+    decentriqDer: builtins.bytes
     def __init__(
         self,
         *,
@@ -278,7 +296,8 @@ class AttestationSpecificationAmdSnp(google.protobuf.message.Message):
         measurement: builtins.bytes = ...,
         roughtimePubKey: builtins.bytes = ...,
         authorizedChipIds: collections.abc.Iterable[builtins.bytes] | None = ...,
+        decentriqDer: builtins.bytes = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "authorizedChipIds", b"authorizedChipIds", "measurement", b"measurement", "roughtimePubKey", b"roughtimePubKey"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["amdArkDer", b"amdArkDer", "authorizedChipIds", b"authorizedChipIds", "decentriqDer", b"decentriqDer", "measurement", b"measurement", "roughtimePubKey", b"roughtimePubKey"]) -> None: ...
 
 global___AttestationSpecificationAmdSnp = AttestationSpecificationAmdSnp

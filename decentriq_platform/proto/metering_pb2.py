@@ -12,61 +12,80 @@ _sym_db = _symbol_database.Default()
 
 
 from . import attestation_pb2 as attestation__pb2
+from . import data_room_pb2 as data__room__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emetering.proto\x12\x08metering\x1a\x11\x61ttestation.proto\"\xb1\x04\n\x0fMeteringRequest\x12/\n\tcreateDcr\x18\x01 \x01(\x0b\x32\x1a.metering.CreateDcrRequestH\x00\x12;\n\x0f\x63reateDcrCommit\x18\x02 \x01(\x0b\x32 .metering.CreateDcrCommitRequestH\x00\x12+\n\x07stopDcr\x18\x03 \x01(\x0b\x32\x18.metering.StopDcrRequestH\x00\x12\x39\n\x0epublishDataset\x18\x04 \x01(\x0b\x32\x1f.metering.PublishDatasetRequestH\x00\x12=\n\x10unpublishDataset\x18\x05 \x01(\x0b\x32!.metering.UnpublishDatasetRequestH\x00\x12\x39\n\x0eworkerMetadata\x18\x06 \x01(\x0b\x32\x1f.metering.WorkerMetadataRequestH\x00\x12O\n\x19submitWorkerExecutionTime\x18\x07 \x01(\x0b\x32*.metering.SubmitWorkerExecutionTimeRequestH\x00\x12\x39\n\x0e\x64\x63rInteraction\x18\x08 \x01(\x0b\x32\x1f.metering.DcrInteractionRequestH\x00\x12\x37\n\rcreateDataset\x18\t \x01(\x0b\x32\x1e.metering.CreateDatasetRequestH\x00\x42\t\n\x07request\"\xc3\x04\n\x17MeteringSuccessResponse\x12\x30\n\tcreateDcr\x18\x01 \x01(\x0b\x32\x1b.metering.CreateDcrResponseH\x00\x12<\n\x0f\x63reateDcrCommit\x18\x02 \x01(\x0b\x32!.metering.CreateDcrCommitResponseH\x00\x12,\n\x07stopDcr\x18\x03 \x01(\x0b\x32\x19.metering.StopDcrResponseH\x00\x12:\n\x0epublishDataset\x18\x04 \x01(\x0b\x32 .metering.PublishDatasetResponseH\x00\x12>\n\x10unpublishDataset\x18\x05 \x01(\x0b\x32\".metering.UnpublishDatasetResponseH\x00\x12:\n\x0eworkerMetadata\x18\x06 \x01(\x0b\x32 .metering.WorkerMetadataResponseH\x00\x12P\n\x19submitWorkerExecutionTime\x18\x07 \x01(\x0b\x32+.metering.SubmitWorkerExecutionTimeResponseH\x00\x12:\n\x0e\x64\x63rInteraction\x18\x08 \x01(\x0b\x32 .metering.DcrInteractionResponseH\x00\x12\x38\n\rcreateDataset\x18\t \x01(\x0b\x32\x1f.metering.CreateDatasetResponseH\x00\x42\n\n\x08response\"g\n\x10MeteringResponse\x12\x34\n\x07success\x18\x01 \x01(\x0b\x32!.metering.MeteringSuccessResponseH\x00\x12\x11\n\x07\x66\x61ilure\x18\x02 \x01(\tH\x00\x42\n\n\x08response\"\x98\x01\n\x0b\x44\x63rMetadata\x12+\n\x07purpose\x18\x01 \x01(\x0e\x32\x1a.metering.CreateDcrPurpose\x12\x1c\n\x14showOrganizationLogo\x18\x02 \x01(\x08\x12\x17\n\x0frequirePassword\x18\x03 \x01(\x08\x12%\n\x04kind\x18\x04 \x01(\x0e\x32\x17.metering.CreateDcrKind\"\x8d\x01\n\x10\x43reateDcrRequest\x12\r\n\x05idHex\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x03 \x01(\t\x12\x19\n\x11participantEmails\x18\x04 \x03(\t\x12\x15\n\x08metadata\x18\x05 \x01(\x0cH\x00\x88\x01\x01\x42\x0b\n\t_metadata\"]\n\x15\x44\x63rInteractionRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x02 \x01(\t\x12\x0f\n\x07scopeId\x18\x03 \x01(\t\"y\n\x15PublishDatasetRequest\x12\x15\n\rcomputeNodeId\x18\x01 \x01(\t\x12\x14\n\x0cmanifestHash\x18\x02 \x01(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x03 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x04 \x01(\t\"\x99\x02\n\x14\x43reateDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x01(\t\x12\x15\n\x08manifest\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x0f\n\x07scopeId\x18\x03 \x01(\t\x12\x0c\n\x04name\x18\x04 \x01(\t\x12\x18\n\x0b\x64\x65scription\x18\x05 \x01(\tH\x01\x88\x01\x01\x12\x16\n\tsizeBytes\x18\x06 \x01(\x04H\x02\x88\x01\x01\x12\x17\n\nstatistics\x18\x07 \x01(\tH\x03\x88\x01\x01\x12\x1c\n\x0f\x64\x61tasetImportId\x18\x08 \x01(\tH\x04\x88\x01\x01\x42\x0b\n\t_manifestB\x0e\n\x0c_descriptionB\x0c\n\n_sizeBytesB\r\n\x0b_statisticsB\x12\n\x10_datasetImportId\"e\n\x17UnpublishDatasetRequest\x12\x15\n\rcomputeNodeId\x18\x01 \x01(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x03 \x01(\t\"E\n\x0eStopDcrRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x02 \x01(\t\"$\n\x16\x43reateDcrCommitRequest\x12\n\n\x02id\x18\x01 \x01(\t\"\x13\n\x11\x43reateDcrResponse\"\x18\n\x16\x44\x63rInteractionResponse\"\x19\n\x17\x43reateDcrCommitResponse\"\x11\n\x0fStopDcrResponse\"\x18\n\x16PublishDatasetResponse\"#\n\x15\x43reateDatasetResponse\x12\n\n\x02id\x18\x01 \x01(\t\"\x1a\n\x18UnpublishDatasetResponse\"h\n\x15WorkerMetadataRequest\x12>\n\x0f\x61ttestationSpec\x18\x01 \x01(\x0b\x32%.attestation.AttestationSpecification\x12\x0f\n\x07scopeId\x18\x02 \x01(\t\"5\n\x16WorkerMetadataResponse\x12\x1b\n\x13maxExecutionSeconds\x18\x01 \x01(\x04\"\x91\x01\n SubmitWorkerExecutionTimeRequest\x12\x1c\n\x14\x65xecutionTimeSeconds\x18\x01 \x01(\r\x12>\n\x0f\x61ttestationSpec\x18\x02 \x01(\x0b\x32%.attestation.AttestationSpecification\x12\x0f\n\x07scopeId\x18\x03 \x01(\t\"#\n!SubmitWorkerExecutionTimeResponse*A\n\x10\x43reateDcrPurpose\x12\x0c\n\x08STANDARD\x10\x00\x12\x0e\n\nVALIDATION\x10\x01\x12\x0f\n\x0b\x44\x41TA_IMPORT\x10\x02*7\n\rCreateDcrKind\x12\n\n\x06\x45XPERT\x10\x00\x12\x0f\n\x0b\x44\x41TASCIENCE\x10\x01\x12\t\n\x05MEDIA\x10\x02\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emetering.proto\x12\x08metering\x1a\x11\x61ttestation.proto\x1a\x0f\x64\x61ta_room.proto\"[\n\x0b\x45nclaveInfo\x12\x1e\n\x16\x61ttestationSpecHashHex\x18\x01 \x01(\t\x12\x1a\n\rtaskQueueName\x18\x02 \x01(\tH\x00\x88\x01\x01\x42\x10\n\x0e_taskQueueName\"\xb9\x05\n\x0fMeteringRequest\x12/\n\tcreateDcr\x18\x01 \x01(\x0b\x32\x1a.metering.CreateDcrRequestH\x00\x12;\n\x0f\x63reateDcrCommit\x18\x02 \x01(\x0b\x32 .metering.CreateDcrCommitRequestH\x00\x12+\n\x07stopDcr\x18\x03 \x01(\x0b\x32\x18.metering.StopDcrRequestH\x00\x12\x39\n\x0epublishDataset\x18\x04 \x01(\x0b\x32\x1f.metering.PublishDatasetRequestH\x00\x12=\n\x10unpublishDataset\x18\x05 \x01(\x0b\x32!.metering.UnpublishDatasetRequestH\x00\x12\x39\n\x0eworkerMetadata\x18\x06 \x01(\x0b\x32\x1f.metering.WorkerMetadataRequestH\x00\x12O\n\x19submitWorkerExecutionTime\x18\x07 \x01(\x0b\x32*.metering.SubmitWorkerExecutionTimeRequestH\x00\x12\x39\n\x0e\x64\x63rInteraction\x18\x08 \x01(\x0b\x32\x1f.metering.DcrInteractionRequestH\x00\x12\x37\n\rcreateDataset\x18\t \x01(\x0b\x32\x1e.metering.CreateDatasetRequestH\x00\x12K\n\x17getOrCreateDatasetScope\x18\n \x01(\x0b\x32(.metering.GetOrCreateDatasetScopeRequestH\x00\x12\x39\n\x0emergeDcrCommit\x18\x0b \x01(\x0b\x32\x1f.metering.MergeDcrCommitRequestH\x00\x42\t\n\x07request\"\xcd\x05\n\x17MeteringSuccessResponse\x12\x30\n\tcreateDcr\x18\x01 \x01(\x0b\x32\x1b.metering.CreateDcrResponseH\x00\x12<\n\x0f\x63reateDcrCommit\x18\x02 \x01(\x0b\x32!.metering.CreateDcrCommitResponseH\x00\x12,\n\x07stopDcr\x18\x03 \x01(\x0b\x32\x19.metering.StopDcrResponseH\x00\x12:\n\x0epublishDataset\x18\x04 \x01(\x0b\x32 .metering.PublishDatasetResponseH\x00\x12>\n\x10unpublishDataset\x18\x05 \x01(\x0b\x32\".metering.UnpublishDatasetResponseH\x00\x12:\n\x0eworkerMetadata\x18\x06 \x01(\x0b\x32 .metering.WorkerMetadataResponseH\x00\x12P\n\x19submitWorkerExecutionTime\x18\x07 \x01(\x0b\x32+.metering.SubmitWorkerExecutionTimeResponseH\x00\x12:\n\x0e\x64\x63rInteraction\x18\x08 \x01(\x0b\x32 .metering.DcrInteractionResponseH\x00\x12\x38\n\rcreateDataset\x18\t \x01(\x0b\x32\x1f.metering.CreateDatasetResponseH\x00\x12L\n\x17getOrCreateDatasetScope\x18\n \x01(\x0b\x32).metering.GetOrCreateDatasetScopeResponseH\x00\x12:\n\x0emergeDcrCommit\x18\x0b \x01(\x0b\x32 .metering.MergeDcrCommitResponseH\x00\x42\n\n\x08response\"g\n\x10MeteringResponse\x12\x34\n\x07success\x18\x01 \x01(\x0b\x32!.metering.MeteringSuccessResponseH\x00\x12\x11\n\x07\x66\x61ilure\x18\x02 \x01(\tH\x00\x42\n\n\x08response\"\x98\x01\n\x0b\x44\x63rMetadata\x12+\n\x07purpose\x18\x01 \x01(\x0e\x32\x1a.metering.CreateDcrPurpose\x12\x1c\n\x14showOrganizationLogo\x18\x02 \x01(\x08\x12\x17\n\x0frequirePassword\x18\x03 \x01(\x08\x12%\n\x04kind\x18\x04 \x01(\x0e\x32\x17.metering.CreateDcrKind\"\xb9\x01\n\x10\x43reateDcrRequest\x12\r\n\x05idHex\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x03 \x01(\t\x12\x19\n\x11participantEmails\x18\x04 \x03(\t\x12\x15\n\x08metadata\x18\x05 \x01(\x0cH\x00\x88\x01\x01\x12*\n\x0b\x65nclaveInfo\x18\x06 \x03(\x0b\x32\x15.metering.EnclaveInfoB\x0b\n\t_metadata\"~\n!ExecuteComputationNodeInteraction\x12\x0e\n\x06nodeId\x18\x01 \x01(\t\x12\x38\n\x0crateLimiting\x18\x02 \x01(\x0b\x32\x1d.data_room.RateLimitingConfigH\x00\x88\x01\x01\x42\x0f\n\r_rateLimiting\"[\n\x1d\x45xecuteComputationInteraction\x12:\n\x05nodes\x18\x01 \x03(\x0b\x32+.metering.ExecuteComputationNodeInteraction\"v\n\x19PublishDatasetInteraction\x12\x0e\n\x06nodeId\x18\x01 \x01(\t\x12\x38\n\x0crateLimiting\x18\x02 \x01(\x0b\x32\x1d.data_room.RateLimitingConfigH\x00\x88\x01\x01\x42\x0f\n\r_rateLimiting\"\xa2\x01\n\x12\x44\x63rInteractionKind\x12\x45\n\x12\x65xecuteComputation\x18\x01 \x01(\x0b\x32\'.metering.ExecuteComputationInteractionH\x00\x12=\n\x0epublishDataset\x18\x02 \x01(\x0b\x32#.metering.PublishDatasetInteractionH\x00\x42\x06\n\x04kind\"\x90\x01\n\x15\x44\x63rInteractionRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x02 \x01(\t\x12\x0f\n\x07scopeId\x18\x03 \x01(\t\x12\x31\n\x0binteraction\x18\x04 \x01(\x0b\x32\x1c.metering.DcrInteractionKind\"y\n\x15PublishDatasetRequest\x12\x15\n\rcomputeNodeId\x18\x01 \x01(\t\x12\x14\n\x0cmanifestHash\x18\x02 \x01(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x03 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x04 \x01(\t\"\x99\x02\n\x14\x43reateDatasetRequest\x12\x14\n\x0cmanifestHash\x18\x01 \x01(\t\x12\x15\n\x08manifest\x18\x02 \x01(\tH\x00\x88\x01\x01\x12\x0f\n\x07scopeId\x18\x03 \x01(\t\x12\x0c\n\x04name\x18\x04 \x01(\t\x12\x18\n\x0b\x64\x65scription\x18\x05 \x01(\tH\x01\x88\x01\x01\x12\x16\n\tsizeBytes\x18\x06 \x01(\x04H\x02\x88\x01\x01\x12\x17\n\nstatistics\x18\x07 \x01(\tH\x03\x88\x01\x01\x12\x1c\n\x0f\x64\x61tasetImportId\x18\x08 \x01(\tH\x04\x88\x01\x01\x42\x0b\n\t_manifestB\x0e\n\x0c_descriptionB\x0c\n\n_sizeBytesB\r\n\x0b_statisticsB\x12\n\x10_datasetImportId\"L\n\x1eGetOrCreateDatasetScopeRequest\x12\x19\n\x0cmanifestHash\x18\x01 \x01(\tH\x00\x88\x01\x01\x42\x0f\n\r_manifestHash\"e\n\x17UnpublishDatasetRequest\x12\x15\n\rcomputeNodeId\x18\x01 \x01(\t\x12\x14\n\x0c\x64\x61taRoomHash\x18\x02 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x03 \x01(\t\"E\n\x0eStopDcrRequest\x12\x14\n\x0c\x64\x61taRoomHash\x18\x01 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x02 \x01(\t\"\x81\x01\n\x16\x43reateDcrCommitRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x64\x63rIdHex\x18\x02 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x03 \x01(\t\x12*\n\x0b\x65nclaveInfo\x18\x06 \x03(\x0b\x32\x15.metering.EnclaveInfo\"\x80\x01\n\x15MergeDcrCommitRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x10\n\x08\x64\x63rIdHex\x18\x02 \x01(\t\x12\x1d\n\x15\x64riverAttestationHash\x18\x03 \x01(\t\x12*\n\x0b\x65nclaveInfo\x18\x06 \x03(\x0b\x32\x15.metering.EnclaveInfo\"\x13\n\x11\x43reateDcrResponse\"-\n\x1fGetOrCreateDatasetScopeResponse\x12\n\n\x02id\x18\x01 \x01(\t\"\x18\n\x16\x44\x63rInteractionResponse\"\x19\n\x17\x43reateDcrCommitResponse\"\x18\n\x16MergeDcrCommitResponse\"\x11\n\x0fStopDcrResponse\"\x18\n\x16PublishDatasetResponse\"#\n\x15\x43reateDatasetResponse\x12\n\n\x02id\x18\x01 \x01(\t\"\x1a\n\x18UnpublishDatasetResponse\"h\n\x15WorkerMetadataRequest\x12>\n\x0f\x61ttestationSpec\x18\x01 \x01(\x0b\x32%.attestation.AttestationSpecification\x12\x0f\n\x07scopeId\x18\x02 \x01(\t\"5\n\x16WorkerMetadataResponse\x12\x1b\n\x13maxExecutionSeconds\x18\x01 \x01(\x04\"\x91\x01\n SubmitWorkerExecutionTimeRequest\x12\x1c\n\x14\x65xecutionTimeSeconds\x18\x01 \x01(\r\x12>\n\x0f\x61ttestationSpec\x18\x02 \x01(\x0b\x32%.attestation.AttestationSpecification\x12\x0f\n\x07scopeId\x18\x03 \x01(\t\"#\n!SubmitWorkerExecutionTimeResponse*`\n\x10\x43reateDcrPurpose\x12\x0c\n\x08STANDARD\x10\x00\x12\x0e\n\nVALIDATION\x10\x01\x12\x0f\n\x0b\x44\x41TA_IMPORT\x10\x02\x12\x0f\n\x0b\x44\x41TA_EXPORT\x10\x03\x12\x0c\n\x08\x44\x41TA_LAB\x10\x04*L\n\rCreateDcrKind\x12\n\n\x06\x45XPERT\x10\x00\x12\x0f\n\x0b\x44\x41TASCIENCE\x10\x01\x12\t\n\x05MEDIA\x10\x02\x12\x13\n\x0fLOOKALIKE_MEDIA\x10\x03\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'metering_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _CREATEDCRPURPOSE._serialized_start=2841
-  _CREATEDCRPURPOSE._serialized_end=2906
-  _CREATEDCRKIND._serialized_start=2908
-  _CREATEDCRKIND._serialized_end=2963
-  _METERINGREQUEST._serialized_start=48
-  _METERINGREQUEST._serialized_end=609
-  _METERINGSUCCESSRESPONSE._serialized_start=612
-  _METERINGSUCCESSRESPONSE._serialized_end=1191
-  _METERINGRESPONSE._serialized_start=1193
-  _METERINGRESPONSE._serialized_end=1296
-  _DCRMETADATA._serialized_start=1299
-  _DCRMETADATA._serialized_end=1451
-  _CREATEDCRREQUEST._serialized_start=1454
-  _CREATEDCRREQUEST._serialized_end=1595
-  _DCRINTERACTIONREQUEST._serialized_start=1597
-  _DCRINTERACTIONREQUEST._serialized_end=1690
-  _PUBLISHDATASETREQUEST._serialized_start=1692
-  _PUBLISHDATASETREQUEST._serialized_end=1813
-  _CREATEDATASETREQUEST._serialized_start=1816
-  _CREATEDATASETREQUEST._serialized_end=2097
-  _UNPUBLISHDATASETREQUEST._serialized_start=2099
-  _UNPUBLISHDATASETREQUEST._serialized_end=2200
-  _STOPDCRREQUEST._serialized_start=2202
-  _STOPDCRREQUEST._serialized_end=2271
-  _CREATEDCRCOMMITREQUEST._serialized_start=2273
-  _CREATEDCRCOMMITREQUEST._serialized_end=2309
-  _CREATEDCRRESPONSE._serialized_start=2311
-  _CREATEDCRRESPONSE._serialized_end=2330
-  _DCRINTERACTIONRESPONSE._serialized_start=2332
-  _DCRINTERACTIONRESPONSE._serialized_end=2356
-  _CREATEDCRCOMMITRESPONSE._serialized_start=2358
-  _CREATEDCRCOMMITRESPONSE._serialized_end=2383
-  _STOPDCRRESPONSE._serialized_start=2385
-  _STOPDCRRESPONSE._serialized_end=2402
-  _PUBLISHDATASETRESPONSE._serialized_start=2404
-  _PUBLISHDATASETRESPONSE._serialized_end=2428
-  _CREATEDATASETRESPONSE._serialized_start=2430
-  _CREATEDATASETRESPONSE._serialized_end=2465
-  _UNPUBLISHDATASETRESPONSE._serialized_start=2467
-  _UNPUBLISHDATASETRESPONSE._serialized_end=2493
-  _WORKERMETADATAREQUEST._serialized_start=2495
-  _WORKERMETADATAREQUEST._serialized_end=2599
-  _WORKERMETADATARESPONSE._serialized_start=2601
-  _WORKERMETADATARESPONSE._serialized_end=2654
-  _SUBMITWORKEREXECUTIONTIMEREQUEST._serialized_start=2657
-  _SUBMITWORKEREXECUTIONTIMEREQUEST._serialized_end=2802
-  _SUBMITWORKEREXECUTIONTIMERESPONSE._serialized_start=2804
-  _SUBMITWORKEREXECUTIONTIMERESPONSE._serialized_end=2839
+  _CREATEDCRPURPOSE._serialized_start=4203
+  _CREATEDCRPURPOSE._serialized_end=4299
+  _CREATEDCRKIND._serialized_start=4301
+  _CREATEDCRKIND._serialized_end=4377
+  _ENCLAVEINFO._serialized_start=64
+  _ENCLAVEINFO._serialized_end=155
+  _METERINGREQUEST._serialized_start=158
+  _METERINGREQUEST._serialized_end=855
+  _METERINGSUCCESSRESPONSE._serialized_start=858
+  _METERINGSUCCESSRESPONSE._serialized_end=1575
+  _METERINGRESPONSE._serialized_start=1577
+  _METERINGRESPONSE._serialized_end=1680
+  _DCRMETADATA._serialized_start=1683
+  _DCRMETADATA._serialized_end=1835
+  _CREATEDCRREQUEST._serialized_start=1838
+  _CREATEDCRREQUEST._serialized_end=2023
+  _EXECUTECOMPUTATIONNODEINTERACTION._serialized_start=2025
+  _EXECUTECOMPUTATIONNODEINTERACTION._serialized_end=2151
+  _EXECUTECOMPUTATIONINTERACTION._serialized_start=2153
+  _EXECUTECOMPUTATIONINTERACTION._serialized_end=2244
+  _PUBLISHDATASETINTERACTION._serialized_start=2246
+  _PUBLISHDATASETINTERACTION._serialized_end=2364
+  _DCRINTERACTIONKIND._serialized_start=2367
+  _DCRINTERACTIONKIND._serialized_end=2529
+  _DCRINTERACTIONREQUEST._serialized_start=2532
+  _DCRINTERACTIONREQUEST._serialized_end=2676
+  _PUBLISHDATASETREQUEST._serialized_start=2678
+  _PUBLISHDATASETREQUEST._serialized_end=2799
+  _CREATEDATASETREQUEST._serialized_start=2802
+  _CREATEDATASETREQUEST._serialized_end=3083
+  _GETORCREATEDATASETSCOPEREQUEST._serialized_start=3085
+  _GETORCREATEDATASETSCOPEREQUEST._serialized_end=3161
+  _UNPUBLISHDATASETREQUEST._serialized_start=3163
+  _UNPUBLISHDATASETREQUEST._serialized_end=3264
+  _STOPDCRREQUEST._serialized_start=3266
+  _STOPDCRREQUEST._serialized_end=3335
+  _CREATEDCRCOMMITREQUEST._serialized_start=3338
+  _CREATEDCRCOMMITREQUEST._serialized_end=3467
+  _MERGEDCRCOMMITREQUEST._serialized_start=3470
+  _MERGEDCRCOMMITREQUEST._serialized_end=3598
+  _CREATEDCRRESPONSE._serialized_start=3600
+  _CREATEDCRRESPONSE._serialized_end=3619
+  _GETORCREATEDATASETSCOPERESPONSE._serialized_start=3621
+  _GETORCREATEDATASETSCOPERESPONSE._serialized_end=3666
+  _DCRINTERACTIONRESPONSE._serialized_start=3668
+  _DCRINTERACTIONRESPONSE._serialized_end=3692
+  _CREATEDCRCOMMITRESPONSE._serialized_start=3694
+  _CREATEDCRCOMMITRESPONSE._serialized_end=3719
+  _MERGEDCRCOMMITRESPONSE._serialized_start=3721
+  _MERGEDCRCOMMITRESPONSE._serialized_end=3745
+  _STOPDCRRESPONSE._serialized_start=3747
+  _STOPDCRRESPONSE._serialized_end=3764
+  _PUBLISHDATASETRESPONSE._serialized_start=3766
+  _PUBLISHDATASETRESPONSE._serialized_end=3790
+  _CREATEDATASETRESPONSE._serialized_start=3792
+  _CREATEDATASETRESPONSE._serialized_end=3827
+  _UNPUBLISHDATASETRESPONSE._serialized_start=3829
+  _UNPUBLISHDATASETRESPONSE._serialized_end=3855
+  _WORKERMETADATAREQUEST._serialized_start=3857
+  _WORKERMETADATAREQUEST._serialized_end=3961
+  _WORKERMETADATARESPONSE._serialized_start=3963
+  _WORKERMETADATARESPONSE._serialized_end=4016
+  _SUBMITWORKEREXECUTIONTIMEREQUEST._serialized_start=4019
+  _SUBMITWORKEREXECUTIONTIMEREQUEST._serialized_end=4164
+  _SUBMITWORKEREXECUTIONTIMERESPONSE._serialized_start=4166
+  _SUBMITWORKEREXECUTIONTIMERESPONSE._serialized_end=4201
 # @@protoc_insertion_point(module_scope)

@@ -1,4 +1,7 @@
+import hashlib
 from google.protobuf.json_format import MessageToDict
+
+from .storage import Key
 from .proto import AttestationSpecification, ComputeNodeProtocol, DriverTaskConfig
 from typing import List, Dict, Optional, Any
 from typing_extensions import TypedDict
@@ -13,6 +16,7 @@ __all__ = [
     "JobId",
     "DataRoomDescription",
     "DatasetDescription",
+    "DatasetType",
 ]
 
 
@@ -22,6 +26,7 @@ class JobId:
 
     Objects of this class can be used to retrieve results for processed computations.
     """
+
     def __init__(self, job_id: str, compute_node_id: str):
         self.id = job_id
         """The identifier of the job that processed a particular computation."""
@@ -31,7 +36,7 @@ class JobId:
 
 
 class ScopeTypes(str, Enum):
-    DATASET = "DATASET",
+    DATASET = "DATASET"
     DCR_DATA = "DCR_DATA"
 
 
@@ -90,6 +95,7 @@ class UserDescription(TypedDict):
 
 class DataRoomDescription(TypedDict):
     """The identifier of the data room"""
+
     id: str
     """The title that was given to the data room"""
     title: str
@@ -103,10 +109,16 @@ class DataRoomDescription(TypedDict):
     updatedAt: str
 
 
+class DatasetUsage(str, Enum):
+    PUBLISHED = "PUBLISHED"
+    TEST = "TEST"
+
+
 class DatasetDescription(TypedDict):
     """
     This class includes information about an uploaded dataset
     """
+
     id: str
     """The identifier of this dataset"""
     manifestHash: str
@@ -117,6 +129,10 @@ class DatasetDescription(TypedDict):
     """An optional description"""
     createdAt: str
     """When the dataset was uploaded"""
+    size: int
+    """Size of the dataset"""
+    usage: DatasetUsage
+    """Usage"""
 
 
 class SignatureResponse(TypedDict):
@@ -139,6 +155,7 @@ class EnclaveSpecification(TypedDict):
     This class includes information about an enclave deployed in the platform.
     Please refer to `decentriq_platform.EnclaveSpecifications` for a detailed explanation.
     """
+
     proto: AttestationSpecification
     """The Protobuf object."""
     workerProtocols: List[int]
@@ -213,3 +230,140 @@ class KeychainInstance(TypedDict):
     salt: str
     encrypted: bytes
     casIndex: int
+
+
+class TestDataset(TypedDict):
+    manifest_hash: str
+    key: Key
+
+
+class DryRunOptions(TypedDict):
+    test_datasets: Dict[str, TestDataset]
+
+
+# The matching ID specified by the user.
+class MatchingId(str, Enum):
+    """
+    The type of Matching ID to use.
+    """
+
+    STRING = "STRING"
+    EMAIL = "EMAIL"
+    HASHED_EMAIL = "HASHED_EMAIL"
+    PHONE_NUMBER = "PHONE_NUMBER"
+    HASHED_PHONE_NUMBER = "HASHED_PHONE_NUMBER"
+
+
+# Internal Matching ID used by the SDK.
+# Maps to the above user specified `MatchingId`.
+class MatchingIdFormat(str, Enum):
+    STRING = "STRING"
+    EMAIL = "EMAIL"
+    HASH_SHA256_HEX = "HASH_SHA256_HEX"
+    PHONE_NUMBER_E164 = "PHONE_NUMBER_E164"
+
+
+class TableColumnHashingAlgorithm(str, Enum):
+    SHA256_HEX = "SHA256_HEX"
+
+
+class DataLabDatasetType(Enum):
+    EMBEDDINGS = 1
+    DEMOGRAPHICS = 2
+    MATCH = 3
+    SEGMENTS = 4
+
+
+class Dataset(TypedDict):
+    id: str
+    manifestHash: str
+    name: str
+
+
+class DataLabDataset(TypedDict):
+    name: str
+    dataset: Dataset
+
+
+class DataLabDefinition(TypedDict):
+    id: str
+    name: str
+    datasets: List[DataLabDataset]
+    usersDataset: Dataset
+    segmentsDataset: Dataset
+    demographicsDataset: Dataset
+    embeddingsDataset: Dataset
+    statistics: str
+    requireDemographicsDataset: bool
+    requireEmbeddingsDataset: bool
+    isValidated: bool
+    numEmbeddings: int
+    matchingIdFormat: MatchingIdFormat
+    matchingIdHashingAlgorithm: TableColumnHashingAlgorithm
+    validationComputeJobId: str
+    statisticsComputeJobId: str
+    jobsDriverAttestationHash: str
+    highLevelRepresentationAsString: str
+    createdAt: str
+    updatedAt: str
+
+
+class DataLabListFilter(Enum):
+    VALIDATED = 1  # List validated DataLabs
+    UNVALIDATED = 2  # List un-validated DataLabs
+
+
+class DataRoomKind(str, Enum):
+    EXPERT = "EXPERT"
+    DATA_SCIENCE = "DATA_SCIENCE"
+    MEDIA = "MEDIA"
+    LOOKALIKE_MEDIA = "LOOKALIKE_MEDIA"
+
+
+class DataRoom(TypedDict):
+    id: str
+    title: str
+    kind: DataRoomKind
+    createdAt: str
+    updatedAt: str
+    owner: UserResponse
+
+
+class CreateMediaComputeJobInput(TypedDict):
+    publishedDataRoomId: str
+    computeNodeName: str
+    cacheKey: str
+    jobType: str
+    jobIdHex: str
+
+
+class MediaComputeJobFilterInput(TypedDict):
+    publishedDataRoomId: str
+    jobType: str
+    cacheKey: str
+
+
+class MediaComputeJob(TypedDict):
+    jobIdHex: str
+    publishedDataRoomId: str
+    computeNodeName: str
+    jobType: str
+    cacheKey: str
+    createdAt: str
+
+
+class PublishedDataset(TypedDict):
+    leafId: str
+    user: str
+    timestamp: int
+    datasetHash: bytes
+
+
+class OverlapInsightsCacheKey(TypedDict):
+    dataRoomId: str
+    advertiserDatasetHash: str
+    publisherUsersDatasetHash: str
+    publisherSegmentsDatasetHash: str
+    publisherDemographicsDatasetHash: Optional[str]
+    publisherEmbeddingsDatasetHash: Optional[str]
+    publishedDatasets: List[PublishedDataset]

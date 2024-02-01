@@ -1,4 +1,11 @@
-from typing import BinaryIO, List, Dict, Optional, Tuple
+from __future__ import annotations
+
+from typing import BinaryIO, List, Dict, Optional, Tuple, TYPE_CHECKING
+
+# Avoid circular import client -> keychain -> client outside of typechecking
+if TYPE_CHECKING:
+    from .keychain import Keychain
+
 from .endorsement import Endorser
 
 import hashlib
@@ -15,14 +22,22 @@ from .config import (
         DECENTRIQ_HOST,
         DECENTRIQ_PORT,
         DECENTRIQ_USE_TLS,
+        _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
 )
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
 from .types import (
+    CreateMediaComputeJobInput,
+    DataRoom,
+    DatasetUsage,
     EnclaveSpecification,
     DatasetDescription,
     DataRoomDescription,
     KeychainInstance,
+    DataLabDefinition,
+    DataLabListFilter,
+    MediaComputeJob,
+    MediaComputeJobFilterInput,
 )
 from .api import NotFoundError
 from .proto import (
@@ -61,7 +76,8 @@ class Client:
             user_email: str,
             api: Api,
             graphql: GqlClient,
-            request_timeout: int = None
+            request_timeout: int = None,
+            unsafe_disable_known_root_ca_check: Bool = False,
     ):
         """
         Create a client instance.
@@ -73,6 +89,7 @@ class Client:
         self._api = api
         self._graphql = graphql
         self.request_timeout = request_timeout
+        self.unsafe_disable_known_root_ca_check = unsafe_disable_known_root_ca_check
 
     def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
@@ -207,7 +224,6 @@ class Client:
     def _ensure_dcr_data_scope(
             self,
             data_room_hash: str,
-            driver_attestation_hash: str,
     ) -> str:
         data = self._graphql.post(
             """
@@ -225,12 +241,206 @@ class Client:
             {
                 "input": {
                     "dataRoomHash": data_room_hash,
-                    "driverAttestationHash": driver_attestation_hash,
                 }
             }
         )
         scope = data["scope"]["getOrCreateDcrDataScope"]["record"]
         return scope["id"]
+
+    def _set_datalab_matching_dataset(
+            self,
+            data_lab_id: str,
+            manifest_hash: Optional[str],
+    ) -> str:
+        """
+        Store the matching dataset manifest hash in the database.
+        """
+        data = self._graphql.post(
+            """
+            mutation SetDataLabUsersDataset($input: SetDataLabDatasetInput!) {
+                dataLab {
+                    setUsersDataset(input: $input) {
+                        record {
+                            id
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                        }
+                    }
+
+                }
+            }
+            """,
+            {
+                "input": {
+                    "id": data_lab_id,
+                    "manifestHash": manifest_hash
+                }
+            }
+        )
+        return data["dataLab"]["setUsersDataset"]["record"]["id"]
+
+    def _set_datalab_segments_dataset(
+            self,
+            data_lab_id: str,
+            manifest_hash: str,
+    ) -> str:
+        """
+        Store the segments dataset manifest hash in the database.
+        """
+        data = self._graphql.post(
+            """
+            mutation SetDataLabSegmentsDataset($input: SetDataLabDatasetInput!) {
+                dataLab {
+                    setSegmentsDataset(input: $input) {
+                        record {
+                            id
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                        }
+                    }
+
+                }
+            }
+            """,
+            {
+                "input": {
+                    "id": data_lab_id,
+                    "manifestHash": manifest_hash
+                }
+            }
+        )
+        return data["dataLab"]["setSegmentsDataset"]["record"]["id"]
+
+    def _set_datalab_demographics_dataset(
+            self,
+            data_lab_id: str,
+            manifest_hash: str,
+    ) -> str:
+        """
+        Store the demographics dataset manifest hash in the database.
+        """
+        data = self._graphql.post(
+            """
+            mutation SetDataLabDemographicsDataset($input: SetDataLabDatasetInput!) {
+                dataLab {
+                    setDemographicsDataset(input: $input) {
+                        record {
+                            id
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                        }
+                    }
+
+                }
+            }
+            """,
+            {
+                "input": {
+                    "id": data_lab_id,
+                    "manifestHash": manifest_hash
+                }
+            }
+        )
+        return data["dataLab"]["setDemographicsDataset"]["record"]["id"]
+
+    def _set_datalab_embeddings_dataset(
+            self,
+            data_lab_id: str,
+            manifest_hash: str,
+    ) -> str:
+        """
+        Store the embeddings dataset manifest hash in the database.
+        """
+        data = self._graphql.post(
+            """
+            mutation SetDataLabEmbeddingsDataset($input: SetDataLabDatasetInput!) {
+                dataLab {
+                    setEmbeddingsDataset(input: $input) {
+                        record {
+                            id
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                        }
+                    }
+
+                }
+            }
+            """,
+            {
+                "input": {
+                    "id": data_lab_id,
+                    "manifestHash": manifest_hash
+                }
+            }
+        )
+        return data["dataLab"]["setEmbeddingsDataset"]["record"]["id"]
+
+    def _set_datalab_job_ids(
+            self,
+            data_lab_id: str,
+            validation_compute_job_id: str,
+            statistics_compute_job_id: str,
+            jobs_driver_attestation_hash: str,
+    ) -> str:
+        """
+        Store the job IDs associated with the DataLab.
+        """
+        data = self._graphql.post(
+            """
+            mutation SetDataLabJobIds($input: SetDataLabJobIdsInput!) {
+                dataLab {
+                    setJobIds(input: $input) {
+                        record {
+                            id
+                        }
+                    }
+
+                }
+            }
+            """,
+            {
+                "input": {
+                    "id": data_lab_id,
+                    "validationComputeJobId": validation_compute_job_id,
+	                "statisticsComputeJobId": statistics_compute_job_id,
+	                "jobsDriverAttestationHash": jobs_driver_attestation_hash,
+                }
+            }
+        )
+        return data["dataLab"]["setJobIds"]["record"]["id"]
+
+    def _set_datalab_statistics(
+            self,
+            data_lab_id: str,
+            statistics: str,
+    ) -> str:
+        """
+        Store the DataLab statistics in the database.
+        """
+        data = self._graphql.post(
+            """
+            mutation SetDataLabStatistics($input: SetDataLabStatisticsInput!) {
+                dataLab {
+                    setStatistics(input: $input) {
+                        record {
+                            id
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "id": data_lab_id,
+                    "statistics": json.loads(statistics),
+                }
+            }
+        )
+        return data["dataLab"]["setStatistics"]["record"]["id"]
 
     def upload_dataset(
             self,
@@ -241,6 +451,8 @@ class Client:
             description: str = "",
             chunk_size: int = 8 * 1024 ** 2,
             parallel_uploads: int = 8,
+            usage: DatasetUsage = DatasetUsage.PUBLISHED,
+            store_in_keychain: Optional[Keychain] = None,
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -255,12 +467,7 @@ class Client:
         - `description`: An optional file description.
         - `chunk_size`: Size of the chunks into which the stream is split in bytes.
         - `parallel_uploads`: Whether to upload chunks in parallel.
-        - `organization`: The name of the organization under which this dataset
-            should be uploaded. This option is useful if the current user's own parent
-            organization does not currently have a license with Decentriq and therefore
-            is not able to provide resources for user-uploaded datasets.
-            Note that even using this feature, the specified organization will not be
-            able to read the uploaded dataset.
+        - `store_in_keychain`: An optional keychain in which to store the dataset key.
         """
         uploader = BoundedExecutor(
                 bound=parallel_uploads * 2,
@@ -269,10 +476,11 @@ class Client:
         # create and upload chunks
         chunker = Chunker(data, chunk_size=chunk_size)
         chunk_hashes: List[str] = []
+        chunk_content_sizes: List[int] = []
         chunk_uploads_futures = []
         upload_id = self._create_upload()
 
-        for chunk_hash, chunk_data in chunker:
+        for chunk_hash, chunk_data, chunk_content_size in chunker:
             chunk_uploads_futures.append(
                 uploader.submit(
                     self._encrypt_and_upload_chunk,
@@ -283,6 +491,7 @@ class Client:
                 )
             )
             chunk_hashes.append(chunk_hash.hex())
+            chunk_content_sizes.append(chunk_content_size)
 
         # check chunks uploads were successful
         completed, pending = futures.wait(
@@ -299,7 +508,8 @@ class Client:
             key.material,
             os.urandom(16),
             json.dumps(chunk_hashes).encode("utf-8"),
-            content_size=chunker.content_size
+            content_size=chunker.content_size,
+            chunk_content_sizes=chunk_content_sizes,
         )
         scope_id = self._ensure_dataset_scope(
             manifest_hash.hex(),
@@ -312,7 +522,14 @@ class Client:
             manifest_encrypted=manifest_encrypted,
             chunks=chunk_hashes,
             description=description,
+            usage=usage,
         )
+
+        if store_in_keychain:
+            from .keychain import KeychainEntry
+            store_in_keychain.insert(
+                KeychainEntry("dataset_key", manifest_hash, key.material)
+            )
 
         return manifest_hash
 
@@ -390,7 +607,8 @@ class Client:
             manifest_hash: bytes,
             manifest_encrypted: bytes,
             chunks: List[str],
-            description: Optional[str] = None
+            description: Optional[str] = None,
+            usage: Optional[DatasetUsage] = None,
     ) -> str:
         data = self._graphql.post(
             """
@@ -412,6 +630,7 @@ class Client:
                     "manifestHash": manifest_hash.hex(),
                     "name": name,
                     "description": description,
+                    "usage": usage,
                     "chunkHashes": chunks,
                     "scopeId": scope_id
                 }
@@ -468,8 +687,11 @@ class Client:
                             id
                             name
                             manifestHash
+                            statistics
+                            size
                             description
                             createdAt
+                            usage
                         }
                     }
                 }
@@ -818,6 +1040,438 @@ class Client:
         )
         return
 
+    def list_data_labs(
+            self,
+            filter: Optional[DataLabListFilter] = None
+    ) -> List[DataLabDefinition]:
+        """
+        Return a list of DataLabs based on the `filter` criteria.
+
+        **Parameters**:
+        - `filter`: Criteria used to filter the list. Can be one of the following values:
+            - NONE: Display all DataLabs.
+            - VALIDATED: Display DataLabs that have been validated.
+            - UNVALIDATED: Display DataLabs that have not been validated.
+        """
+        data = self._graphql.post(
+            """
+            query ListDataLabIds() {
+                dataLabs {
+                    nodes {
+                        id
+                        name
+                        datasets {
+                            name
+                            dataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                        }
+                        usersDataset {
+                            id
+                            manifestHash
+                            name
+                        }
+                        segmentsDataset {
+                            id
+                            manifestHash
+                            name
+                        }
+                        demographicsDataset {
+                            id
+                            manifestHash
+                            name
+                        }
+                        embeddingsDataset  {
+                            id
+                            manifestHash
+                            name
+                        }
+                        requireDemographicsDataset
+                        requireEmbeddingsDataset
+                        isValidated
+                        numEmbeddings
+                        matchingIdFormat
+                        matchingIdHashingAlgorithm
+                        validationComputeJobId
+                        statisticsComputeJobId
+                        jobsDriverAttestationHash
+                        highLevelRepresentationAsString
+                        createdAt
+                        updatedAt
+                    }
+                }
+            }
+            """,
+        )
+        data_labs = data["dataLabs"]["nodes"]
+        if filter is None:
+            return [lab for lab in data_labs]
+        elif filter == DataLabListFilter.VALIDATED:
+            return [lab for lab in data_labs if lab["isValidated"] == True]
+        elif filter == DataLabListFilter.UNVALIDATED:
+            return [lab for lab in data_labs if lab["isValidated"] == False]
+        else:
+            raise Exception(f"Unknown DataLab filter {filter}")
+
+    def get_data_lab(
+            self,
+            id: str,
+    ) -> DataLabDefinition:
+        """
+        Return the DataLab with the given ID.
+
+        **Parameters**:
+        - `id`: ID of the DataLab to get.
+        """
+        data = self._graphql.post(
+            """
+            query GetDataLab($id: String!) {
+                dataLab(id: $id) {
+                    id
+                    name
+                    datasets {
+                        name
+                        dataset {
+                            id
+                            manifestHash
+                            name
+                        }
+                    }
+                    usersDataset {
+                        id
+                        manifestHash
+                        name
+                    }
+                    segmentsDataset {
+                        id
+                        manifestHash
+                        name
+                    }
+                    demographicsDataset {
+                        id
+                        manifestHash
+                        name
+                    }
+                    embeddingsDataset {
+                        id
+                        manifestHash
+                        name
+                    }
+                    statistics
+                    requireDemographicsDataset
+                    requireEmbeddingsDataset
+                    isValidated
+                    numEmbeddings
+                    matchingIdFormat
+                    matchingIdHashingAlgorithm
+                    validationComputeJobId
+                    statisticsComputeJobId
+                    jobsDriverAttestationHash
+                    highLevelRepresentationAsString
+                }
+            }
+            """,
+            {
+                "id": id
+            }
+        )
+        return data["dataLab"]
+
+    def _publish_data_lab_from_existing(
+            self,
+            data_lab: Dict[str, str],
+    ) -> str:
+        """
+        Publish a DataLab from an existing high level representation.
+
+        **Parameters**:
+        - `data_lab`: DataLab high level representation
+        """
+        data = self._graphql.post(
+            """
+            mutation PublishDataLab($input: CreateDataLabFromExistingInput!) {
+                dataLab {
+                    createFromExisting(input: $input) {
+                        record {
+                            id
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "dataLab": data_lab
+                }
+            }
+        )
+        return (data["dataLab"]["createFromExisting"]["record"]["id"])
+
+    def _get_enclave_spec_from_hash(self, hash: str) -> Optional[EnclaveSpecification]:
+        available_specs = self._get_enclave_specifications()
+        for spec in available_specs:
+            hashed_attestation_spec = hashlib.sha256(serialize_length_delimited(spec["proto"])).hexdigest()
+            if hashed_attestation_spec == hash:
+                return spec
+        return None
+
+    def _get_lmdcr_driver_attestation_hash(
+            self,
+            id: str,
+    ) -> str:
+        """
+        Get the driver attestation hash for the Lookalike Media DCR with the given ID.
+
+        **Parameters**:
+        - `id`: ID of the Lookalike Media DCR.
+        """
+        data = self._graphql.post(
+            """
+            query GetLookalikeMediaDcr($id: String!) {
+                publishedLookalikeMediaDataRoom(id: $id) {
+                    driverAttestationHash
+                }
+            }
+            """,
+            {
+                "id": id
+            }
+        )
+        return data["publishedLookalikeMediaDataRoom"]["driverAttestationHash"]
+
+    def get_lookalike_media_data_rooms(
+            self,
+    ) -> List[DataRoom]:
+        """
+        Get all Lookalike Media data clean rooms.
+        """
+        data = self._graphql.post(
+            """
+            query GetAllLookalikeMediaDcrs($filter: DataRoomFilter, $sortBy: DataRoomSortBy) {
+                dataRooms(filter: $filter, sortBy: $sortBy) {
+                    nodes {
+                        id
+                        title
+                        kind
+                        createdAt
+                        updatedAt
+                        owner {
+                            id
+                            email
+                        }
+                    }
+                    totalCount
+                }
+            }
+            """,
+            { 
+                "filter": None, 
+                "sortBy": None 
+            }
+        )
+        data_rooms = data["dataRooms"]["nodes"]
+        lookalike_media_data_rooms = [data_room for data_room in data_rooms if data_room["kind"] == "LOOKALIKE_MEDIA"]
+        return lookalike_media_data_rooms
+
+    def _create_media_compute_job(
+            self,
+            input: CreateMediaComputeJobInput,
+    ) -> MediaComputeJob:
+        """
+        Create a compute job for the Lookalike Media DCR.
+        """
+        data = self._graphql.post(
+            """
+            mutation CreateMediaComputeJob($input: CreateMediaComputeJobInput!) {
+                mediaComputeJob {
+                    create(input: $input) {
+                        record {
+                            jobIdHex
+                            publishedDataRoomId
+                            computeNodeName
+                            jobType
+                            cacheKey
+                            createdAt
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": input
+            }
+        )
+        return data["mediaComputeJob"]["create"]["record"]
+
+    def _get_media_compute_job(
+            self,
+            input: MediaComputeJobFilterInput,
+    ) -> MediaComputeJob:
+        """
+        Get a compute job for the Lookalike Media DCR.
+        """
+        data = self._graphql.post(
+            """
+            query GetMediaComputeJob($input: MediaComputeJobFilterInput!) {
+                mediaComputeJob (input: $input) {
+                    jobIdHex
+                    publishedDataRoomId
+                    computeNodeName
+                    jobType
+                    cacheKey
+                    createdAt
+                }
+            }
+            """,
+            {
+                "input": input
+            }
+        )
+        return data["mediaComputeJob"]
+
+    def _provision_data_lab(
+            self,
+            data_room_id: str,
+            data_lab_id: str,
+    ) -> DataLabDefinition:
+        """
+        Provision a DataLab to a DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision to.
+        - `data_lab_id`: ID of the DataLab to be provisioned.
+        """
+        data = self._graphql.post(
+            """
+            mutation ProvisionDataLab($input: ProvisionDataLabInput!) {
+                dataLab {
+                    provisionDataLab(input: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "dataRoomId": data_room_id,
+                    "dataLabId": data_lab_id, 
+                }
+            }
+        )
+        return data["dataLab"]["provisionDataLab"]["publishedDataLab"]
+
+    def _deprovision_data_lab(
+            self,
+            data_room_id: str
+    ) -> DataLabDefinition:
+        """
+        Deprovision a DataLab from a DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to deprovision from.
+        """
+        data = self._graphql.post(
+            """
+            mutation DeprovisionDataLab($input: String!) {
+                dataLab {
+                    deprovisionDataLab(lookalikeMediaDcrId: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": data_room_id,
+            }
+        )
+        return data["dataLab"]["deprovisionDataLab"]["publishedDataLab"]
+
 
 def create_client(
         user_email: str,
@@ -827,7 +1481,8 @@ def create_client(
         api_host: str = DECENTRIQ_HOST,
         api_port: int = DECENTRIQ_PORT,
         api_use_tls: bool = DECENTRIQ_USE_TLS,
-        request_timeout: Optional[int] = None
+        request_timeout: Optional[int] = None,
+        unsafe_disable_known_root_ca_check: Bool = _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK
 ) -> Client:
     """
     The primary way to create a `Client` object.
@@ -854,7 +1509,8 @@ def create_client(
         user_email,
         api,
         graphql,
-        request_timeout=request_timeout
+        request_timeout=request_timeout,
+        unsafe_disable_known_root_ca_check=unsafe_disable_known_root_ca_check
     )
 
 
