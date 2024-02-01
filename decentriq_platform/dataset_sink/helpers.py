@@ -5,7 +5,7 @@ from ..builders import DataRoomCommitBuilder
 from ..types import EnclaveSpecification
 from . import DatasetSink
 from .proto import SinkInput, ZipFile, SingleFile, FileSelection
-from .. import Permissions
+from ..permission import Permissions
 from ..container import read_result_as_zipfile
 import json
 

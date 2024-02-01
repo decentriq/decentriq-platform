@@ -52,6 +52,7 @@ from .api import (
     retry
 )
 from .graphql import GqlClient
+from .attestation import EnclaveSpecifications, enclave_specifications
 
 import base64
 
@@ -132,6 +133,32 @@ class Client:
             )
             enclave_specs.append(enclave_spec)
         return enclave_specs
+
+
+    def create_session_from_data_room_description(
+        self,
+        data_room_description: DataRoomDescription,
+        specs: Optional[EnclaveSpecifications] = enclave_specifications
+    ) -> Session:
+        """
+        Create a session for interacting with a DCR of the given data room description.
+        """
+        driver_attestation_hash = data_room_description["driverAttestationHash"]
+        driver_enclave_spec = dict()
+        for spec in specs.all():
+            attestation_hash = hashlib.sha256(
+                serialize_length_delimited(spec["proto"])
+            ).hexdigest()
+            if attestation_hash == driver_attestation_hash:
+                driver_enclave_spec = {"decentriq.driver": spec} 
+                break
+        if not driver_enclave_spec:
+            raise Exception(
+                f"Driver enclave specification with attestation hash {driver_attestation_hash} not found"
+            )
+        auth, _ = self.create_auth_using_decentriq_pki(driver_enclave_spec)
+        return self.create_session(auth, driver_enclave_spec)
+
 
     def create_session(
             self,

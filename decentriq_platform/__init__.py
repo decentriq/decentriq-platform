@@ -38,7 +38,9 @@ __pdoc__ = {
 }
 
 from .client import Client, create_client, Session
-from .builders import DataRoomBuilder, DataRoomCommitBuilder, DataLabBuilder, GovernanceProtocol, LookalikeMediaDcrBuilder 
+from .builders import DataRoomBuilder, DataRoomCommitBuilder, GovernanceProtocol
+from .data_lab import DataLabBuilder
+from .lookalike_media import LookalikeMediaDcrBuilder
 from .compute import Noop, StaticContent
 from .permission import Permissions
 from .storage import Key
