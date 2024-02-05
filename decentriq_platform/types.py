@@ -88,6 +88,13 @@ class ChunkDescription(TypedDict):
     chunkHash: str
 
 
+class DataRoomKind(str, Enum):
+    EXPERT = "EXPERT"
+    DATA_SCIENCE = "DATA_SCIENCE"
+    MEDIA = "MEDIA"
+    LOOKALIKE_MEDIA = "LOOKALIKE_MEDIA"
+
+
 class Owner(TypedDict):
     email: str
 
@@ -107,7 +114,9 @@ class DataRoomDescription(TypedDict):
     """When the data room was last updated"""
     updatedAt: str
     """Email address of the data room owner"""
-    owner: Owner 
+    owner: Owner
+    """The kind of data room"""
+    kind: DataRoomKind
 
 
 class DatasetUsage(str, Enum):
@@ -312,13 +321,6 @@ class DataLabDefinition(TypedDict):
 class DataLabListFilter(Enum):
     VALIDATED = 1  # List validated DataLabs
     UNVALIDATED = 2  # List un-validated DataLabs
-
-
-class DataRoomKind(str, Enum):
-    EXPERT = "EXPERT"
-    DATA_SCIENCE = "DATA_SCIENCE"
-    MEDIA = "MEDIA"
-    LOOKALIKE_MEDIA = "LOOKALIKE_MEDIA"
 
 
 class DataRoom(TypedDict):

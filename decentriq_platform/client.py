@@ -38,6 +38,7 @@ from .types import (
     DataLabListFilter,
     MediaComputeJob,
     MediaComputeJobFilterInput,
+    DataRoomKind,
 )
 from .api import NotFoundError
 from .proto import (
@@ -844,6 +845,7 @@ class Client:
                         owner {
                             email
                         }
+                        kind
                     }
                 }
             }
@@ -869,6 +871,27 @@ class Client:
             driver_attestation_hash
         )
 
+    def _get_data_room_kind(
+            self,
+            data_room_id: str,
+    ) -> DataRoomKind:
+        """
+        Get the kind of data room.
+        """
+        data = self._graphql.post(
+            """
+            query GetPublishedDataRoomType($dataRoomId: String!) {
+                publishedDataRoom(id: $dataRoomId) {
+                    kind
+                }
+            }
+            """,
+            {
+                "dataRoomId": data_room_id,
+            }
+        )
+        return data["publishedDataRoom"]["kind"]
+
     def _get_data_room_by_hash(
             self,
             data_room_hash: str,
@@ -887,6 +910,7 @@ class Client:
                     owner {
                         email
                     }
+                    kind
                 }
             }
             """,
@@ -940,6 +964,7 @@ class Client:
                                     owner {
                                         email
                                     }
+                                    kind
                                 }
                             }
                         }

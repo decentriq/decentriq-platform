@@ -1,5 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from datetime import datetime
+import json
 import chily
 import hashlib
 import hmac
@@ -18,7 +20,6 @@ from typing import (
     Text,
 )
 from time import sleep
-import struct
 from decentriq_platform.proto.gcg_pb2 import (
     GetResultsSizeRequest,
     RetrieveUsedAirlockQuotaRequest,
@@ -83,8 +84,9 @@ from .proto import (
 )
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .storage import Key
-from .types import DryRunOptions, JobId
+from .types import DryRunOptions, JobId, DataRoomKind
 from .verification import QuoteBody, Verification
+from decentriq_dcr_compiler import compiler
 
 if TYPE_CHECKING:
     from .client import Client
@@ -748,6 +750,30 @@ class Session:
                 + str(response.WhichOneof("gcg_response"))
             )
         return response.retrieveAuditLogResponse
+
+    def retrieve_data_room_json(self, data_room_id: str) -> str:
+        """
+        Get the JSON configuration file for the data room with the given ID.
+        Returns a JSON string representing the configuration.
+        """
+        dcr_kind = self.client._get_data_room_kind(data_room_id)
+        if dcr_kind == DataRoomKind.DATA_SCIENCE:
+            dcr = self.retrieve_data_room(data_room_id)
+            commits = [serialize_length_delimited(c) for c in dcr.commits]
+            verified_dcr = compiler.verify_data_room(
+                serialize_length_delimited(dcr.dataRoom),
+                commits,
+                dcr.highLevelRepresentation,
+            )
+            latest_dcr = compiler.upgrade_data_science_data_room_to_latest(verified_dcr)
+            output = {
+                # Format timestamp as ISO standard UTC time.
+                "createdAt": str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))[:-3] + "Z",
+                "dataScienceDataRoom": json.loads(latest_dcr.json()),
+            }
+            return json.dumps(output, indent=2)
+        else:
+            raise Exception(f"Cannot retrieve JSON for data room kind {dcr_kind}")
 
     def publish_dataset(
         self,
