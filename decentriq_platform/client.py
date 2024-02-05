@@ -841,6 +841,9 @@ class Client:
                         isStopped
                         createdAt
                         updatedAt
+                        owner {
+                            email
+                        }
                     }
                 }
             }
@@ -881,6 +884,9 @@ class Client:
                     isStopped
                     createdAt
                     updatedAt
+                    owner {
+                        email
+                    }
                 }
             }
             """,
@@ -931,6 +937,9 @@ class Client:
                                     isStopped
                                     createdAt
                                     updatedAt
+                                    owner {
+                                        email
+                                    }
                                 }
                             }
                         }

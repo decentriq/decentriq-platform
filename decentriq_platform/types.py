@@ -88,8 +88,7 @@ class ChunkDescription(TypedDict):
     chunkHash: str
 
 
-class UserDescription(TypedDict):
-    id: str
+class Owner(TypedDict):
     email: str
 
 
@@ -107,6 +106,8 @@ class DataRoomDescription(TypedDict):
     createdAt: str
     """When the data room was last updated"""
     updatedAt: str
+    """Email address of the data room owner"""
+    owner: Owner 
 
 
 class DatasetUsage(str, Enum):
