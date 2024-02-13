@@ -314,8 +314,8 @@ class DataLab:
         parameters: Optional[Mapping[Text, Text]] = None,
     ):
         """
-        Running the DataLab results in the validation jobs and statistics job being kicked off. 
-        This function does not block waiting for the results. Instead the user should call the 
+        Running the DataLab results in the validation jobs and statistics job being kicked off.
+        This function does not block waiting for the results. Instead the user should call the
         `get_validation_report` or `get_statistics_report` function.
         """
         features = self._get_features()

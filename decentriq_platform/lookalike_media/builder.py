@@ -150,7 +150,7 @@ class LookalikeMediaDcrBuilder:
             advertiser_emails = [self.main_advertiser_email] + self.advertiser_emails
             lmdcr = {
                 "v3": {
-                    "v0": {
+                    "v2": {
                         "id": id,
                         "name": self.name,
                         "mainPublisherEmail": self.main_publisher_email,
@@ -170,6 +170,7 @@ class LookalikeMediaDcrBuilder:
                         },
                         "enableAuditLogRetrieval": self.audit_log_retrieval,
                         "enableDevComputations": self.dev_computations,
+                        "enableDebugMode": False,
                         "advertiserEmails": advertiser_emails,
                         "agencyEmails": self.agency_emails,
                         "observerEmails": self.observer_emails,

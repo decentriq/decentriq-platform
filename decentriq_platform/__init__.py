@@ -40,7 +40,7 @@ __pdoc__ = {
 from .client import Client, create_client, Session
 from .builders import DataRoomBuilder, DataRoomCommitBuilder, GovernanceProtocol
 from .data_lab import DataLabBuilder
-from .lookalike_media import LookalikeMediaDcrBuilder
+from .lookalike_media import LookalikeMediaDcrBuilder, LookalikeMediaDcr
 from .compute import Noop, StaticContent
 from .permission import Permissions
 from .storage import Key
@@ -62,6 +62,7 @@ __all__ = [
     "DataRoomCommitBuilder",
     "DataLabBuilder",
     "LookalikeMediaDcrBuilder",
+    "LookalikeMediaDcr",
     "DataLabDatasetType",
     "Permissions",
     "GovernanceProtocol",
