@@ -4,9 +4,9 @@ import struct
 import asn1crypto.x509
 import asn1crypto.pem
 from sgx_ias_structs import QuoteBody as _QuoteBody
-from oscrypto import asymmetric
 from certvalidator import CertificateValidator, ValidationContext
 from enum import IntFlag
+import cryptography
 
 
 from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
@@ -134,9 +134,12 @@ class Verification:
         validator.validate_usage({"digital_signature"})
 
         # Step 2: verify message signature
-        pubk = asymmetric.load_public_key(epid.iasCertificate)
-        asymmetric.rsa_pkcs1v15_verify(
-            pubk, epid.iasSignature, epid.iasResponseBody, "sha256"
+        ias_root_cert = cryptography.x509.load_pem_x509_certificate(epid.iasCertificate)
+        ias_root_cert.public_key().verify(
+            epid.iasSignature,
+            epid.iasResponseBody,
+            cryptography.hazmat.primitives.asymmetric.padding.PKCS1v15(),
+            cryptography.hazmat.primitives.hashes.SHA256(),
         )
 
         # Step 3: parse message and get quote body
@@ -265,8 +268,12 @@ class Verification:
         validator.validate_usage({"digital_signature"})
 
         # Verify that the QE REPORT signature
-        pubk = asymmetric.dump_public_key(asymmetric.load_public_key(certificate))
-        vk = VerifyingKey.from_pem(pubk)
+        cert = cryptography.x509.load_pem_x509_certificate(certificate)
+        pubk_pem = cert.public_key().public_bytes(
+            encoding=cryptography.hazmat.primitives.serialization.Encoding.PEM,
+            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        vk = VerifyingKey.from_pem(pubk_pem)
         vk.verify(quote[948:1012], quote[564:948], hashfunc=sha256)
 
         flags = quote[96]
@@ -296,10 +303,12 @@ class Verification:
         validator_tcb.validate_usage({"digital_signature"})
 
         # Verify signature over the tcb info body
-        tcb_pubk = asymmetric.dump_public_key(
-            asymmetric.load_public_key(dcap.tcbSignCert)
+        tcb_sign_cert = cryptography.x509.load_pem_x509_certificate(dcap.tcbSignCert)
+        tcb_pubk_pem = tcb_sign_cert.public_key().public_bytes(
+            encoding=cryptography.hazmat.primitives.serialization.Encoding.PEM,
+            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        tcb_vk = VerifyingKey.from_pem(tcb_pubk)
+        tcb_vk = VerifyingKey.from_pem(tcb_pubk_pem)
         tcb_vk.verify(tcb_info_sign, tcb_info_body, hashfunc=sha256)
 
         # Checking the tcbStatus is supported
@@ -325,10 +334,12 @@ class Verification:
         validator_qe.validate_usage({"digital_signature"})
 
         # Verify Signature over enclave identity
-        qe_pubk = asymmetric.dump_public_key(
-            asymmetric.load_public_key(dcap.qeSignCert)
+        qe_sign_cert = cryptography.x509.load_pem_x509_certificate(dcap.qeSignCert)
+        qe_pubk_pem = qe_sign_cert.public_key().public_bytes(
+            encoding=cryptography.hazmat.primitives.serialization.Encoding.PEM,
+            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        qe_vk = VerifyingKey.from_pem(qe_pubk)
+        qe_vk = VerifyingKey.from_pem(qe_pubk_pem)
         qe_vk.verify(qe_id_sign, qe_id_body, hashfunc=sha256)
 
         # Checking if isvprodid is matching
