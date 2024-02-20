@@ -113,17 +113,15 @@ class LookalikeMediaDcr:
             raise Exception("Cannot provision DataLab, not validated.")
 
         # Check compatibility
-        hl_data_lab = compiler.DataLab.parse_obj(
-            json.loads(data_lab["highLevelRepresentationAsString"])
-        )
-        compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room(
-            hl_data_lab, self.hl_lmdcr
+        hl_data_lab = data_lab["highLevelRepresentationAsString"]
+        compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room_serialized(
+            hl_data_lab, self.hl_lmdcr.json()
         )
         if not compatible:
             raise Exception("DataLab is incompatible with Lookalike Media DCR")
 
         # Provision datasets
-        lmdcr_datasets = compiler.get_consumed_datasets(self.hl_lmdcr)
+        lmdcr_datasets = compiler.get_consumed_datasets(self.hl_lmdcr.json())
         data_lab_datasets = self._get_data_lab_datasets_dict(data_lab)
 
         # Check all required datasets can be provisioned by the DataLab before
@@ -173,7 +171,7 @@ class LookalikeMediaDcr:
         """
         Deprovision a DataLab from the Lookalike Media DCR.
         """
-        lmdcr_datasets = compiler.get_consumed_datasets(self.hl_lmdcr)
+        lmdcr_datasets = compiler.get_consumed_datasets(self.hl_lmdcr.json())
         # Deprovision all required datasets.
         for required_dataset in lmdcr_datasets.required:
             lmdcr_node_name = self._get_lmdcr_node_name(required_dataset)

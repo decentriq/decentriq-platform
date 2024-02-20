@@ -1,7 +1,7 @@
 import base64
 import io
 import json
-from typing import Dict, Mapping, Optional, Text
+from typing import Dict, Mapping, Optional, Text, Tuple
 from uuid import uuid4
 import uuid
 import zipfile
@@ -20,8 +20,7 @@ from decentriq_dcr_compiler.schemas.lookalike_media_data_room import (
 )
 from decentriq_dcr_compiler.schemas.create_data_lab import (
     CreateDataLab,
-    CreateDataLab,
-    CreateDataLabItem1,
+    CreateDataLab2,
     CreateDataLabComputeV1,
 )
 from ..proto import DataRoom, CreateDcrPurpose
@@ -116,7 +115,7 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                __root__=CreateDataLabItem1(
+                root=CreateDataLab2(
                     v1=CreateDataLabComputeV1(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
                         driverEnclaveSpecification=EnclaveSpecification(
@@ -456,14 +455,14 @@ class DataLab:
                 raise Exception("Can't provision to DCR. DataLab not validated.")
 
         # Check DataLab and LMDCR are compatible.
-        lmdcr, lmdcr_session = self._get_lmdcr(data_room_id)
-        compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room(
-            self.hl_data_lab, lmdcr
+        lmdcr_hl, lmdcr_session = self._get_lmdcr(data_room_id)
+        compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room_serialized(
+            self.hl_data_lab.json(), lmdcr_hl
         )
         if not compatible:
             raise Exception("DataLab is incompatible with DCR")
 
-        lmdcr_datasets = compiler.get_consumed_datasets(lmdcr)
+        lmdcr_datasets = compiler.get_consumed_datasets(lmdcr_hl)
         data_lab = self.client.get_data_lab(self.data_lab_id)
         data_lab_datasets = self._get_data_lab_datasets_dict(data_lab)
         # Check all required datasets can be provisioned by the DataLab before
@@ -519,7 +518,7 @@ class DataLab:
             datasets_dict[dataset["name"]] = dataset["dataset"]
         return datasets_dict
 
-    def _get_lmdcr(self, data_room_id) -> (LookalikeMediaDataRoom, Session):
+    def _get_lmdcr(self, data_room_id) -> Tuple[str, Session]:
         # Get the high level representation of the LMDCR.
         lmdcr_driver_attestation_hash = self.client._get_lmdcr_driver_attestation_hash(
             data_room_id
@@ -532,18 +531,8 @@ class DataLab:
 
         session = create_session_from_driver_spec(self.client, lmdcr_driver_spec)
         existing_lmdcr = session.retrieve_data_room(data_room_id)
-        lmdcr_hl = json.loads(existing_lmdcr.highLevelRepresentation.decode())
-        lmdcr = LookalikeMediaDataRoom.parse_obj(lmdcr_hl)
-
-        # Verify data room.
-        # Verification involves compiling the LMDCR again and checking that the
-        # low level representation matches the original low level representation.
-        compiled_serialized = compiler.compile_lookalike_media_data_room(lmdcr)
-        recompiled_low_level_dcr = DataRoom()
-        parse_length_delimited(compiled_serialized, recompiled_low_level_dcr)
-        if recompiled_low_level_dcr != existing_lmdcr.dataRoom:
-            raise Exception("LMDCR failed verification")
-        return (lmdcr, session)
+        lmdcr_hl = existing_lmdcr.highLevelRepresentation.decode()
+        return (lmdcr_hl, session)
 
     # Construct the actual DCR that implements the DataLab functionality.
     def _construct_backing_dcr(self, session: Session) -> str:
