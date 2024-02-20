@@ -4,9 +4,9 @@ import struct
 import asn1crypto.x509
 import asn1crypto.pem
 from sgx_ias_structs import QuoteBody as _QuoteBody
-from certvalidator import CertificateValidator, ValidationContext
 from enum import IntFlag
 import cryptography
+import OpenSSL
 
 
 from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
@@ -120,18 +120,16 @@ class Verification:
         self.check_known_root_ca = False
 
     def _verify_epid(self, epid: FatquoteEpid) -> bytes:
-        if (
-            self.attestation_specification.WhichOneof("attestation_specification")
-            != "intelEpid"
-        ):
-            raise Exception(f"Incompatible attestation specification, expected EPID")
+        spec_type = self.attestation_specification.WhichOneof("attestation_specification")
+        if spec_type != "intelEpid":
+            raise Exception(f"Incompatible attestation specification, expected EPID, got {spec_type}")
         spec_epid = self.attestation_specification.intelEpid
-        trust_roots = [spec_epid.iasRootCaDer]
-        validation_context = ValidationContext(trust_roots)
-        validator = CertificateValidator(
-            epid.iasCertificate, validation_context=validation_context
-        )
-        validator.validate_usage({"digital_signature"})
+        root_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, spec_epid.iasRootCaDer)
+        trust_store = OpenSSL.crypto.X509Store()
+        trust_store.add_cert(root_x509)
+        cert_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, epid.iasCertificate)
+        context = OpenSSL.crypto.X509StoreContext(trust_store, cert_x509)
+        context.verify_certificate()
 
         # Step 2: verify message signature
         ias_root_cert = cryptography.x509.load_pem_x509_certificate(epid.iasCertificate)
@@ -258,14 +256,13 @@ class Verification:
         certificate = self._dcap_get_cert(quote)
         pck_certs = Pem.parse(certificate)
         # Validate PCK Cert Chain
-        trust_roots = [spec_dcap.dcapRootCaDer]
-        validation_context = ValidationContext(trust_roots)
-        validator = CertificateValidator(
-            pck_certs[0].as_bytes(),
-            intermediate_certs=map(lambda cert: cert.as_bytes(), pck_certs[1:]),
-            validation_context=validation_context,
-        )
-        validator.validate_usage({"digital_signature"})
+        root_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, spec_dcap.dcapRootCaDer)
+        trust_store = OpenSSL.crypto.X509Store()
+        trust_store.add_cert(root_x509)
+        pck_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, pck_certs[0].as_bytes())
+        intermediate_certs = map(lambda cert: OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert.as_bytes()), pck_certs[1:])
+        context = OpenSSL.crypto.X509StoreContext(trust_store, pck_x509, list(intermediate_certs))
+        context.verify_certificate()
 
         # Verify that the QE REPORT signature
         cert = cryptography.x509.load_pem_x509_certificate(certificate)
@@ -296,11 +293,9 @@ class Verification:
         tcb_info_sign = bytearray.fromhex(tcb_info_dic["signature"])
 
         # Verify TCB Sign Cert
-
-        validator_tcb = CertificateValidator(
-            dcap.tcbSignCert, validation_context=validation_context
-        )
-        validator_tcb.validate_usage({"digital_signature"})
+        tcb_cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, dcap.tcbSignCert)
+        tcb_cert_context = OpenSSL.crypto.X509StoreContext(trust_store, tcb_cert, list(intermediate_certs))
+        tcb_cert_context.verify_certificate()
 
         # Verify signature over the tcb info body
         tcb_sign_cert = cryptography.x509.load_pem_x509_certificate(dcap.tcbSignCert)
@@ -328,10 +323,9 @@ class Verification:
         qe_id_sign = bytearray.fromhex(qe_id_dic["signature"])
 
         # Verify the Qe Sign Cert
-        validator_qe = CertificateValidator(
-            dcap.qeSignCert, validation_context=validation_context
-        )
-        validator_qe.validate_usage({"digital_signature"})
+        qe_cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, dcap.qeSignCert)
+        qe_cert_context = OpenSSL.crypto.X509StoreContext(trust_store, qe_cert, list(intermediate_certs))
+        qe_cert_context.verify_certificate()
 
         # Verify Signature over enclave identity
         qe_sign_cert = cryptography.x509.load_pem_x509_certificate(dcap.qeSignCert)
@@ -366,11 +360,9 @@ class Verification:
         return quote
 
     def _verify_dcap(self, dcap: FatquoteDcap) -> bytes:
-        if (
-            self.attestation_specification.WhichOneof("attestation_specification")
-            != "intelDcap"
-        ):
-            raise Exception(f"Incompatible attestation specification, expected DCAP")
+        spec_type = self.attestation_specification.WhichOneof("attestation_specification")
+        if spec_type != "intelDcap":
+            raise Exception(f"Incompatible attestation specification, expected DCAP, got {spec_type}")
         spec_dcap = self.attestation_specification.intelDcap
         quote = self._verify_dcap_inner(dcap, spec_dcap)
 
