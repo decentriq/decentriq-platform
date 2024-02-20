@@ -3,9 +3,9 @@
 # source: synth_data.proto
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
-from google.protobuf import message as _message
-from google.protobuf import reflection as _reflection
+from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf.internal import builder as _builder
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -14,243 +14,19 @@ _sym_db = _symbol_database.Default()
 from . import compute_sql_pb2 as compute__sql__pb2
 
 
-DESCRIPTOR = _descriptor.FileDescriptor(
-  name='synth_data.proto',
-  package='synth_data',
-  syntax='proto3',
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x10synth_data.proto\x12\nsynth_data\x1a\x11\x63ompute_sql.proto\"j\n\x11SyntheticDataConf\x12#\n\x07\x63olumns\x18\x01 \x03(\x0b\x32\x12.synth_data.Column\x12\x1f\n\x17outputOriginalDataStats\x18\x02 \x01(\x08\x12\x0f\n\x07\x65psilon\x18\x03 \x01(\x02\"\xeb\x01\n\x04Mask\x12+\n\x06\x66ormat\x18\x01 \x01(\x0e\x32\x1b.synth_data.Mask.MaskFormat\"\xb5\x01\n\nMaskFormat\x12\x12\n\x0eGENERIC_STRING\x10\x00\x12\x12\n\x0eGENERIC_NUMBER\x10\x01\x12\x08\n\x04NAME\x10\x02\x12\x0b\n\x07\x41\x44\x44RESS\x10\x03\x12\x0c\n\x08POSTCODE\x10\x04\x12\x10\n\x0cPHONE_NUMBER\x10\x05\x12\x1a\n\x16SOCIAL_SECURITY_NUMBER\x10\x06\x12\t\n\x05\x45MAIL\x10\x07\x12\x08\n\x04\x44\x41TE\x10\x08\x12\r\n\tTIMESTAMP\x10\t\x12\x08\n\x04IBAN\x10\n\"^\n\x06\x43olumn\x12\r\n\x05index\x18\x01 \x01(\x05\x12%\n\x04type\x18\x02 \x01(\x0b\x32\x17.compute_sql.ColumnType\x12\x1e\n\x04mask\x18\x03 \x01(\x0b\x32\x10.synth_data.Maskb\x06proto3'
-  ,
-  dependencies=[compute__sql__pb2.DESCRIPTOR,])
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10synth_data.proto\x12\nsynth_data\x1a\x11\x63ompute_sql.proto\"j\n\x11SyntheticDataConf\x12#\n\x07\x63olumns\x18\x01 \x03(\x0b\x32\x12.synth_data.Column\x12\x1f\n\x17outputOriginalDataStats\x18\x02 \x01(\x08\x12\x0f\n\x07\x65psilon\x18\x03 \x01(\x02\"\xeb\x01\n\x04Mask\x12+\n\x06\x66ormat\x18\x01 \x01(\x0e\x32\x1b.synth_data.Mask.MaskFormat\"\xb5\x01\n\nMaskFormat\x12\x12\n\x0eGENERIC_STRING\x10\x00\x12\x12\n\x0eGENERIC_NUMBER\x10\x01\x12\x08\n\x04NAME\x10\x02\x12\x0b\n\x07\x41\x44\x44RESS\x10\x03\x12\x0c\n\x08POSTCODE\x10\x04\x12\x10\n\x0cPHONE_NUMBER\x10\x05\x12\x1a\n\x16SOCIAL_SECURITY_NUMBER\x10\x06\x12\t\n\x05\x45MAIL\x10\x07\x12\x08\n\x04\x44\x41TE\x10\x08\x12\r\n\tTIMESTAMP\x10\t\x12\x08\n\x04IBAN\x10\n\"^\n\x06\x43olumn\x12\r\n\x05index\x18\x01 \x01(\x05\x12%\n\x04type\x18\x02 \x01(\x0b\x32\x17.compute_sql.ColumnType\x12\x1e\n\x04mask\x18\x03 \x01(\x0b\x32\x10.synth_data.Maskb\x06proto3')
 
-
-
-_MASK_MASKFORMAT = _descriptor.EnumDescriptor(
-  name='MaskFormat',
-  full_name='synth_data.Mask.MaskFormat',
-  filename=None,
-  file=DESCRIPTOR,
-  create_key=_descriptor._internal_create_key,
-  values=[
-    _descriptor.EnumValueDescriptor(
-      name='GENERIC_STRING', index=0, number=0,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='GENERIC_NUMBER', index=1, number=1,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='NAME', index=2, number=2,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='ADDRESS', index=3, number=3,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='POSTCODE', index=4, number=4,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='PHONE_NUMBER', index=5, number=5,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='SOCIAL_SECURITY_NUMBER', index=6, number=6,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='EMAIL', index=7, number=7,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='DATE', index=8, number=8,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='TIMESTAMP', index=9, number=9,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='IBAN', index=10, number=10,
-      serialized_options=None,
-      type=None,
-      create_key=_descriptor._internal_create_key),
-  ],
-  containing_type=None,
-  serialized_options=None,
-  serialized_start=214,
-  serialized_end=395,
-)
-_sym_db.RegisterEnumDescriptor(_MASK_MASKFORMAT)
-
-
-_SYNTHETICDATACONF = _descriptor.Descriptor(
-  name='SyntheticDataConf',
-  full_name='synth_data.SyntheticDataConf',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='columns', full_name='synth_data.SyntheticDataConf.columns', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='outputOriginalDataStats', full_name='synth_data.SyntheticDataConf.outputOriginalDataStats', index=1,
-      number=2, type=8, cpp_type=7, label=1,
-      has_default_value=False, default_value=False,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='epsilon', full_name='synth_data.SyntheticDataConf.epsilon', index=2,
-      number=3, type=2, cpp_type=6, label=1,
-      has_default_value=False, default_value=float(0),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=51,
-  serialized_end=157,
-)
-
-
-_MASK = _descriptor.Descriptor(
-  name='Mask',
-  full_name='synth_data.Mask',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='format', full_name='synth_data.Mask.format', index=0,
-      number=1, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-    _MASK_MASKFORMAT,
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=160,
-  serialized_end=395,
-)
-
-
-_COLUMN = _descriptor.Descriptor(
-  name='Column',
-  full_name='synth_data.Column',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='index', full_name='synth_data.Column.index', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='type', full_name='synth_data.Column.type', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='mask', full_name='synth_data.Column.mask', index=2,
-      number=3, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=397,
-  serialized_end=491,
-)
-
-_SYNTHETICDATACONF.fields_by_name['columns'].message_type = _COLUMN
-_MASK.fields_by_name['format'].enum_type = _MASK_MASKFORMAT
-_MASK_MASKFORMAT.containing_type = _MASK
-_COLUMN.fields_by_name['type'].message_type = compute__sql__pb2._COLUMNTYPE
-_COLUMN.fields_by_name['mask'].message_type = _MASK
-DESCRIPTOR.message_types_by_name['SyntheticDataConf'] = _SYNTHETICDATACONF
-DESCRIPTOR.message_types_by_name['Mask'] = _MASK
-DESCRIPTOR.message_types_by_name['Column'] = _COLUMN
-_sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-SyntheticDataConf = _reflection.GeneratedProtocolMessageType('SyntheticDataConf', (_message.Message,), {
-  'DESCRIPTOR' : _SYNTHETICDATACONF,
-  '__module__' : 'synth_data_pb2'
-  # @@protoc_insertion_point(class_scope:synth_data.SyntheticDataConf)
-  })
-_sym_db.RegisterMessage(SyntheticDataConf)
-
-Mask = _reflection.GeneratedProtocolMessageType('Mask', (_message.Message,), {
-  'DESCRIPTOR' : _MASK,
-  '__module__' : 'synth_data_pb2'
-  # @@protoc_insertion_point(class_scope:synth_data.Mask)
-  })
-_sym_db.RegisterMessage(Mask)
-
-Column = _reflection.GeneratedProtocolMessageType('Column', (_message.Message,), {
-  'DESCRIPTOR' : _COLUMN,
-  '__module__' : 'synth_data_pb2'
-  # @@protoc_insertion_point(class_scope:synth_data.Column)
-  })
-_sym_db.RegisterMessage(Column)
-
-
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'synth_data_pb2', _globals)
+if _descriptor._USE_C_DESCRIPTORS == False:
+  DESCRIPTOR._options = None
+  _globals['_SYNTHETICDATACONF']._serialized_start=51
+  _globals['_SYNTHETICDATACONF']._serialized_end=157
+  _globals['_MASK']._serialized_start=160
+  _globals['_MASK']._serialized_end=395
+  _globals['_MASK_MASKFORMAT']._serialized_start=214
+  _globals['_MASK_MASKFORMAT']._serialized_end=395
+  _globals['_COLUMN']._serialized_start=397
+  _globals['_COLUMN']._serialized_end=491
 # @@protoc_insertion_point(module_scope)
