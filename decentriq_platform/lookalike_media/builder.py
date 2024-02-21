@@ -14,6 +14,7 @@ from ..helpers import (
 )
 from ..lookup_tables import MATCHING_ID_INTERNAL_LOOKUP
 
+
 class LookalikeMediaDcrBuilder:
     """
     A helper class to build a Lookalike Media DCR
@@ -150,7 +151,7 @@ class LookalikeMediaDcrBuilder:
             advertiser_emails = [self.main_advertiser_email] + self.advertiser_emails
             lmdcr = {
                 "v3": {
-                    "v2": {
+                    "v3": {
                         "id": id,
                         "name": self.name,
                         "mainPublisherEmail": self.main_publisher_email,

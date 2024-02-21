@@ -114,8 +114,10 @@ class LookalikeMediaDcr:
 
         # Check compatibility
         hl_data_lab = data_lab["highLevelRepresentationAsString"]
-        compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room_serialized(
-            hl_data_lab, self.hl_lmdcr.json()
+        compatible = (
+            compiler.is_data_lab_compatible_with_lookalike_media_data_room_serialized(
+                hl_data_lab, self.hl_lmdcr.json()
+            )
         )
         if not compatible:
             raise Exception("DataLab is incompatible with Lookalike Media DCR")
