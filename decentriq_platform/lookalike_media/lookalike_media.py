@@ -7,11 +7,12 @@ import numbers
 from typing import List, Optional, Dict
 import zipfile
 
-from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.lookalike_media_data_room import (
+from decentriq_dcr_compiler import (
+    compiler,
     LookalikeMediaDataRoom,
+    LookalikeMediaResponse,
+    LookalikeMediaRequest
 )
-from decentriq_dcr_compiler.schemas.lookalike_media_request import LookalikeMediaRequest
 
 from ..client import Client
 from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
@@ -81,6 +82,31 @@ class LookalikeMediaDcr:
             self.session = client.create_session(self.auth, enclave_specs)
             (self.hl_lmdcr, self.id) = self._create_lmdcr(high_level_representation)
         self.overlap_insights_job = None
+
+
+    @staticmethod
+    def send_request(
+            lmdcr_request: LookalikeMediaRequest,
+            session: Session,
+    ) -> LookalikeMediaResponse:
+        pki = session._get_message_pki(session.auth)
+        endorsements = session.auth.endorsements
+        auth = UserAuth(pki=pki, enclaveEndorsements=endorsements)
+        request_serialized = compiler.compile_lookalike_media_request_serialized(
+            lmdcr_request,
+            serialize_length_delimited(auth),
+        )
+        gcg_request = GcgRequest()
+        parse_length_delimited(request_serialized, gcg_request)
+        responses = session.send_request(gcg_request, LATEST_GCG_PROTOCOL_VERSION)
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+        serialised_response = serialize_length_delimited(responses[0])
+        response = compiler.decompile_lookalike_media_response(
+            lmdcr_request, serialised_response
+        )
+        return response
+
 
     def _create_lmdcr(
         self, high_level_representation: str
@@ -222,14 +248,7 @@ class LookalikeMediaDcr:
                 }
             }
         )
-        gcg_request = self._get_lmdcr_gcg_request(lmdcr_request)
-        responses = self.session.send_request(gcg_request, LATEST_GCG_PROTOCOL_VERSION)
-        if len(responses) != 1:
-            raise Exception("Malformed response")
-        serialised_response = serialize_length_delimited(responses[0])
-        response = compiler.decompile_lookalike_media_response(
-            lmdcr_request, serialised_response
-        )
+        response = LookalikeMediaDcr.send_request(lmdcr_request, self.session)
         response_json = json.loads(response.json())
         job_id_hex = response_json["calculateOverlapInsights"]["jobIdHex"]
         cache_key = self._get_overlap_insights_cache_key_string()
@@ -406,4 +425,5 @@ def provision_dataset(
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=dataset_type.value, key=key
     )
+
     return manifest_hash

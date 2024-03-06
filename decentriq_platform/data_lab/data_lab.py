@@ -15,10 +15,8 @@ from ..types import (
     MatchingId,
 )
 from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.lookalike_media_data_room import (
+from decentriq_dcr_compiler.schemas import (
     LookalikeMediaDataRoom,
-)
-from decentriq_dcr_compiler.schemas.create_data_lab import (
     CreateDataLab,
     CreateDataLab2,
     CreateDataLabComputeV1,

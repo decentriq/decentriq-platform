@@ -1258,6 +1258,7 @@ class Session:
         *,
         interval: int = 5,
         timeout: int = None,
+        parameters: Optional[Mapping[Text, Text]] = None,
     ) -> Optional[bytes]:
         """
         Run a specific computation and return its results.
@@ -1265,7 +1266,7 @@ class Session:
         This method is simply a wrapper for running `run_computation` and
         `get_computation_result` directly after each other
         """
-        job_id = self.run_computation(data_room_id, compute_node_id)
+        job_id = self.run_computation(data_room_id, compute_node_id, parameters=parameters)
         return self.get_computation_result(job_id, interval=interval, timeout=timeout)
 
     def retrieve_used_airlock_quotas(
