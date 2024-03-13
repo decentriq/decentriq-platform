@@ -211,6 +211,23 @@ SPECIFICATIONS = {
         decoder=GcgDriverDecoder(),
         clientProtocols=[6],
     ),
+    "decentriq.driver:v21": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "ae290dfdee2759066341697af5441993ff6df00359be52439c551c37416f77e1"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[6],
+    ),
     "decentriq.sql-worker:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
@@ -520,6 +537,21 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-ml-worker-32-64:v22": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "490c7043fd83a4cedf2ca9d6cf128d302b406b5f1a8172ed48afc3e231f15621ece52d97babb89322592018907eed6d3"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
@@ -622,6 +654,21 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-synth-data-worker-32-64:v17": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "26a9c458b2326c4dc63ec619429590da0d9a38a25ba51a759cb3e04cd744e045bf9ca091dc484c0c1b304fc23b689fba"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.r-latex-worker-32-32:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
@@ -715,6 +762,21 @@ SPECIFICATIONS = {
                 amdArkDer=amd_snp_ark_der,
                 measurement=bytes.fromhex(
                     "dfecd4a6642efca9fdf5720711b490b996b1526bd2a24e42f12d67d772641653119745f8c679a5a27c10bf0b06331a8b"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.r-latex-worker-32-32:v17": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "7f212fb3d7d60c74438d12edfa2e17212a05a6906b881ab7153e2c85bb9235d0ef167c858dcddd89050838bc4e57df49"
                 ),
                 roughtimePubKey=roughtime_public_key,
                 decentriqDer=decentriq_root_ca_der,
