@@ -768,7 +768,8 @@ class Session:
             latest_dcr = compiler.upgrade_data_science_data_room_to_latest(verified_dcr)
             output = {
                 # Format timestamp as ISO standard UTC time.
-                "createdAt": str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))[:-3] + "Z",
+                "createdAt": str(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"))[:-3]
+                + "Z",
                 "dataScienceDataRoom": json.loads(latest_dcr.json()),
             }
             return json.dumps(output, indent=2)
@@ -1266,7 +1267,9 @@ class Session:
         This method is simply a wrapper for running `run_computation` and
         `get_computation_result` directly after each other
         """
-        job_id = self.run_computation(data_room_id, compute_node_id, parameters=parameters)
+        job_id = self.run_computation(
+            data_room_id, compute_node_id, parameters=parameters
+        )
         return self.get_computation_result(job_id, interval=interval, timeout=timeout)
 
     def retrieve_used_airlock_quotas(

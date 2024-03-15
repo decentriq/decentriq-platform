@@ -18,11 +18,11 @@ from base64 import b64decode, b64encode
 from .api import Api
 from .authentication import Auth, generate_key, generate_self_signed_certificate
 from .config import (
-        DECENTRIQ_CLIENT_ID,
-        DECENTRIQ_HOST,
-        DECENTRIQ_PORT,
-        DECENTRIQ_USE_TLS,
-        _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
+    DECENTRIQ_CLIENT_ID,
+    DECENTRIQ_HOST,
+    DECENTRIQ_PORT,
+    DECENTRIQ_USE_TLS,
+    _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
 )
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
@@ -46,14 +46,18 @@ from .proto import (
     parse_length_delimited,
     serialize_length_delimited,
     AuthenticationMethod,
-    PkiPolicy
+    PkiPolicy,
+    DataRoom as ProtoDataRoom,
+    CreateDcrKind,
 )
-from .api import (
-    Endpoints,
-    retry
-)
+from .api import Endpoints, retry
 from .graphql import GqlClient
-from .attestation import EnclaveSpecifications, enclave_specifications
+from .attestation import EnclaveSpecifications, enclave_specifications, SPECIFICATIONS
+
+from decentriq_dcr_compiler import compiler
+from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
+
+from .analytics import AnalyticsDcr
 
 import base64
 
@@ -74,12 +78,12 @@ class Client:
     _graphql: GqlClient
 
     def __init__(
-            self,
-            user_email: str,
-            api: Api,
-            graphql: GqlClient,
-            request_timeout: int = None,
-            unsafe_disable_known_root_ca_check: Bool = False,
+        self,
+        user_email: str,
+        api: Api,
+        graphql: GqlClient,
+        request_timeout: int = None,
+        unsafe_disable_known_root_ca_check: Bool = False,
     ):
         """
         Create a client instance.
@@ -98,13 +102,16 @@ class Client:
         Check whether the selected enclaves are deployed at this moment.
         If one of the enclaves is not deployed, an exception will be raised.
         """
-        available_specs =\
-            [spec["proto"].SerializeToString() for spec in self._get_enclave_specifications()]
+        available_specs = [
+            spec["proto"].SerializeToString()
+            for spec in self._get_enclave_specifications()
+        ]
         for spec in specs.values():
             if spec["proto"].SerializeToString() not in available_specs:
                 raise Exception(
-                    "No available enclave deployed for attestation spec '{name}' (version {version})".\
-                        format(name=spec["name"], version=spec["version"])
+                    "No available enclave deployed for attestation spec '{name}' (version {version})".format(
+                        name=spec["name"], version=spec["version"]
+                    )
                 )
 
     def _get_enclave_specifications(self) -> List[EnclaveSpecification]:
@@ -135,23 +142,23 @@ class Client:
             enclave_specs.append(enclave_spec)
         return enclave_specs
 
-
     def create_session_from_data_room_description(
         self,
         data_room_description: DataRoomDescription,
-        specs: Optional[EnclaveSpecifications] = enclave_specifications
+        specs: Optional[List[EnclaveSpecification]] = None,
     ) -> Session:
         """
         Create a session for interacting with a DCR of the given data room description.
         """
         driver_attestation_hash = data_room_description["driverAttestationHash"]
         driver_enclave_spec = dict()
-        for spec in specs.all():
+        specs = specs if specs else enclave_specifications.all()
+        for spec in specs:
             attestation_hash = hashlib.sha256(
                 serialize_length_delimited(spec["proto"])
             ).hexdigest()
             if attestation_hash == driver_attestation_hash:
-                driver_enclave_spec = {"decentriq.driver": spec} 
+                driver_enclave_spec = {"decentriq.driver": spec}
                 break
         if not driver_enclave_spec:
             raise Exception(
@@ -160,11 +167,10 @@ class Client:
         auth, _ = self.create_auth_using_decentriq_pki(driver_enclave_spec)
         return self.create_session(auth, driver_enclave_spec)
 
-
     def create_session(
-            self,
-            auth: Auth,
-            enclaves: Dict[str, EnclaveSpecification],
+        self,
+        auth: Auth,
+        enclaves: Dict[str, EnclaveSpecification],
     ) -> Session:
         """
         Creates a new `decentriq_platform.session.Session` instance to communicate
@@ -177,21 +183,22 @@ class Client:
         """
         if "decentriq.driver" not in enclaves:
             raise Exception(
-                "Unable to find a specification for the driver enclave" +
-                f" named 'decentriq.driver', you can get these specifications" +
-                " from the main package."
+                "Unable to find a specification for the driver enclave"
+                + f" named 'decentriq.driver', you can get these specifications"
+                + " from the main package."
             )
         driver_spec = enclaves["decentriq.driver"]
-
-        if "clientProtocols" not in driver_spec or driver_spec["clientProtocols"] is None:
-            raise Exception(
-                "Missing client supported protocol versions"
-            )
+        if (
+            "clientProtocols" not in driver_spec
+            or driver_spec["clientProtocols"] is None
+        ):
+            raise Exception("Missing client supported protocol versions")
         attestation_proto = driver_spec["proto"]
         client_protocols = driver_spec["clientProtocols"]
 
-        attestation_specification_hash =\
-            hashlib.sha256(serialize_length_delimited(attestation_proto)).hexdigest()
+        attestation_specification_hash = hashlib.sha256(
+            serialize_length_delimited(attestation_proto)
+        ).hexdigest()
 
         data = self._graphql.post(
             """
@@ -209,7 +216,7 @@ class Client:
                 "input": {
                     "enclaveAttestationHash": attestation_specification_hash,
                 }
-            }
+            },
         )
         session_id = data["session"]["create"]["record"]["id"]
         session = Session(
@@ -223,8 +230,8 @@ class Client:
         return session
 
     def _ensure_dataset_scope(
-            self,
-            manifest_hash: Optional[str] = None,
+        self,
+        manifest_hash: Optional[str] = None,
     ) -> str:
         payload = {
             "manifestHash": manifest_hash,
@@ -242,16 +249,14 @@ class Client:
                 }
             }
             """,
-            {
-                "input": payload
-            }
+            {"input": payload},
         )
         scope = data["scope"]["getOrCreateDatasetScope"]["record"]
         return scope["id"]
 
     def _ensure_dcr_data_scope(
-            self,
-            data_room_hash: str,
+        self,
+        data_room_hash: str,
     ) -> str:
         data = self._graphql.post(
             """
@@ -270,15 +275,15 @@ class Client:
                 "input": {
                     "dataRoomHash": data_room_hash,
                 }
-            }
+            },
         )
         scope = data["scope"]["getOrCreateDcrDataScope"]["record"]
         return scope["id"]
 
     def _set_datalab_matching_dataset(
-            self,
-            data_lab_id: str,
-            manifest_hash: Optional[str],
+        self,
+        data_lab_id: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the matching dataset manifest hash in the database.
@@ -299,19 +304,14 @@ class Client:
                 }
             }
             """,
-            {
-                "input": {
-                    "id": data_lab_id,
-                    "manifestHash": manifest_hash
-                }
-            }
+            {"input": {"id": data_lab_id, "manifestHash": manifest_hash}},
         )
         return data["dataLab"]["setUsersDataset"]["record"]["id"]
 
     def _set_datalab_segments_dataset(
-            self,
-            data_lab_id: str,
-            manifest_hash: str,
+        self,
+        data_lab_id: str,
+        manifest_hash: str,
     ) -> str:
         """
         Store the segments dataset manifest hash in the database.
@@ -332,19 +332,14 @@ class Client:
                 }
             }
             """,
-            {
-                "input": {
-                    "id": data_lab_id,
-                    "manifestHash": manifest_hash
-                }
-            }
+            {"input": {"id": data_lab_id, "manifestHash": manifest_hash}},
         )
         return data["dataLab"]["setSegmentsDataset"]["record"]["id"]
 
     def _set_datalab_demographics_dataset(
-            self,
-            data_lab_id: str,
-            manifest_hash: str,
+        self,
+        data_lab_id: str,
+        manifest_hash: str,
     ) -> str:
         """
         Store the demographics dataset manifest hash in the database.
@@ -365,19 +360,14 @@ class Client:
                 }
             }
             """,
-            {
-                "input": {
-                    "id": data_lab_id,
-                    "manifestHash": manifest_hash
-                }
-            }
+            {"input": {"id": data_lab_id, "manifestHash": manifest_hash}},
         )
         return data["dataLab"]["setDemographicsDataset"]["record"]["id"]
 
     def _set_datalab_embeddings_dataset(
-            self,
-            data_lab_id: str,
-            manifest_hash: str,
+        self,
+        data_lab_id: str,
+        manifest_hash: str,
     ) -> str:
         """
         Store the embeddings dataset manifest hash in the database.
@@ -398,21 +388,16 @@ class Client:
                 }
             }
             """,
-            {
-                "input": {
-                    "id": data_lab_id,
-                    "manifestHash": manifest_hash
-                }
-            }
+            {"input": {"id": data_lab_id, "manifestHash": manifest_hash}},
         )
         return data["dataLab"]["setEmbeddingsDataset"]["record"]["id"]
 
     def _set_datalab_job_ids(
-            self,
-            data_lab_id: str,
-            validation_compute_job_id: str,
-            statistics_compute_job_id: str,
-            jobs_driver_attestation_hash: str,
+        self,
+        data_lab_id: str,
+        validation_compute_job_id: str,
+        statistics_compute_job_id: str,
+        jobs_driver_attestation_hash: str,
     ) -> str:
         """
         Store the job IDs associated with the DataLab.
@@ -434,17 +419,17 @@ class Client:
                 "input": {
                     "id": data_lab_id,
                     "validationComputeJobId": validation_compute_job_id,
-	                "statisticsComputeJobId": statistics_compute_job_id,
-	                "jobsDriverAttestationHash": jobs_driver_attestation_hash,
+                    "statisticsComputeJobId": statistics_compute_job_id,
+                    "jobsDriverAttestationHash": jobs_driver_attestation_hash,
                 }
-            }
+            },
         )
         return data["dataLab"]["setJobIds"]["record"]["id"]
 
     def _set_datalab_statistics(
-            self,
-            data_lab_id: str,
-            statistics: str,
+        self,
+        data_lab_id: str,
+        statistics: str,
     ) -> str:
         """
         Store the DataLab statistics in the database.
@@ -466,21 +451,22 @@ class Client:
                     "id": data_lab_id,
                     "statistics": json.loads(statistics),
                 }
-            }
+            },
         )
         return data["dataLab"]["setStatistics"]["record"]["id"]
 
     def upload_dataset(
-            self,
-            data: BinaryIO,
-            key: Key,
-            file_name: str,
-            /, *,
-            description: str = "",
-            chunk_size: int = 8 * 1024 ** 2,
-            parallel_uploads: int = 8,
-            usage: DatasetUsage = DatasetUsage.PUBLISHED,
-            store_in_keychain: Optional[Keychain] = None,
+        self,
+        data: BinaryIO,
+        key: Key,
+        file_name: str,
+        /,
+        *,
+        description: str = "",
+        chunk_size: int = 8 * 1024**2,
+        parallel_uploads: int = 8,
+        usage: DatasetUsage = DatasetUsage.PUBLISHED,
+        store_in_keychain: Optional[Keychain] = None,
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -498,8 +484,7 @@ class Client:
         - `store_in_keychain`: An optional keychain in which to store the dataset key.
         """
         uploader = BoundedExecutor(
-                bound=parallel_uploads * 2,
-                max_workers=parallel_uploads
+            bound=parallel_uploads * 2, max_workers=parallel_uploads
         )
         # create and upload chunks
         chunker = Chunker(data, chunk_size=chunk_size)
@@ -523,12 +508,11 @@ class Client:
 
         # check chunks uploads were successful
         completed, pending = futures.wait(
-                chunk_uploads_futures,
-                None,
-                futures.FIRST_EXCEPTION
-            )
+            chunk_uploads_futures, None, futures.FIRST_EXCEPTION
+        )
         # re-raise exception
-        for future in completed: future.result()
+        for future in completed:
+            future.result()
         uploader.shutdown(wait=False)
 
         # create manifest and upload
@@ -555,6 +539,7 @@ class Client:
 
         if store_in_keychain:
             from .keychain import KeychainEntry
+
             store_in_keychain.insert(
                 KeychainEntry("dataset_key", manifest_hash, key.material)
             )
@@ -562,11 +547,7 @@ class Client:
         return manifest_hash
 
     def _encrypt_and_upload_chunk(
-            self,
-            chunk_hash: bytes,
-            chunk_data: bytes,
-            key: bytes,
-            upload_id: str
+        self, chunk_hash: bytes, chunk_data: bytes, key: bytes, upload_id: str
     ):
         cipher = StorageCipher(key)
         chunk_data_encrypted = cipher.encrypt(chunk_data)
@@ -594,14 +575,11 @@ class Client:
         return upload_id
 
     def _upload_chunk(
-            self,
-            chunk_hash: bytes,
-            chunk_data_encrypted: bytes,
-            upload_id: str
+        self, chunk_hash: bytes, chunk_data_encrypted: bytes, upload_id: str
     ):
-        url = Endpoints.USER_UPLOAD_CHUNKS \
-            .replace(":uploadId", upload_id) \
-            .replace(":chunkHash", chunk_hash.hex())
+        url = Endpoints.USER_UPLOAD_CHUNKS.replace(":uploadId", upload_id).replace(
+            ":chunkHash", chunk_hash.hex()
+        )
         try:
             self._api.put(
                 url,
@@ -622,21 +600,19 @@ class Client:
                 }
             }
             """,
-            {
-                "id": upload_id
-            }
+            {"id": upload_id},
         )
 
     def _finalize_upload(
-            self,
-            scope_id: str,
-            upload_id: str,
-            name: str,
-            manifest_hash: bytes,
-            manifest_encrypted: bytes,
-            chunks: List[str],
-            description: Optional[str] = None,
-            usage: Optional[DatasetUsage] = None,
+        self,
+        scope_id: str,
+        upload_id: str,
+        name: str,
+        manifest_hash: bytes,
+        manifest_encrypted: bytes,
+        chunks: List[str],
+        description: Optional[str] = None,
+        usage: Optional[DatasetUsage] = None,
     ) -> str:
         data = self._graphql.post(
             """
@@ -660,10 +636,10 @@ class Client:
                     "description": description,
                     "usage": usage,
                     "chunkHashes": chunks,
-                    "scopeId": scope_id
+                    "scopeId": scope_id,
                 }
             },
-            retry=retry
+            retry=retry,
         )
 
         dataset = data["upload"]["finalizeUploadAndCreateDataset"]["record"]
@@ -671,10 +647,7 @@ class Client:
 
         return manifest_hash
 
-    def get_dataset(
-            self,
-            manifest_hash: str
-    ) -> Optional[DatasetDescription]:
+    def get_dataset(self, manifest_hash: str) -> Optional[DatasetDescription]:
         """
         Returns information about a user dataset given a dataset id.
         """
@@ -692,9 +665,7 @@ class Client:
                     }
                 }
                 """,
-                {
-                    "manifestHash": manifest_hash
-                }
+                {"manifestHash": manifest_hash},
             )
             return data["datasetByManifestHash"]
         except NotFoundError:
@@ -740,9 +711,13 @@ class Client:
         Note, however, that this might put some data rooms in a broken
         state as they might try to read data that does not exist anymore.
         """
-        data_rooms_ids_with_dataset = self._get_data_room_ids_for_publication(manifest_hash)
+        data_rooms_ids_with_dataset = self._get_data_room_ids_for_publication(
+            manifest_hash
+        )
         if data_rooms_ids_with_dataset:
-            id_list = "\n".join([f"- {dcr_id}" for dcr_id in data_rooms_ids_with_dataset])
+            id_list = "\n".join(
+                [f"- {dcr_id}" for dcr_id in data_rooms_ids_with_dataset]
+            )
             if force:
                 print(
                     "This dataset is published to the following data rooms."
@@ -765,7 +740,7 @@ class Client:
             """,
             {
                 "manifestHash": manifest_hash,
-            }
+            },
         )
 
     @property
@@ -775,13 +750,15 @@ class Client:
         Note that when using this certificate in any authentication scheme,
         you trust Decentriq as an identity provider!
         """
-        data = self._graphql.post("""
+        data = self._graphql.post(
+            """
             {
                 certificateAuthority {
                     rootCertificate
                 }
             }
-        """)
+        """
+        )
         certificate = data["certificateAuthority"]["rootCertificate"].encode("utf-8")
         return certificate
 
@@ -802,13 +779,10 @@ class Client:
         own custom `decentriq_platform.authentication.Auth` objects.
         """
         root_pki = self.decentriq_ca_root_certificate
-        return AuthenticationMethod(
-            dqPki=PkiPolicy(rootCertificatePem=root_pki)
-        )
+        return AuthenticationMethod(dqPki=PkiPolicy(rootCertificatePem=root_pki))
 
     def create_auth_using_decentriq_pki(
-        self,
-        enclaves: Dict[str, EnclaveSpecification]
+        self, enclaves: Dict[str, EnclaveSpecification]
     ) -> Tuple[Auth, Endorser]:
         auth = self.create_auth()
         endorser = Endorser(auth, self, enclaves)
@@ -851,12 +825,12 @@ class Client:
             }
             """
         )
-        return [DataRoomDescription(**item) for item in data["publishedDataRooms"]["nodes"]]
+        return [
+            DataRoomDescription(**item) for item in data["publishedDataRooms"]["nodes"]
+        ]
 
     def get_data_room_description(
-            self,
-            data_room_hash,
-            enclave_specs
+        self, data_room_hash, enclave_specs
     ) -> Optional[DataRoomDescription]:
         """
         Get a single data room description.
@@ -866,14 +840,11 @@ class Client:
         driver_attestation_hash = hashlib.sha256(
             serialize_length_delimited(attestation_proto)
         ).hexdigest()
-        return self._get_data_room_by_hash(
-            data_room_hash,
-            driver_attestation_hash
-        )
+        return self._get_data_room_by_hash(data_room_hash, driver_attestation_hash)
 
     def _get_data_room_kind(
-            self,
-            data_room_id: str,
+        self,
+        data_room_id: str,
     ) -> DataRoomKind:
         """
         Get the kind of data room.
@@ -888,14 +859,12 @@ class Client:
             """,
             {
                 "dataRoomId": data_room_id,
-            }
+            },
         )
         return data["publishedDataRoom"]["kind"]
 
     def _get_data_room_by_hash(
-            self,
-            data_room_hash: str,
-            driver_attestation_hash: str
+        self, data_room_hash: str, driver_attestation_hash: str
     ) -> Optional[DataRoomDescription]:
         data = self._graphql.post(
             """
@@ -917,7 +886,7 @@ class Client:
             {
                 "dataRoomHash": data_room_hash,
                 "driverAttestationHash": driver_attestation_hash,
-            }
+            },
         )
         result = data.get("publishedDataRoom")
         if result is not None:
@@ -931,25 +900,29 @@ class Client:
             return None
 
     def _get_user_certificate(self, email: str, csr_pem: str) -> str:
-        data = self._graphql.post("""
+        data = self._graphql.post(
+            """
             query getUserCertificate($input: UserCsrInput!) {
                 certificateAuthority {
                     userCertificate(input: $input)
                 }
             }
-            """, {
+            """,
+            {
                 "input": {
                     "csrPem": csr_pem,
                     "email": email,
                 }
-            }
+            },
         )
         cert_chain_pem = data["certificateAuthority"]["userCertificate"]
         return cert_chain_pem
 
-    def _get_data_rooms_with_published_dataset(self, manifest_hash) -> List[DataRoomDescription]:
-            data = self._graphql.post(
-                """
+    def _get_data_rooms_with_published_dataset(
+        self, manifest_hash
+    ) -> List[DataRoomDescription]:
+        data = self._graphql.post(
+            """
                 query GetDatasetPublications($manifestHash: HexString!) {
                     datasetByManifestHash(manifestHash: $manifestHash) {
                         publications {
@@ -971,18 +944,18 @@ class Client:
                     }
                 }
                 """,
-                {
-                    "manifestHash": manifest_hash,
-                }
-            )
-            publications = data["datasetByManifestHash"]["publications"]["nodes"]
+            {
+                "manifestHash": manifest_hash,
+            },
+        )
+        publications = data["datasetByManifestHash"]["publications"]["nodes"]
 
-            if publications:
-                dcrs = [publication["dataRoom"] for publication in publications]
-                deduplicated_dcrs = ({ dcr["id"]: dcr for dcr in dcrs }).values()
-                return list(deduplicated_dcrs)
-            else:
-                return []
+        if publications:
+            dcrs = [publication["dataRoom"] for publication in publications]
+            deduplicated_dcrs = ({dcr["id"]: dcr for dcr in dcrs}).values()
+            return list(deduplicated_dcrs)
+        else:
+            return []
 
     def _get_data_room_ids_for_publication(self, manifest_hash) -> List[str]:
         data_rooms = self._get_data_rooms_with_published_dataset(manifest_hash)
@@ -1013,9 +986,7 @@ class Client:
                 }
             }
             """,
-            {
-                "scopeId": scope_id
-            }
+            {"scopeId": scope_id},
         )
         return data["scope"]
 
@@ -1039,7 +1010,6 @@ class Client:
             keychain["encrypted"] = b64decode(keychain["encrypted"])
         return keychain
 
-
     def create_keychain_instance(self, salt: str, encrypted: bytes) -> KeychainInstance:
         data = self._graphql.post(
             """
@@ -1057,19 +1027,19 @@ class Client:
             {
                 "inner": {
                     "salt": salt,
-                    "encrypted": b64encode(encrypted).decode('ascii')
+                    "encrypted": b64encode(encrypted).decode("ascii"),
                 }
-            }
+            },
         )
         keychain = data["keychain"]["create"]
         keychain["encrypted"] = b64decode(keychain["encrypted"])
         return keychain
 
     def compare_and_swap_keychain(
-            self,
-            cas_index: int,
-            salt: Optional[str] = None,
-            encrypted: Optional[bytes] = None,
+        self,
+        cas_index: int,
+        salt: Optional[str] = None,
+        encrypted: Optional[bytes] = None,
     ) -> KeychainInstance:
         data = self._graphql.post(
             """
@@ -1082,10 +1052,10 @@ class Client:
             {
                 "inner": {
                     "salt": salt,
-                    "encrypted": b64encode(encrypted).decode('ascii'),
+                    "encrypted": b64encode(encrypted).decode("ascii"),
                     "casIndex": cas_index,
                 }
-            }
+            },
         )
         return data["keychain"]["compareAndSwap"]
 
@@ -1102,8 +1072,7 @@ class Client:
         return
 
     def list_data_labs(
-            self,
-            filter: Optional[DataLabListFilter] = None
+        self, filter: Optional[DataLabListFilter] = None
     ) -> List[DataLabDefinition]:
         """
         Return a list of DataLabs based on the `filter` criteria.
@@ -1177,8 +1146,8 @@ class Client:
             raise Exception(f"Unknown DataLab filter {filter}")
 
     def get_data_lab(
-            self,
-            id: str,
+        self,
+        id: str,
     ) -> DataLabDefinition:
         """
         Return the DataLab with the given ID.
@@ -1234,15 +1203,13 @@ class Client:
                 }
             }
             """,
-            {
-                "id": id
-            }
+            {"id": id},
         )
         return data["dataLab"]
 
     def _publish_data_lab_from_existing(
-            self,
-            data_lab: Dict[str, str],
+        self,
+        data_lab: Dict[str, str],
     ) -> str:
         """
         Publish a DataLab from an existing high level representation.
@@ -1262,25 +1229,23 @@ class Client:
                 }
             }
             """,
-            {
-                "input": {
-                    "dataLab": data_lab
-                }
-            }
+            {"input": {"dataLab": data_lab}},
         )
-        return (data["dataLab"]["createFromExisting"]["record"]["id"])
+        return data["dataLab"]["createFromExisting"]["record"]["id"]
 
     def _get_enclave_spec_from_hash(self, hash: str) -> Optional[EnclaveSpecification]:
         available_specs = self._get_enclave_specifications()
         for spec in available_specs:
-            hashed_attestation_spec = hashlib.sha256(serialize_length_delimited(spec["proto"])).hexdigest()
+            hashed_attestation_spec = hashlib.sha256(
+                serialize_length_delimited(spec["proto"])
+            ).hexdigest()
             if hashed_attestation_spec == hash:
                 return spec
         return None
 
     def _get_lmdcr_driver_attestation_hash(
-            self,
-            id: str,
+        self,
+        id: str,
     ) -> str:
         """
         Get the driver attestation hash for the Lookalike Media DCR with the given ID.
@@ -1296,14 +1261,12 @@ class Client:
                 }
             }
             """,
-            {
-                "id": id
-            }
+            {"id": id},
         )
         return data["publishedLookalikeMediaDataRoom"]["driverAttestationHash"]
 
     def get_lookalike_media_data_rooms(
-            self,
+        self,
     ) -> List[DataRoom]:
         """
         Get all Lookalike Media data clean rooms.
@@ -1327,18 +1290,19 @@ class Client:
                 }
             }
             """,
-            { 
-                "filter": None, 
-                "sortBy": None 
-            }
+            {"filter": None, "sortBy": None},
         )
         data_rooms = data["dataRooms"]["nodes"]
-        lookalike_media_data_rooms = [data_room for data_room in data_rooms if data_room["kind"] == "LOOKALIKE_MEDIA"]
+        lookalike_media_data_rooms = [
+            data_room
+            for data_room in data_rooms
+            if data_room["kind"] == "LOOKALIKE_MEDIA"
+        ]
         return lookalike_media_data_rooms
 
     def _create_media_compute_job(
-            self,
-            input: CreateMediaComputeJobInput,
+        self,
+        input: CreateMediaComputeJobInput,
     ) -> MediaComputeJob:
         """
         Create a compute job for the Lookalike Media DCR.
@@ -1360,15 +1324,13 @@ class Client:
                 }
             }
             """,
-            {
-                "input": input
-            }
+            {"input": input},
         )
         return data["mediaComputeJob"]["create"]["record"]
 
     def _get_media_compute_job(
-            self,
-            input: MediaComputeJobFilterInput,
+        self,
+        input: MediaComputeJobFilterInput,
     ) -> MediaComputeJob:
         """
         Get a compute job for the Lookalike Media DCR.
@@ -1386,16 +1348,14 @@ class Client:
                 }
             }
             """,
-            {
-                "input": input
-            }
+            {"input": input},
         )
         return data["mediaComputeJob"]
 
     def _provision_data_lab(
-            self,
-            data_room_id: str,
-            data_lab_id: str,
+        self,
+        data_room_id: str,
+        data_lab_id: str,
     ) -> DataLabDefinition:
         """
         Provision a DataLab to a DCR.
@@ -1459,16 +1419,13 @@ class Client:
             {
                 "input": {
                     "dataRoomId": data_room_id,
-                    "dataLabId": data_lab_id, 
+                    "dataLabId": data_lab_id,
                 }
-            }
+            },
         )
         return data["dataLab"]["provisionDataLab"]["publishedDataLab"]
 
-    def _deprovision_data_lab(
-            self,
-            data_room_id: str
-    ) -> DataLabDefinition:
+    def _deprovision_data_lab(self, data_room_id: str) -> DataLabDefinition:
         """
         Deprovision a DataLab from a DCR.
 
@@ -1529,21 +1486,73 @@ class Client:
             """,
             {
                 "input": data_room_id,
-            }
+            },
         )
         return data["dataLab"]["deprovisionDataLab"]["publishedDataLab"]
 
+    def retrieve_analytics_dcr(
+        self,
+        dcr_id,
+        enclave_specs: Optional[List[EnclaveSpecification]] = None,
+    ) -> AnalyticsDcr:
+        """
+        Retrieve an existing Analytics DCR.
+
+        **Parameters**:
+        - `dcr_id`: Data Clean Room ID.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        return AnalyticsDcr._from_existing(
+            dcr_id, client=self, enclave_specs=enclave_specs
+        )
+
+    def publish_analytics_dcr(
+        self,
+        dcr_definition: AnalyticsDcrDefinition,
+        *,
+        enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
+    ) -> AnalyticsDcr:
+        data_room = DataScienceDataRoom.model_validate(
+            dcr_definition._get_high_level_representation()
+        )
+        compiled_data_room = compiler.compile_data_science_data_room(data_room)
+        self.compile_context = compiled_data_room.compile_context
+
+        low_level_data_room = ProtoDataRoom()
+        parse_length_delimited(compiled_data_room.data_room, low_level_data_room)
+
+        # Get a new session
+        specs = enclave_specs if enclave_specs else enclave_specifications.latest()
+        auth, _ = self.create_auth_using_decentriq_pki(specs)
+        session = self.create_session(auth, specs)
+
+        dcr_id = session.publish_data_room(
+            low_level_data_room,
+            kind=CreateDcrKind.DATASCIENCE,
+            high_level_representation=compiled_data_room.datascience_data_room_encoded,
+        )
+
+        # Now that we've published the DCR the simplest way to construct
+        # the DCR is using the `from_existing` method. This takes care
+        # of correctly constructing all the node definitions.
+        published_ds_dcr = AnalyticsDcr._from_existing(
+            dcr_id=dcr_id, client=self, enclave_specs=list(specs.values())
+        )
+        return published_ds_dcr
+
 
 def create_client(
-        user_email: str,
-        api_token: str,
-        *,
-        client_id: str = DECENTRIQ_CLIENT_ID,
-        api_host: str = DECENTRIQ_HOST,
-        api_port: int = DECENTRIQ_PORT,
-        api_use_tls: bool = DECENTRIQ_USE_TLS,
-        request_timeout: Optional[int] = None,
-        unsafe_disable_known_root_ca_check: Bool = _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK
+    user_email: str,
+    api_token: str,
+    *,
+    client_id: str = DECENTRIQ_CLIENT_ID,
+    api_host: str = DECENTRIQ_HOST,
+    api_port: int = DECENTRIQ_PORT,
+    api_use_tls: bool = DECENTRIQ_USE_TLS,
+    request_timeout: Optional[int] = None,
+    unsafe_disable_known_root_ca_check: bool = _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
 ) -> Client:
     """
     The primary way to create a `Client` object.
@@ -1561,7 +1570,7 @@ def create_client(
         api_port,
         api_prefix="",
         use_tls=api_use_tls,
-        timeout=request_timeout
+        timeout=request_timeout,
     )
 
     graphql = GqlClient(api, path=Endpoints.GRAPHQL)
@@ -1571,7 +1580,7 @@ def create_client(
         api,
         graphql,
         request_timeout=request_timeout,
-        unsafe_disable_known_root_ca_check=unsafe_disable_known_root_ca_check
+        unsafe_disable_known_root_ca_check=unsafe_disable_known_root_ca_check,
     )
 
 
@@ -1586,6 +1595,7 @@ class BoundedExecutor:
             if error:
                 print(f"Error in future: {error}")
             self.semaphore.release()
+
         self.semaphore.acquire()
         try:
             future = self.executor.submit(fn, *args, **kwargs)

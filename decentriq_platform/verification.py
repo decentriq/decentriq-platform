@@ -120,14 +120,22 @@ class Verification:
         self.check_known_root_ca = False
 
     def _verify_epid(self, epid: FatquoteEpid) -> bytes:
-        spec_type = self.attestation_specification.WhichOneof("attestation_specification")
+        spec_type = self.attestation_specification.WhichOneof(
+            "attestation_specification"
+        )
         if spec_type != "intelEpid":
-            raise Exception(f"Incompatible attestation specification, expected EPID, got {spec_type}")
+            raise Exception(
+                f"Incompatible attestation specification, expected EPID, got {spec_type}"
+            )
         spec_epid = self.attestation_specification.intelEpid
-        root_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, spec_epid.iasRootCaDer)
+        root_x509 = OpenSSL.crypto.load_certificate(
+            OpenSSL.crypto.FILETYPE_ASN1, spec_epid.iasRootCaDer
+        )
         trust_store = OpenSSL.crypto.X509Store()
         trust_store.add_cert(root_x509)
-        cert_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, epid.iasCertificate)
+        cert_x509 = OpenSSL.crypto.load_certificate(
+            OpenSSL.crypto.FILETYPE_PEM, epid.iasCertificate
+        )
         context = OpenSSL.crypto.X509StoreContext(trust_store, cert_x509)
         context.verify_certificate()
 
@@ -256,19 +264,30 @@ class Verification:
         certificate = self._dcap_get_cert(quote)
         pck_certs = Pem.parse(certificate)
         # Validate PCK Cert Chain
-        root_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_ASN1, spec_dcap.dcapRootCaDer)
+        root_x509 = OpenSSL.crypto.load_certificate(
+            OpenSSL.crypto.FILETYPE_ASN1, spec_dcap.dcapRootCaDer
+        )
         trust_store = OpenSSL.crypto.X509Store()
         trust_store.add_cert(root_x509)
-        pck_x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, pck_certs[0].as_bytes())
-        intermediate_certs = map(lambda cert: OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert.as_bytes()), pck_certs[1:])
-        context = OpenSSL.crypto.X509StoreContext(trust_store, pck_x509, list(intermediate_certs))
+        pck_x509 = OpenSSL.crypto.load_certificate(
+            OpenSSL.crypto.FILETYPE_PEM, pck_certs[0].as_bytes()
+        )
+        intermediate_certs = map(
+            lambda cert: OpenSSL.crypto.load_certificate(
+                OpenSSL.crypto.FILETYPE_PEM, cert.as_bytes()
+            ),
+            pck_certs[1:],
+        )
+        context = OpenSSL.crypto.X509StoreContext(
+            trust_store, pck_x509, list(intermediate_certs)
+        )
         context.verify_certificate()
 
         # Verify that the QE REPORT signature
         cert = cryptography.x509.load_pem_x509_certificate(certificate)
         pubk_pem = cert.public_key().public_bytes(
             encoding=cryptography.hazmat.primitives.serialization.Encoding.PEM,
-            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
+            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo,
         )
         vk = VerifyingKey.from_pem(pubk_pem)
         vk.verify(quote[948:1012], quote[564:948], hashfunc=sha256)
@@ -293,15 +312,19 @@ class Verification:
         tcb_info_sign = bytearray.fromhex(tcb_info_dic["signature"])
 
         # Verify TCB Sign Cert
-        tcb_cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, dcap.tcbSignCert)
-        tcb_cert_context = OpenSSL.crypto.X509StoreContext(trust_store, tcb_cert, list(intermediate_certs))
+        tcb_cert = OpenSSL.crypto.load_certificate(
+            OpenSSL.crypto.FILETYPE_PEM, dcap.tcbSignCert
+        )
+        tcb_cert_context = OpenSSL.crypto.X509StoreContext(
+            trust_store, tcb_cert, list(intermediate_certs)
+        )
         tcb_cert_context.verify_certificate()
 
         # Verify signature over the tcb info body
         tcb_sign_cert = cryptography.x509.load_pem_x509_certificate(dcap.tcbSignCert)
         tcb_pubk_pem = tcb_sign_cert.public_key().public_bytes(
             encoding=cryptography.hazmat.primitives.serialization.Encoding.PEM,
-            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
+            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo,
         )
         tcb_vk = VerifyingKey.from_pem(tcb_pubk_pem)
         tcb_vk.verify(tcb_info_sign, tcb_info_body, hashfunc=sha256)
@@ -323,15 +346,19 @@ class Verification:
         qe_id_sign = bytearray.fromhex(qe_id_dic["signature"])
 
         # Verify the Qe Sign Cert
-        qe_cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, dcap.qeSignCert)
-        qe_cert_context = OpenSSL.crypto.X509StoreContext(trust_store, qe_cert, list(intermediate_certs))
+        qe_cert = OpenSSL.crypto.load_certificate(
+            OpenSSL.crypto.FILETYPE_PEM, dcap.qeSignCert
+        )
+        qe_cert_context = OpenSSL.crypto.X509StoreContext(
+            trust_store, qe_cert, list(intermediate_certs)
+        )
         qe_cert_context.verify_certificate()
 
         # Verify Signature over enclave identity
         qe_sign_cert = cryptography.x509.load_pem_x509_certificate(dcap.qeSignCert)
         qe_pubk_pem = qe_sign_cert.public_key().public_bytes(
             encoding=cryptography.hazmat.primitives.serialization.Encoding.PEM,
-            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo
+            format=cryptography.hazmat.primitives.serialization.PublicFormat.SubjectPublicKeyInfo,
         )
         qe_vk = VerifyingKey.from_pem(qe_pubk_pem)
         qe_vk.verify(qe_id_sign, qe_id_body, hashfunc=sha256)
@@ -360,9 +387,13 @@ class Verification:
         return quote
 
     def _verify_dcap(self, dcap: FatquoteDcap) -> bytes:
-        spec_type = self.attestation_specification.WhichOneof("attestation_specification")
+        spec_type = self.attestation_specification.WhichOneof(
+            "attestation_specification"
+        )
         if spec_type != "intelDcap":
-            raise Exception(f"Incompatible attestation specification, expected DCAP, got {spec_type}")
+            raise Exception(
+                f"Incompatible attestation specification, expected DCAP, got {spec_type}"
+            )
         spec_dcap = self.attestation_specification.intelDcap
         quote = self._verify_dcap_inner(dcap, spec_dcap)
 

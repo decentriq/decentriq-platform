@@ -1,12 +1,14 @@
 from __future__ import annotations
 import typing
 from typing import Dict, Literal, Optional, Union, Tuple, List
-from .client import Client, KeychainInstance
+
+# from .client import Client, KeychainInstance
 import cbor2
 import chily
 from base64 import b64encode
 
 KeychainEntryKind = Literal["dataset_key", "other_secret"]
+
 
 class KeychainEntry:
     kind: KeychainEntryKind
@@ -18,9 +20,11 @@ class KeychainEntry:
         self.key = key
         self.value = value
 
+
 class KeychainDecryptException(Exception):
     def __init__(self) -> None:
         super().__init__()
+
 
 class Keychain:
 
@@ -30,11 +34,11 @@ class Keychain:
     _keychain_instance: KeychainInstance
 
     def __init__(
-            self,
-            client: Client,
-            secret_wrapper: chily.SecretWrapper,
-            keychain_instance: KeychainInstance,
-            store: Dict[str, bytes],
+        self,
+        client: Client,
+        secret_wrapper: chily.SecretWrapper,
+        keychain_instance: KeychainInstance,
+        store: Dict[str, bytes],
     ):
         self._client = client
         self._store = store
@@ -64,26 +68,20 @@ class Keychain:
 
     @staticmethod
     def _encrypt_store_static(
-            user_email: str,
-            secret_wrapper: chily.SecretWrapper,
-            store: Dict[str, bytes]
+        user_email: str, secret_wrapper: chily.SecretWrapper, store: Dict[str, bytes]
     ) -> bytes:
         return secret_wrapper.wrap_secret(user_email, Keychain._serialize_store(store))
 
     def _encrypt_store(
-            self,
+        self,
     ):
         self._keychain_instance["encrypted"] = Keychain._encrypt_store_static(
-            self._client.user_email,
-            self._secret_wrapper,
-            self._store
+            self._client.user_email, self._secret_wrapper, self._store
         )
 
     @staticmethod
     def _decrypt_store_static(
-            user_email: str,
-            secret_wrapper: chily.SecretWrapper,
-            encrypted: bytes
+        user_email: str, secret_wrapper: chily.SecretWrapper, encrypted: bytes
     ) -> Dict[str, bytes]:
         try:
             decrypted = secret_wrapper.unwrap_secret(user_email, encrypted)
@@ -95,7 +93,7 @@ class Keychain:
         self._store = Keychain._decrypt_store_static(
             self._client.user_email,
             self._secret_wrapper,
-            self._keychain_instance["encrypted"]
+            self._keychain_instance["encrypted"],
         )
 
     def _set_keychain_instance(self, keychain_instance: KeychainInstance):
@@ -110,7 +108,9 @@ class Keychain:
     def _init_keychain_instance(client: Client) -> KeychainInstance:
         keychain_instance = client.get_keychain_instance()
         if not keychain_instance:
-            raise Exception("Cannot init Keychain, no instance exists in the server, create a new instance first")
+            raise Exception(
+                "Cannot init Keychain, no instance exists in the server, create a new instance first"
+            )
         return keychain_instance
 
     @staticmethod
@@ -120,22 +120,26 @@ class Keychain:
 
     @staticmethod
     def _create_new_keychain_with_secret_wrapper(
-            client: Client,
-            secret_wrapper: chily.SecretWrapper,
-            check_for_existing_keychain: bool = True
+        client: Client,
+        secret_wrapper: chily.SecretWrapper,
+        check_for_existing_keychain: bool = True,
     ) -> Optional[Keychain]:
         if check_for_existing_keychain and Keychain._has_keychain_instance(client):
             return None
         store: Dict[str, bytes] = {}
-        encrypted = secret_wrapper.wrap_secret(client.user_email, Keychain._serialize_store(store))
-        keychain_instance = client.create_keychain_instance(secret_wrapper.salt, encrypted)
+        encrypted = secret_wrapper.wrap_secret(
+            client.user_email, Keychain._serialize_store(store)
+        )
+        keychain_instance = client.create_keychain_instance(
+            secret_wrapper.salt, encrypted
+        )
         return Keychain(client, secret_wrapper, keychain_instance, store)
 
     @staticmethod
     def create_new_keychain(
-            client: Client,
-            password: bytes,
-            check_for_existing_keychain: bool = True,
+        client: Client,
+        password: bytes,
+        check_for_existing_keychain: bool = True,
     ) -> Optional[Keychain]:
         """
         Create a new keychain that is encrypted using the given password.
@@ -153,8 +157,8 @@ class Keychain:
 
     @staticmethod
     def get_or_create_unlocked_keychain(
-            client: Client,
-            password: bytes,
+        client: Client,
+        password: bytes,
     ) -> Keychain:
         """
         Get and unlock the user's keychain using the provided password.
@@ -187,9 +191,9 @@ class Keychain:
 
     @staticmethod
     def create_new_keychain_with_master_key(
-            client: Client,
-            master_key: bytes,
-            salt: str,
+        client: Client,
+        master_key: bytes,
+        salt: str,
     ) -> Optional[Keychain]:
         """
         Create a new keychain with the given master key.
@@ -212,8 +216,12 @@ class Keychain:
         method that will create the keychain if it does not exist already.
         """
         keychain_instance = Keychain._init_keychain_instance(client)
-        secret_wrapper = chily.SecretWrapper.with_master_key(master_key, keychain_instance["salt"])
-        store = Keychain._decrypt_store_static(client.user_email, secret_wrapper, keychain_instance["encrypted"])
+        secret_wrapper = chily.SecretWrapper.with_master_key(
+            master_key, keychain_instance["salt"]
+        )
+        store = Keychain._decrypt_store_static(
+            client.user_email, secret_wrapper, keychain_instance["encrypted"]
+        )
         return Keychain(client, secret_wrapper, keychain_instance, store)
 
     @staticmethod
@@ -228,13 +236,13 @@ class Keychain:
         method that will create the keychain if it does not exist already.
         """
         keychain_instance = Keychain._init_keychain_instance(client)
-        return Keychain._decrypt_store_with_password(client, keychain_instance, password)
+        return Keychain._decrypt_store_with_password(
+            client, keychain_instance, password
+        )
 
     @staticmethod
     def _decrypt_store_with_password(
-            client: Client,
-            keychain_instance: KeychainInstance,
-            password: bytes
+        client: Client, keychain_instance: KeychainInstance, password: bytes
     ) -> Keychain:
         secret_wrapper = chily.SecretWrapper.with_password(
             password, keychain_instance["salt"]
@@ -250,7 +258,9 @@ class Keychain:
             raise Exception("Keychain instance has not been created yet")
 
         if self._secret_wrapper.salt != keychain_instance["salt"]:
-            raise Exception("Keychain salt has changed upstream. Reinitialize Keychain with password first")
+            raise Exception(
+                "Keychain salt has changed upstream. Reinitialize Keychain with password first"
+            )
 
         if keychain_instance["casIndex"] != self._keychain_instance["casIndex"]:
             self._set_keychain_instance(keychain_instance)
@@ -276,7 +286,9 @@ class Keychain:
     def _insert_local(self, entry: KeychainEntry):
         ns_key = self._namespaced_key(entry.kind, entry.key)
         if self._store.get(ns_key):
-            raise Exception("Cannot insert new entry: an entry already exists for this (kind, key) pair")
+            raise Exception(
+                "Cannot insert new entry: an entry already exists for this (kind, key) pair"
+            )
         if entry.kind in ["dataset_key", "other_secret"]:
             self._store[ns_key] = entry.value
         else:
@@ -321,13 +333,19 @@ class Keychain:
             self._download()
 
     def change_password(self, new_password: bytes):
-        new_secret_wrapper = chily.SecretWrapper.with_password(new_password, self._secret_wrapper.salt)
+        new_secret_wrapper = chily.SecretWrapper.with_password(
+            new_password, self._secret_wrapper.salt
+        )
         return self.change_master_key(new_secret_wrapper.master_key)
 
     def change_master_key(self, new_master_key: bytes):
-        new_secret_wrapper = chily.SecretWrapper.with_master_key(new_master_key, self._secret_wrapper.salt)
+        new_secret_wrapper = chily.SecretWrapper.with_master_key(
+            new_master_key, self._secret_wrapper.salt
+        )
         while True:
-            new_keychain = Keychain(self._client, new_secret_wrapper, self._keychain_instance, self._store)
+            new_keychain = Keychain(
+                self._client, new_secret_wrapper, self._keychain_instance, self._store
+            )
             new_keychain._encrypt_store()
             if new_keychain._compare_and_swap():
                 self.__dict__.update(new_keychain.__dict__)

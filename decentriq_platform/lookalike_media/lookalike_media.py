@@ -11,7 +11,7 @@ from decentriq_dcr_compiler import (
     compiler,
     LookalikeMediaDataRoom,
     LookalikeMediaResponse,
-    LookalikeMediaRequest
+    LookalikeMediaRequest,
 )
 
 from ..client import Client
@@ -83,11 +83,10 @@ class LookalikeMediaDcr:
             (self.hl_lmdcr, self.id) = self._create_lmdcr(high_level_representation)
         self.overlap_insights_job = None
 
-
     @staticmethod
     def send_request(
-            lmdcr_request: LookalikeMediaRequest,
-            session: Session,
+        lmdcr_request: LookalikeMediaRequest,
+        session: Session,
     ) -> LookalikeMediaResponse:
         pki = session._get_message_pki(session.auth)
         endorsements = session.auth.endorsements
@@ -106,7 +105,6 @@ class LookalikeMediaDcr:
             lmdcr_request, serialised_response
         )
         return response
-
 
     def _create_lmdcr(
         self, high_level_representation: str

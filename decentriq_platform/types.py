@@ -1,23 +1,8 @@
-import hashlib
-from google.protobuf.json_format import MessageToDict
-
 from .storage import Key
-from .proto import AttestationSpecification, ComputeNodeProtocol, DriverTaskConfig
+from .proto import AttestationSpecification
 from typing import List, Dict, Optional, Any
 from typing_extensions import TypedDict
 from enum import Enum
-from .proto.length_delimited import parse_length_delimited
-from .proto.compute_sql_pb2 import SqlWorkerConfiguration
-from .container.proto.compute_container_pb2 import ContainerWorkerConfiguration
-
-
-__all__ = [
-    "EnclaveSpecification",
-    "JobId",
-    "DataRoomDescription",
-    "DatasetDescription",
-    "DatasetType",
-]
 
 
 class JobId:
@@ -370,3 +355,18 @@ class OverlapInsightsCacheKey(TypedDict):
     publisherDemographicsDatasetHash: Optional[str]
     publisherEmbeddingsDatasetHash: Optional[str]
     publishedDatasets: List[PublishedDataset]
+
+
+MATCHING_ID_INTERNAL_LOOKUP = {
+    MatchingId.STRING: (MatchingIdFormat.STRING, None),
+    MatchingId.EMAIL: (MatchingIdFormat.EMAIL, None),
+    MatchingId.HASHED_EMAIL: (
+        MatchingIdFormat.EMAIL,
+        TableColumnHashingAlgorithm.SHA256_HEX,
+    ),
+    MatchingId.PHONE_NUMBER: (MatchingIdFormat.PHONE_NUMBER_E164, None),
+    MatchingId.HASHED_PHONE_NUMBER: (
+        MatchingIdFormat.PHONE_NUMBER_E164,
+        TableColumnHashingAlgorithm.SHA256_HEX,
+    ),
+}

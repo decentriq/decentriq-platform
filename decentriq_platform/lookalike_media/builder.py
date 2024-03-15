@@ -1,18 +1,22 @@
 import base64
+import uuid
 from ..client import Client
 from typing import Optional, List
 from decentriq_dcr_compiler import compiler
 from ..types import MatchingId
 from ..keychain import Keychain
-from ..lookalike_media import LookalikeMediaDcr, ExistingLookalikeMediaDcr
+from .lookalike_media import LookalikeMediaDcr, ExistingLookalikeMediaDcr
 from ..proto import serialize_length_delimited
 import json
-from ..builders import DataRoomBuilder
 from ..helpers import (
     create_session_from_driver_spec,
     get_latest_enclave_specs_as_dictionary,
 )
-from ..lookup_tables import MATCHING_ID_INTERNAL_LOOKUP
+from ..types import MATCHING_ID_INTERNAL_LOOKUP
+
+
+def _generate_id():
+    return str(uuid.uuid4())
 
 
 class LookalikeMediaDcrBuilder:
@@ -139,7 +143,7 @@ class LookalikeMediaDcrBuilder:
             existing = ExistingLookalikeMediaDcr(self.lmdcr_id, driver_enclave_spec)
             return LookalikeMediaDcr(self.client, high_level_representation, existing)
         else:
-            id = f"Lookalike DCR {DataRoomBuilder._generate_id()}"
+            id = f"Lookalike DCR {_generate_id()}"
             root_cert_pem = self.client.decentriq_ca_root_certificate.decode()
             (driver_spec, python_spec) = self._get_lmdcr_enclave_specs(self.client)
             (

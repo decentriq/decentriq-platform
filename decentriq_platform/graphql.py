@@ -12,14 +12,14 @@ class GqlClient:
         self._path = path
 
     def post(self, query: str, variables={}, retry=None) -> dict:
-        request_payload = { "query": query }
+        request_payload = {"query": query}
         if variables:
             request_payload["variables"] = variables
         response = self._http_api.post(
             self._path,
             json.dumps(request_payload),
             {"Content-type": "application/json"},
-            retry=retry
+            retry=retry,
         )
         payload = response.json()
         if "errors" in payload:

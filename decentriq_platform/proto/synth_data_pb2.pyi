@@ -49,7 +49,7 @@ class Mask(google.protobuf.message.Message):
         ValueType = typing.NewType("ValueType", builtins.int)
         V: typing_extensions.TypeAlias = ValueType
 
-    class _MaskFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Mask._MaskFormat.ValueType], builtins.type):
+    class _MaskFormatEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[Mask._MaskFormat.ValueType], builtins.type):  # noqa: F821
         DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
         GENERIC_STRING: Mask._MaskFormat.ValueType  # 0
         GENERIC_NUMBER: Mask._MaskFormat.ValueType  # 1

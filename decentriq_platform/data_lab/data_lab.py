@@ -30,19 +30,9 @@ from ..helpers import (
     get_latest_enclave_specs_as_dictionary,
     create_session_from_driver_spec,
 )
-from ..lookup_tables import MATCHING_ID_INTERNAL_LOOKUP
+from ..types import MATCHING_ID_INTERNAL_LOOKUP
 from pathlib import Path
 
-__all__ = [
-    "MatchingId",
-    "provision_local_datasets",
-    "run",
-    "get_validation_report",
-    "get_statistics_report",
-    "provision_to_lookalike_media_data_room",
-    "DataLab",
-    "DataLabBuilder",
-]
 
 class Dataset:
     def __init__(self, manifest_hash: str, key: Key):
@@ -454,8 +444,10 @@ class DataLab:
 
         # Check DataLab and LMDCR are compatible.
         lmdcr_hl, lmdcr_session = self._get_lmdcr(data_room_id)
-        compatible = compiler.is_data_lab_compatible_with_lookalike_media_data_room_serialized(
-            self.hl_data_lab.json(), lmdcr_hl
+        compatible = (
+            compiler.is_data_lab_compatible_with_lookalike_media_data_room_serialized(
+                self.hl_data_lab.json(), lmdcr_hl
+            )
         )
         if not compatible:
             raise Exception("DataLab is incompatible with DCR")
