@@ -195,6 +195,7 @@ class AnalyticsDcrBuilder:
         nodes = [
             node._get_high_level_representation() for node in self.node_definitions
         ]
+        permissions = self._add_owner_permissions()
         hl_dcr = {
             DATA_SCIENCE_DCR_SUPPORTED_VERSION: {
                 # Only interactive DCRs are supported.
@@ -215,13 +216,27 @@ class AnalyticsDcrBuilder:
                         "enclaveSpecifications": self._get_hl_specs(),
                         "id": self._generate_id(),
                         "nodes": nodes,
-                        "participants": self.permissions,
+                        "participants": permissions,
                         "title": self.name,
                     },
                 }
             }
         }
         return AnalyticsDcrDefinition(name=self.name, high_level=hl_dcr)
+
+    def _add_owner_permissions(self):
+        for entry in self.permissions:
+            if entry["user"] == self.owner:
+                permissions = entry["permissions"]
+                permissions.append({"manager": {}})
+                entry["permissions"] = permissions
+                return self.permissions
+
+        # Entry wasn't found for existing user, so add a new one.
+        self.permissions.append(
+            {"user": self.owner, "permissions": [{"manager": {}}]}
+        )
+        return self.permissions
 
     def _get_hl_specs(self):
         specs = [
