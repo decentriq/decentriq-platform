@@ -23,7 +23,11 @@ amd_snp_ark_der = asn1crypto.pem.unarmor(amd_snp_ark_pem)[2]
 
 
 # From https://developers.cloudflare.com/time-services/roughtime/recipes/
+# See announcement about new server https://groups.google.com/a/chromium.org/g/proto-roughtime/c/vbmjoudG184/m/aXMLEAktBAAJ
+# old roughtime public key, valid until July 1st, 2024
 roughtime_public_key = base64.b64decode("gD63hSj3ScS+wuOeGrubXlq35N1c5Lby/S+T7MNTjxo=")
+# new roughtime public key
+new_roughtime_public_key = base64.b64decode("0GD7c3yP8xEc4Zl2zeuN2SlLvDVVocjsPSL8/Rl/7zg=")
 decentriq_root_ca_der = base64.b64decode(
     "MIIBPjCB46ADAgECAgEBMAwGCCqGSM49BAMCBQAwEjEQMA4GA1UEAwwHUm9vdCBDQTAgFw0yMzAxMDEwMDAwMDBaGA8yMDcwMDEwMTAwMDAwMFowEjEQMA4GA1UEAwwHUm9vdCBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOnqVIfFUOqBS5tt8g5srIRfFJkYl61kbOKaAH3gi1QICmItg69K5hdtye3loMCUNiQGSnqS/TeGJuXjTqGpsSWjJjAkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEAMAwGCCqGSM49BAMCBQADSAAwRQIgX9UM7iEie/2Q5YJiXYn8qHT/FlAOy593VKACQZcqMgsCIQDyxkeooGwU85ilwj0oJOXg4YF7ohVZOuKagomsThIFKg=="
 )
@@ -575,6 +579,21 @@ SPECIFICATIONS = {
                     "490c7043fd83a4cedf2ca9d6cf128d302b406b5f1a8172ed48afc3e231f15621ece52d97babb89322592018907eed6d3"
                 ),
                 roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.python-ml-worker-32-64:v23": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "9d13a27344d211698052b8cb911c7a7624b614a9b416ce617894d3c7238925d0cd0f152400e234d39103390d7d3aec68"
+                ),
+                roughtimePubKey=new_roughtime_public_key,
                 decentriqDer=decentriq_root_ca_der,
             )
         ),
