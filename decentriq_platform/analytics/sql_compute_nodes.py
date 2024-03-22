@@ -38,7 +38,8 @@ class SqlComputeNodeDefinition(NodeDefinition):
         **Parameters**:
         `name`: Name of the `SqlComputeNodeDefinition`.
         `query`: SQL query string.
-        `dependencies`: Nodes that the `SqlComputeNodeDefinition` depends on.
+        `dependencies`: Mappings between node id and the table name under
+          which they should be made available.
         `minimum_rows_count`: Minimum number of rows required by the `SqlComputeNodeDefinition`.
         `id`: Optional ID of the `SqlComputeNodeDefinition`.
         """

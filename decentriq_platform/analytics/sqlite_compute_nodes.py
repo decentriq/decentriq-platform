@@ -32,7 +32,8 @@ class SqliteComputeNodeDefinition(NodeDefinition):
         **Parameters**:
         - `name`: Name of the `SqliteComputeNodeDefinition`.
         - `query`: SQLite query string.
-        - `dependencies`: Nodes that the `SqliteComputeNodeSqliteComputeNodeDefinition` depends on.
+        - `dependencies`: Mappings between node id and the table name under
+          which they should be made available.
         - `enable_logs_on_error`: Enable logs in the event of an error.
         - `enable_logs_on_success`: Enable logs when the computation is successful.
         - `id`: Optional ID of the `SqliteComputeNodeDefinition`.
