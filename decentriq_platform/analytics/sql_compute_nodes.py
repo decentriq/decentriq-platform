@@ -13,12 +13,6 @@ from decentriq_dcr_compiler.schemas.data_science_data_room import (
 import json
 
 
-@dataclass
-class TableMapping:
-    node_id: str
-    table_name: str
-
-
 class SqlComputeNodeDefinition(NodeDefinition):
     """
     Class representing an SQL Computation Node Definition.
@@ -28,7 +22,7 @@ class SqlComputeNodeDefinition(NodeDefinition):
         self,
         name: str,
         query: str,
-        dependencies: Optional[List[TableMapping]] = None,
+        dependencies: Optional[List[str]] = None,
         minimum_rows_count: Optional[int] = None,
         id: Optional[str] = None,
     ) -> None:
@@ -38,8 +32,7 @@ class SqlComputeNodeDefinition(NodeDefinition):
         **Parameters**:
         `name`: Name of the `SqlComputeNodeDefinition`.
         `query`: SQL query string.
-        `dependencies`: Mappings between node id and the table name under
-          which they should be made available.
+        `dependencies`: Node ids that the SQL node depends on.
         `minimum_rows_count`: Minimum number of rows required by the `SqlComputeNodeDefinition`.
         `id`: Optional ID of the `SqlComputeNodeDefinition`.
         """
@@ -58,8 +51,8 @@ class SqlComputeNodeDefinition(NodeDefinition):
             for dependency in self.dependencies:
                 dependencies.append(
                     {
-                        "nodeId": dependency.node_id,
-                        "tableName": dependency.table_name,
+                        "nodeId": dependency,
+                        "tableName": dependency,
                     }
                 )
 
@@ -152,7 +145,7 @@ class SqlComputeNode(StructuredOutputNode):
         session: Session,
         node_definition: NodeDefinition,
         *,
-        dependencies: Optional[List[TableMapping]] = None,
+        dependencies: Optional[List[str]] = None,
         minimum_rows_count: Optional[int] = None,
     ) -> None:
         """

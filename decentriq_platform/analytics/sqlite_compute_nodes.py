@@ -4,7 +4,6 @@ from .high_level_node import StructuredOutputNode
 from typing import Dict, List, Optional
 from .node_definitions import NodeDefinition
 from ..session import Session
-from .sql_compute_nodes import TableMapping
 from typing_extensions import Self
 from decentriq_dcr_compiler.schemas.data_science_data_room import (
     SqliteComputationNode,
@@ -21,7 +20,7 @@ class SqliteComputeNodeDefinition(NodeDefinition):
         self,
         name: str,
         query: str,
-        dependencies: Optional[List[TableMapping]] = None,
+        dependencies: Optional[List[str]] = None,
         enable_logs_on_error: bool = False,
         enable_logs_on_success: bool = False,
         id: Optional[str] = None,
@@ -56,8 +55,8 @@ class SqliteComputeNodeDefinition(NodeDefinition):
             for dependency in self.dependencies:
                 dependencies.append(
                     {
-                        "nodeId": dependency.node_id,
-                        "tableName": dependency.table_name,
+                        "nodeId": dependency,
+                        "tableName": dependency,
                     }
                 )
         computation_node = {
@@ -145,7 +144,7 @@ class SqliteComputeNode(StructuredOutputNode):
         client: Client,
         session: Session,
         node_definition: NodeDefinition,
-        dependencies: Optional[List[TableMapping]] = None,
+        dependencies: Optional[List[str]] = None,
         enable_logs_on_error: bool = False,
         enable_logs_on_success: bool = False,
     ) -> None:

@@ -19,7 +19,6 @@ from .table_data_nodes import (
 from .sql_compute_nodes import (
     SqlComputeNode,
     SqlComputeNodeDefinition,
-    TableMapping,
 )
 from .sqlite_compute_nodes import (
     SqliteComputeNode,
@@ -98,7 +97,6 @@ __all__ = [
     "SqlComputeNodeDefinition",
     "SqliteComputeNode",
     "SqliteComputeNodeDefinition",
-    "TableMapping",
     "S3SinkComputeNode",
     "S3SinkComputeNodeDefinition",
     "S3Provider",
