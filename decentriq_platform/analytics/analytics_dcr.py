@@ -72,6 +72,18 @@ class AnalyticsDcr:
                 return node
         return None
 
+    def retrieve_audit_log(self) -> str:
+        """
+        Retrieve the Analytics DCR audit log.
+        """
+        return self.session.retrieve_audit_log(self.id).log.decode("utf-8")
+
+    def stop(self):
+        """
+        Stop the Analytics DCR.
+        """
+        self.session.stop_data_room(self.id)
+
     @staticmethod
     def _from_existing(
         dcr_id: str,
