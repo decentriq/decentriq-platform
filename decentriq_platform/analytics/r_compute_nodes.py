@@ -43,7 +43,7 @@ class RComputeNodeDefinition(NodeDefinition):
         self.enable_logs_on_error = enable_logs_on_error
         self.enable_logs_on_success = enable_logs_on_success
         self.output = output
-        self.scripting_specification_id = "decentriq.r-latex-worker-32-32"
+        self.scripting_specification_id = "decentriq.r-ml-worker-32-32"
         self.static_content_specification_id = "decentriq.driver"
 
     def _get_high_level_representation(self) -> Dict[str, str]:
@@ -200,7 +200,7 @@ class RComputeNode(ContainerComputationNode):
         self.enable_logs_on_error = enable_logs_on_error
         self.enable_logs_on_success = enable_logs_on_success
         self.output = output
-        self.scripting_specification_id = "decentriq.r-latex-worker-32-32"
+        self.scripting_specification_id = "decentriq.r-ml-worker-32-32"
         self.static_content_specification_id = "decentriq.driver"
 
     def _get_computation_id(self) -> str:
