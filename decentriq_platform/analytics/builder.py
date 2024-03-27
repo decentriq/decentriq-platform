@@ -222,7 +222,7 @@ class AnalyticsDcrBuilder:
                 }
             }
         }
-        return AnalyticsDcrDefinition(name=self.name, high_level=hl_dcr)
+        return AnalyticsDcrDefinition(name=self.name, high_level=hl_dcr, enclave_specs=self.enclave_specs)
 
     def _add_owner_permissions(self):
         for entry in self.permissions:
