@@ -1524,7 +1524,11 @@ class Client:
         parse_length_delimited(compiled_data_room.data_room, low_level_data_room)
 
         # Get a new session
-        specs = enclave_specs if enclave_specs else enclave_specifications.latest()
+        # Determine which driver enclave spec (as given by the enclave_specs value)
+        # to use. If this is not explicitly specified, try to check whether it was
+        # already set on the builder that constructed the DCR definition.
+        # If this is also not specified, simply use the latest specifications known to this SDK.
+        specs = enclave_specs or dcr_definition.enclave_specs or enclave_specifications.latest()
         auth, _ = self.create_auth_using_decentriq_pki(specs)
         session = self.create_session(auth, specs)
 

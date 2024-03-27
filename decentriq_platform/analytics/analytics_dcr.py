@@ -15,9 +15,14 @@ class AnalyticsDcrDefinition:
     A class representing an Analytics DCR Definition.
     """
 
-    def __init__(self, name: str, high_level: Dict[str, Any]) -> None:
+    def __init__(
+        self, name: str,
+        high_level: Dict[str, Any],
+        enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
+    ) -> None:
         self.name = name
         self.high_level = high_level
+        self.enclave_specs = enclave_specs
 
     def _get_high_level_representation(self) -> Dict[str, Any]:
         return self.high_level
