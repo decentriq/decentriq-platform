@@ -10,11 +10,13 @@ __all__ = ["Key"]
 
 KEY_LEN = 32
 
-class Key():
+
+class Key:
     """
     This class wraps the key material that is used to encrypt the
     files that are uploaded to the decentriq platform.
     """
+
     material: bytes
 
     def __init__(self, material: Optional[bytes] = None):
@@ -29,7 +31,10 @@ class Key():
             key_bytes = material
         self.material = key_bytes
 
-def create_chunk_header(extra_entropy: bytes, content_size: Optional[int], chunk_content_sizes: List[int]) -> bytes:
+
+def create_chunk_header(
+    extra_entropy: bytes, content_size: Optional[int], chunk_content_sizes: List[int]
+) -> bytes:
     chunk_header = ChunkHeader()
     chunk_header.extraEntropy = extra_entropy
     if content_size is not None:
@@ -45,13 +50,14 @@ def create_version_header() -> bytes:
     version_header.version = 0
     return serialize_length_delimited(version_header)
 
+
 # Returns (integrity hash, encrypted blob)
 def create_encrypted_chunk(
-        key: bytes,
-        extra_entropy: bytes,
-        data: bytes,
-        content_size: Optional[int],
-        chunk_content_sizes: List[int],
+    key: bytes,
+    extra_entropy: bytes,
+    data: bytes,
+    content_size: Optional[int],
+    chunk_content_sizes: List[int],
 ) -> Tuple[bytes, bytes]:
     chunk_bytes = []
 
@@ -63,7 +69,7 @@ def create_encrypted_chunk(
 
     chunk_bytes.append(data)
 
-    chunk = b''.join(chunk_bytes)
+    chunk = b"".join(chunk_bytes)
     chunk_hasher = sha256()
     chunk_hasher.update(chunk)
     chunk_hash = chunk_hasher.digest()
@@ -72,6 +78,7 @@ def create_encrypted_chunk(
     encrypted_chunk = cipher.encrypt(chunk)
 
     return chunk_hash, encrypted_chunk
+
 
 class Chunker(Iterator):
     def __init__(self, input_stream: BinaryIO, chunk_size: int):
@@ -86,7 +93,9 @@ class Chunker(Iterator):
     # returns (hash, chunk, chunk content size)
     def __next__(self) -> Tuple[bytes, bytes, int]:
         version_header_bytes = create_version_header()
-        chunk_header_bytes = create_chunk_header(os.urandom(16), content_size=None, chunk_content_sizes=[])
+        chunk_header_bytes = create_chunk_header(
+            os.urandom(16), content_size=None, chunk_content_sizes=[]
+        )
 
         # Does not account for header size
         chunk_bytes = [version_header_bytes, chunk_header_bytes]
@@ -98,14 +107,14 @@ class Chunker(Iterator):
             raise StopIteration
         chunk_bytes.append(input_chunk_bytes)
 
-        chunk = b''.join(chunk_bytes)
+        chunk = b"".join(chunk_bytes)
         chunk_hasher = sha256()
         chunk_hasher.update(chunk)
         chunk_hash = chunk_hasher.digest()
         return chunk_hash, chunk, chunk_content_size
 
 
-class StorageCipher():
+class StorageCipher:
     def __init__(self, symmetric_key: bytes):
         self.enc_key = symmetric_key
         self.cipher: chily.Cipher = chily.Cipher.from_symmetric(self.enc_key)
@@ -118,5 +127,7 @@ class StorageCipher():
         encryption_header.chilyKey.encryptionNonce = bytes(nonce.bytes)
 
         serialized_encryption_header = serialize_length_delimited(encryption_header)
-        encrypted_data_with_header = bytes(list(serialized_encryption_header) + encrypted_data)
+        encrypted_data_with_header = bytes(
+            list(serialized_encryption_header) + encrypted_data
+        )
         return encrypted_data_with_header

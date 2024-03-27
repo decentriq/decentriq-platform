@@ -1,24 +1,10 @@
 import base64
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from .types import EnclaveSpecification
-from .compute import GcgDriverDecoder
-from .post.compute import PostWorkerDecoder
-from .sql.compute import SqlWorkerDecoder
-from .container.compute import ContainerWorkerDecoder
-from .s3_sink.compute import S3SinkWorkerDecoder
-from .salesforce import DataSourceSalesforceWorkerDecoder
-from .dataset_sink import DatasetSinkWorkerDecoder
-from .meta_sink import MetaSinkWorkerDecoder
-from .google_ad_manager import GoogleAdManagerWorkerDecoder
-from .google_dv_360_sink import GoogleDv360SinkWorkerDecoder
-from .azure_blob_storage import AzureBlobStorageWorkerDecoder
-from .data_source_s3 import DataSourceS3WorkerDecoder
-from .permutive import PermutiveWorkerDecoder
-from .data_source_snowflake import DataSourceSnowflakeWorkerDecoder
+from .decoder import *
 from .proto import (
     AttestationSpecification,
     AttestationSpecificationIntelDcap,
-    AttestationSpecificationAwsNitro,
     AttestationSpecificationAmdSnp,
 )
 import asn1crypto.pem
@@ -37,8 +23,14 @@ amd_snp_ark_der = asn1crypto.pem.unarmor(amd_snp_ark_pem)[2]
 
 
 # From https://developers.cloudflare.com/time-services/roughtime/recipes/
+# See announcement about new server https://groups.google.com/a/chromium.org/g/proto-roughtime/c/vbmjoudG184/m/aXMLEAktBAAJ
+# old roughtime public key, valid until July 1st, 2024
 roughtime_public_key = base64.b64decode("gD63hSj3ScS+wuOeGrubXlq35N1c5Lby/S+T7MNTjxo=")
-decentriq_root_ca_der = base64.b64decode("MIIBPjCB46ADAgECAgEBMAwGCCqGSM49BAMCBQAwEjEQMA4GA1UEAwwHUm9vdCBDQTAgFw0yMzAxMDEwMDAwMDBaGA8yMDcwMDEwMTAwMDAwMFowEjEQMA4GA1UEAwwHUm9vdCBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOnqVIfFUOqBS5tt8g5srIRfFJkYl61kbOKaAH3gi1QICmItg69K5hdtye3loMCUNiQGSnqS/TeGJuXjTqGpsSWjJjAkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEAMAwGCCqGSM49BAMCBQADSAAwRQIgX9UM7iEie/2Q5YJiXYn8qHT/FlAOy593VKACQZcqMgsCIQDyxkeooGwU85ilwj0oJOXg4YF7ohVZOuKagomsThIFKg==")
+# new roughtime public key
+new_roughtime_public_key = base64.b64decode("0GD7c3yP8xEc4Zl2zeuN2SlLvDVVocjsPSL8/Rl/7zg=")
+decentriq_root_ca_der = base64.b64decode(
+    "MIIBPjCB46ADAgECAgEBMAwGCCqGSM49BAMCBQAwEjEQMA4GA1UEAwwHUm9vdCBDQTAgFw0yMzAxMDEwMDAwMDBaGA8yMDcwMDEwMTAwMDAwMFowEjEQMA4GA1UEAwwHUm9vdCBDQTBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOnqVIfFUOqBS5tt8g5srIRfFJkYl61kbOKaAH3gi1QICmItg69K5hdtye3loMCUNiQGSnqS/TeGJuXjTqGpsSWjJjAkMA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEAMAwGCCqGSM49BAMCBQADSAAwRQIgX9UM7iEie/2Q5YJiXYn8qHT/FlAOy593VKACQZcqMgsCIQDyxkeooGwU85ilwj0oJOXg4YF7ohVZOuKagomsThIFKg=="
+)
 
 SPECIFICATIONS = {
     "decentriq.driver:v10": EnclaveSpecification(
@@ -211,6 +203,23 @@ SPECIFICATIONS = {
         decoder=GcgDriverDecoder(),
         clientProtocols=[6],
     ),
+    "decentriq.driver:v21": EnclaveSpecification(
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "ae290dfdee2759066341697af5441993ff6df00359be52439c551c37416f77e1"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                accept_debug=False,
+                accept_out_of_date=False,
+                accept_configuration_needed=False,
+                accept_revoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[6],
+    ),
     "decentriq.sql-worker:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
@@ -339,11 +348,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -360,11 +379,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -381,11 +410,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -402,12 +441,24 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
-                    bytes.fromhex("7102b9671cb139729cf41529cffbd45504c2a644947d56c53ec187e6cdde1d4b136a58958049c6d081362d5c4eac518ba6cbce73fba66d56a288b4b26b36c6f3"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
+                    bytes.fromhex(
+                        "7102b9671cb139729cf41529cffbd45504c2a644947d56c53ec187e6cdde1d4b136a58958049c6d081362d5c4eac518ba6cbce73fba66d56a288b4b26b36c6f3"
+                    ),
                 ],
             )
         ),
@@ -520,6 +571,36 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-ml-worker-32-64:v22": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "490c7043fd83a4cedf2ca9d6cf128d302b406b5f1a8172ed48afc3e231f15621ece52d97babb89322592018907eed6d3"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.python-ml-worker-32-64:v23": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "9d13a27344d211698052b8cb911c7a7624b614a9b416ce617894d3c7238925d0cd0f152400e234d39103390d7d3aec68"
+                ),
+                roughtimePubKey=new_roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
@@ -529,11 +610,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -550,11 +641,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -622,6 +723,36 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-synth-data-worker-32-64:v17": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "26a9c458b2326c4dc63ec619429590da0d9a38a25ba51a759cb3e04cd744e045bf9ca091dc484c0c1b304fc23b689fba"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.python-synth-data-worker-32-64:v18": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "7c15aafecef3fa78b0e9b1b195b96bb1c00d445e8914ba0243ff66619de346d06e40a95e06b1934c5e3d4ed37686e053"
+                ),
+                roughtimePubKey=new_roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.r-latex-worker-32-32:v10": EnclaveSpecification(
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
@@ -631,11 +762,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -652,11 +793,21 @@ SPECIFICATIONS = {
                 ),
                 roughtimePubKey=roughtime_public_key,
                 authorizedChipIds=[
-                    bytes.fromhex("372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"),
-                    bytes.fromhex("ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"),
-                    bytes.fromhex("86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"),
-                    bytes.fromhex("7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"),
-                    bytes.fromhex("02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"),
+                    bytes.fromhex(
+                        "372499d1b652b98aa1cde6d146136ad2b3e8f93b8223c367087577a73b76813928ad25545327032f7dc44a288965eb8e7f16179dbdb3a71fddc36cc19478ce47"
+                    ),
+                    bytes.fromhex(
+                        "ce8a61aea3f76bbdd05706bcbfb4ade4c65b33ad41f49d0e89dec177951117d247781a3195de2e85399b7117d9eee2f6f2c2e5d21064a4d7e2815380212f0937"
+                    ),
+                    bytes.fromhex(
+                        "86185338a275af6b5e26e06a21b4e0c65db0fc9033e4a24e27cb528321726dc152f28b08c05493c48e8fba3047aba6f0a0dd01d3eebb055b3318c1029c0a74ee"
+                    ),
+                    bytes.fromhex(
+                        "7d2e30af8f43cc6de4e6c3ee59a7ab0d9ddfbff4caba3de0e54430215bd640c571d0e4b49d0cd1502fa74ae8a59475fe06dd9e7635500d584478e13f1191dc27"
+                    ),
+                    bytes.fromhex(
+                        "02926acb4dab55b176946d75e5955154b11269dd8bfe7ff7bcd162b26ea47d8b9557bebd927e90667e34e6dbf9f1bb3bff4bdd36f41d2b755cccabf50270e324"
+                    ),
                 ],
             )
         ),
@@ -717,6 +868,36 @@ SPECIFICATIONS = {
                     "dfecd4a6642efca9fdf5720711b490b996b1526bd2a24e42f12d67d772641653119745f8c679a5a27c10bf0b06331a8b"
                 ),
                 roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.r-latex-worker-32-32:v17": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "7f212fb3d7d60c74438d12edfa2e17212a05a6906b881ab7153e2c85bb9235d0ef167c858dcddd89050838bc4e57df49"
+                ),
+                roughtimePubKey=roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.r-ml-worker-32-32:v1": EnclaveSpecification(
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "8ad29c4692d73649da5509b25675ba92d500b8d09f149f3bc7dfac6e8eb8abd8f14cd298264449aaa8bf41134ca91aad"
+                ),
+                roughtimePubKey=new_roughtime_public_key,
                 decentriqDer=decentriq_root_ca_der,
             )
         ),
@@ -1461,6 +1642,20 @@ class EnclaveSpecifications:
             enclave_type = version.split(":")[0]
             selected_specifications[enclave_type] = self.specifications[version]
         return selected_specifications
+
+    def latest(self) -> Dict[str, EnclaveSpecification]:
+        """Select the latest specification of each enclave type"""
+        latest_spec_by_type = {}
+        latest_version_by_type = {}
+        for enclave_identifier in self.specifications:
+            enclave_type, enclave_version = enclave_identifier.split(":")
+            previous_version = latest_version_by_type.get(enclave_type)
+            if previous_version is None or previous_version < enclave_version:
+                latest_spec_by_type[enclave_type] = self.specifications[
+                    enclave_identifier
+                ]
+                latest_version_by_type[enclave_type] = enclave_version
+        return latest_spec_by_type
 
     def all(self) -> List[EnclaveSpecification]:
         """Get a list of all available enclave specifications."""
