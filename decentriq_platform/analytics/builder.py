@@ -1,16 +1,14 @@
 from __future__ import annotations
 
 import base64
+import functools
 from enum import Enum
 from typing import Dict, List, Optional
 from typing_extensions import Self
 import uuid
 from ..attestation import enclave_specifications
-from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
 from ..session import (
     LATEST_WORKER_PROTOCOL_VERSION,
-    Session,
 )
 from ..proto.length_delimited import serialize_length_delimited
 from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
@@ -31,6 +29,22 @@ class AnalyticsDcrType(str, Enum):
 class ParticipantPermission(Enum):
     DATA_OWNER = 1
     ANALYST = 2
+
+
+def _get_hl_specs(enclave_specs: Dict[str, EnclaveSpecification]):
+    specs = [
+        {
+            "attestationProtoBase64": base64.b64encode(
+                serialize_length_delimited(spec["proto"])
+            ).decode(),
+            "id": name,
+            "workerProtocol": spec.get(
+                "workerProtocol", LATEST_WORKER_PROTOCOL_VERSION
+            ),
+        }
+        for name, spec in enclave_specs.items()
+    ]
+    return specs
 
 
 class AnalyticsDcrBuilder:
@@ -195,6 +209,21 @@ class AnalyticsDcrBuilder:
         nodes = [
             node._get_high_level_representation() for node in self.node_definitions
         ]
+        required_workers = functools.reduce(
+            lambda a, b: a.union(b),
+            [set(node.required_workers) for node in self.node_definitions],
+            {"decentriq.driver"},
+        )
+        used_enclave_specs = {}
+        for worker in required_workers:
+            if worker in self.enclave_specs:
+                used_enclave_specs[worker] = self.enclave_specs[worker]
+            else:
+                raise Exception(
+                    f"One of the nodes you added requires a worker of type '{worker}',"
+                    " but no enclave specification matching this worker is known to this builder."
+                )
+        used_hl_enclave_specs = _get_hl_specs(used_enclave_specs)
         permissions = self._add_owner_permissions()
         hl_dcr = {
             DATA_SCIENCE_DCR_SUPPORTED_VERSION: {
@@ -213,7 +242,7 @@ class AnalyticsDcrBuilder:
                         "enableSqliteWorker": False,
                         "enableTestDatasets": False,
                         "enclaveRootCertificatePem": self.client.decentriq_ca_root_certificate.decode(),
-                        "enclaveSpecifications": self._get_hl_specs(),
+                        "enclaveSpecifications": used_hl_enclave_specs,
                         "id": self._generate_id(),
                         "nodes": nodes,
                         "participants": permissions,
@@ -222,7 +251,9 @@ class AnalyticsDcrBuilder:
                 }
             }
         }
-        return AnalyticsDcrDefinition(name=self.name, high_level=hl_dcr, enclave_specs=self.enclave_specs)
+        return AnalyticsDcrDefinition(
+            name=self.name, high_level=hl_dcr, enclave_specs=self.enclave_specs
+        )
 
     def _add_owner_permissions(self):
         for entry in self.permissions:
@@ -233,23 +264,8 @@ class AnalyticsDcrBuilder:
                 return self.permissions
 
         # Entry wasn't found for existing user, so add a new one.
-        self.permissions.append(
-            {"user": self.owner, "permissions": [{"manager": {}}]}
-        )
+        self.permissions.append({"user": self.owner, "permissions": [{"manager": {}}]})
         return self.permissions
-
-    def _get_hl_specs(self):
-        specs = [
-            {
-                "attestationProtoBase64": base64.b64encode(
-                    serialize_length_delimited(spec["proto"])
-                ).decode(),
-                "id": name,
-                "workerProtocol": LATEST_WORKER_PROTOCOL_VERSION,
-            }
-            for name, spec in self.enclave_specs.items()
-        ]
-        return specs
 
     @staticmethod
     def _generate_id():

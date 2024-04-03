@@ -87,6 +87,10 @@ class PythonComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
+    @property
+    def required_workers(self):
+        return [self.scripting_specification_id, self.static_content_specification_id]
+
     def _from_high_level(
         id: str,
         name: str,

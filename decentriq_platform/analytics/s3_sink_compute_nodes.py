@@ -50,6 +50,10 @@ class S3SinkComputeNodeDefinition(NodeDefinition):
         self.provider = provider
         self.specification_id = "decentriq.s3-sink-worker"
 
+    @property
+    def required_workers(self):
+        return [self.specification_id]
+
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
         Retrieve the high level representation of the `S3SinkComputeNodeDefinition`.

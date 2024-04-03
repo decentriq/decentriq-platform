@@ -27,7 +27,6 @@ class KeychainDecryptException(Exception):
 
 
 class Keychain:
-
     _client: Client
     _store: Dict[str, bytes]
     _secret_wrapper: chily.SecretWrapper

@@ -104,6 +104,8 @@ class TableDataNodeDefinition(NodeDefinition):
         super().__init__(name, id=id or name)
         self.is_required = is_required
         self.columns = columns
+        self.specification_id = "decentriq.python-ml-worker-32-64"
+        self.static_content_specification_id = "decentriq.driver"
 
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
@@ -141,8 +143,8 @@ class TableDataNodeDefinition(NodeDefinition):
                         "table": {
                             "columns": column_entries,
                             "validationNode": {
-                                "staticContentSpecificationId": "decentriq.driver",
-                                "pythonSpecificationId": "decentriq.python-ml-worker-32-64",
+                                "staticContentSpecificationId": self.static_content_specification_id,
+                                "pythonSpecificationId": self.specification_id,
                                 "validation": {},
                             },
                         }
@@ -151,6 +153,10 @@ class TableDataNodeDefinition(NodeDefinition):
             },
         }
         return table_node
+
+    @property
+    def required_workers(self):
+        return [self.static_content_specification_id, self.specification_id]
 
     @staticmethod
     def _from_high_level(

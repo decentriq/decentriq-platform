@@ -3,6 +3,7 @@ from google.protobuf.message import Message
 from google.protobuf.internal.encoder import _VarintBytes  # type: ignore
 from google.protobuf.internal.decoder import _DecodeVarint32  # type: ignore
 
+
 # Returns the end offset from serialized_bytes
 def parse_length_delimited(
     serialized_bytes: bytes, deserialized_object: Message

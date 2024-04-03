@@ -16,7 +16,8 @@ class AnalyticsDcrDefinition:
     """
 
     def __init__(
-        self, name: str,
+        self,
+        name: str,
         high_level: Dict[str, Any],
         enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
     ) -> None:

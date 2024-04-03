@@ -46,6 +46,10 @@ class RComputeNodeDefinition(NodeDefinition):
         self.scripting_specification_id = "decentriq.r-ml-worker-32-32"
         self.static_content_specification_id = "decentriq.driver"
 
+    @property
+    def required_workers(self):
+        return [self.scripting_specification_id, self.static_content_specification_id]
+
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
         Retrieve the high level representation of the `RComputeNodeDefinition`.

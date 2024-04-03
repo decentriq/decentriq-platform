@@ -42,6 +42,10 @@ class SqlComputeNodeDefinition(NodeDefinition):
         self.minimum_rows_count = minimum_rows_count
         self.specification_id = "decentriq.sql-worker"
 
+    @property
+    def required_workers(self):
+        return [self.specification_id]
+
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
         Retrieve the high level representation of the `SqlComputeNodeDefinition`.

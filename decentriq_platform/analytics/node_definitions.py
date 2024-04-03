@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import re
-from typing import Dict, Union
+from typing import Dict, Union, List
 from abc import ABC, abstractmethod
 from .high_level_node import ComputationNode, DataNode
 
 
-_valid_node_name_pattern = re.compile(r"^([a-zA-Z]|[a-zA-Z][a-zA-Z0-9_ -]*[a-zA-Z0-9])$")
+_valid_node_name_pattern = re.compile(
+    r"^([a-zA-Z]|[a-zA-Z][a-zA-Z0-9_ -]*[a-zA-Z0-9])$"
+)
 
 
 class NodeDefinition(ABC):
@@ -39,4 +41,11 @@ class NodeDefinition(ABC):
         client: Client,
         session: Session,
     ) -> Union[ComputationNode, DataNode]:
+        pass
+
+    @property
+    @abstractmethod
+    def required_workers(
+        self,
+    ) -> List[str]:
         pass
