@@ -31,7 +31,6 @@ class PreviewComputeNodeDefinition(NodeDefinition):
         """
         super().__init__(name=name, id=id or name)
         self.quota_bytes = quota_bytes
-        self.specification_id = "decentriq.python-ml-worker-32-64"
         self.dependency = dependency
 
     def _get_high_level_representation(self) -> Dict[str, str]:
@@ -70,6 +69,10 @@ class PreviewComputeNodeDefinition(NodeDefinition):
             dependency=preview_node["dependency"],
             quota_bytes=preview_node["quotaBytes"],
         )
+
+    @property
+    def required_workers(self):
+        return ["decentriq.driver"]
 
     def build(
         self,
@@ -140,7 +143,6 @@ class PreviewComputeNode(ComputationNode):
         )
         self.dependency = dependency
         self.quota_bytes = quota_bytes
-        self.specification_id = "decentriq.python-ml-worker-32-64"
         self.node_definition = node_definition
 
     def _get_computation_id(self) -> str:

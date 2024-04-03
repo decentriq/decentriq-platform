@@ -1528,7 +1528,11 @@ class Client:
         # to use. If this is not explicitly specified, try to check whether it was
         # already set on the builder that constructed the DCR definition.
         # If this is also not specified, simply use the latest specifications known to this SDK.
-        specs = enclave_specs or dcr_definition.enclave_specs or enclave_specifications.latest()
+        specs = (
+            enclave_specs
+            or dcr_definition.enclave_specs
+            or enclave_specifications.latest()
+        )
         auth, _ = self.create_auth_using_decentriq_pki(specs)
         session = self.create_session(auth, specs)
 

@@ -58,6 +58,10 @@ class RawDataNodeDefinition(NodeDefinition):
             is_required=is_required,
         )
 
+    @property
+    def required_workers(self):
+        return []
+
     def build(
         self,
         dcr_id: str,

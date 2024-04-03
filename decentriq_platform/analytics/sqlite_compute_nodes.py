@@ -46,6 +46,10 @@ class SqliteComputeNodeDefinition(NodeDefinition):
         self.specification_id = "decentriq.python-ml-worker-32-64"
         self.static_content_specification_id = "decentriq.driver"
 
+    @property
+    def required_workers(self):
+        return [self.static_content_specification_id, self.specification_id]
+
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
         Retrieve the high level representation of the `SqliteComputeNodeDefinition`.
