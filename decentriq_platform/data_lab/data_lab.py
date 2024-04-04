@@ -32,6 +32,13 @@ from ..helpers import (
 )
 from ..types import MATCHING_ID_INTERNAL_LOOKUP
 from pathlib import Path
+from decentriq_dcr_compiler.schemas import MediaInsightsRequest, MediaInsightsResponse
+from ..proto import (
+    parse_length_delimited,
+    serialize_length_delimited,
+    UserAuth,
+    GcgRequest,
+)
 
 
 class Dataset:
@@ -376,9 +383,9 @@ class DataLab:
             result = session.get_computation_result(job_id, timeout=timeout)
             zip = zipfile.ZipFile(io.BytesIO(result), "r")
             if "validation-report.json" in zip.namelist():
-                validation_reports[
-                    node.removesuffix("_validation_report")
-                ] = json.loads(zip.read("validation-report.json").decode())
+                validation_reports[node.removesuffix("_validation_report")] = (
+                    json.loads(zip.read("validation-report.json").decode())
+                )
         return validation_reports
 
     def get_statistics_report(self, timeout: int = None):
@@ -423,6 +430,106 @@ class DataLab:
             return report
         else:
             raise Exception("Failed to retrieve statistics")
+
+    def provision_to_media_insights_data_room(
+        self, data_room_id: str, keychain: Keychain
+    ):
+        """
+        Provision the DataLab to the DCR with the given ID.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision the DataLab to.
+        - `keychain`: Keychain to use to provision the datasets.
+        """
+        # DataLab must be validated before it can be provisioned.
+        if not self._validated():
+            # Retrieve and store the statistics. This will validate the DataLab.
+            self.get_statistics_report()
+            # Check again if the DataLab is validated.
+            if not self._validated():
+                raise Exception("Can't provision to DCR. DataLab not validated.")
+
+        # Check compatibility.
+        midcr_hl, midcr_session = self._get_midcr(data_room_id)
+        compatible = compiler.is_data_lab_compatible_with_media_insights_dcr_serialized(
+            self.hl_data_lab.json(), midcr_hl
+        )
+        if not compatible:
+            raise Exception("DataLab is incompatible with DCR")
+
+        data_lab = self.client.get_data_lab(self.data_lab_id)
+        data_lab_datasets = self._get_data_lab_datasets_dict(data_lab)
+        # Provision all existing Data Lab datasets to the DCR.
+        for dataset_type, dataset in data_lab_datasets.items():
+            if not dataset:
+                # Dataset was not provisioned to the Data Lab.
+                continue
+            manifest_hash = dataset["manifestHash"]
+            encryption_key = keychain.get("dataset_key", manifest_hash)
+            if dataset_type == "MATCHING_DATA":
+                request_key = "publishPublisherUsersDataset"
+            elif dataset_type == "SEGMENTS_DATA":
+                request_key = "publishSegmentsDataset"
+            elif dataset_type == "DEMOGRAPHICS_DATA":
+                request_key = "publishDemographicsDataset"
+            elif dataset_type == "EMBEDDINGS_DATA":
+                request_key = "publishEmbeddingsDataset"
+            else:
+                raise Exception(
+                    f"Failed to provision Data Lab. Dataset type '{dataset_type}' unknown."
+                )
+            self._send_publish_dataset_request(
+                request_key, manifest_hash, encryption_key, midcr_session, data_room_id
+            )
+
+    def _send_publish_dataset_request(
+        self,
+        request_key: str,
+        manifest_hash: str,
+        encryption_key: KeychainEntry,
+        session: Session,
+        data_room_id: str,
+    ):
+        scope_id = self.client._ensure_dcr_data_scope(data_room_id)
+        request_content = {
+            "dataRoomIdHex": data_room_id,
+            "datasetHashHex": manifest_hash,
+            "encryptionKeyHex": encryption_key.value.hex(),
+            "scopeIdHex": scope_id,
+        }
+        request = MediaInsightsRequest.model_validate(
+            {
+                request_key: request_content,
+            }
+        )
+        response = self._send_request(request, session)
+        if request_key not in response.model_dump_json():
+            raise Exception(f'Failed to publish "{request_key}"')
+
+    def _send_request(
+        self, request: MediaInsightsRequest, session: Session
+    ) -> MediaInsightsResponse:
+        pki = session._get_message_pki(session.auth)
+        endorsements = session.auth.endorsements
+        auth = UserAuth(pki=pki, enclaveEndorsements=endorsements)
+        request_serialized = compiler.compile_media_insights_request(
+            request,
+            serialize_length_delimited(auth),
+        )
+        gcg_request = GcgRequest()
+        parse_length_delimited(request_serialized, gcg_request)
+        # TODO: The `endpoint_protocols` should come from DDC as it knows
+        # the appropriate supported versions.
+        endpoint_protocols = [3, 4, 5, 6]
+        protocol = session._get_client_protocol(endpoint_protocols)
+        responses = session.send_request(gcg_request, protocol=protocol)
+        if len(responses) != 1:
+            raise Exception("Malformed response")
+        serialised_response = serialize_length_delimited(responses[0])
+        response = compiler.decompile_media_insights_response(
+            request, serialised_response
+        )
+        return response
 
     def provision_to_lookalike_media_data_room(
         self, data_room_id: str, keychain: Keychain
@@ -507,6 +614,21 @@ class DataLab:
         for dataset in data_lab["datasets"]:
             datasets_dict[dataset["name"]] = dataset["dataset"]
         return datasets_dict
+
+    def _get_midcr(self, data_room_id) -> Tuple[str, Session]:
+        midcr_driver_attestation_hash = self.client._get_midcr_driver_attestation_hash(
+            data_room_id
+        )
+        midcr_driver_spec = self.client._get_enclave_spec_from_hash(
+            midcr_driver_attestation_hash
+        )
+        if midcr_driver_spec == None:
+            raise Exception(f"Failed to find driver for data room {data_room_id}")
+
+        session = create_session_from_driver_spec(self.client, midcr_driver_spec)
+        existing_midcr = session.retrieve_data_room(data_room_id)
+        midcr_hl = existing_midcr.highLevelRepresentation.decode()
+        return (midcr_hl, session)
 
     def _get_lmdcr(self, data_room_id) -> Tuple[str, Session]:
         # Get the high level representation of the LMDCR.
