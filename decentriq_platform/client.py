@@ -1265,6 +1265,28 @@ class Client:
         )
         return data["publishedLookalikeMediaDataRoom"]["driverAttestationHash"]
 
+    def _get_midcr_driver_attestation_hash(
+        self,
+        id: str,
+    ) -> str:
+        """
+        Get the driver attestation hash for the Media Insights DCR with the given ID.
+
+        **Parameters**:
+        - `id`: ID of the Media Insights DCR.
+        """
+        data = self._graphql.post(
+            """
+            query GetMediaInsightsDcr($id: String!) {
+                publishedMediaInsightsDcr(id: $id) {
+                    driverAttestationHash
+                }
+            }
+            """,
+            {"id": id},
+        )
+        return data["publishedMediaInsightsDcr"]["driverAttestationHash"]
+
     def get_lookalike_media_data_rooms(
         self,
     ) -> List[DataRoom]:
