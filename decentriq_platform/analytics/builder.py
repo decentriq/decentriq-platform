@@ -75,9 +75,6 @@ class AnalyticsDcrBuilder:
         self.description = ""
         self.owner = None
         self.dcr_id = None
-        self.enable_development = False
-        self.enable_airlock = False
-        self.enable_auto_merge_feature = False
         self.compile_context = None
         self.node_definitions = []
         """The current list of Node Definitions that will be added to the Data Clean Room."""
@@ -132,14 +129,6 @@ class AnalyticsDcrBuilder:
         )
         return self
 
-    def with_auto_merge(self) -> Self:
-        """
-        Allow auto-merging of commits.
-        This allows non-conflicting changes to be merged without rebasing.
-        """
-        self.enable_auto_merge_feature = True
-        return self
-
     def with_owner(self, email: str) -> Self:
         """
         Set the owner of the Data Clean Room.
@@ -148,30 +137,6 @@ class AnalyticsDcrBuilder:
         - `email`: The email address of the owner of the Data Clean Room.
         """
         self.owner = email
-        return self
-
-    def with_development_mode(self) -> Self:
-        """
-        Enable Development Mode in the Data Clean Room.
-
-        This allows Development Computations to be executed in the Data Clean Room.
-        Development Computations are not yet part of the Data Clean Room, but allow users
-        to run new computations on top of existing DCRs.
-        The driver enclave makes sure that only data to which the user already has access
-        can be read.
-        """
-        self.enable_development = True
-        return self
-
-    def with_airlock(self) -> Self:
-        """
-        Enable the Airlock feature in the Data Clean Room.
-
-        This requires Development Mode to be enabled.
-        The Airlock feature allows the addition of Preview Nodes that allow
-        restricting the amount of data that can be read from specific Data Nodes.
-        """
-        self.enable_airlock = True
         return self
 
     def add_node_definition(self, definition: NodeDefinition) -> Self:
@@ -230,17 +195,17 @@ class AnalyticsDcrBuilder:
                 # Only interactive DCRs are supported.
                 "interactive": {
                     "commits": [],
-                    "enableAutomergeFeature": self.enable_auto_merge_feature,
+                    "enableAutomergeFeature": True,
                     "initialConfiguration": {
                         "description": self.description,
-                        "enableAirlock": self.enable_airlock,
-                        "enableAllowEmptyFilesInValidation": False,
-                        "enableDevelopment": self.enable_development,
-                        "enablePostWorker": False,
+                        "enableAirlock": True,
+                        "enableAllowEmptyFilesInValidation": True,
+                        "enableDevelopment": True,
+                        "enablePostWorker": True,
                         "enableSafePythonWorkerStacktrace": True,
                         "enableServersideWasmValidation": True,
-                        "enableSqliteWorker": False,
-                        "enableTestDatasets": False,
+                        "enableSqliteWorker": True,
+                        "enableTestDatasets": True,
                         "enclaveRootCertificatePem": self.client.decentriq_ca_root_certificate.decode(),
                         "enclaveSpecifications": used_hl_enclave_specs,
                         "id": self._generate_id(),
