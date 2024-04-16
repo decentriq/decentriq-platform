@@ -120,6 +120,9 @@ class AnalyticsDcrBuilder:
         - `data_owner_of`: The names of the Data Nodes to which the user can
           connect a dataset.
         """
+        if any(permissions["user"] == email for permissions in self.permissions):
+            raise Exception(f"Participant with email {email} has already been added.")
+
         anaylst_permissions = [{"analyst": {"nodeId": node}} for node in analyst_of]
         data_owner_permissions = [
             {"dataOwner": {"nodeId": node}} for node in data_owner_of
