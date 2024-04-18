@@ -1,9 +1,14 @@
 from __future__ import annotations
 
 import re
-from typing import Dict, Union, List
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Dict, List, Union
+
+from ..session import Session
 from .high_level_node import ComputationNode, DataNode
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 _valid_node_name_pattern = re.compile(

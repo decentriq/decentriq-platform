@@ -1,18 +1,19 @@
 import base64
-import uuid
-from ..client import Client
-from typing import Optional, List
-from decentriq_dcr_compiler import compiler
-from ..types import MatchingId
-from ..keychain import Keychain
-from .lookalike_media import LookalikeMediaDcr, ExistingLookalikeMediaDcr
-from ..proto import serialize_length_delimited
 import json
+import uuid
+from typing import List, Optional, Tuple
+
+from decentriq_dcr_compiler import compiler
+
+from ..client import Client
 from ..helpers import (
     create_session_from_driver_spec,
     get_latest_enclave_specs_as_dictionary,
 )
-from ..types import MATCHING_ID_INTERNAL_LOOKUP
+from ..keychain import Keychain
+from ..proto import serialize_length_delimited
+from ..types import MATCHING_ID_INTERNAL_LOOKUP, MatchingId
+from .lookalike_media import ExistingLookalikeMediaDcr, LookalikeMediaDcr
 
 
 def _generate_id():
@@ -200,10 +201,10 @@ class LookalikeMediaDcrBuilder:
     @staticmethod
     def _get_lmdcr_enclave_specs(
         client: Client,
-    ) -> (compiler.EnclaveSpecification, compiler.EnclaveSpecification):
+    ) -> Tuple[compiler.EnclaveSpecification, compiler.EnclaveSpecification]:
         enclave_specs = get_latest_enclave_specs_as_dictionary(client)
-        driver_spec = {}
-        python_spec = {}
+        driver_spec = None
+        python_spec = None
         for spec_id, spec in enclave_specs.items():
             spec_payload = {
                 "attestationProtoBase64": base64.b64encode(
@@ -216,4 +217,8 @@ class LookalikeMediaDcrBuilder:
                 driver_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
             elif "decentriq.python-ml-worker" in spec_id:
                 python_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+        if driver_spec is None:
+            raise Exception("No driver enclave spec found for the datalab")
+        if python_spec is None:
+            raise Exception("No python-ml-worker enclave spec found for the datalab")
         return (driver_spec, python_spec)

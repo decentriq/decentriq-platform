@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import json
+from dataclasses import asdict, dataclass
+from typing import TYPE_CHECKING, Dict, List, Optional
+
 from decentriq_dcr_compiler.schemas.data_science_data_room import (
     MatchingComputationNode,
 )
-from .high_level_node import ContainerComputationNode
-from typing import Dict, List, Optional
-from .node_definitions import NodeDefinition
-from ..session import Session
-from dataclasses import dataclass, asdict
 from typing_extensions import Self
-import json
+
+from ..session import Session
+from .high_level_node import ContainerComputationNode
+from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 @dataclass
@@ -89,8 +94,10 @@ class MatchingComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
-    @staticmethod
-    def _from_high_level(id: str, name: str, node: MatchingComputationNode) -> Self:
+    @classmethod
+    def _from_high_level(
+        cls, id: str, name: str, node: MatchingComputationNode
+    ) -> Self:
         """
         Instantiate a `MatchingComputeNode` from its high level representation.
 
@@ -99,7 +106,7 @@ class MatchingComputeNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `MatchingComputeNode`.
         """
         matching_node = json.loads(node.model_dump_json())
-        return MatchingComputeNodeDefinition(
+        return cls(
             name=name,
             config=json.loads(matching_node["config"]),
             dependencies=matching_node["dependencies"],

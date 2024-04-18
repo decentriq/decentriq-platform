@@ -3,11 +3,16 @@ from __future__ import annotations
 import io
 import zipfile
 from abc import ABC, abstractmethod
-from typing import BinaryIO, Optional
+from typing import TYPE_CHECKING, BinaryIO, Optional
 
+from ..keychain import Keychain
 from ..session import Session
 from ..storage import Key
 from .sql_helper import read_sql_query_result_as_string
+
+if TYPE_CHECKING:
+    from ..client import Client
+    from .node_definitions import NodeDefinition
 
 
 class HighLevelNode(ABC):

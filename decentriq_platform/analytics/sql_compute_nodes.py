@@ -1,16 +1,17 @@
 from __future__ import annotations
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import SqlComputationNode
-from .high_level_node import StructuredOutputNode
-from typing import Dict, List, Optional
-from .node_definitions import NodeDefinition
-from ..session import Session
-from dataclasses import dataclass
-from typing_extensions import Self
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
-    SqlComputationNode,
-)
 import json
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+from decentriq_dcr_compiler.schemas.data_science_data_room import SqlComputationNode
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import StructuredOutputNode
+from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class SqlComputeNodeDefinition(NodeDefinition):
@@ -81,8 +82,8 @@ class SqlComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
-    @staticmethod
-    def _from_high_level(id: str, name: str, node: SqlComputationNode) -> Self:
+    @classmethod
+    def _from_high_level(cls, id: str, name: str, node: SqlComputationNode) -> Self:
         """
         Instantiate a `SqlComputeNodeDefinition` from its high level representation.
 
@@ -96,7 +97,7 @@ class SqlComputeNodeDefinition(NodeDefinition):
             if not sql_node["privacyFilter"]
             else sql_node["privacyFilter"]["minimumRowsCount"]
         )
-        return SqlComputeNodeDefinition(
+        return cls(
             id=id,
             name=name,
             query=sql_node["statement"],

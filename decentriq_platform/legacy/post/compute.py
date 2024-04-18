@@ -1,18 +1,20 @@
 from __future__ import annotations
+
 from google.protobuf.json_format import MessageToDict
-from .proto import PostWorkerConfiguration
+
 from ...proto import (
-    serialize_length_delimited,
     ComputeNodeFormat,
     parse_length_delimited,
+    serialize_length_delimited,
 )
 from ..node import Node
-
+from .proto import PostWorkerConfiguration
 
 __all__ = ["PostCompute"]
 
 
 class PostWorkerDecoder:
+    @staticmethod
     def decode(config: bytes):
         config_decoded = PostWorkerConfiguration()
         parse_length_delimited(config, config_decoded)

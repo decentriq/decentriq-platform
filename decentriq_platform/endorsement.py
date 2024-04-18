@@ -1,14 +1,14 @@
-# This is to avoid circular import with Endorser
 from __future__ import annotations
-from typing import TYPE_CHECKING, Dict
+
+from typing import TYPE_CHECKING, Dict, Tuple
+
+from .authentication import Auth, generate_csr
+from .proto import EnclaveEndorsement
+from .session import Session
+from .types import EnclaveSpecification
 
 if TYPE_CHECKING:
     from .client import Client
-
-from .authentication import Auth, generate_csr
-from .types import EnclaveSpecification
-from .session import Session
-from .proto import EnclaveEndorsement
 
 
 class Endorser:

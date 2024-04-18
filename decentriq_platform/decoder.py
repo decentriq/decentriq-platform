@@ -1,24 +1,24 @@
 from __future__ import annotations
 
 from google.protobuf.json_format import MessageToDict
+
 from .proto import (
+    AzureBlobStorageWorkerConfiguration,
+    ContainerWorkerConfiguration,
+    DatasetSinkWorkerConfiguration,
+    DataSourceS3WorkerConfiguration,
+    DataSourceSnowflakeWorkerConfiguration,
+    DriverTaskConfig,
+    GoogleAdManagerWorkerConfiguration,
+    GoogleDv360SinkWorkerConfiguration,
+    MetaSinkWorkerConfiguration,
+    PermutiveWorkerConfiguration,
+    PostWorkerConfiguration,
+    S3SinkWorkerConfiguration,
+    SalesforceWorkerConfiguration,
+    SqlWorkerConfiguration,
     parse_length_delimited,
 )
-from .proto import DriverTaskConfig
-from .proto import PostWorkerConfiguration
-from .proto import PermutiveWorkerConfiguration
-from .proto import AzureBlobStorageWorkerConfiguration
-from .proto import ContainerWorkerConfiguration
-from .proto import DataSourceS3WorkerConfiguration
-from .proto import DataSourceSnowflakeWorkerConfiguration
-from .proto import DatasetSinkWorkerConfiguration
-from .proto import GoogleAdManagerWorkerConfiguration
-from .proto import GoogleDv360SinkWorkerConfiguration
-from .proto import MetaSinkWorkerConfiguration
-from .proto import PermutiveWorkerConfiguration
-from .proto import S3SinkWorkerConfiguration
-from .proto import SalesforceWorkerConfiguration
-from .proto import SqlWorkerConfiguration
 
 
 class GcgDriverDecoder:

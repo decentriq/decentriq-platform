@@ -1,11 +1,13 @@
 from __future__ import annotations
-import typing
-from typing import Dict, Literal, Optional, Union, Tuple, List
 
-# from .client import Client, KeychainInstance
+from typing import TYPE_CHECKING, Dict, List, Literal, Optional, Tuple, get_args
+from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from .client import Client, KeychainInstance
+
 import cbor2
 import chily
-from base64 import b64encode
 
 KeychainEntryKind = Literal["dataset_key", "other_secret"]
 
@@ -60,7 +62,7 @@ class Keychain:
         splitted = ns_key.split("/")
         if len(splitted) < 2:
             raise Exception("Invalid namespaced key: no `/` found")
-        if splitted[0] not in typing.get_args(KeychainEntryKind):
+        if splitted[0] not in get_args(KeychainEntryKind):
             raise Exception(f"Invalid namespaced key kind: found {splitted[0]}")
         remainder = "/".join(splitted[1:])
         return [splitted[0], remainder]
@@ -139,7 +141,7 @@ class Keychain:
         client: Client,
         password: bytes,
         check_for_existing_keychain: bool = True,
-    ) -> Optional[Keychain]:
+    ) -> Optional[Self]:
         """
         Create a new keychain that is encrypted using the given password.
 
@@ -158,7 +160,7 @@ class Keychain:
     def get_or_create_unlocked_keychain(
         client: Client,
         password: bytes,
-    ) -> Keychain:
+    ) -> Self:
         """
         Get and unlock the user's keychain using the provided password.
 
@@ -193,7 +195,7 @@ class Keychain:
         client: Client,
         master_key: bytes,
         salt: str,
-    ) -> Optional[Keychain]:
+    ) -> Optional[Self]:
         """
         Create a new keychain with the given master key.
 
@@ -204,7 +206,7 @@ class Keychain:
         return Keychain._create_new_keychain_with_secret_wrapper(client, secret_wrapper)
 
     @staticmethod
-    def init_with_master_key(client: Client, master_key: bytes) -> Keychain:
+    def init_with_master_key(client: Client, master_key: bytes) -> Self:
         """
         Decrypt an existing keychain with the given master key.
 
@@ -224,7 +226,7 @@ class Keychain:
         return Keychain(client, secret_wrapper, keychain_instance, store)
 
     @staticmethod
-    def init_with_password(client: Client, password: bytes) -> Keychain:
+    def init_with_password(client: Client, password: bytes) -> Self:
         """
         Decrypt an existing keychain with the given password.
 
@@ -242,7 +244,7 @@ class Keychain:
     @staticmethod
     def _decrypt_store_with_password(
         client: Client, keychain_instance: KeychainInstance, password: bytes
-    ) -> Keychain:
+    ) -> Self:
         secret_wrapper = chily.SecretWrapper.with_password(
             password, keychain_instance["salt"]
         )

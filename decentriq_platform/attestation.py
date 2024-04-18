@@ -1,25 +1,34 @@
 import base64
-from typing import Dict, List
-from .types import EnclaveSpecification
-from .decoder import *
-from .proto import (
-    AttestationSpecification,
-    AttestationSpecificationIntelDcap,
-    AttestationSpecificationAmdSnp,
-)
+from typing import Any, Dict, List, Tuple, cast
+
 import asn1crypto.pem
+
 from .certs import (
-    aws_nitro_root_ca_pem,
     amd_snp_ark_pem,
+    aws_nitro_root_ca_pem,
     intel_sgx_dcap_root_ca,
     intel_sgx_ias_root_ca,
 )
+from .decoder import *
+from .proto import (
+    AttestationSpecification,
+    AttestationSpecificationAmdSnp,
+    AttestationSpecificationIntelDcap,
+)
+from .types import EnclaveSpecification
 
-
-intel_sgx_dcap_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_dcap_root_ca)[2]
-intel_sgx_ias_root_ca_der = asn1crypto.pem.unarmor(intel_sgx_ias_root_ca)[2]
-aws_nitro_root_ca_der = asn1crypto.pem.unarmor(aws_nitro_root_ca_pem)[2]
-amd_snp_ark_der = asn1crypto.pem.unarmor(amd_snp_ark_pem)[2]
+intel_sgx_dcap_root_ca_der = cast(
+    Tuple[Any, Any, bytes], asn1crypto.pem.unarmor(intel_sgx_dcap_root_ca)
+)[2]
+intel_sgx_ias_root_ca_der = cast(
+    Tuple[Any, Any, bytes], asn1crypto.pem.unarmor(intel_sgx_ias_root_ca)
+)[2]
+aws_nitro_root_ca_der = cast(
+    Tuple[Any, Any, bytes], asn1crypto.pem.unarmor(aws_nitro_root_ca_pem)
+)[2]
+amd_snp_ark_der = cast(Tuple[Any, Any, bytes], asn1crypto.pem.unarmor(amd_snp_ark_pem))[
+    2
+]
 
 
 # From https://developers.cloudflare.com/time-services/roughtime/recipes/
@@ -36,6 +45,8 @@ decentriq_root_ca_der = base64.b64decode(
 
 SPECIFICATIONS = {
     "decentriq.driver:v10": EnclaveSpecification(
+        name="decentriq.driver",
+        version="10",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -53,6 +64,8 @@ SPECIFICATIONS = {
         clientProtocols=[3],
     ),
     "decentriq.driver:v11": EnclaveSpecification(
+        name="decentriq.driver",
+        version="11",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -70,6 +83,8 @@ SPECIFICATIONS = {
         clientProtocols=[4],
     ),
     "decentriq.driver:v12": EnclaveSpecification(
+        name="decentriq.driver",
+        version="12",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -87,6 +102,8 @@ SPECIFICATIONS = {
         clientProtocols=[4],
     ),
     "decentriq.driver:v13": EnclaveSpecification(
+        name="decentriq.driver",
+        version="13",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -104,6 +121,8 @@ SPECIFICATIONS = {
         clientProtocols=[5],
     ),
     "decentriq.driver:v14": EnclaveSpecification(
+        name="decentriq.driver",
+        version="14",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -121,6 +140,8 @@ SPECIFICATIONS = {
         clientProtocols=[5],
     ),
     "decentriq.driver:v16": EnclaveSpecification(
+        name="decentriq.driver",
+        version="16",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -138,6 +159,8 @@ SPECIFICATIONS = {
         clientProtocols=[5],
     ),
     "decentriq.driver:v17": EnclaveSpecification(
+        name="decentriq.driver",
+        version="17",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -155,6 +178,8 @@ SPECIFICATIONS = {
         clientProtocols=[5],
     ),
     "decentriq.driver:v18": EnclaveSpecification(
+        name="decentriq.driver",
+        version="18",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -172,6 +197,8 @@ SPECIFICATIONS = {
         clientProtocols=[5],
     ),
     "decentriq.driver:v19": EnclaveSpecification(
+        name="decentriq.driver",
+        version="19",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -189,6 +216,8 @@ SPECIFICATIONS = {
         clientProtocols=[5],
     ),
     "decentriq.driver:v20": EnclaveSpecification(
+        name="decentriq.driver",
+        version="20",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -206,6 +235,8 @@ SPECIFICATIONS = {
         clientProtocols=[6],
     ),
     "decentriq.driver:v21": EnclaveSpecification(
+        name="decentriq.driver",
+        version="21",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -223,6 +254,8 @@ SPECIFICATIONS = {
         clientProtocols=[6],
     ),
     "decentriq.sql-worker:v10": EnclaveSpecification(
+        name="decentriq.sql-worker",
+        version="10",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -240,6 +273,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sql-worker:v11": EnclaveSpecification(
+        name="decentriq.sql-worker",
+        version="11",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -257,6 +292,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sql-worker:v12": EnclaveSpecification(
+        name="decentriq.sql-worker",
+        version="12",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -274,6 +311,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.post-worker:v5": EnclaveSpecification(
+        name="decentriq.post-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -291,6 +330,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.post-worker:v6": EnclaveSpecification(
+        name="decentriq.post-worker",
+        version="6",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -308,6 +349,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.post-worker:v8": EnclaveSpecification(
+        name="decentriq.post-worker",
+        version="8",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -325,6 +368,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.post-worker:v9": EnclaveSpecification(
+        name="decentriq.post-worker",
+        version="9",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -342,6 +387,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v10": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="10",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -373,6 +420,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v11": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="11",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -404,6 +453,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v12": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="12",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -435,6 +486,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v13": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="13",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -469,6 +522,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v14": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="14",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -484,6 +539,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v16": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="16",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -499,6 +556,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v17": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="17",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -514,6 +573,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v18": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="18",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -529,6 +590,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v19": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="19",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -544,6 +607,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v20": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="20",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -559,6 +624,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v21": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="21",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -574,6 +641,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v22": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="22",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -589,6 +658,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-ml-worker-32-64:v23": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="23",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -604,6 +675,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="10",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -635,6 +708,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v11": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="11",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -666,6 +741,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v12": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="12",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -681,6 +758,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v14": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="14",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -696,6 +775,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v15": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="15",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -711,6 +792,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v16": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="16",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -726,6 +809,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v17": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="17",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -741,6 +826,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.python-synth-data-worker-32-64:v18": EnclaveSpecification(
+        name="decentriq.python-synth-data-worker-32-64",
+        version="18",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -756,6 +843,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v10": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="10",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -787,6 +876,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v11": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="11",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -818,6 +909,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v12": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="12",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -833,6 +926,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v14": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="14",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -848,6 +943,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v15": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="15",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -863,6 +960,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v16": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="16",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -878,6 +977,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-latex-worker-32-32:v17": EnclaveSpecification(
+        name="decentriq.r-latex-worker-32-32",
+        version="17",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -893,6 +994,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.r-ml-worker-32-32:v1": EnclaveSpecification(
+        name="decentriq.r-ml-worker-32-32",
+        version="1",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -908,6 +1011,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.s3-sink-worker:v2": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -925,6 +1030,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.s3-sink-worker:v3": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -942,6 +1049,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.s3-sink-worker:v5": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -959,6 +1068,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.s3-sink-worker:v6": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        version="6",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -976,6 +1087,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.s3-sink-worker:v7": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        version="7",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -993,6 +1106,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.salesforce-worker:v1": EnclaveSpecification(
+        name="decentriq.salesforce-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1010,6 +1125,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.salesforce-worker:v2": EnclaveSpecification(
+        name="decentriq.salesforce-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1027,6 +1144,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.permutive-worker:v1": EnclaveSpecification(
+        name="decentriq.permutive-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1044,6 +1163,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.dataset-sink-worker:v1": EnclaveSpecification(
+        name="decentriq.dataset-sink-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1061,6 +1182,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.dataset-sink-worker:v2": EnclaveSpecification(
+        name="decentriq.dataset-sink-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1078,6 +1201,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.dataset-sink-worker:v3": EnclaveSpecification(
+        name="decentriq.dataset-sink-worker",
+        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1095,6 +1220,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.dataset-sink-worker:v5": EnclaveSpecification(
+        name="decentriq.dataset-sink-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1112,6 +1239,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.dataset-sink-worker:v6": EnclaveSpecification(
+        name="decentriq.dataset-sink-worker",
+        version="6",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1129,6 +1258,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-s3-worker:v1": EnclaveSpecification(
+        name="decentriq.data-source-s3-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1146,6 +1277,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-s3-worker:v2": EnclaveSpecification(
+        name="decentriq.data-source-s3-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1163,6 +1296,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-s3-worker:v4": EnclaveSpecification(
+        name="decentriq.data-source-s3-worker",
+        version="4",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1180,6 +1315,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-s3-worker:v5": EnclaveSpecification(
+        name="decentriq.data-source-s3-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1197,6 +1334,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-s3-worker:v6": EnclaveSpecification(
+        name="decentriq.data-source-s3-worker",
+        version="6",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1214,6 +1353,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-snowflake-worker:v1": EnclaveSpecification(
+        name="decentriq.data-source-snowflake-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1231,6 +1372,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-snowflake-worker:v2": EnclaveSpecification(
+        name="decentriq.data-source-snowflake-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1248,6 +1391,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-snowflake-worker:v4": EnclaveSpecification(
+        name="decentriq.data-source-snowflake-worker",
+        version="4",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1265,6 +1410,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.data-source-snowflake-worker:v5": EnclaveSpecification(
+        name="decentriq.data-source-snowflake-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1282,6 +1429,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.meta-sink-worker:v1": EnclaveSpecification(
+        name="decentriq.meta-sink-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1299,6 +1448,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.meta-sink-worker:v2": EnclaveSpecification(
+        name="decentriq.meta-sink-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1316,6 +1467,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.meta-sink-worker:v4": EnclaveSpecification(
+        name="decentriq.meta-sink-worker",
+        version="4",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1333,6 +1486,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.meta-sink-worker:v5": EnclaveSpecification(
+        name="decentriq.meta-sink-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1350,6 +1505,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-ad-manager-worker:v1": EnclaveSpecification(
+        name="decentriq.google-ad-manager-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1367,6 +1524,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-ad-manager-worker:v2": EnclaveSpecification(
+        name="decentriq.google-ad-manager-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1384,6 +1543,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-ad-manager-worker:v3": EnclaveSpecification(
+        name="decentriq.google-ad-manager-worker",
+        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1401,6 +1562,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-dv-360-sink-worker:v1": EnclaveSpecification(
+        name="decentriq.google-dv-360-sink-worker",
+        version="1",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1418,6 +1581,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-dv-360-sink-worker:v3": EnclaveSpecification(
+        name="decentriq.google-dv-360-sink-worker",
+        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1435,6 +1600,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-dv-360-sink-worker:v4": EnclaveSpecification(
+        name="decentriq.google-dv-360-sink-worker",
+        version="4",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1452,6 +1619,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.google-dv-360-sink-worker:v5": EnclaveSpecification(
+        name="decentriq.google-dv-360-sink-worker",
+        version="5",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1469,6 +1638,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.azure-blob-storage-worker:v2": EnclaveSpecification(
+        name="decentriq.azure-blob-storage-worker",
+        version="2",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1486,6 +1657,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.azure-blob-storage-worker:v3": EnclaveSpecification(
+        name="decentriq.azure-blob-storage-worker",
+        version="3",
         proto=AttestationSpecification(
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
@@ -1503,6 +1676,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sqlite-container-worker-32-64:v1": EnclaveSpecification(
+        name="decentriq.sqlite-container-worker-32-64",
+        version="1",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -1518,6 +1693,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sqlite-container-worker-32-64:v2": EnclaveSpecification(
+        name="decentriq.sqlite-container-worker-32-64",
+        version="2",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -1533,6 +1710,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sqlite-container-worker-32-64:v4": EnclaveSpecification(
+        name="decentriq.sqlite-container-worker-32-64",
+        version="4",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -1548,6 +1727,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sqlite-container-worker-32-64:v5": EnclaveSpecification(
+        name="decentriq.sqlite-container-worker-32-64",
+        version="5",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -1563,6 +1744,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sqlite-container-worker-32-64:v6": EnclaveSpecification(
+        name="decentriq.sqlite-container-worker-32-64",
+        version="6",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -1578,6 +1761,8 @@ SPECIFICATIONS = {
         clientProtocols=None,
     ),
     "decentriq.sqlite-container-worker-32-64:v7": EnclaveSpecification(
+        name="decentriq.sqlite-container-worker-32-64",
+        version="7",
         proto=AttestationSpecification(
             amdSnp=AttestationSpecificationAmdSnp(
                 amdArkDer=amd_snp_ark_der,
@@ -1648,7 +1833,7 @@ class EnclaveSpecifications:
     def latest(self) -> Dict[str, EnclaveSpecification]:
         """Select the latest specification of each enclave type"""
         latest_spec_by_type = {}
-        latest_version_by_type = {}
+        latest_version_by_type: Dict[str, str] = {}
         for enclave_identifier in self.specifications:
             enclave_type, enclave_version = enclave_identifier.split(":")
             previous_version = latest_version_by_type.get(enclave_type)

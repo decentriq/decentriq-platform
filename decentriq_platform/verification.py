@@ -1,28 +1,27 @@
 import json
 import struct
-
-import asn1crypto.x509
-import asn1crypto.pem
-from sgx_ias_structs import QuoteBody as _QuoteBody
 from enum import IntFlag
-import cryptography
-import OpenSSL
-
-
-from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
-from .proto import (
-    AttestationSpecification,
-    Fatquote,
-    FatquoteEpid,
-    FatquoteDcap,
-    AttestationSpecificationIntelDcap,
-    AttestationSpecificationIntelDcapMrsigner,
-)
-from ecdsa import VerifyingKey
 from hashlib import sha256
 from typing import List, Optional, Union
+
+import asn1crypto.pem
+import asn1crypto.x509
+import cryptography
+import OpenSSL
 import pem as Pem
-from .certs import intel_sgx_ias_root_ca, intel_sgx_dcap_root_ca
+from ecdsa import VerifyingKey
+from sgx_ias_structs import QuoteBody as _QuoteBody
+
+from .certs import intel_sgx_dcap_root_ca, intel_sgx_ias_root_ca
+from .proto import (
+    AttestationSpecification,
+    AttestationSpecificationIntelDcap,
+    AttestationSpecificationIntelDcapMrsigner,
+    Fatquote,
+    FatquoteDcap,
+    FatquoteEpid,
+)
+from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
 
 
 class QuoteBody:

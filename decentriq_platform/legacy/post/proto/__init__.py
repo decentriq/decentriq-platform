@@ -1,3 +1,1 @@
-from .compute_post_pb2 import (
-    PostWorkerConfiguration,
-)
+from .compute_post_pb2 import PostWorkerConfiguration

@@ -1,17 +1,14 @@
+from enum import Enum
+
 from google.protobuf.json_format import MessageToDict
+
 from ...proto import (
-    serialize_length_delimited,
     ComputeNodeFormat,
     parse_length_delimited,
+    serialize_length_delimited,
 )
 from ..node import Node
-from .proto import (
-    SalesforceWorkerConfiguration,
-    ImportRole,
-    Core,
-    MarketingCloud,
-)
-from enum import Enum
+from .proto import Core, ImportRole, MarketingCloud, SalesforceWorkerConfiguration
 
 
 class ProductType(Enum):

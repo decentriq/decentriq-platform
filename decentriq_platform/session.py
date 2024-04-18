@@ -1,92 +1,82 @@
 from __future__ import annotations
+
+import json
 from dataclasses import dataclass
 from datetime import datetime
-import json
-import chily
-import hashlib
-import hmac
-from base64 import b64decode
-from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.primitives import hashes
-from typing import (
-    Any,
-    List,
-    Tuple,
-    TYPE_CHECKING,
-    Iterator,
-    Optional,
-    Dict,
-    Mapping,
-    Text,
-)
 from time import sleep
-from decentriq_platform.proto.gcg_pb2 import (
-    GetResultsSizeRequest,
-    RetrieveUsedAirlockQuotaRequest,
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Text,
+    Tuple,
 )
-from .api import Endpoints
-from .authentication import Auth, Sigma
+
+import chily
+from decentriq_dcr_compiler import compiler
+
+
+from .authentication import Auth
+from .connection import Connection
+from .channel import Channel, CompilerRequest, CompilerResponse
 from .proto import (
-    DcrMetadata,
-    CreateDcrPurpose,
-    CreateDcrKind,
-    DataRoom,
-    ComputeNodeProtocol,
-    DataNoncePubkey,
-    Request,
-    Response,
+    ConfigurationCommit,
+    CreateConfigurationCommitRequest,
     CreateDataRoomRequest,
     CreateDataRoomResponse,
+    CreateDcrKind,
+    CreateDcrPurpose,
+    DataRoom,
+    DataRoomConfiguration,
+    DataRoomStatus,
+    DcrMetadata,
+    DcrSecretEndorsementRequest,
+    DcrSecretEndorsementResponse,
+    EndorsementRequest,
+    EndorsementResponse,
     ExecuteComputeRequest,
     ExecuteComputeResponse,
+    ExecuteDevelopmentComputeRequest,
     GcgRequest,
     GcgResponse,
+    GenerateMergeApprovalSignatureRequest,
     GetResultsRequest,
     GetResultsResponseChunk,
+    GetResultsSizeRequest,
     JobStatusRequest,
     JobStatusResponse,
+    MergeConfigurationCommitRequest,
+    MergeConfigurationCommitResponse,
+    PkiEndorsementRequest,
+    PkiEndorsementResponse,
     PublishDatasetToDataRoomRequest,
     PublishDatasetToDataRoomResponse,
     RemovePublishedDatasetRequest,
     RemovePublishedDatasetResponse,
     RetrieveAuditLogRequest,
     RetrieveAuditLogResponse,
+    RetrieveConfigurationCommitApproversRequest,
+    RetrieveConfigurationCommitRequest,
+    RetrieveConfigurationCommitResponse,
+    RetrieveCurrentDataRoomConfigurationRequest,
     RetrieveDataRoomRequest,
     RetrieveDataRoomResponse,
     RetrieveDataRoomStatusRequest,
-    RetrieveConfigurationCommitResponse,
     RetrievePublishedDatasetsRequest,
     RetrievePublishedDatasetsResponse,
-    UpdateDataRoomStatusRequest,
-    ExecuteDevelopmentComputeRequest,
-    CreateConfigurationCommitRequest,
-    GenerateMergeApprovalSignatureRequest,
-    MergeConfigurationCommitRequest,
-    RetrieveCurrentDataRoomConfigurationRequest,
-    UpdateDataRoomStatusResponse,
-    DataRoomStatus,
-    AttestationSpecification,
-    Fatquote,
-    CreateConfigurationCommitRequest,
-    RetrieveConfigurationCommitApproversRequest,
-    RetrieveConfigurationCommitRequest,
-    ConfigurationCommit,
-    MergeConfigurationCommitResponse,
-    DataRoomConfiguration,
-    EndorsementRequest,
-    EndorsementResponse,
-    Pki,
-    PkiEndorsementRequest,
-    PkiEndorsementResponse,
-    DcrSecretEndorsementRequest,
-    DcrSecretEndorsementResponse,
+    RetrieveUsedAirlockQuotaRequest,
     TestDataset as TestDatasetProto,
+    UpdateDataRoomStatusRequest,
+    UpdateDataRoomStatusResponse,
 )
-from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
+from .proto.length_delimited import serialize_length_delimited
 from .storage import Key
-from .types import DryRunOptions, JobId, DataRoomKind
-from .verification import QuoteBody, Verification
-from decentriq_dcr_compiler import compiler
+from .types import DataRoomKind, DryRunOptions, JobId
 
 if TYPE_CHECKING:
     from .client import Client
@@ -126,45 +116,21 @@ def _get_data_room_id(create_data_room_response: CreateDataRoomResponse) -> byte
         )
 
 
-def datanoncepubkey_to_message(
-    encrypted_data: bytes,
-    nonce: bytes,
-    pubkey: bytes,
-) -> DataNoncePubkey:
-    message = DataNoncePubkey()
-    message.data = encrypted_data
-    message.nonce = nonce
-    message.pubkey = pubkey
-    return message
-
-
-def message_to_datanoncepubkey(message: bytes) -> Tuple[bytes, bytes, bytes]:
-    parsed_msg = DataNoncePubkey()
-    parse_length_delimited(message, parsed_msg)
-    return (parsed_msg.data, parsed_msg.nonce, parsed_msg.pubkey)
-
-
 class Session:
     """
     Class for managing the communication with an enclave.
     """
 
     client: Client
-    session_id: str
-    enclave_identifier: str
+    connection: Connection
     auth: Auth
-    email: str
     keypair: Any
-    fatquote: Fatquote
-    quote: QuoteBody
-    driver_attestation_specification: AttestationSpecification
     client_protocols: List[int]
 
     def __init__(
         self,
         client: Client,
-        session_id: str,
-        driver_attestation_specification: AttestationSpecification,
+        connection: Connection,
         client_protocols: List[int],
         auth: Auth,
     ):
@@ -172,40 +138,10 @@ class Session:
         `Session` instances should not be instantiated directly but rather
          be created using a `Client` object using  `decentriq_platform.Client.create_session`.
         """
-        data = client._graphql.post(
-            """
-            query GetFatquote($id: String!) {
-                session(id: $id) {
-                    fatquote
-                }
-            }
-            """,
-            {
-                "id": session_id,
-            },
-        )
-
-        fatquote = Fatquote()
-        fatquote_bytes_encoded = b64decode(data["session"]["fatquote"])
-        parse_length_delimited(fatquote_bytes_encoded, fatquote)
-        verification = Verification(
-            attestation_specification=driver_attestation_specification
-        )
-        if client.unsafe_disable_known_root_ca_check == True:
-            verification.disable_known_root_ca_check()
-
-        report_data = verification.verify(fatquote)
         self.client = client
-        self.session_id = session_id
+        self.connection = connection
         self.auth = auth
-        self.email = auth.user_id
         self.keypair = chily.Keypair.from_random()
-        self.fatquote = fatquote
-        self.report_data = report_data
-        self.driver_attestation_specification = driver_attestation_specification
-        self.driver_attestation_specification_hash = hashlib.sha256(
-            serialize_length_delimited(driver_attestation_specification)
-        ).hexdigest()
         self.client_protocols = client_protocols
 
     def _get_client_protocol(self, endpoint_protocols: List[int]) -> int:
@@ -223,48 +159,6 @@ class Session:
             else:
                 exception_message += "Try using an older version of the SDK"
             raise Exception(exception_message)
-
-    def _get_enclave_pubkey(self):
-        pub_keyB = bytearray(self.report_data[:32])
-        return chily.PublicKey.from_bytes(pub_keyB)
-
-    def _get_message_pki(self, auth: Auth) -> Pki:
-        shared_key = bytes(
-            self.keypair.secret.diffie_hellman(self._get_enclave_pubkey()).bytes
-        )
-        hkdf = HKDF(
-            algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b""
-        )
-        mac_key = hkdf.derive(shared_key)
-        mac_tag = hmac.digest(mac_key, auth._get_user_id().encode(), "sha512")
-        public_keys = bytes(self.keypair.public_key.bytes) + bytes(
-            self._get_enclave_pubkey().bytes
-        )
-        signature = auth._sign(public_keys)
-        sigma_auth = Sigma(signature, mac_tag, auth)
-        return Pki(
-            certChainPem=sigma_auth.get_cert_chain(),
-            signature=sigma_auth.get_signature(),
-            idMac=sigma_auth.get_mac_tag(),
-        )
-
-    def _encrypt_and_encode_data(self, data: bytes) -> DataNoncePubkey:
-        nonce = chily.Nonce.from_random()
-        cipher = chily.Cipher(self.keypair.secret, self._get_enclave_pubkey())
-        enc_data = cipher.encrypt("client sent session data", data, nonce)
-        data_nonce_pubkey = datanoncepubkey_to_message(
-            bytes(enc_data),
-            bytes(nonce.bytes),
-            bytes(self.keypair.public_key.bytes),
-        )
-        return data_nonce_pubkey
-
-    def _decode_and_decrypt_data(self, data: bytes) -> bytes:
-        dec_data, nonceB, _ = message_to_datanoncepubkey(data)
-        cipher = chily.Cipher(self.keypair.secret, self._get_enclave_pubkey())
-        return cipher.decrypt(
-            "client received session data", dec_data, chily.Nonce.from_bytes(nonceB)
-        )
 
     def _send_endorsement_request(
         self,
@@ -298,7 +192,7 @@ class Session:
         if not response.HasField("pkiEndorsementResponse"):
             raise Exception(
                 "Expected pkiEndorsementResponse, got "
-                + str(response.WhichOneof("gcg_response"))
+                + str(response.WhichOneof("endorsementResponse"))
             )
         return response.pkiEndorsementResponse
 
@@ -318,7 +212,7 @@ class Session:
         if not response.HasField("dcrSecretEndorsementResponse"):
             raise Exception(
                 "Expected dcrSecretEndorsementResponse, got "
-                + str(response.WhichOneof("gcg_response"))
+                + str(response.WhichOneof("endorsementResponse"))
             )
         return response.dcrSecretEndorsementResponse
 
@@ -332,51 +226,33 @@ class Session:
         Use this method if any of the convenience methods (such as `run_computation`) don't perform
         the exact task you want.
         """
-        message_pki = self._get_message_pki(self.auth)
-        request.userAuth.pki.CopyFrom(message_pki)
-        request.userAuth.enclaveEndorsements.CopyFrom(self.auth.endorsements)
-        gcg_protocol = serialize_length_delimited(ComputeNodeProtocol(version=protocol))
-        serialized_request = serialize_length_delimited(
-            Request(
-                deltaRequest=self._encrypt_and_encode_data(
-                    gcg_protocol + serialize_length_delimited(request)
-                )
-            )
-        )
-        url = Endpoints.SESSION_MESSAGES.replace(":sessionId", self.session_id)
-        enclave_response: bytes = self.client._api.post(
-            url,
-            serialized_request,
-            {"Content-type": "application/octet-stream", "Accept-Version": "2"},
-        ).content
-
-        responses: List[GcgResponse] = []
-        offset = 0
-        while offset < len(enclave_response):
-            response_container = Response()
-            offset += parse_length_delimited(
-                enclave_response[offset:], response_container
-            )
-            if response_container.HasField("unsuccessfulResponse"):
-                raise Exception(response_container.unsuccessfulResponse)
-            else:
-                response = GcgResponse()
-                decrypted_response = self._decode_and_decrypt_data(
-                    response_container.successfulResponse
-                )
-                response_protocol = ComputeNodeProtocol()
-                response_offset = parse_length_delimited(
-                    decrypted_response, response_protocol
-                )
-                if response_protocol.version != protocol:
-                    raise Exception(
-                        "Different response protocol version than requested"
-                    )
-                parse_length_delimited(decrypted_response[response_offset:], response)
-                if response.HasField("failure"):
-                    raise Exception(response.failure)
-                responses.append(response)
+        responses = self.connection.send_request(request, protocol, self.auth)
         return responses
+
+    def send_request_raw(
+        self,
+        request: bytes,
+        protocol: int,
+    ) -> List[bytes]:
+        """
+        Low-level method for sending a raw `GcgRequest` to the enclave.
+        Use this method if any of the convenience methods (such as `run_computation`) don't perform
+        the exact task you want.
+        """
+        responses = self.connection.send_request_raw(request, protocol, self.auth)
+        return responses
+
+    def send_compilable_request(
+        self,
+        compile_request: Callable[[CompilerRequest, Channel], bytes],
+        request: CompilerRequest,
+        decompile_response: Callable[[List[bytes]], CompilerResponse],
+        protocol: int,
+    ) -> CompilerResponse:
+        response = self.connection.send_compilable_request(
+            compile_request, request, decompile_response, protocol, self.auth
+        )
+        return response
 
     def _publish_data_room(
         self,
@@ -1106,7 +982,7 @@ class Session:
         return JobId(response.jobId.hex(), compute_node_id)
 
     def wait_until_computation_has_finished(
-        self, job_id: JobId, /, *, interval: int = 5, timeout: int = None
+        self, job_id: JobId, /, *, interval: int = 5, timeout: Optional[int] = None
     ):
         """
         Wait for the given job to complete.
@@ -1137,7 +1013,7 @@ class Session:
         /,
         *,
         interval: int = 5,
-        timeout: int = None,
+        timeout: Optional[int] = None,
     ):
         """
         Wait for the given job to complete for all of the given compute nodes.
@@ -1193,7 +1069,7 @@ class Session:
         /,
         *,
         interval: int = 5,
-        timeout: int = None,
+        timeout: Optional[int] = None,
     ) -> bytes:
         """
         Wait for the given job to complete and retrieve its results as a raw byte string.
@@ -1218,7 +1094,7 @@ class Session:
         /,
         *,
         interval: int = 5,
-        timeout: int = None,
+        timeout: Optional[int] = None,
     ) -> int:
         """
         Wait for the given job to complete and retrieve its results size.
@@ -1258,7 +1134,7 @@ class Session:
         /,
         *,
         interval: int = 5,
-        timeout: int = None,
+        timeout: Optional[int] = None,
         parameters: Optional[Mapping[Text, Text]] = None,
     ) -> Optional[bytes]:
         """

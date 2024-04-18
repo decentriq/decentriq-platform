@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union, Any
-from .high_level_node import DataNode, ComputationNode
-from ..session import Session
-from .existing_builder import ExistingAnalyticsDcrBuilder
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from typing_extensions import Self
+
 from ..attestation import enclave_specifications
-from typing_extensions import Self
+from ..session import Session
+from ..types import EnclaveSpecification
+from .existing_builder import ExistingAnalyticsDcrBuilder
+from .high_level_node import ComputationNode, DataNode
 from .node_definitions import NodeDefinition
-from typing_extensions import Self
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class AnalyticsDcrDefinition:
@@ -90,8 +95,9 @@ class AnalyticsDcr:
         """
         self.session.stop_data_room(self.id)
 
-    @staticmethod
+    @classmethod
     def _from_existing(
+        cls,
         dcr_id: str,
         *,
         client: Client,
@@ -123,7 +129,7 @@ class AnalyticsDcr:
         )
         existing_dcr_builder = ExistingAnalyticsDcrBuilder(dcr_id, client, session)
         cfg = existing_dcr_builder.get_configuration()
-        dcr = AnalyticsDcr(
+        dcr = cls(
             client=client,
             session=session,
             dcr_id=dcr_id,

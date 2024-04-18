@@ -1,14 +1,12 @@
 from google.protobuf.json_format import MessageToDict
+
 from ...proto import (
-    serialize_length_delimited,
     ComputeNodeFormat,
     parse_length_delimited,
+    serialize_length_delimited,
 )
 from ..node import Node
-from .proto import (
-    DataSourceSnowflakeWorkerConfiguration,
-    SnowflakeSource,
-)
+from .proto import DataSourceSnowflakeWorkerConfiguration, SnowflakeSource
 
 __docformat__ = "restructuredtext"
 __pdoc__ = {

@@ -1,9 +1,11 @@
-from .proto import AttestationSpecification, DataRoomConfiguration
-from google.protobuf.json_format import MessageToDict
-from .types import EnclaveSpecification
-from .client import Client
-from .session import LATEST_GCG_PROTOCOL_VERSION, Session
 from typing import Dict, List
+
+from google.protobuf.json_format import MessageToDict
+
+from .client import Client
+from .proto import AttestationSpecification, DataRoomConfiguration
+from .session import LATEST_GCG_PROTOCOL_VERSION, Session
+from .types import EnclaveSpecification
 
 
 def decode_compute_node_config(

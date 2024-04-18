@@ -1,35 +1,40 @@
 from __future__ import annotations
 
 import json
-from ..proto import serialize_length_delimited
-from typing import Dict, List, Tuple, Union, Optional
-from ..session import Session
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
+
 from decentriq_dcr_compiler import (
     upgrade_data_science_data_room_to_latest,
     verify_data_room,
 )
 from decentriq_dcr_compiler.schemas.data_science_commit import DataScienceCommitV6
 from decentriq_dcr_compiler.schemas.data_science_data_room import (
+    ComputationNodeV6,
     DataScienceDataRoom,
     DataScienceDataRoomConfigurationV6,
     LeafNodeV2,
-    ComputationNodeV6,
-    ScriptingLanguage,
     Participant,
+    ScriptingLanguage,
 )
+
+from ..proto import serialize_length_delimited
+from ..session import Session
+from .matching_compute_nodes import MatchingComputeNodeDefinition
 from .node_definitions import NodeDefinition
+from .preview_compute_nodes import PreviewComputeNodeDefinition
 from .python_compute_nodes import PythonComputeNodeDefinition
 from .r_compute_nodes import RComputeNodeDefinition
+from .raw_data_nodes import RawDataNodeDefinition
+from .s3_sink_compute_nodes import S3SinkComputeNodeDefinition
 from .sql_compute_nodes import SqlComputeNodeDefinition
 from .sqlite_compute_nodes import SqliteComputeNodeDefinition
-from .s3_sink_compute_nodes import S3SinkComputeNodeDefinition
-from .matching_compute_nodes import MatchingComputeNodeDefinition
 from .synthetic_compute_nodes import SyntheticDataComputeNodeDefinition
-from .preview_compute_nodes import PreviewComputeNodeDefinition
-from .raw_data_nodes import RawDataNodeDefinition
 from .table_data_nodes import TableDataNodeDefinition
 from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 @dataclass
@@ -54,7 +59,6 @@ class ExistingAnalyticsDcrBuilder:
         self.dcr_id = dcr_id
         self.client = client
         self.session = session
-        self.high_level = None
         existing_dcr = self.session.retrieve_data_room(self.dcr_id)
         self.high_level = json.loads(existing_dcr.highLevelRepresentation.decode())
 
@@ -131,7 +135,7 @@ class ExistingAnalyticsDcrBuilder:
     def _get_nodes(
         self,
         config: DataScienceDataRoomConfigurationV6,
-        commits: List[DataDataScienceDataRoomCommitV6],
+        commits: List[DataScienceCommitV6],
     ) -> List[NodeDefinition]:
         nodes = []
         hl_nodes = config.nodes

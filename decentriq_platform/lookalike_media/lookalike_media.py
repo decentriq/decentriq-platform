@@ -1,40 +1,38 @@
-from enum import Enum
 import hashlib
 import io
 import json
 import numbers
-
-from typing import List, Optional, Dict
 import zipfile
+from enum import Enum
+from typing import Dict, List, Optional, Tuple
 
 from decentriq_dcr_compiler import (
-    compiler,
     LookalikeMediaDataRoom,
-    LookalikeMediaResponse,
     LookalikeMediaRequest,
+    LookalikeMediaResponse,
+    compiler,
 )
 
+from ..channel import Channel
 from ..client import Client
+from ..helpers import get_latest_enclave_specs_as_dictionary
+from ..keychain import Keychain, KeychainEntry
+from ..proto import (
+    CreateDcrKind,
+    DataRoom,
+    GcgRequest,
+    UserAuth,
+    parse_length_delimited,
+    serialize_length_delimited,
+)
 from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
 from ..storage import Key
-from ..keychain import Keychain, KeychainEntry
 from ..types import (
     CreateMediaComputeJobInput,
     EnclaveSpecification,
     JobId,
     OverlapInsightsCacheKey,
     PublishedDataset,
-)
-from ..proto import (
-    DataRoom,
-    parse_length_delimited,
-    serialize_length_delimited,
-    CreateDcrKind,
-    UserAuth,
-    GcgRequest,
-)
-from ..helpers import (
-    get_latest_enclave_specs_as_dictionary,
 )
 
 __docformat__ = "restructuredtext"
@@ -64,7 +62,7 @@ class LookalikeMediaDcr:
         self,
         client: Client,
         high_level_representation: str,
-        existing_lookalike_media_dcr: ExistingLookalikeMediaDcr = None,
+        existing_lookalike_media_dcr: Optional[ExistingLookalikeMediaDcr] = None,
     ) -> None:
         self.client = client
         if existing_lookalike_media_dcr:
@@ -74,7 +72,9 @@ class LookalikeMediaDcr:
             self.session = client.create_session(
                 self.auth, existing_lookalike_media_dcr.driver_enclave_spec
             )
-            self.hl_lmdcr = LookalikeMediaDataRoom.parse_obj(high_level_representation)
+            self.hl_lmdcr = LookalikeMediaDataRoom.model_validate(
+                high_level_representation
+            )
             self.id = existing_lookalike_media_dcr.id
         else:
             enclave_specs = get_latest_enclave_specs_as_dictionary(self.client)
@@ -88,28 +88,34 @@ class LookalikeMediaDcr:
         lmdcr_request: LookalikeMediaRequest,
         session: Session,
     ) -> LookalikeMediaResponse:
-        pki = session._get_message_pki(session.auth)
-        endorsements = session.auth.endorsements
-        auth = UserAuth(pki=pki, enclaveEndorsements=endorsements)
-        request_serialized = compiler.compile_lookalike_media_request_serialized(
+        def compile_request(lmdcr_request: LookalikeMediaRequest, channel: Channel):
+            user_auth = channel._get_message_auth(session.auth)
+            request_serialized = compiler.compile_lookalike_media_request_serialized(
+                lmdcr_request,
+                serialize_length_delimited(user_auth),
+            )
+            return bytes(request_serialized)
+
+        def decompile_response(responses: List[bytes]) -> LookalikeMediaResponse:
+            if len(responses) != 1:
+                raise Exception("Malformed response")
+            response = compiler.decompile_lookalike_media_response(
+                lmdcr_request, bytes(responses[0])
+            )
+            return response
+
+        response = session.send_compilable_request(
+            compile_request,
             lmdcr_request,
-            serialize_length_delimited(auth),
-        )
-        gcg_request = GcgRequest()
-        parse_length_delimited(request_serialized, gcg_request)
-        responses = session.send_request(gcg_request, LATEST_GCG_PROTOCOL_VERSION)
-        if len(responses) != 1:
-            raise Exception("Malformed response")
-        serialised_response = serialize_length_delimited(responses[0])
-        response = compiler.decompile_lookalike_media_response(
-            lmdcr_request, serialised_response
+            decompile_response,
+            LATEST_GCG_PROTOCOL_VERSION,
         )
         return response
 
     def _create_lmdcr(
         self, high_level_representation: str
-    ) -> (LookalikeMediaDataRoom, str):
-        create_lmdcr = compiler.CreateLookalikeMediaDataRoom.parse_obj(
+    ) -> Tuple[LookalikeMediaDataRoom, str]:
+        create_lmdcr = compiler.CreateLookalikeMediaDataRoom.model_validate(
             high_level_representation
         )
         lmdcr = compiler.create_lookalike_media_data_room(create_lmdcr)
@@ -277,15 +283,15 @@ class LookalikeMediaDcr:
     def _generate_overlap_insights_cache_key(
         self, published_datasets
     ) -> OverlapInsightsCacheKey:
-        cache_key = OverlapInsightsCacheKey()
-        cache_key["dataRoomId"] = self.id
+        cache_key = OverlapInsightsCacheKey(dataRoomId=self.id)
         published_datasets_list: List[PublishedDataset] = []
         for dataset in published_datasets:
-            published_dataset = PublishedDataset()
-            published_dataset["leafId"] = dataset.leafId
-            published_dataset["user"] = dataset.user
-            published_dataset["timestamp"] = dataset.timestamp
-            published_dataset["datasetHash"] = bytearray(dataset.datasetHash)
+            published_dataset = PublishedDataset(
+                leafId=dataset.leafId,
+                user=dataset.user,
+                timestamp=dataset.timestamp,
+                datasetHash=bytearray(dataset.datasetHash),
+            )
             published_datasets_list.append(published_dataset)
 
             node_id = dataset.leafId
@@ -350,7 +356,7 @@ class LookalikeMediaDcr:
         hex_digest = digest.hexdigest()
         return hex_digest
 
-    def get_overlap_insights(self, timeout: int = None) -> Dict[str, str]:
+    def get_overlap_insights(self, timeout: Optional[int] = None) -> Dict[str, str]:
         """
         Retrieve the results of running the overlap insights computation.
         """
@@ -374,20 +380,6 @@ class LookalikeMediaDcr:
             return report
         else:
             raise Exception("Failed to retrieve overlap insights")
-
-    def _get_lmdcr_gcg_request(
-        self, lmdcr_request: LookalikeMediaRequest
-    ) -> GcgRequest:
-        pki = self.session._get_message_pki(self.auth)
-        endorsements = self.auth.endorsements
-        auth = UserAuth(pki=pki, enclaveEndorsements=endorsements)
-        request_serialized = compiler.compile_lookalike_media_request_serialized(
-            lmdcr_request,
-            serialize_length_delimited(auth),
-        )
-        request = GcgRequest()
-        parse_length_delimited(request_serialized, request)
-        return request
 
     def _upload_dataset_to_keychain(
         self, file_path: str, name: str, key: Key, keychain: Keychain

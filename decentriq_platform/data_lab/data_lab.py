@@ -1,43 +1,51 @@
 import base64
 import io
 import json
-from typing import Dict, Mapping, Optional, Text, Tuple
-from uuid import uuid4
 import uuid
 import zipfile
+from pathlib import Path
+from typing import Dict, List, Mapping, Optional, Text, Tuple
+from uuid import uuid4
+
+from decentriq_dcr_compiler import compiler
+from decentriq_dcr_compiler._schemas.create_data_lab import (
+    EnclaveSpecification as HlEnclaveSpecification,
+)
+from decentriq_dcr_compiler import (
+    CreateDataLab,
+    CreateDataLab2,
+    CreateDataLabComputeV1,
+    MediaInsightsRequest,
+    MediaInsightsResponse,
+)
+
+
 from ..client import Client
+from ..channel import Channel
+from ..helpers import (
+    create_session_from_driver_spec,
+    get_latest_enclave_specs_as_dictionary,
+)
+from ..keychain import Keychain, KeychainEntry
+from ..proto import (
+    CreateDcrPurpose,
+    DataRoom,
+    GcgRequest,
+    UserAuth,
+    parse_length_delimited,
+    serialize_length_delimited,
+)
+from ..proto.length_delimited import parse_length_delimited, serialize_length_delimited
+from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
+from ..storage import Key
 from ..types import (
+    MATCHING_ID_INTERNAL_LOOKUP,
     DataLabDatasetType,
     DataLabDefinition,
     DryRunOptions,
     EnclaveSpecification,
     JobId,
     MatchingId,
-)
-from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas import (
-    LookalikeMediaDataRoom,
-    CreateDataLab,
-    CreateDataLab2,
-    CreateDataLabComputeV1,
-)
-from ..proto import DataRoom, CreateDcrPurpose
-from ..proto.length_delimited import parse_length_delimited, serialize_length_delimited
-from ..storage import Key
-from ..keychain import Keychain, KeychainEntry
-from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
-from ..helpers import (
-    get_latest_enclave_specs_as_dictionary,
-    create_session_from_driver_spec,
-)
-from ..types import MATCHING_ID_INTERNAL_LOOKUP
-from pathlib import Path
-from decentriq_dcr_compiler.schemas import MediaInsightsRequest, MediaInsightsResponse
-from ..proto import (
-    parse_length_delimited,
-    serialize_length_delimited,
-    UserAuth,
-    GcgRequest,
 )
 
 
@@ -85,7 +93,7 @@ class DataLab:
         self,
         client: Client,
         cfg: DataLabConfig,
-        existing_data_lab: ExistingDataLab = None,
+        existing_data_lab: Optional[ExistingDataLab] = None,
     ):
         self.client = client
         enclave_specs = get_latest_enclave_specs_as_dictionary(self.client)
@@ -113,7 +121,7 @@ class DataLab:
                 root=CreateDataLab2(
                     v1=CreateDataLabComputeV1(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
-                        driverEnclaveSpecification=EnclaveSpecification(
+                        driverEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
                             id="",
                             workerProtocol=0,
@@ -126,7 +134,7 @@ class DataLab:
                         name=self.cfg.name,
                         numEmbeddings=self.cfg.num_embeddings,
                         publisherEmail=self.client.user_email,
-                        pythonEnclaveSpecification=EnclaveSpecification(
+                        pythonEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
                             id="",
                             workerProtocol=0,
@@ -178,9 +186,9 @@ class DataLab:
     def _get_data_lab_enclave_specs(
         self,
         enclave_specs: Dict[str, EnclaveSpecification],
-    ) -> (EnclaveSpecification, EnclaveSpecification):
-        driver_spec = {}
-        python_spec = {}
+    ) -> Tuple[HlEnclaveSpecification, HlEnclaveSpecification]:
+        driver_spec = None
+        python_spec = None
         for spec_id, spec in enclave_specs.items():
             spec_payload = {
                 "attestationProtoBase64": base64.b64encode(
@@ -191,10 +199,14 @@ class DataLab:
             }
             if "decentriq.driver" in spec_id:
                 spec["clientProtocols"] = [LATEST_GCG_PROTOCOL_VERSION]
-                driver_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+                driver_spec = HlEnclaveSpecification.parse_obj(spec_payload)
             elif "decentriq.python-ml-worker" in spec_id:
                 spec["clientProtocols"] = [LATEST_GCG_PROTOCOL_VERSION]
-                python_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+                python_spec = HlEnclaveSpecification.parse_obj(spec_payload)
+        if driver_spec is None:
+            raise Exception("No driver enclave spec found for the datalab")
+        if python_spec is None:
+            raise Exception("No python-ml-worker enclave spec found for the datalab")
         return (driver_spec, python_spec)
 
     def provision_local_datasets(
@@ -339,10 +351,10 @@ class DataLab:
             self.data_lab_id,
             validation_job_id,
             statistics_job_id,
-            self.session.driver_attestation_specification_hash,
+            self.session.connection.channel.driver_attestation_specification_hash,
         )
 
-    def get_validation_report(self, timeout: int = None):
+    def get_validation_report(self, timeout: Optional[int] = None):
         """
         Retrieve the validation report. This function will block until the report is ready unless a timeout is specified.
 
@@ -388,7 +400,7 @@ class DataLab:
                 )
         return validation_reports
 
-    def get_statistics_report(self, timeout: int = None):
+    def get_statistics_report(self, timeout: Optional[int] = None):
         """
         Retrieve the statistics report. This function will block until the report is ready unless a timeout is specified.
 
@@ -509,25 +521,24 @@ class DataLab:
     def _send_request(
         self, request: MediaInsightsRequest, session: Session
     ) -> MediaInsightsResponse:
-        pki = session._get_message_pki(session.auth)
-        endorsements = session.auth.endorsements
-        auth = UserAuth(pki=pki, enclaveEndorsements=endorsements)
-        request_serialized = compiler.compile_media_insights_request(
-            request,
-            serialize_length_delimited(auth),
-        )
-        gcg_request = GcgRequest()
-        parse_length_delimited(request_serialized, gcg_request)
-        # TODO: The `endpoint_protocols` should come from DDC as it knows
-        # the appropriate supported versions.
-        endpoint_protocols = [3, 4, 5, 6]
-        protocol = session._get_client_protocol(endpoint_protocols)
-        responses = session.send_request(gcg_request, protocol=protocol)
-        if len(responses) != 1:
-            raise Exception("Malformed response")
-        serialised_response = serialize_length_delimited(responses[0])
-        response = compiler.decompile_media_insights_response(
-            request, serialised_response
+        def compile_request(mi_request: MediaInsightsRequest, channel: Channel):
+            user_auth = channel._get_message_auth(session.auth)
+            request_serialized = compiler.compile_media_insights_request(
+                mi_request,
+                serialize_length_delimited(user_auth),
+            )
+            return bytes(request_serialized)
+
+        def decompile_response(responses: List[bytes]) -> MediaInsightsResponse:
+            if len(responses) != 1:
+                raise Exception("Malformed response")
+            response = compiler.decompile_media_insights_response(
+                request, bytes(responses[0])
+            )
+            return response
+
+        response = session.send_compilable_request(
+            compile_request, request, decompile_response, LATEST_GCG_PROTOCOL_VERSION
         )
         return response
 

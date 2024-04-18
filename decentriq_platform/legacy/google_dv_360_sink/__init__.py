@@ -1,15 +1,12 @@
 from google.protobuf.json_format import MessageToDict
+
 from ...proto import (
-    serialize_length_delimited,
     ComputeNodeFormat,
     parse_length_delimited,
+    serialize_length_delimited,
 )
 from ..node import Node
-from .proto import (
-    GoogleDv360SinkWorkerConfiguration,
-    SinkInput,
-)
-
+from .proto import GoogleDv360SinkWorkerConfiguration, SinkInput
 
 __docformat__ = "restructuredtext"
 __pdoc__ = {

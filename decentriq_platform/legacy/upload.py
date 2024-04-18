@@ -1,10 +1,9 @@
 import io
-
 from typing import Optional
 
+from .keychain import Keychain
 from .session import Session
 from .storage import Key
-from .keychain import Keychain
 
 
 def provision_tabular_dataset_to_data_science_data_room(
