@@ -1,11 +1,16 @@
 from __future__ import annotations
 
-from .node_definitions import NodeDefinition
-from .high_level_node import DataNode
-from ..session import Session
-from typing_extensions import Self
-from typing import Dict, Optional, List
+from typing import TYPE_CHECKING, Dict, List, Optional, cast
+
 from decentriq_dcr_compiler.schemas.data_science_data_room import RawLeafNode
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import DataNode
+from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class RawDataNodeDefinition(NodeDefinition):
@@ -37,8 +42,9 @@ class RawDataNodeDefinition(NodeDefinition):
         }
         return raw_node
 
-    @staticmethod
+    @classmethod
     def _from_high_level(
+        cls,
         id: str,
         name: str,
         _node: RawLeafNode,
@@ -52,7 +58,7 @@ class RawDataNodeDefinition(NodeDefinition):
         - `_node`: Pydantic model of the `RawDataNodeDefinition`.
         - `is_required`: Flag determining if the `RawDataNodeDefinition` must be present for dependent computations.
         """
-        return RawDataNodeDefinition(
+        return cls(
             id=id,
             name=name,
             is_required=is_required,
@@ -83,7 +89,7 @@ class RawDataNodeDefinition(NodeDefinition):
             name=self.name,
             is_required=self.is_required,
             dcr_id=dcr_id,
-            node_definition=node_definition,
+            node_definition=cast(RawDataNodeDefinition, node_definition),
             client=client,
             session=session,
             id=self.id,

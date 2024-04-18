@@ -1,6 +1,5 @@
-from typing import List, Any, Optional
 import uuid
-
+from typing import Any, List, Optional
 
 __all__ = ["Node"]
 

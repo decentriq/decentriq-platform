@@ -1,13 +1,14 @@
+from typing import List, Optional
+
 from google.protobuf.json_format import MessageToDict
+
 from ...proto import (
-    serialize_length_delimited,
     ComputeNodeFormat,
     parse_length_delimited,
+    serialize_length_delimited,
 )
 from ..node import Node
-from typing import Optional, List
 from .proto import DatasetSinkWorkerConfiguration, SinkInput
-
 
 __docformat__ = "restructuredtext"
 __pdoc__ = {
@@ -73,6 +74,5 @@ class DatasetSink(Node):
 
 from ...decoder import DatasetSinkWorkerConfiguration
 from .helpers import store_computation_result_as_dataset
-
 
 __all__ = ["DatasetSink", "store_computation_result_as_dataset"]

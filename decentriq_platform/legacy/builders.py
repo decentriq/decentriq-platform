@@ -1,35 +1,31 @@
 from __future__ import annotations
+
 import uuid
-from typing import List, Any, Optional, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from ..proto import (
-    AuthenticationMethod,
-    UserPermission,
-    ComputeNode,
-    ComputeNodeLeaf,
-    ComputeNodeBranch,
-    Permission,
-    DataRoom,
-    ComputeNodeParameter,
-    AttestationSpecification,
-    StaticDataRoomPolicy,
-    AffectedDataOwnersApprovePolicy,
-    ConfigurationModification,
     AddModification,
+    AffectedDataOwnersApprovePolicy,
+    AttestationSpecification,
+    AuthenticationMethod,
     ChangeModification,
-    ConfigurationElement,
-    ConfigurationCommit,
-    DataRoomConfiguration,
-    ComputeNodeProtocol,
+    ComputeNode,
     ComputeNodeAirlock,
+    ComputeNodeBranch,
+    ComputeNodeLeaf,
+    ComputeNodeParameter,
+    ComputeNodeProtocol,
+    ConfigurationCommit,
+    ConfigurationElement,
+    ConfigurationModification,
+    DataRoom,
+    DataRoomConfiguration,
 )
-from ..proto import (
-    GovernanceProtocol as GovernanceProtocolProto,
-)
+from ..proto import GovernanceProtocol as GovernanceProtocolProto
+from ..proto import Permission, StaticDataRoomPolicy, UserPermission
+from ..types import EnclaveSpecification
 from .node import Node
 from .permission import Permissions
-from ..types import EnclaveSpecification
-
 
 __all__ = [
     "DataRoomBuilder",
@@ -156,8 +152,8 @@ class DataRoomBuilder:
         governance_protocol: GovernanceProtocolProto = GovernanceProtocol.static(),
         *,
         add_basic_user_permissions: bool = True,
-        description: str = None,
-        dcr_secret_id: bytes = None,
+        description: Optional[str] = None,
+        dcr_secret_id: Optional[bytes] = None,
     ) -> None:
         """
         Create a data room builder object.
@@ -391,7 +387,7 @@ class DataRoomModificationsBuilder:
 
         self.change_user_permissions = []
         self.change_attestation_specs = []
-        self.change_compute_nodes = []
+        self.change_compute_nodes: List[Tuple[str, ComputeNode]] = []
 
         extracted_conf_elements = _extract_configuration_elements(
             data_room_configuration

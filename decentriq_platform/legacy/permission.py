@@ -1,17 +1,17 @@
 from ..proto import (
-    Permission,
-    LeafCrudPermission,
-    RetrieveAuditLogPermission,
+    DryRunPermission,
     ExecuteComputePermission,
+    ExecuteDevelopmentComputePermission,
+    GenerateMergeSignaturePermission,
+    LeafCrudPermission,
+    MergeConfigurationCommitPermission,
+    Permission,
+    RetrieveAuditLogPermission,
     RetrieveComputeResultPermission,
     RetrieveDataRoomPermission,
     RetrieveDataRoomStatusPermission,
-    UpdateDataRoomStatusPermission,
     RetrievePublishedDatasetsPermission,
-    DryRunPermission,
-    GenerateMergeSignaturePermission,
-    ExecuteDevelopmentComputePermission,
-    MergeConfigurationCommitPermission,
+    UpdateDataRoomStatusPermission,
 )
 
 

@@ -1,11 +1,9 @@
 import io
-
 from typing import Optional
 
+from ..keychain import Keychain, KeychainEntry
 from ..session import Session
 from ..storage import Key
-from ..keychain import Keychain, KeychainEntry
-
 
 __docformat__ = "restructuredtext"
 

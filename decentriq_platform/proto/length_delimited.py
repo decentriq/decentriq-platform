@@ -1,7 +1,8 @@
 from typing import Tuple
-from google.protobuf.message import Message
-from google.protobuf.internal.encoder import _VarintBytes  # type: ignore
+
 from google.protobuf.internal.decoder import _DecodeVarint32  # type: ignore
+from google.protobuf.internal.encoder import _VarintBytes  # type: ignore
+from google.protobuf.message import Message
 
 
 # Returns the end offset from serialized_bytes

@@ -2,18 +2,22 @@ from __future__ import annotations
 
 import base64
 import functools
-from enum import Enum
-from typing import Dict, List, Optional
-from typing_extensions import Self
 import uuid
+from enum import Enum
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+from typing_extensions import Self
+
 from ..attestation import enclave_specifications
-from ..session import (
-    LATEST_WORKER_PROTOCOL_VERSION,
-)
 from ..proto.length_delimited import serialize_length_delimited
-from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
-from .node_definitions import NodeDefinition
+from ..session import LATEST_WORKER_PROTOCOL_VERSION
+from ..types import EnclaveSpecification
 from .analytics_dcr import AnalyticsDcrDefinition
+from .node_definitions import NodeDefinition
+from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 __all__ = [

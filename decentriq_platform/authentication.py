@@ -1,12 +1,14 @@
-from .proto import EnclaveEndorsement, EnclaveEndorsements
-
+import datetime
 from typing import Optional
+
+import chily
 from cryptography import x509
-from cryptography.x509 import Certificate
-from cryptography.x509.oid import NameOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
-import datetime
+from cryptography.x509 import Certificate
+from cryptography.x509.oid import NameOID
+
+from .proto import EnclaveEndorsement, EnclaveEndorsements
 
 __all__ = ["Auth"]
 
@@ -38,12 +40,13 @@ class Auth:
         self.certificate_chain = certificate_chain
         self.kp = keypair
         self.user_id = user_id
+        self.keypair = chily.Keypair.from_random()
         self._endorsements = EnclaveEndorsements()
 
     def _get_user_id(self) -> str:
         return self.user_id
 
-    def _sign(self, data: bytes) -> bytes:
+    def sign(self, data: bytes) -> bytes:
         return self.kp.sign(data, padding.PKCS1v15(), hashes.SHA512())
 
     def get_certificate_chain_pem(self) -> bytes:
@@ -52,8 +55,7 @@ class Auth:
         """
         return self.certificate_chain
 
-    @property
-    def endorsements(self) -> EnclaveEndorsements:
+    def get_enclave_endorsements(self) -> EnclaveEndorsements:
         return self._endorsements
 
     def attach_endorsement(

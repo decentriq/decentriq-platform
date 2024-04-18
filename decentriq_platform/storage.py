@@ -1,10 +1,15 @@
-import chily
 import os
 from hashlib import sha256
-from .proto import serialize_length_delimited
-from .proto import ChunkHeader, EncryptionHeader, VersionHeader
-from typing import BinaryIO, Iterator, Tuple, Optional, List
-from io import TextIOWrapper
+from typing import BinaryIO, Iterator, List, Optional, Tuple
+
+import chily
+
+from .proto import (
+    ChunkHeader,
+    EncryptionHeader,
+    VersionHeader,
+    serialize_length_delimited,
+)
 
 __all__ = ["Key"]
 
@@ -86,7 +91,7 @@ class Chunker(Iterator):
         self.content_size = 0
         self.input_stream = input_stream
 
-    def __iter__(self) -> Iterator[Tuple[bytes, bytes]]:
+    def __iter__(self) -> Iterator[Tuple[bytes, bytes, int]]:
         self.input_stream.seek(0)
         return self
 

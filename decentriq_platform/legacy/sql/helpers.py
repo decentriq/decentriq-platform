@@ -1,16 +1,17 @@
-import zipfile
-import io
 import csv
-from typing import List, Tuple, Any
-from .compute import SqlSchemaVerifier
-from ..permission import Permissions
+import io
+import zipfile
+from typing import Any, List, Tuple
+
+from ...proto import AuthenticationMethod, Permission
+from ...proto.length_delimited import parse_length_delimited
 from ...session import Session
 from ...storage import Key
 from ..builders import DataRoomBuilder
 from ..compute import Noop
+from ..permission import Permissions
+from .compute import SqlSchemaVerifier
 from .proto import TableSchema
-from ...proto import Permission, AuthenticationMethod
-from ...proto.length_delimited import parse_length_delimited
 
 
 def _data_node_id(node: str):

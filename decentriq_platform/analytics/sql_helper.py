@@ -1,7 +1,8 @@
-import zipfile
-import io
 import csv
+import io
+import zipfile
 from typing import List, Tuple
+
 from ..proto.compute_sql_pb2 import TableSchema
 from ..proto.length_delimited import parse_length_delimited
 

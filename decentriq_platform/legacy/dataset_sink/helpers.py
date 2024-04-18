@@ -1,13 +1,14 @@
-from typing import Dict
-from ...storage import Key
-from ...session import Session
-from ..builders import DataRoomCommitBuilder
-from ...types import EnclaveSpecification
-from . import DatasetSink
-from .proto import SinkInput, ZipFile, SingleFile, FileSelection
-from ..permission import Permissions
-from ..container import read_result_as_zipfile
 import json
+from typing import Dict
+
+from ...session import Session
+from ...storage import Key
+from ...types import EnclaveSpecification
+from ..builders import DataRoomCommitBuilder
+from ..container import read_result_as_zipfile
+from ..permission import Permissions
+from . import DatasetSink
+from .proto import FileSelection, SingleFile, SinkInput, ZipFile
 
 
 def store_computation_result_as_dataset(
@@ -49,7 +50,7 @@ def store_computation_result_as_dataset(
     builder.add_parameter_node(key_node_id, is_required=True, node_id=key_node_id)
 
     builder.add_user_permission(
-        email=session.email,
+        email=session.auth.user_id,
         authentication_method=session.client.decentriq_pki_authentication,
         permissions=[
             Permissions.execute_compute(sink_node_id),

@@ -1,13 +1,15 @@
 from typing import List, Optional
+
 from google.protobuf.json_format import MessageToDict
+
+from ...proto import ComputeNodeFormat
+from ...proto.length_delimited import parse_length_delimited, serialize_length_delimited
+from ..node import Node
 from .proto.compute_container_pb2 import (
     ContainerWorkerConfiguration,
     MountPoint,
     ProxyConfiguration,
 )
-from ...proto.length_delimited import serialize_length_delimited, parse_length_delimited
-from ...proto import ComputeNodeFormat
-from ..node import Node
 
 
 class StaticContainerCompute(Node):

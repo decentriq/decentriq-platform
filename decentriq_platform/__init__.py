@@ -3,18 +3,20 @@
 ___
 """
 
-from .client import Client, create_client, Session
-from .storage import Key
-from .attestation import enclave_specifications, EnclaveSpecifications
-
+from . import (
+    analytics,
+    data_lab,
+    legacy,
+    lookalike_media,
+    session,
+    types,
+    authentication,
+)
+from .attestation import EnclaveSpecifications, enclave_specifications
+from .client import Client, Session, create_client
 from .endorsement import Endorser
 from .keychain import Keychain, KeychainEntry
-
-from . import analytics
-from . import lookalike_media
-from . import legacy
-from . import data_lab
-from . import session
+from .storage import Key
 
 __docformat__ = "restructuredtext"
 

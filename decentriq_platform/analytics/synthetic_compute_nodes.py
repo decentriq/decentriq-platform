@@ -1,18 +1,23 @@
 from __future__ import annotations
 
-from enum import Enum
-from .high_level_node import ContainerComputationNode
-from typing import Dict, List, Optional
-from .node_definitions import NodeDefinition
-from ..session import Session
+import json
 from dataclasses import dataclass
-from .table_data_nodes import PrimitiveType
-from typing_extensions import Self
+from enum import Enum
+from typing import TYPE_CHECKING, Dict, List, Optional
+
 from decentriq_dcr_compiler.schemas.data_science_data_room import (
     SyntheticDataComputationNode,
 )
-import json
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import ContainerComputationNode
+from .node_definitions import NodeDefinition
 from .sql_helper import read_sql_query_result_as_string
+from .table_data_nodes import PrimitiveType
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class MaskType(str, Enum):
@@ -123,9 +128,9 @@ class SyntheticDataComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
-    @staticmethod
+    @classmethod
     def _from_high_level(
-        id: str, name: str, node: SyntheticDataComputationNode
+        cls, id: str, name: str, node: SyntheticDataComputationNode
     ) -> Self:
         """
         Instantiate a `SyntheticDataComputeNodeDefinition` from its high level representation.
@@ -135,7 +140,7 @@ class SyntheticDataComputeNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `SyntheticDataComputeNode`.
         """
         synthetic_data_node = json.loads(node.model_dump_json())
-        return SyntheticDataComputeNodeDefinition(
+        return cls(
             id=id,
             name=name,
             columns=synthetic_data_node["columns"],

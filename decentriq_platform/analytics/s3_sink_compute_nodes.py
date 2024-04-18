@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-from enum import Enum
-from decentriq_dcr_compiler.schemas.data_science_data_room import S3SinkComputationNode
-from .high_level_node import ComputationNode
-from typing import Dict, Optional
-from .node_definitions import NodeDefinition
-from ..session import Session
-from typing_extensions import Self
 import json
+from enum import Enum
+from typing import TYPE_CHECKING, Dict, Optional
+
+from decentriq_dcr_compiler.schemas.data_science_data_room import S3SinkComputationNode
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import ComputationNode
+from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class S3Provider(str, Enum):
@@ -27,7 +32,7 @@ class S3SinkComputeNodeDefinition(NodeDefinition):
         endpoint: str,
         region: str,
         dependency: str,
-        provider: Optional[S3Provider] = S3Provider.AWS,
+        provider: S3Provider = S3Provider.AWS,
         id: Optional[str] = None,
     ) -> None:
         """
@@ -78,8 +83,8 @@ class S3SinkComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
-    @staticmethod
-    def _from_high_level(id: str, name: str, node: S3SinkComputationNode) -> Self:
+    @classmethod
+    def _from_high_level(cls, id: str, name: str, node: S3SinkComputationNode) -> Self:
         """
         Instantiate a `S3SinkComputeNodeDefinition` from its high level representation.
 
@@ -88,7 +93,7 @@ class S3SinkComputeNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `S3SinkComputeNode`.
         """
         s3_sink_node = json.loads(node.model_dump_json())
-        return S3SinkComputeNodeDefinition(
+        return cls(
             name=name,
             credentials_dependency_id=s3_sink_node["credentialsDependencyId"],
             endpoint=s3_sink_node["endpoint"],

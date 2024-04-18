@@ -1,14 +1,17 @@
 from __future__ import annotations
-from decentriq_dcr_compiler.schemas.data_science_data_room import SqliteComputationNode
-from .high_level_node import StructuredOutputNode
-from typing import Dict, List, Optional
-from .node_definitions import NodeDefinition
-from ..session import Session
-from typing_extensions import Self
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
-    SqliteComputationNode,
-)
+
 import json
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+from decentriq_dcr_compiler.schemas.data_science_data_room import SqliteComputationNode
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import StructuredOutputNode
+from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class SqliteComputeNodeDefinition(NodeDefinition):
@@ -83,8 +86,8 @@ class SqliteComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
-    @staticmethod
-    def _from_high_level(id: str, name: str, node: SqliteComputationNode) -> Self:
+    @classmethod
+    def _from_high_level(cls, id: str, name: str, node: SqliteComputationNode) -> Self:
         """
         Instantiate a `SqliteComputeNodeDefinition` from its high level representation.
 
@@ -94,7 +97,7 @@ class SqliteComputeNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `SqliteComputeNode`.
         """
         sqlite_node = json.loads(node.model_dump_json())
-        return SqliteComputeNodeDefinition(
+        return cls(
             id=id,
             name=name,
             query=sqlite_node["statement"],

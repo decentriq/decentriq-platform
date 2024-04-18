@@ -1,65 +1,48 @@
-from __future__ import annotations
-
-from typing import BinaryIO, List, Dict, Optional, Tuple, TYPE_CHECKING
-
-# Avoid circular import client -> keychain -> client outside of typechecking
-if TYPE_CHECKING:
-    from .keychain import Keychain
-
-from .endorsement import Endorser
-
 import hashlib
 import json
 import os
-from threading import BoundedSemaphore
-from concurrent import futures
 from base64 import b64decode, b64encode
-
-from .api import Api
-from .authentication import Auth, generate_key, generate_self_signed_certificate
-from .config import (
-    DECENTRIQ_CLIENT_ID,
-    DECENTRIQ_HOST,
-    DECENTRIQ_PORT,
-    DECENTRIQ_USE_TLS,
-    _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
-)
-from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
-from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
-from .types import (
-    CreateMediaComputeJobInput,
-    DataRoom,
-    DatasetUsage,
-    EnclaveSpecification,
-    DatasetDescription,
-    DataRoomDescription,
-    KeychainInstance,
-    DataLabDefinition,
-    DataLabListFilter,
-    MediaComputeJob,
-    MediaComputeJobFilterInput,
-    DataRoomKind,
-)
-from .api import NotFoundError
-from .proto import (
-    AttestationSpecification,
-    parse_length_delimited,
-    serialize_length_delimited,
-    AuthenticationMethod,
-    PkiPolicy,
-    DataRoom as ProtoDataRoom,
-    CreateDcrKind,
-)
-from .api import Endpoints, retry
-from .graphql import GqlClient
-from .attestation import EnclaveSpecifications, enclave_specifications, SPECIFICATIONS
+from concurrent import futures
+from threading import BoundedSemaphore
+from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
 
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
 
-from .analytics import AnalyticsDcr
-
-import base64
+from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
+from .api import Api, Endpoints, NotFoundError, retry
+from .attestation import enclave_specifications
+from .authentication import Auth, generate_key, generate_self_signed_certificate
+from .config import (
+    _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
+    DECENTRIQ_CLIENT_ID,
+    DECENTRIQ_HOST,
+    DECENTRIQ_PORT,
+    DECENTRIQ_USE_TLS,
+)
+from .connection import Connection
+from .endorsement import Endorser
+from .graphql import GqlClient
+from .keychain import Keychain
+from .proto import AttestationSpecification, AuthenticationMethod, CreateDcrKind
+from .proto import DataRoom as ProtoDataRoom
+from .proto import PkiPolicy, parse_length_delimited, serialize_length_delimited
+from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
+from .storage import Chunker, Key, StorageCipher, create_encrypted_chunk
+from .types import (
+    CreateMediaComputeJobInput,
+    DataLabDefinition,
+    DataLabListFilter,
+    DataRoom,
+    DataRoomDescription,
+    DataRoomKind,
+    DatasetDescription,
+    DatasetUsage,
+    EnclaveSpecification,
+    KeychainInstance,
+    MediaComputeJob,
+    MediaComputeJobFilterInput,
+)
 
 
 class Client:
@@ -76,14 +59,15 @@ class Client:
 
     _api: Api
     _graphql: GqlClient
+    _connections: Dict[str, Connection]
 
     def __init__(
         self,
         user_email: str,
         api: Api,
         graphql: GqlClient,
-        request_timeout: int = None,
-        unsafe_disable_known_root_ca_check: Bool = False,
+        request_timeout: Optional[int] = None,
+        unsafe_disable_known_root_ca_check: bool = False,
     ):
         """
         Create a client instance.
@@ -96,6 +80,7 @@ class Client:
         self._graphql = graphql
         self.request_timeout = request_timeout
         self.unsafe_disable_known_root_ca_check = unsafe_disable_known_root_ca_check
+        self._connections = dict()
 
     def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
@@ -129,7 +114,7 @@ class Client:
         enclave_specs = []
         for spec_json in data["attestationSpecs"]:
             attestation_specification = AttestationSpecification()
-            spec_length_delimited = base64.b64decode(spec_json["spec"])
+            spec_length_delimited = b64decode(spec_json["spec"])
             parse_length_delimited(spec_length_delimited, attestation_specification)
             enclave_spec = EnclaveSpecification(
                 name=spec_json["name"],
@@ -195,34 +180,21 @@ class Client:
             raise Exception("Missing client supported protocol versions")
         attestation_proto = driver_spec["proto"]
         client_protocols = driver_spec["clientProtocols"]
-
         attestation_specification_hash = hashlib.sha256(
             serialize_length_delimited(attestation_proto)
         ).hexdigest()
-
-        data = self._graphql.post(
-            """
-            mutation CreateSession($input: CreateSessionInput!) {
-                session {
-                    create(input: $input) {
-                        record {
-                            id
-                        }
-                    }
-                }
-            }
-            """,
-            {
-                "input": {
-                    "enclaveAttestationHash": attestation_specification_hash,
-                }
-            },
-        )
-        session_id = data["session"]["create"]["record"]["id"]
+        connection = self._connections.get(attestation_specification_hash)
+        if connection is None:
+            connection = Connection(
+                attestation_proto,
+                self._api,
+                self._graphql,
+                self.unsafe_disable_known_root_ca_check,
+            )
+            self._connections[attestation_specification_hash] = connection
         session = Session(
             self,
-            session_id,
-            attestation_proto,
+            connection,
             client_protocols,
             auth=auth,
         )
@@ -311,7 +283,7 @@ class Client:
     def _set_datalab_segments_dataset(
         self,
         data_lab_id: str,
-        manifest_hash: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the segments dataset manifest hash in the database.
@@ -339,7 +311,7 @@ class Client:
     def _set_datalab_demographics_dataset(
         self,
         data_lab_id: str,
-        manifest_hash: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the demographics dataset manifest hash in the database.
@@ -367,7 +339,7 @@ class Client:
     def _set_datalab_embeddings_dataset(
         self,
         data_lab_id: str,
-        manifest_hash: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the embeddings dataset manifest hash in the database.
@@ -516,7 +488,7 @@ class Client:
         uploader.shutdown(wait=False)
 
         # create manifest and upload
-        manifest_hash, manifest_encrypted = create_encrypted_chunk(
+        manifest_hash_bytes, manifest_encrypted = create_encrypted_chunk(
             key.material,
             os.urandom(16),
             json.dumps(chunk_hashes).encode("utf-8"),
@@ -524,13 +496,13 @@ class Client:
             chunk_content_sizes=chunk_content_sizes,
         )
         scope_id = self._ensure_dataset_scope(
-            manifest_hash.hex(),
+            manifest_hash_bytes.hex(),
         )
         manifest_hash = self._finalize_upload(
             scope_id=scope_id,
             upload_id=upload_id,
             name=file_name,
-            manifest_hash=manifest_hash,
+            manifest_hash_bytes=manifest_hash_bytes,
             manifest_encrypted=manifest_encrypted,
             chunks=chunk_hashes,
             description=description,
@@ -608,7 +580,7 @@ class Client:
         scope_id: str,
         upload_id: str,
         name: str,
-        manifest_hash: bytes,
+        manifest_hash_bytes: bytes,
         manifest_encrypted: bytes,
         chunks: List[str],
         description: Optional[str] = None,
@@ -631,7 +603,7 @@ class Client:
                 "input": {
                     "uploadId": upload_id,
                     "manifest": b64encode(manifest_encrypted).decode("ascii"),
-                    "manifestHash": manifest_hash.hex(),
+                    "manifestHash": manifest_hash_bytes.hex(),
                     "name": name,
                     "description": description,
                     "usage": usage,
@@ -1040,7 +1012,7 @@ class Client:
         cas_index: int,
         salt: Optional[str] = None,
         encrypted: Optional[bytes] = None,
-    ) -> KeychainInstance:
+    ) -> bool:
         data = self._graphql.post(
             """
             mutation CompareAndSwapKeychain($inner: CompareAndSwapKeychainInput!) {
@@ -1052,7 +1024,11 @@ class Client:
             {
                 "inner": {
                     "salt": salt,
-                    "encrypted": b64encode(encrypted).decode("ascii"),
+                    "encrypted": (
+                        b64encode(encrypted).decode("ascii")
+                        if encrypted is not None
+                        else None
+                    ),
                     "casIndex": cas_index,
                 }
             },
