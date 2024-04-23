@@ -4,7 +4,7 @@ import json
 import uuid
 import zipfile
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Text, Tuple
+from typing import Dict, Mapping, Optional, Text, Tuple
 from uuid import uuid4
 
 from decentriq_dcr_compiler import compiler
@@ -16,12 +16,10 @@ from decentriq_dcr_compiler import (
     CreateDataLab2,
     CreateDataLabComputeV1,
     MediaInsightsRequest,
-    MediaInsightsResponse,
 )
 
-
+from ..media.request import Request
 from ..client import Client
-from ..channel import Channel
 from ..helpers import (
     create_session_from_driver_spec,
     get_latest_enclave_specs_as_dictionary,
@@ -30,8 +28,6 @@ from ..keychain import Keychain, KeychainEntry
 from ..proto import (
     CreateDcrPurpose,
     DataRoom,
-    GcgRequest,
-    UserAuth,
     parse_length_delimited,
     serialize_length_delimited,
 )
@@ -469,6 +465,9 @@ class DataLab:
         if not compatible:
             raise Exception("DataLab is incompatible with DCR")
 
+        # Deprovision existing datalabs before provisioning new ones.
+        self._deprovision_existing_data_lab_from_media_dcr(data_room_id, midcr_session)
+
         data_lab = self.client.get_data_lab(self.data_lab_id)
         data_lab_datasets = self._get_data_lab_datasets_dict(data_lab)
         # Provision all existing Data Lab datasets to the DCR.
@@ -494,6 +493,21 @@ class DataLab:
                 request_key, manifest_hash, encryption_key, midcr_session, data_room_id
             )
 
+    def _deprovision_existing_data_lab_from_media_dcr(
+        self, dcr_id: str, session: Session
+    ):
+        midcr_driver_attestation_hash = self.client._get_midcr_driver_attestation_hash(
+            dcr_id
+        )
+        midcr_driver_spec = self.client._get_enclave_spec_from_hash(
+            midcr_driver_attestation_hash
+        )
+        endpoint_protocols = [3, 4, 5, 6]
+        protocol = session._get_client_protocol(endpoint_protocols)
+        midcr_driver_spec["clientProtocols"] = [protocol]
+        media_dcr = self.client.retrieve_media_dcr(dcr_id, [midcr_driver_spec])
+        media_dcr.deprovision_data_lab()
+
     def _send_publish_dataset_request(
         self,
         request_key: str,
@@ -502,45 +516,19 @@ class DataLab:
         session: Session,
         data_room_id: str,
     ):
-        scope_id = self.client._ensure_dcr_data_scope(data_room_id)
-        request_content = {
-            "dataRoomIdHex": data_room_id,
-            "datasetHashHex": manifest_hash,
-            "encryptionKeyHex": encryption_key.value.hex(),
-            "scopeIdHex": scope_id,
-        }
         request = MediaInsightsRequest.model_validate(
             {
-                request_key: request_content,
+                request_key: {
+                    "dataRoomIdHex": data_room_id,
+                    "datasetHashHex": manifest_hash,
+                    "encryptionKeyHex": encryption_key.value.hex(),
+                    "scopeIdHex": self.client._ensure_dcr_data_scope(data_room_id),
+                },
             }
         )
-        response = self._send_request(request, session)
+        response = Request.send(request, session)
         if request_key not in response.model_dump_json():
             raise Exception(f'Failed to publish "{request_key}"')
-
-    def _send_request(
-        self, request: MediaInsightsRequest, session: Session
-    ) -> MediaInsightsResponse:
-        def compile_request(mi_request: MediaInsightsRequest, channel: Channel):
-            user_auth = channel._get_message_auth(session.auth)
-            request_serialized = compiler.compile_media_insights_request(
-                mi_request,
-                serialize_length_delimited(user_auth),
-            )
-            return bytes(request_serialized)
-
-        def decompile_response(responses: List[bytes]) -> MediaInsightsResponse:
-            if len(responses) != 1:
-                raise Exception("Malformed response")
-            response = compiler.decompile_media_insights_response(
-                request, bytes(responses[0])
-            )
-            return response
-
-        response = session.send_compilable_request(
-            compile_request, request, decompile_response, LATEST_GCG_PROTOCOL_VERSION
-        )
-        return response
 
     def provision_to_lookalike_media_data_room(
         self, data_room_id: str, keychain: Keychain

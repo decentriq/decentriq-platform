@@ -5,7 +5,7 @@ import json
 import zipfile
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, cast
 
 from decentriq_dcr_compiler.schemas.data_science_data_room import TableLeafNodeV2
 from typing_extensions import Self
@@ -205,7 +205,7 @@ class TableDataNodeDefinition(NodeDefinition):
     def build(
         self,
         dcr_id: str,
-        node_definition: TableDataNodeDefinition,
+        node_definition: NodeDefinition,
         client: Client,
         session: Session,
     ) -> TableDataNode:
@@ -224,7 +224,7 @@ class TableDataNodeDefinition(NodeDefinition):
             columns=self.columns,
             is_required=self.is_required,
             dcr_id=dcr_id,
-            node_definition=node_definition,
+            node_definition=cast(TableDataNodeDefinition, node_definition),
             client=client,
             session=session,
             id=self.id,
