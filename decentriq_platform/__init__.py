@@ -40,6 +40,7 @@ __pdoc__ = {
     "data_lab": True,
     "legacy": True,
     "decoder": False,
+    "media": True,
 }
 
 __all__ = [
@@ -61,4 +62,5 @@ __all__ = [
     "data_lab",
     "legacy",
     "analytics",
+    "media",
 ]

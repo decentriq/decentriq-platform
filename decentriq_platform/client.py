@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
 
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
+from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
 
 from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
 from .api import Api, Endpoints, NotFoundError, retry
@@ -24,6 +25,7 @@ from .connection import Connection
 from .endorsement import Endorser
 from .graphql import GqlClient
 from .keychain import Keychain
+from .media import MediaDcr, MediaDcrDefinition
 from .proto import AttestationSpecification, AuthenticationMethod, CreateDcrKind
 from .proto import DataRoom as ProtoDataRoom
 from .proto import PkiPolicy, parse_length_delimited, serialize_length_delimited
@@ -1512,6 +1514,15 @@ class Client:
         *,
         enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
     ) -> AnalyticsDcr:
+        """
+        Publish an Analytics DCR.
+
+        **Parameters**:
+        - `dcr_definition`: Definition of the Analytics DCR.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
         data_room = DataScienceDataRoom.model_validate(
             dcr_definition._get_high_level_representation()
         )
@@ -1521,7 +1532,7 @@ class Client:
         low_level_data_room = ProtoDataRoom()
         parse_length_delimited(compiled_data_room.data_room, low_level_data_room)
 
-        # Get a new session
+        # Get a new session.
         # Determine which driver enclave spec (as given by the enclave_specs value)
         # to use. If this is not explicitly specified, try to check whether it was
         # already set on the builder that constructed the DCR definition.
@@ -1547,6 +1558,216 @@ class Client:
             dcr_id=dcr_id, client=self, enclave_specs=list(specs.values())
         )
         return published_ds_dcr
+
+    def retrieve_media_dcr(
+        self,
+        dcr_id,
+        enclave_specs: Optional[List[EnclaveSpecification]] = None,
+    ) -> MediaDcr:
+        """
+        Retrieve an existing Media DCR.
+
+        **Parameters**:
+        - `dcr_id`: Data Clean Room ID.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        return MediaDcr._from_existing(
+            dcr_id, client=self, enclave_specs=enclave_specs
+        )
+
+    def publish_media_dcr(
+        self,
+        dcr_definition: MediaDcrDefinition,
+        *,
+        enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
+    ) -> MediaDcr:
+        """
+        Publish a Media DCR.
+
+        **Parameters**:
+        - `dcr_definition`: Definition of the Media DCR.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        dcr = MediaInsightsDcrSchema.model_validate_json(
+            dcr_definition._high_level
+        )
+        # Ensure we create the latest known version of the DCR.
+        dcr_latest = compiler.upgrade_media_insights_dcr_to_latest(dcr)
+
+        compiled_serialized = compiler.compile_media_insights_dcr(dcr_latest)
+        low_level_dcr = ProtoDataRoom()
+        parse_length_delimited(compiled_serialized, low_level_dcr)
+
+        # Get a new session.
+        # Determine which driver enclave spec (as given by the enclave_specs value)
+        # to use. If this is not explicitly specified, try to check whether it was
+        # already set on the builder that constructed the DCR definition.
+        # If this is also not specified, simply use the latest specifications known to this SDK.
+        specs = (
+            enclave_specs
+            or dcr_definition._enclave_specs
+            or enclave_specifications.latest()
+        )
+        auth, _ = self.create_auth_using_decentriq_pki(specs)
+        session = self.create_session(auth, specs)
+
+        dcr_id = session.publish_data_room(
+            low_level_dcr,
+            kind=CreateDcrKind.MEDIA_INSIGHTS,
+            high_level_representation=dcr_latest.model_dump_json(
+                by_alias=True
+            ).encode(),
+        )
+        existing_dcr = MediaDcr._from_existing(
+            dcr_id=dcr_id,
+            client=self,
+            enclave_specs=list(specs.values()),
+        )
+        return existing_dcr
+
+    def _provision_data_lab_to_midcr(
+        self,
+        data_room_id: str,
+        data_lab_id: str,
+    ) -> DataLabDefinition:
+        """
+        Provision a DataLab to a Media DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision to.
+        - `data_lab_id`: ID of the DataLab to be provisioned.
+        """
+        data = self._graphql.post(
+            """
+            mutation ProvisionDataLabToMediaInsightsDcr($input: ProvisionDataLabInput!) {
+                dataLab {
+                    provisionDataLabToMediaInsightsDcr(input: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "dataRoomId": data_room_id,
+                    "dataLabId": data_lab_id,
+                }
+            },
+        )
+        return data["dataLab"]["provisionDataLabToMediaInsightsDcr"]["publishedDataLab"]
+
+    def _deprovision_data_lab_from_midcr(self, data_room_id: str) -> DataLabDefinition:
+        """
+        Deprovision a DataLab from a Media DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to deprovision from.
+        """
+        data = self._graphql.post(
+            """
+            mutation DeprovisionDataLabFromMediaInsightsDcr($input: String!) {
+                dataLab {
+                    deprovisionDataLabFromMediaInsightsDcr(mediaInsightsDcrId: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": data_room_id,
+            },
+        )
+        return data["dataLab"]["deprovisionDataLabFromMediaInsightsDcr"][
+            "publishedDataLab"
+        ]
 
 
 def create_client(
