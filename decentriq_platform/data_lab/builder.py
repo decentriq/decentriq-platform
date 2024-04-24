@@ -18,6 +18,7 @@ class DataLabBuilder:
         self.has_demographics = False
         self.has_embeddings = False
         self.num_embeddings = 0
+        self.has_segments = False
         self.matching_id = MatchingId.STRING
         self.validation_id: Optional[str] = None
         self.client = client
@@ -58,6 +59,9 @@ class DataLabBuilder:
         self.has_embeddings = True
         self.num_embeddings = num_embeddings
 
+    def with_segments(self):
+        self.has_segments = True
+
     def from_existing(self, data_lab_id: str, keychain: Keychain):
         """
         Construct a new DataLab from an existing DataLab with the given ID.
@@ -83,6 +87,7 @@ class DataLabBuilder:
                 data_lab_definition["requireDemographicsDataset"],
                 data_lab_definition["requireEmbeddingsDataset"],
                 data_lab_definition["numEmbeddings"],
+                data_lab_definition["requireSegmentsDataset"],
                 data_lab_definition["matchingIdFormat"],
             )
             existing_data_lab = ExistingDataLab(data_lab_definition, self.keychain)
@@ -94,6 +99,7 @@ class DataLabBuilder:
                 self.has_demographics,
                 self.has_embeddings,
                 self.num_embeddings,
+                self.has_segments,
                 self.matching_id,
             )
             return DataLab(self.client, cfg)

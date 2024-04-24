@@ -51,6 +51,7 @@ class MediaDcrBuilder:
         self.enable_insights = False
         self.enable_lookalike = False
         self.enable_retargeting = False
+        self.hide_absolute_values_from_insights = False
 
     def with_name(self, name: str) -> Self:
         """
@@ -143,6 +144,13 @@ class MediaDcrBuilder:
         self.enable_retargeting = True
         return self
 
+    def with_hide_absolute_values_from_insights(self) -> Self:
+        """
+        Ensure absolute values are not included in the output of the insights computation.
+        """
+        self.hide_absolute_values_from_insights = True
+        return self
+
     def build(self) -> MediaDcrDefinition:
         """
         Build the Data Clean Room.
@@ -178,6 +186,7 @@ class MediaDcrBuilder:
                 "enableInsights": self.enable_insights,
                 "enableLookalike": self.enable_lookalike,
                 "enableRetargeting": self.enable_retargeting,
+                "hideAbsoluteValuesFromInsights": self.hide_absolute_values_from_insights,
                 "hashMatchingIdWith": matching_id_hashing_algorithm,
                 "id": id,
                 "mainAdvertiserEmail": self.main_advertiser_email,
