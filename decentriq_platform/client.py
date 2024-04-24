@@ -1168,6 +1168,7 @@ class Client:
                         name
                     }
                     statistics
+                    requireSegmentsDataset
                     requireDemographicsDataset
                     requireEmbeddingsDataset
                     isValidated

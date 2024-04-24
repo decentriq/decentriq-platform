@@ -23,7 +23,7 @@ pem = "^21.2.0"
 certifi = "^2023.7.22"
 sqloxide = "^0.1.26"
 cbor2 = "^5.4.6"
-decentriq-dcr-compiler = "0.7.0.dev1"
+decentriq-dcr-compiler = "0.7.0.dev2"
 
 [tool.poetry.dev-dependencies]
 mypy-protobuf = "^3.4.0"

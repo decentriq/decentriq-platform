@@ -13,8 +13,8 @@ from decentriq_dcr_compiler._schemas.create_data_lab import (
 )
 from decentriq_dcr_compiler import (
     CreateDataLab,
-    CreateDataLab2,
-    CreateDataLabComputeV1,
+    CreateDataLab3,
+    CreateDataLabComputeV2,
     MediaInsightsRequest,
 )
 
@@ -58,12 +58,14 @@ class DataLabConfig:
         has_demographics: bool,
         has_embeddings: bool,
         num_embeddings: int,
+        has_segments: bool,
         matching_id: MatchingId,
     ):
         self.name = name
         self.has_demographics = has_demographics
         self.has_embeddings = has_embeddings
         self.num_embeddings = num_embeddings
+        self.has_segments = has_segments
         self.matching_id = matching_id
 
 
@@ -114,8 +116,8 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                root=CreateDataLab2(
-                    v1=CreateDataLabComputeV1(
+                root=CreateDataLab3(
+                    v2=CreateDataLabComputeV2(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
                         driverEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
@@ -124,6 +126,7 @@ class DataLab:
                         ),
                         hasDemographics=self.cfg.has_demographics,
                         hasEmbeddings=self.cfg.has_embeddings,
+                        hasSegments=self.cfg.has_segments,
                         id=self.data_lab_id,
                         matchingIdFormat=matching_id_format,
                         matchingIdHashingAlgorithm=matching_id_hashing_algorithm,
@@ -210,7 +213,7 @@ class DataLab:
         key: Key,
         keychain: Keychain,
         matching_data_path: str,
-        segments_data_path: str,
+        segments_data_path: Optional[str] = None,
         demographics_data_path: Optional[str] = None,
         embeddings_data_path: Optional[str] = None,
     ):
