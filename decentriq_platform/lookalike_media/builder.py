@@ -161,8 +161,12 @@ class LookalikeMediaDcrBuilder:
                         "name": self.name,
                         "mainPublisherEmail": self.main_publisher_email,
                         "mainAdvertiserEmail": self.main_advertiser_email,
-                        "matchingIdFormat": matching_id_format,
-                        "hashMatchingIdWith": matching_id_hashing_algorithm,
+                        "matchingIdFormat": matching_id_format.value,
+                        "hashMatchingIdWith": (
+                            None
+                            if matching_id_hashing_algorithm is None
+                            else matching_id_hashing_algorithm.value
+                        ),
                         "authenticationRootCertificatePem": root_cert_pem,
                         "driverEnclaveSpecification": {
                             "attestationProtoBase64": driver_spec.attestationProtoBase64,
