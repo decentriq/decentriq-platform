@@ -128,8 +128,12 @@ class DataLab:
                         hasEmbeddings=self.cfg.has_embeddings,
                         hasSegments=self.cfg.has_segments,
                         id=self.data_lab_id,
-                        matchingIdFormat=matching_id_format,
-                        matchingIdHashingAlgorithm=matching_id_hashing_algorithm,
+                        matchingIdFormat=matching_id_format.value,
+                        matchingIdHashingAlgorithm=(
+                            None
+                            if matching_id_hashing_algorithm is None
+                            else matching_id_hashing_algorithm.value
+                        ),
                         name=self.cfg.name,
                         numEmbeddings=self.cfg.num_embeddings,
                         publisherEmail=self.client.user_email,

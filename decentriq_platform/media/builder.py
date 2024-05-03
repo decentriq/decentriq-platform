@@ -187,11 +187,15 @@ class MediaDcrBuilder:
                 "enableLookalike": self.enable_lookalike,
                 "enableRetargeting": self.enable_retargeting,
                 "hideAbsoluteValuesFromInsights": self.hide_absolute_values_from_insights,
-                "hashMatchingIdWith": matching_id_hashing_algorithm,
+                "hashMatchingIdWith": (
+                    None
+                    if matching_id_hashing_algorithm is None
+                    else matching_id_hashing_algorithm.value
+                ),
                 "id": id,
                 "mainAdvertiserEmail": self.main_advertiser_email,
                 "mainPublisherEmail": self.main_publisher_email,
-                "matchingIdFormat": matching_id_format,
+                "matchingIdFormat": matching_id_format.value,
                 "modelEvaluation": {
                     "postScopeMerge": ["ROC_CURVE"],
                     "preScopeMerge": [],
