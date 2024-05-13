@@ -22,12 +22,12 @@ from .publisher_computations import (
 )
 
 from .advertiser_computations import (
-    AvailableAudiencesComputation,
     GetAudiencesForAdvertiserComputation,
 )
 from .request import Request
 from .audience import Audience
 from ..types import EnclaveSpecification
+from .version import MEDIA_DCR_SUPPORTED_VERSION, MEDIA_DCR_WRAPPER_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -354,6 +354,27 @@ class MediaDcr:
             "activated_audiences.json",
             key,
         )
+
+    def participants(self) -> Dict[str, Any]:
+        """
+        Retrieve the participants of the Media DCR.
+        This returns a dictionary of roles (keys) mapped to participants (email addresses).
+        """
+        dcr = self.high_level[MEDIA_DCR_WRAPPER_SUPPORTED_VERSION]
+        compute_keys_list = list(dcr["compute"].keys())
+        if len(compute_keys_list) != 1:
+            raise Exception(
+                f"Unable to extract Media DCR version. Expected a single top-level property indicating the DCR version."
+            )
+
+        compute_version = compute_keys_list[0]
+        compute = dcr["compute"][compute_version]
+        return {
+            "publisher": compute["publisherEmails"],
+            "advertiser": compute["advertiserEmails"],
+            "observer": compute["observerEmails"],
+            "agency": compute["agencyEmails"],
+        }
 
 
 def _get_features(high_level: Dict[str, Any]) -> MediaInsightFeatures:
