@@ -10,6 +10,7 @@ from ..types import EnclaveSpecification
 from .existing_builder import ExistingAnalyticsDcrBuilder
 from .high_level_node import ComputationNode, DataNode
 from .node_definitions import NodeDefinition
+from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -137,3 +138,32 @@ class AnalyticsDcr:
             nodes=cfg.node_definitions,
         )
         return dcr
+
+    def participants(self) -> List[str]:
+        """
+        Retrieve the participants of the Analytics DCR as a list.
+        """
+        keys = list(self.high_level.keys())
+        if len(keys) != 1:
+            raise Exception(
+                f"Unable to extract Analytics DCR version. Expected a single top-level property indicating the DCR version."
+            )
+        dcr_version = keys[0]
+
+        dcr = self.high_level[dcr_version]
+        keys = list(dcr.keys())
+        if len(keys) != 1:
+            raise Exception(
+                f"Unable to extract the interactivity type for the Analytics DCR. Expected a single top-level property indicating the interactivity type."
+            )
+
+        dcr_type = keys[0]
+        if dcr_type == "interactive":
+            participants = dcr[dcr_type]["initialConfiguration"]["participants"]
+        elif dcr_type == "static":
+            participants = dcr[dcr_type]["participants"]
+        else:
+            raise Exception(
+                f'Unknown DCR type {dcr_type}. Expected "interactive" or "static" type.'
+            )
+        return [participant["user"] for participant in participants]
