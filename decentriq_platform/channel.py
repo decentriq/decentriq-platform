@@ -17,6 +17,7 @@ from .proto.delta_enclave_api_pb2 import DataNoncePubkey, Request, Response
 from .proto.gcg_pb2 import GcgRequest, GcgResponse, Pki, UserAuth
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import Verification
+from .logger import logger
 
 
 class EnclaveError(Exception):
@@ -109,7 +110,7 @@ class Channel:
             attestation_specification=driver_attestation_specification
         )
         if unsafe_disable_known_root_ca_check == True:
-            print("WARNING: ROOT CHECK VERIFICATION DISABLED FOR CURRENT ENCLAVE SESSION")
+            logger.warning("WARNING: ROOT CHECK VERIFICATION DISABLED FOR CURRENT ENCLAVE SESSION")
             verification.disable_known_root_ca_check()
 
         # Extract enclave public key from report data

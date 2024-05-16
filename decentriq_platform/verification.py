@@ -22,6 +22,7 @@ from .proto import (
     FatquoteEpid,
 )
 from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
+from .logger import logger
 
 
 class QuoteBody:
@@ -179,7 +180,7 @@ class Verification:
             raise EnclaveQuoteFlagsError
         if flags & Verification.IASAttributeFlags.DEBUG:
             if spec_epid.accept_debug:
-                print(
+                logger.warning(
                     "!!!WARNING!!! DEBUG quote is being accepted, quote is NOT to be trusted !!!WARNING!!!"
                 )
             else:
@@ -298,7 +299,7 @@ class Verification:
             raise EnclaveQuoteFlagsError
         if flags & Verification.IASAttributeFlags.DEBUG:
             if spec_dcap.accept_debug:
-                print(
+                logger.warning(
                     "!!!WARNING!!! DEBUG quote is being accepted, quote is NOT to be trusted !!!WARNING!!!"
                 )
             else:
@@ -471,7 +472,7 @@ class Verification:
             else:
                 raise Exception(f"Unknown fatquote type")
         else:
-            print(
+            logger.warning(
                 "!!!WARNING!!! MOCKED QUOTE is being accepted, quote is NOT to be trusted !!!WARNING!!!"
             )
 
