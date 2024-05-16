@@ -45,6 +45,7 @@ from .types import (
     MediaComputeJob,
     MediaComputeJobFilterInput,
 )
+from .logger import logger
 
 
 class Client:
@@ -562,7 +563,7 @@ class Client:
                 retry=retry,
             )
         except Exception as e:
-            print(e)
+            logger.error(e)
             raise e
 
     def _delete_user_upload(self, upload_id: str):
@@ -693,7 +694,7 @@ class Client:
                 [f"- {dcr_id}" for dcr_id in data_rooms_ids_with_dataset]
             )
             if force:
-                print(
+                logger.warning(
                     "This dataset is published to the following data rooms."
                     " These data rooms might be in a broken state now:"
                     f"\n{id_list}"
@@ -1821,7 +1822,7 @@ class BoundedExecutor:
         def done_callback(f):
             error = f.exception()
             if error:
-                print(f"Error in future: {error}")
+                logger.error(f"Error in future: {error}")
             self.semaphore.release()
 
         self.semaphore.acquire()
