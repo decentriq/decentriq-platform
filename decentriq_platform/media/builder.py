@@ -47,11 +47,14 @@ class MediaDcrBuilder:
         self.additional_advertiser_emails = []
         self.agency_emails = []
         self.observer_emails = []
+        self.data_partner_emails = []
+        self.enable_data_partner = False
         self.matching_id = None
         self.enable_insights = False
         self.enable_lookalike = False
         self.enable_retargeting = False
         self.hide_absolute_values_from_insights = False
+        self.enable_advertiser_audience_download = False
 
     def with_name(self, name: str) -> Self:
         """
@@ -113,6 +116,17 @@ class MediaDcrBuilder:
         self.observer_emails = emails
         return self
 
+    def with_data_partner_emails(self, emails: List[str]) -> Self:
+        """
+        Set the data partner email addresses.
+
+        **Parameters**:
+        - `emails`: List of data partner email addresses.
+        """
+        self.data_partner_emails = emails
+        self.enable_data_partner = True
+        return self
+
     def with_matching_id_format(self, matching_id: MatchingId) -> Self:
         """
         Set the matching ID format.
@@ -142,6 +156,13 @@ class MediaDcrBuilder:
         Enable the "retargeting" feature set.
         """
         self.enable_retargeting = True
+        return self
+
+    def with_advertiser_audience_download(self) -> Self:
+        """
+        Allow the advertiser to download the user ids for an audience.
+        """
+        self.enable_advertiser_audience_download = True
         return self
 
     def with_hide_absolute_values_from_insights(self) -> Self:
@@ -187,6 +208,7 @@ class MediaDcrBuilder:
                 "enableLookalike": self.enable_lookalike,
                 "enableRetargeting": self.enable_retargeting,
                 "hideAbsoluteValuesFromInsights": self.hide_absolute_values_from_insights,
+                "enableAdvertiserAudienceDownload": self.enable_advertiser_audience_download,
                 "hashMatchingIdWith": (
                     None
                     if matching_id_hashing_algorithm is None
@@ -208,6 +230,8 @@ class MediaDcrBuilder:
                     "id": python_spec.id,
                     "workerProtocol": python_spec.workerProtocol,
                 },
+                "enableDataPartner": self.enable_data_partner,
+                "dataPartnerEmails": self.data_partner_emails,
             }
         }
         media_insights_dcr = compiler.create_media_insights_dcr(

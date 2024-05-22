@@ -120,8 +120,8 @@ class GetAudienceUserListComputation(Computation):
 
     def get_results(
         self, interval: int = 5, timeout: Optional[int] = None
-    ) -> Dict[str, Any]:
+    ) -> List[str]:
         result = super().get_results_str_from_zip(
             "audience_users.csv", interval=interval, timeout=timeout
         )
-        return str.split(result)
+        return [line for line in result.split("\n") if line]
