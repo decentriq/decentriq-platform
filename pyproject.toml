@@ -12,7 +12,7 @@ homepage = "https://github.com/decentriq/decentriq-platform"
 python = "^3.9"
 typing-extensions = "^4.4.0"
 protobuf = "4.21.9"
-requests = "^2.28.1"
+requests = "^2.32.0"
 sgx-ias-structs = "^0.1.8"
 cryptography = "^42.0.6"
 pyOpenSSL = "^24.0.0"
@@ -24,6 +24,8 @@ certifi = "^2023.7.22"
 sqloxide = "^0.1.26"
 cbor2 = "^5.4.6"
 decentriq-dcr-compiler = "0.8.0-dev2"
+# Force version to be >= 3.7 due to vuln (transitive dependency of `requests` package)
+idna = "^3.7"
 
 [tool.poetry.dev-dependencies]
 mypy-protobuf = "^3.4.0"
