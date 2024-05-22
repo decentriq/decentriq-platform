@@ -23,6 +23,7 @@ from .publisher_computations import (
 
 from .advertiser_computations import (
     GetAudiencesForAdvertiserComputation,
+    GetAudienceUserListForAdvertiserComputation,
 )
 from .request import Request
 from .audience import Audience
@@ -161,6 +162,28 @@ class MediaDcr:
             session=self.session,
         )
         return get_audience_user_list_computation.run_and_get_results()
+
+    def get_audience_user_list_for_advertiser(
+        self,
+        activated_audience: Audience,
+    ) -> List[str]:
+        """
+        Get the list of user ids for the given audience.
+        This method is to be called by the advertiser and is different from `get_audience_user_list`
+        in that it can be used to download user ids for audiences that have not been made available
+        to the publisher.
+        The Media DCR must have been created with the `enable_advertiser_audience_download` set to `true`,
+        in order for this feature to work.
+        """
+        if not self.features.has_enable_advertiser_audience_download():
+            raise Exception("This Media DCR does not support downloading audiences for advertisers.")
+        computation = GetAudienceUserListForAdvertiserComputation(
+            dcr_id=self.id,
+            audience=activated_audience,
+            client=self.client,
+            session=self.session,
+        )
+        return computation.run_and_get_results()
 
     def provision_from_data_lab(self, data_lab_id: str, keychain: Keychain):
         """

@@ -26,5 +26,8 @@ class MediaInsightFeatures:
     def has_enable_noisy_output(self) -> bool:
         return self._features_contain("NOISY_OUTPUTS")
 
+    def has_enable_advertiser_audience_download(self) -> bool:
+        return self._features_contain("ENABLE_ADVERTISER_AUDIENCE_DOWNLOAD")
+
     def _features_contain(self, flag: str) -> bool:
         return flag in self.features
