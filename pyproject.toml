@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "decentriq-platform"
-version = "0.27.1"
+version = "0.28.0rc2"
 description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.com>"]
 readme = 'README.md'
@@ -23,7 +23,7 @@ pem = "^21.2.0"
 certifi = "^2023.7.22"
 sqloxide = "^0.1.26"
 cbor2 = "^5.4.6"
-decentriq-dcr-compiler = "0.8.0-dev2"
+decentriq-dcr-compiler = "0.8.0.dev5"
 # Force version to be >= 3.7 due to vuln (transitive dependency of `requests` package)
 idna = "^3.7"
 
