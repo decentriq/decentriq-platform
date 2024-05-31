@@ -9,7 +9,12 @@ if TYPE_CHECKING:
 import cbor2
 import chily
 
-KeychainEntryKind = Literal["dataset_key", "other_secret"]
+KeychainEntryKind = Literal[
+    "dataset_key",
+    "other_secret",
+    "dataset_metadata",
+    "pending_dataset_import",
+]
 
 
 class KeychainEntry:
@@ -26,6 +31,22 @@ class KeychainEntry:
 class KeychainDecryptException(Exception):
     def __init__(self) -> None:
         super().__init__()
+
+
+def _convert_binary_type(value):
+    """
+    The JS implementation of the keychain deals with keys in terms
+    of Uint8Arrays that are encoded to the CBOR type with tag number 64 (= "uint8 typed arrays").
+    Python's cbor2 transates bytestrings into the CBOR  "byte string" type (tag nr. 2),
+    which are read as Uint8Arrays by JS. The issue arises with Python
+    reading values of type "uint8 typed arrays".
+
+    See: https://www.iana.org/assignments/cbor-tags/cbor-tags.xhtml
+    """
+    if value and isinstance(value, cbor2.CBORTag) and value.tag == 64:
+        return value.value # this will be a simple bytestring
+    else:
+        return value
 
 
 class Keychain:
@@ -272,7 +293,7 @@ class Keychain:
         ns_key = self._namespaced_key(kind, key)
         value = self._store.get(ns_key)
         if value:
-            return KeychainEntry(kind, key, value)
+            return KeychainEntry(kind, key, _convert_binary_type(value))
         else:
             return None
 
@@ -281,7 +302,7 @@ class Keychain:
         items = []
         for ns_key, value in self._store.items():
             kind, key = Keychain._parse_namespaced_key(ns_key)
-            items.append(KeychainEntry(kind, key, value))
+            items.append(KeychainEntry(kind, key, _convert_binary_type(value)))
         return items
 
     def _insert_local(self, entry: KeychainEntry):
