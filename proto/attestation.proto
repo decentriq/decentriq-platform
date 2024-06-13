@@ -8,7 +8,7 @@ message Fatquote {
         FatquoteDcap dcap = 2;
         FatquoteNitro nitro = 3;
         FatquoteSnp snp = 4;
-        FatquoteDcap dcapMrsigner = 5;
+        FatquoteDcapMrsigner dcapMrsigner = 5;
     }
 };
 
@@ -26,6 +26,35 @@ message FatquoteDcap {
     bytes tcbSignCert = 4;
     bytes qeSignCert = 5;
     bytes dcapRootCaDer = 6;
+}
+
+message FatquoteDcapMrsigner {
+    bytes dcapQuote = 1;
+    bytes tcbInfo = 2;
+    bytes qeIdentity = 3;
+    bytes tcbSignCert = 4;
+    bytes qeSignCert = 5;
+    bytes dcapRootCaDer = 6;
+    SigstoreEvidence sigstoreEvidence = 7;
+}
+
+message SigstoreFile {
+    string name = 1;
+    bytes contents = 2;
+}
+
+message SigstoreEvidence {
+    oneof sigstore_evidence {
+        SigstoreEvidenceV1 v1 = 1;
+    }
+}
+
+message SigstoreEvidenceV1 {
+    // This list contains the root.json chain, targets.json and trusted_root.json
+    // (1.root.json, 2.root.json, .., X.root.json, Y.targets.json, trusted_root.json.)
+    repeated SigstoreFile files = 1;
+    // Contains the inclusion proof and the leaf cosign certificate in the transparency log and ultimately the final SHA of the sgxs.
+    bytes rekorLogEntryJson = 2;
 }
 
 message FatquoteNitro {
@@ -59,18 +88,18 @@ message AttestationSpecification {
 message AttestationSpecificationIntelEpid {
     bytes mrenclave = 1;
     bytes iasRootCaDer = 2;
-    bool accept_debug = 3;
-    bool accept_group_out_of_date = 4;
-    bool accept_configuration_needed = 5;
+    bool acceptDebug = 3;
+    bool acceptGroupOutOfDate = 4;
+    bool acceptConfigurationNeeded = 5;
 }
 
 message AttestationSpecificationIntelDcap {
     bytes mrenclave = 1;
     bytes dcapRootCaDer = 2;
-    bool accept_debug = 3;
-    bool accept_out_of_date = 4;
-    bool accept_configuration_needed = 5;
-    bool accept_revoked = 6;
+    bool acceptDebug = 3;
+    bool acceptOutOfDate = 4;
+    bool acceptConfigurationNeeded = 5;
+    bool acceptRevoked = 6;
 }
 
 message AttestationSpecificationAwsNitro {
@@ -91,10 +120,11 @@ message AttestationSpecificationAmdSnp {
 
 message AttestationSpecificationIntelDcapMrsigner {
     bytes mrsigner = 1;
-    uint32 isvprodid = 7;
     bytes dcapRootCaDer = 2;
-    bool accept_debug = 3;
-    bool accept_out_of_date = 4;
-    bool accept_configuration_needed = 5;
-    bool accept_revoked = 6;
+    bool acceptDebug = 3;
+    bool acceptOutOfDate = 4;
+    bool acceptConfigurationNeeded = 5;
+    bool acceptRevoked = 6;
+    uint32 isvprodid = 7;
+    bytes sigstoreRootOlpcJson = 8;
 }

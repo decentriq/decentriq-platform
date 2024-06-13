@@ -7,6 +7,7 @@ from .attestation_pb2 import (
     AttestationSpecificationIntelEpid,
     Fatquote,
     FatquoteDcap,
+    FatquoteDcapMrsigner,
     FatquoteEpid,
 )
 from .azure_blob_storage_pb2 import AzureBlobStorageWorkerConfiguration

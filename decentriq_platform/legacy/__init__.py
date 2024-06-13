@@ -58,7 +58,6 @@ __all__ = [
     "KeychainEntry",
     "StaticContent",
     "Noop",
-    "post",
     "sql",
     "container",
     "s3_sink",
