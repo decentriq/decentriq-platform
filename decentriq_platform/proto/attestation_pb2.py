@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x61ttestation.proto\x12\x0b\x61ttestation\"\xf5\x01\n\x08\x46\x61tquote\x12)\n\x04\x65pid\x18\x01 \x01(\x0b\x32\x19.attestation.FatquoteEpidH\x00\x12)\n\x04\x64\x63\x61p\x18\x02 \x01(\x0b\x32\x19.attestation.FatquoteDcapH\x00\x12+\n\x05nitro\x18\x03 \x01(\x0b\x32\x1a.attestation.FatquoteNitroH\x00\x12\'\n\x03snp\x18\x04 \x01(\x0b\x32\x18.attestation.FatquoteSnpH\x00\x12\x31\n\x0c\x64\x63\x61pMrsigner\x18\x05 \x01(\x0b\x32\x19.attestation.FatquoteDcapH\x00\x42\n\n\x08\x66\x61tquote\"k\n\x0c\x46\x61tquoteEpid\x12\x17\n\x0fiasResponseBody\x18\x01 \x01(\x0c\x12\x16\n\x0eiasCertificate\x18\x02 \x01(\x0c\x12\x14\n\x0ciasSignature\x18\x03 \x01(\x0c\x12\x14\n\x0ciasRootCaDer\x18\x04 \x01(\x0c\"\x86\x01\n\x0c\x46\x61tquoteDcap\x12\x11\n\tdcapQuote\x18\x01 \x01(\x0c\x12\x0f\n\x07tcbInfo\x18\x02 \x01(\x0c\x12\x12\n\nqeIdentity\x18\x03 \x01(\x0c\x12\x13\n\x0btcbSignCert\x18\x04 \x01(\x0c\x12\x12\n\nqeSignCert\x18\x05 \x01(\x0c\x12\x15\n\rdcapRootCaDer\x18\x06 \x01(\x0c\"5\n\rFatquoteNitro\x12\x0c\n\x04\x63ose\x18\x01 \x01(\x0c\x12\x16\n\x0enitroRootCaDer\x18\x02 \x01(\x0c\"\xdf\x01\n\x0b\x46\x61tquoteSnp\x12\x11\n\treportBin\x18\x01 \x01(\x0c\x12\x11\n\tamdArkDer\x18\x02 \x01(\x0c\x12\x11\n\tamdSevDer\x18\x03 \x01(\x0c\x12\x12\n\nvcekCrtDer\x18\x04 \x01(\x0c\x12\x12\n\nreportData\x18\x05 \x01(\x0c\x12\x17\n\x0froughtimePubKey\x18\x06 \x01(\x0c\x12\x16\n\x0eroughtimeNonce\x18\x07 \x01(\x0c\x12\x17\n\x0fsignedTimestamp\x18\x08 \x01(\x0c\x12\x14\n\x0c\x64\x65\x63\x65ntriqDer\x18\t \x01(\x0c\x12\x0f\n\x07\x63hipDer\x18\n \x01(\x0c\"\x98\x03\n\x18\x41ttestationSpecification\x12\x43\n\tintelEpid\x18\x01 \x01(\x0b\x32..attestation.AttestationSpecificationIntelEpidH\x00\x12\x43\n\tintelDcap\x18\x02 \x01(\x0b\x32..attestation.AttestationSpecificationIntelDcapH\x00\x12\x41\n\x08\x61wsNitro\x18\x03 \x01(\x0b\x32-.attestation.AttestationSpecificationAwsNitroH\x00\x12=\n\x06\x61mdSnp\x18\x04 \x01(\x0b\x32+.attestation.AttestationSpecificationAmdSnpH\x00\x12S\n\x11intelDcapMrsigner\x18\x05 \x01(\x0b\x32\x36.attestation.AttestationSpecificationIntelDcapMrsignerH\x00\x42\x1b\n\x19\x61ttestation_specification\"\xa9\x01\n!AttestationSpecificationIntelEpid\x12\x11\n\tmrenclave\x18\x01 \x01(\x0c\x12\x14\n\x0ciasRootCaDer\x18\x02 \x01(\x0c\x12\x14\n\x0c\x61\x63\x63\x65pt_debug\x18\x03 \x01(\x08\x12 \n\x18\x61\x63\x63\x65pt_group_out_of_date\x18\x04 \x01(\x08\x12#\n\x1b\x61\x63\x63\x65pt_configuration_needed\x18\x05 \x01(\x08\"\xbc\x01\n!AttestationSpecificationIntelDcap\x12\x11\n\tmrenclave\x18\x01 \x01(\x0c\x12\x15\n\rdcapRootCaDer\x18\x02 \x01(\x0c\x12\x14\n\x0c\x61\x63\x63\x65pt_debug\x18\x03 \x01(\x08\x12\x1a\n\x12\x61\x63\x63\x65pt_out_of_date\x18\x04 \x01(\x08\x12#\n\x1b\x61\x63\x63\x65pt_configuration_needed\x18\x05 \x01(\x08\x12\x16\n\x0e\x61\x63\x63\x65pt_revoked\x18\x06 \x01(\x08\"r\n AttestationSpecificationAwsNitro\x12\x16\n\x0enitroRootCaDer\x18\x01 \x01(\x0c\x12\x0c\n\x04pcr0\x18\x02 \x01(\x0c\x12\x0c\n\x04pcr1\x18\x03 \x01(\x0c\x12\x0c\n\x04pcr2\x18\x04 \x01(\x0c\x12\x0c\n\x04pcr8\x18\x05 \x01(\x0c\"\x92\x01\n\x1e\x41ttestationSpecificationAmdSnp\x12\x11\n\tamdArkDer\x18\x01 \x01(\x0c\x12\x13\n\x0bmeasurement\x18\x02 \x01(\x0c\x12\x17\n\x0froughtimePubKey\x18\x03 \x01(\x0c\x12\x19\n\x11\x61uthorizedChipIds\x18\x04 \x03(\x0c\x12\x14\n\x0c\x64\x65\x63\x65ntriqDer\x18\x05 \x01(\x0c\"\xd6\x01\n)AttestationSpecificationIntelDcapMrsigner\x12\x10\n\x08mrsigner\x18\x01 \x01(\x0c\x12\x11\n\tisvprodid\x18\x07 \x01(\r\x12\x15\n\rdcapRootCaDer\x18\x02 \x01(\x0c\x12\x14\n\x0c\x61\x63\x63\x65pt_debug\x18\x03 \x01(\x08\x12\x1a\n\x12\x61\x63\x63\x65pt_out_of_date\x18\x04 \x01(\x08\x12#\n\x1b\x61\x63\x63\x65pt_configuration_needed\x18\x05 \x01(\x08\x12\x16\n\x0e\x61\x63\x63\x65pt_revoked\x18\x06 \x01(\x08\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x61ttestation.proto\x12\x0b\x61ttestation\"\xfd\x01\n\x08\x46\x61tquote\x12)\n\x04\x65pid\x18\x01 \x01(\x0b\x32\x19.attestation.FatquoteEpidH\x00\x12)\n\x04\x64\x63\x61p\x18\x02 \x01(\x0b\x32\x19.attestation.FatquoteDcapH\x00\x12+\n\x05nitro\x18\x03 \x01(\x0b\x32\x1a.attestation.FatquoteNitroH\x00\x12\'\n\x03snp\x18\x04 \x01(\x0b\x32\x18.attestation.FatquoteSnpH\x00\x12\x39\n\x0c\x64\x63\x61pMrsigner\x18\x05 \x01(\x0b\x32!.attestation.FatquoteDcapMrsignerH\x00\x42\n\n\x08\x66\x61tquote\"k\n\x0c\x46\x61tquoteEpid\x12\x17\n\x0fiasResponseBody\x18\x01 \x01(\x0c\x12\x16\n\x0eiasCertificate\x18\x02 \x01(\x0c\x12\x14\n\x0ciasSignature\x18\x03 \x01(\x0c\x12\x14\n\x0ciasRootCaDer\x18\x04 \x01(\x0c\"\x86\x01\n\x0c\x46\x61tquoteDcap\x12\x11\n\tdcapQuote\x18\x01 \x01(\x0c\x12\x0f\n\x07tcbInfo\x18\x02 \x01(\x0c\x12\x12\n\nqeIdentity\x18\x03 \x01(\x0c\x12\x13\n\x0btcbSignCert\x18\x04 \x01(\x0c\x12\x12\n\nqeSignCert\x18\x05 \x01(\x0c\x12\x15\n\rdcapRootCaDer\x18\x06 \x01(\x0c\"\xc7\x01\n\x14\x46\x61tquoteDcapMrsigner\x12\x11\n\tdcapQuote\x18\x01 \x01(\x0c\x12\x0f\n\x07tcbInfo\x18\x02 \x01(\x0c\x12\x12\n\nqeIdentity\x18\x03 \x01(\x0c\x12\x13\n\x0btcbSignCert\x18\x04 \x01(\x0c\x12\x12\n\nqeSignCert\x18\x05 \x01(\x0c\x12\x15\n\rdcapRootCaDer\x18\x06 \x01(\x0c\x12\x37\n\x10sigstoreEvidence\x18\x07 \x01(\x0b\x32\x1d.attestation.SigstoreEvidence\".\n\x0cSigstoreFile\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08\x63ontents\x18\x02 \x01(\x0c\"V\n\x10SigstoreEvidence\x12-\n\x02v1\x18\x01 \x01(\x0b\x32\x1f.attestation.SigstoreEvidenceV1H\x00\x42\x13\n\x11sigstore_evidence\"Y\n\x12SigstoreEvidenceV1\x12(\n\x05\x66iles\x18\x01 \x03(\x0b\x32\x19.attestation.SigstoreFile\x12\x19\n\x11rekorLogEntryJson\x18\x02 \x01(\x0c\"5\n\rFatquoteNitro\x12\x0c\n\x04\x63ose\x18\x01 \x01(\x0c\x12\x16\n\x0enitroRootCaDer\x18\x02 \x01(\x0c\"\xdf\x01\n\x0b\x46\x61tquoteSnp\x12\x11\n\treportBin\x18\x01 \x01(\x0c\x12\x11\n\tamdArkDer\x18\x02 \x01(\x0c\x12\x11\n\tamdSevDer\x18\x03 \x01(\x0c\x12\x12\n\nvcekCrtDer\x18\x04 \x01(\x0c\x12\x12\n\nreportData\x18\x05 \x01(\x0c\x12\x17\n\x0froughtimePubKey\x18\x06 \x01(\x0c\x12\x16\n\x0eroughtimeNonce\x18\x07 \x01(\x0c\x12\x17\n\x0fsignedTimestamp\x18\x08 \x01(\x0c\x12\x14\n\x0c\x64\x65\x63\x65ntriqDer\x18\t \x01(\x0c\x12\x0f\n\x07\x63hipDer\x18\n \x01(\x0c\"\x98\x03\n\x18\x41ttestationSpecification\x12\x43\n\tintelEpid\x18\x01 \x01(\x0b\x32..attestation.AttestationSpecificationIntelEpidH\x00\x12\x43\n\tintelDcap\x18\x02 \x01(\x0b\x32..attestation.AttestationSpecificationIntelDcapH\x00\x12\x41\n\x08\x61wsNitro\x18\x03 \x01(\x0b\x32-.attestation.AttestationSpecificationAwsNitroH\x00\x12=\n\x06\x61mdSnp\x18\x04 \x01(\x0b\x32+.attestation.AttestationSpecificationAmdSnpH\x00\x12S\n\x11intelDcapMrsigner\x18\x05 \x01(\x0b\x32\x36.attestation.AttestationSpecificationIntelDcapMrsignerH\x00\x42\x1b\n\x19\x61ttestation_specification\"\xa2\x01\n!AttestationSpecificationIntelEpid\x12\x11\n\tmrenclave\x18\x01 \x01(\x0c\x12\x14\n\x0ciasRootCaDer\x18\x02 \x01(\x0c\x12\x13\n\x0b\x61\x63\x63\x65ptDebug\x18\x03 \x01(\x08\x12\x1c\n\x14\x61\x63\x63\x65ptGroupOutOfDate\x18\x04 \x01(\x08\x12!\n\x19\x61\x63\x63\x65ptConfigurationNeeded\x18\x05 \x01(\x08\"\xb5\x01\n!AttestationSpecificationIntelDcap\x12\x11\n\tmrenclave\x18\x01 \x01(\x0c\x12\x15\n\rdcapRootCaDer\x18\x02 \x01(\x0c\x12\x13\n\x0b\x61\x63\x63\x65ptDebug\x18\x03 \x01(\x08\x12\x17\n\x0f\x61\x63\x63\x65ptOutOfDate\x18\x04 \x01(\x08\x12!\n\x19\x61\x63\x63\x65ptConfigurationNeeded\x18\x05 \x01(\x08\x12\x15\n\racceptRevoked\x18\x06 \x01(\x08\"r\n AttestationSpecificationAwsNitro\x12\x16\n\x0enitroRootCaDer\x18\x01 \x01(\x0c\x12\x0c\n\x04pcr0\x18\x02 \x01(\x0c\x12\x0c\n\x04pcr1\x18\x03 \x01(\x0c\x12\x0c\n\x04pcr2\x18\x04 \x01(\x0c\x12\x0c\n\x04pcr8\x18\x05 \x01(\x0c\"\x92\x01\n\x1e\x41ttestationSpecificationAmdSnp\x12\x11\n\tamdArkDer\x18\x01 \x01(\x0c\x12\x13\n\x0bmeasurement\x18\x02 \x01(\x0c\x12\x17\n\x0froughtimePubKey\x18\x03 \x01(\x0c\x12\x19\n\x11\x61uthorizedChipIds\x18\x04 \x03(\x0c\x12\x14\n\x0c\x64\x65\x63\x65ntriqDer\x18\x05 \x01(\x0c\"\xed\x01\n)AttestationSpecificationIntelDcapMrsigner\x12\x10\n\x08mrsigner\x18\x01 \x01(\x0c\x12\x15\n\rdcapRootCaDer\x18\x02 \x01(\x0c\x12\x13\n\x0b\x61\x63\x63\x65ptDebug\x18\x03 \x01(\x08\x12\x17\n\x0f\x61\x63\x63\x65ptOutOfDate\x18\x04 \x01(\x08\x12!\n\x19\x61\x63\x63\x65ptConfigurationNeeded\x18\x05 \x01(\x08\x12\x15\n\racceptRevoked\x18\x06 \x01(\x08\x12\x11\n\tisvprodid\x18\x07 \x01(\r\x12\x1c\n\x14sigstoreRootOlpcJson\x18\x08 \x01(\x0c\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -21,25 +21,33 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'attestation_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _globals['_FATQUOTE']._serialized_start=35
-  _globals['_FATQUOTE']._serialized_end=280
-  _globals['_FATQUOTEEPID']._serialized_start=282
-  _globals['_FATQUOTEEPID']._serialized_end=389
-  _globals['_FATQUOTEDCAP']._serialized_start=392
-  _globals['_FATQUOTEDCAP']._serialized_end=526
-  _globals['_FATQUOTENITRO']._serialized_start=528
-  _globals['_FATQUOTENITRO']._serialized_end=581
-  _globals['_FATQUOTESNP']._serialized_start=584
-  _globals['_FATQUOTESNP']._serialized_end=807
-  _globals['_ATTESTATIONSPECIFICATION']._serialized_start=810
-  _globals['_ATTESTATIONSPECIFICATION']._serialized_end=1218
-  _globals['_ATTESTATIONSPECIFICATIONINTELEPID']._serialized_start=1221
-  _globals['_ATTESTATIONSPECIFICATIONINTELEPID']._serialized_end=1390
-  _globals['_ATTESTATIONSPECIFICATIONINTELDCAP']._serialized_start=1393
-  _globals['_ATTESTATIONSPECIFICATIONINTELDCAP']._serialized_end=1581
-  _globals['_ATTESTATIONSPECIFICATIONAWSNITRO']._serialized_start=1583
-  _globals['_ATTESTATIONSPECIFICATIONAWSNITRO']._serialized_end=1697
-  _globals['_ATTESTATIONSPECIFICATIONAMDSNP']._serialized_start=1700
-  _globals['_ATTESTATIONSPECIFICATIONAMDSNP']._serialized_end=1846
-  _globals['_ATTESTATIONSPECIFICATIONINTELDCAPMRSIGNER']._serialized_start=1849
-  _globals['_ATTESTATIONSPECIFICATIONINTELDCAPMRSIGNER']._serialized_end=2063
+  _globals['_FATQUOTE']._serialized_end=288
+  _globals['_FATQUOTEEPID']._serialized_start=290
+  _globals['_FATQUOTEEPID']._serialized_end=397
+  _globals['_FATQUOTEDCAP']._serialized_start=400
+  _globals['_FATQUOTEDCAP']._serialized_end=534
+  _globals['_FATQUOTEDCAPMRSIGNER']._serialized_start=537
+  _globals['_FATQUOTEDCAPMRSIGNER']._serialized_end=736
+  _globals['_SIGSTOREFILE']._serialized_start=738
+  _globals['_SIGSTOREFILE']._serialized_end=784
+  _globals['_SIGSTOREEVIDENCE']._serialized_start=786
+  _globals['_SIGSTOREEVIDENCE']._serialized_end=872
+  _globals['_SIGSTOREEVIDENCEV1']._serialized_start=874
+  _globals['_SIGSTOREEVIDENCEV1']._serialized_end=963
+  _globals['_FATQUOTENITRO']._serialized_start=965
+  _globals['_FATQUOTENITRO']._serialized_end=1018
+  _globals['_FATQUOTESNP']._serialized_start=1021
+  _globals['_FATQUOTESNP']._serialized_end=1244
+  _globals['_ATTESTATIONSPECIFICATION']._serialized_start=1247
+  _globals['_ATTESTATIONSPECIFICATION']._serialized_end=1655
+  _globals['_ATTESTATIONSPECIFICATIONINTELEPID']._serialized_start=1658
+  _globals['_ATTESTATIONSPECIFICATIONINTELEPID']._serialized_end=1820
+  _globals['_ATTESTATIONSPECIFICATIONINTELDCAP']._serialized_start=1823
+  _globals['_ATTESTATIONSPECIFICATIONINTELDCAP']._serialized_end=2004
+  _globals['_ATTESTATIONSPECIFICATIONAWSNITRO']._serialized_start=2006
+  _globals['_ATTESTATIONSPECIFICATIONAWSNITRO']._serialized_end=2120
+  _globals['_ATTESTATIONSPECIFICATIONAMDSNP']._serialized_start=2123
+  _globals['_ATTESTATIONSPECIFICATIONAMDSNP']._serialized_end=2269
+  _globals['_ATTESTATIONSPECIFICATIONINTELDCAPMRSIGNER']._serialized_start=2272
+  _globals['_ATTESTATIONSPECIFICATIONINTELDCAPMRSIGNER']._serialized_end=2509
 # @@protoc_insertion_point(module_scope)

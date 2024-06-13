@@ -53,10 +53,10 @@ SPECIFICATIONS = {
                     "799044e44e189338553b18706e32284725300926569bbec19af576557abfba19"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -72,10 +72,10 @@ SPECIFICATIONS = {
                     "661cb988c03197f60a619fc4b6e28980790fefb6ab710f9d8994d42e9d00d8ed"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -91,10 +91,10 @@ SPECIFICATIONS = {
                     "b24067659124bebeb3e83d15733a50ad72669a162484c3bb5488dba8e743a1d7"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -110,10 +110,10 @@ SPECIFICATIONS = {
                     "0858710d10692cfd2f00c3f93cda35d125413beb5076b5ca2a7741d8260ed540"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -129,10 +129,10 @@ SPECIFICATIONS = {
                     "6be4c9677818e70e2b75229617cb3b25c0b53642a7ad50867f9babb1d904d38e"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -148,10 +148,10 @@ SPECIFICATIONS = {
                     "2e4fec5faa3fab558c8b6a248b97cba2824838329bd0a53e6014c14ed9026140"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -167,10 +167,10 @@ SPECIFICATIONS = {
                     "c112b5aaa940100d7d70a590963b0cac71d889ff3f14587a590ffb8f42a576e1"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -186,10 +186,10 @@ SPECIFICATIONS = {
                     "7690de11d11efb95b6977cdd75f99035513006790227e8fd7faf153e02d3cc50"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -205,10 +205,10 @@ SPECIFICATIONS = {
                     "e3584803d8996bac8a090ae6f4f30c5fb6ebc91ad82080fedb1c82160eda529c"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -224,10 +224,10 @@ SPECIFICATIONS = {
                     "ae201c5380a6a7c122f2a0e2762f13add664618c4e868e039e23174e66156892"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -243,10 +243,10 @@ SPECIFICATIONS = {
                     "ae290dfdee2759066341697af5441993ff6df00359be52439c551c37416f77e1"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -262,10 +262,10 @@ SPECIFICATIONS = {
                     "dcc9847948837a5cdb85d4fb13d6b77ff6ff5dab63bef35c95901adfa7f1a102"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -281,10 +281,10 @@ SPECIFICATIONS = {
                     "6812cea56521a8c495d12e4940b7cf66c54d8dbc03859f587db2ea22f68051c8"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -300,10 +300,10 @@ SPECIFICATIONS = {
                     "72ca63e791b03ab1a9136c67da8f4fec2cb505fcea8a611afe6e5f6751cc4dd9"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -319,10 +319,10 @@ SPECIFICATIONS = {
                     "52e363142aaefdfbb27e4cb248c3a96743bd917dcc97b05eb42ac1aa6b019860"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -338,10 +338,10 @@ SPECIFICATIONS = {
                     "95ff137db91d6ed5f187c9c69eed4e936c4200291ef65fd68bdf2dbe775958e3"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -357,10 +357,10 @@ SPECIFICATIONS = {
                     "517096c140d10deb5a081c5b7492953e6ee06b3796c8f191cc48e2785758e596"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -376,10 +376,10 @@ SPECIFICATIONS = {
                     "3829df22f1298b15626c7809e43b23bb298eed1fe85030ab4cd06d4a250475a2"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1019,10 +1019,10 @@ SPECIFICATIONS = {
                     "963ca160598716c0c94722a8b376b5b647302cc369c0344b2f3bae3dfb1e8eb3"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1038,10 +1038,10 @@ SPECIFICATIONS = {
                     "09c34e9750a6e18ec7b18d633a5ffb5533c9d5be2bf896eb280717e3da4f2024"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1057,10 +1057,10 @@ SPECIFICATIONS = {
                     "293b598b660a982bbf6dcc9db44f8c30fcb8a13d0150960434a5669a60d4cb43"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1076,10 +1076,10 @@ SPECIFICATIONS = {
                     "eabe3e4efe8e8472d6945ca1b1a238b6702fad50fe4864cd80dc089f7712d740"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1095,10 +1095,10 @@ SPECIFICATIONS = {
                     "1a7e771493f850e6addd7cbada59ec17023c4fa55b922a02c5db9677ade03c70"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1114,10 +1114,10 @@ SPECIFICATIONS = {
                     "ddf17a7c5a3ef4515c4b1ad68cc590dd4de035610cc326c2577ba00e75dc119c"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1133,10 +1133,10 @@ SPECIFICATIONS = {
                     "655077117b0445a998e08820a9f53623f604aa425b5666505f6cc4b8cbce2ecc"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1152,10 +1152,10 @@ SPECIFICATIONS = {
                     "cc7d4a42538cf6facb683d5b21be8124bad7e470dc3910073fff451d7143de0f"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1171,10 +1171,10 @@ SPECIFICATIONS = {
                     "3ffc8524bfc85837340ebfaabe4775f498b5040bbd84f30dcf62f2b1f86a61f4"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1190,10 +1190,10 @@ SPECIFICATIONS = {
                     "971a45b16095ee1dbff897d42058fa1c1b024d2a2ea2267deda1575f6be21e86"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1209,10 +1209,10 @@ SPECIFICATIONS = {
                     "bcb7afdc6bc64e638b44047515e3a8a4b8445282fee342fb9666f0531cd6fca4"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1228,10 +1228,10 @@ SPECIFICATIONS = {
                     "effbd9945e6e2efcebbb657cd9a9b456e0d2c3171878472a45b7f3f949d060b2"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1247,10 +1247,10 @@ SPECIFICATIONS = {
                     "57444a373aa9c0a451666c2b7cc838c4d2691de2da09c11eb1525b6475fc3d7e"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1266,10 +1266,10 @@ SPECIFICATIONS = {
                     "67b8fe452b4724d85e81210f163936dc3ad1cf9c8602939a27ebe9afa00673ff"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1285,10 +1285,10 @@ SPECIFICATIONS = {
                     "f3e7b026ecd80b766bf3073b0aabcae4f55f91611c8de9cba8e671f1b9597ad7"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1304,10 +1304,10 @@ SPECIFICATIONS = {
                     "e42ddd0aa4a355582bc35128c7008ba8aa197604f3b6c1745c74701438ac5605"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1323,10 +1323,10 @@ SPECIFICATIONS = {
                     "2bbfda5a90e833bdff07ca84828d99cbce48cb55f61db2dab00106c03bd358b6"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1342,10 +1342,10 @@ SPECIFICATIONS = {
                     "1a913c06eb2c8e1ea7d87d572424aa8421802374747aba12a2bd7c92ab00f621"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1361,10 +1361,10 @@ SPECIFICATIONS = {
                     "303f2c98573b322a06b88fbebd05db398607aac0a04023e0cb8d80ea822cfd3e"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1380,10 +1380,10 @@ SPECIFICATIONS = {
                     "0ce5941c05297438d256c5d409afc3f444b09f6bf5a145accbc83525a68459ec"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1399,10 +1399,10 @@ SPECIFICATIONS = {
                     "31642671f42befad424cdf7389bfa7fe0ca08dab454d4f2cac46fb34f618d1ae"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1418,10 +1418,10 @@ SPECIFICATIONS = {
                     "b607c0b71e470c23b09ea0c2b9af22e4f350129a5df055887b17e02e02aba2e1"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1437,10 +1437,10 @@ SPECIFICATIONS = {
                     "b1cc081fa868d6acb4293ff3b287c3da075d11ce2e1eeeb692e311eac9711fff"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1456,10 +1456,10 @@ SPECIFICATIONS = {
                     "7d73f04c12338eafc8cc01747ee1817f2cf86d87ca435c27beda965f5ecd2d77"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1475,10 +1475,10 @@ SPECIFICATIONS = {
                     "785c9f94e339ec07e92dd2f39859b587da16a5104c89b879eb8589ba590ae947"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1494,10 +1494,10 @@ SPECIFICATIONS = {
                     "347cec31ae007bebfe8feedcea51c824688a5bad395e2342fefb9fb0adb7e5e1"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1513,10 +1513,10 @@ SPECIFICATIONS = {
                     "1502c2398e83de066b88050deec30376b2c3dbc54974ced2c7ef37950006a403"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1532,10 +1532,10 @@ SPECIFICATIONS = {
                     "40ed3e2e9b82d1b23d2380e9cb293a59197a979a5ce2918cb0b50f64604bcfeb"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1551,10 +1551,10 @@ SPECIFICATIONS = {
                     "eae60f5bc9ca4cb67fd253206a9a8b4d723f0ce799bb6c9c9b366eb9b7ba8cbd"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1570,10 +1570,10 @@ SPECIFICATIONS = {
                     "3a00807af2ec87b9de3760188d112c494dd1a41877fbae30ecebb607ceafa3e7"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1589,10 +1589,10 @@ SPECIFICATIONS = {
                     "b035a0bdb2ea9522ac96efce0008fbc6aa60a01228c2bc377b3aa0a683920b4a"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1608,10 +1608,10 @@ SPECIFICATIONS = {
                     "3ec53f55dc174a812fd2898ac10c0a6135c3268b6bdd05bad29da35f102be51e"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1627,10 +1627,10 @@ SPECIFICATIONS = {
                     "30a9ef92fc5cfbcddb9632de7a3c48d9d341004847ec44d1f6415e0ff3aa373e"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1646,10 +1646,10 @@ SPECIFICATIONS = {
                     "2db293783d1d072aa7ce3ff148df4f504d091165db7053165fe81af80afab71f"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],
@@ -1665,10 +1665,10 @@ SPECIFICATIONS = {
                     "48df661285eae40318e02a50ff35b269e9f26bac29f369753da55633578a07c0"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
-                accept_debug=False,
-                accept_out_of_date=False,
-                accept_configuration_needed=False,
-                accept_revoked=False,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
             )
         ),
         workerProtocols=[1],

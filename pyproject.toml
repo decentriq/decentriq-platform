@@ -1,43 +1,44 @@
 [tool.poetry]
-name = "decentriq-platform"
-version = "0.28.0"
-description = "Python client library for the Decentriq platform"
 authors = ["decentriq <opensource@decentriq.com>"]
+description = "Python client library for the Decentriq platform"
+homepage = "https://github.com/decentriq/decentriq-platform"
+name = "decentriq-platform"
 readme = 'README.md'
 repository = "https://github.com/decentriq/decentriq-platform"
-homepage = "https://github.com/decentriq/decentriq-platform"
+version = "0.28.0"
 
 [tool.poetry.dependencies]
 # main package
-python = "^3.9"
-typing-extensions = "^4.4.0"
-protobuf = "4.21.9"
-requests = "^2.32.0"
-sgx-ias-structs = "^0.1.8"
-cryptography = "^42.0.6"
-pyOpenSSL = "^24.0.0"
-chily = "^0.8.0"
 asn1crypto = "^1.5.1"
+cbor2 = "^5.4.6"
+certifi = "^2023.7.22"
+chily = "^0.8.0"
+cryptography = "^42.0.6"
+decentriq-dcr-compiler = "0.7.0"
+decentriq-transparency-verification = "0.1.0dev1"
 ecdsa = "^0.18.0"
 pem = "^21.2.0"
-certifi = "^2023.7.22"
+protobuf = "4.21.9"
+pyOpenSSL = "^24.0.0"
+python = "^3.9"
+requests = "^2.32.0"
+sgx-ias-structs = "^0.1.8"
 sqloxide = "^0.1.26"
-cbor2 = "^5.4.6"
-decentriq-dcr-compiler = "0.8.0"
+typing-extensions = "^4.4.0"
 # Force version to be >= 3.7 due to vuln (transitive dependency of `requests` package)
 idna = "^3.7"
 
 [tool.poetry.dev-dependencies]
-mypy-protobuf = "^3.4.0"
-mypy = "^1.9.0"
 black = "^24.4.0"
 isort = "^5.13.2"
-types-requests = "*"
+mypy = "^1.9.0"
+mypy-protobuf = "^3.4.0"
 types-pyOpenSSL = "*"
+types-requests = "*"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
 
 [tool.black]
 extend-exclude = '''
@@ -45,7 +46,7 @@ extend-exclude = '''
 '''
 [tool.mypy]
 plugins = [
-  "pydantic.mypy"
+  "pydantic.mypy",
 ]
 
 [tool.isort]

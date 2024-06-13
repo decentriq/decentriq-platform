@@ -12,17 +12,21 @@ import pem as Pem
 from ecdsa import VerifyingKey
 from sgx_ias_structs import QuoteBody as _QuoteBody
 
-from .certs import intel_sgx_dcap_root_ca, intel_sgx_ias_root_ca
+from .proto import serialize_length_delimited
 from .proto import (
     AttestationSpecification,
     AttestationSpecificationIntelDcap,
     AttestationSpecificationIntelDcapMrsigner,
     Fatquote,
     FatquoteDcap,
+    FatquoteDcapMrsigner,
     FatquoteEpid,
 )
 from .types import IasResponse, Tcb, TcbInfoContainer, TcbLevel
 from .logger import logger
+from .certs import intel_sgx_ias_root_ca, intel_sgx_dcap_root_ca
+from datetime import datetime
+from decentriq_transparency_verification import verify_measurement_transparency
 
 
 class QuoteBody:
@@ -99,6 +103,10 @@ class MrsignerMismatchError(Exception):
 
     pass
 
+class TransparencyVerificationError(Exception):
+    """Raised when we couldn't verify that the enclave was published transparently."""
+
+    pass
 
 class Verification:
     class IASAttributeFlags(IntFlag):
@@ -158,12 +166,12 @@ class Verification:
         if isv_enclave_quote_status == "OK":
             pass
         elif (
-            spec_epid.accept_configuration_needed
+            spec_epid.acceptConfigurationNeeded
             and isv_enclave_quote_status == "CONFIGURATION_NEEDED"
         ):
             pass
         elif (
-            spec_epid.accept_group_out_of_date
+            spec_epid.acceptGroupOutOfDate
             and isv_enclave_quote_status == "GROUP_OUT_OF_DATE"
         ):
             pass
@@ -179,7 +187,7 @@ class Verification:
         if not (flags & Verification.IASAttributeFlags.MODE64BIT):
             raise EnclaveQuoteFlagsError
         if flags & Verification.IASAttributeFlags.DEBUG:
-            if spec_epid.accept_debug:
+            if spec_epid.acceptDebug:
                 logger.warning(
                     "!!!WARNING!!! DEBUG quote is being accepted, quote is NOT to be trusted !!!WARNING!!!"
                 )
@@ -227,20 +235,20 @@ class Verification:
     ):
         if status == "UpToDate" or status == "SWHardeningNeeded":
             return
-        if spec_dcap.accept_out_of_date and status in [
+        if spec_dcap.acceptOutOfDate and status in [
             "OutOfDate",
             "OutOfDateConfigurationNeeded",
         ]:
             return
-        if spec_dcap.accept_configuration_needed and status in [
+        if spec_dcap.acceptConfigurationNeeded and status in [
             "ConfigurationNeeded",
             "OutOfDateConfigurationNeeded",
             "ConfigurationAndSWHardeningNeeded",
         ]:
             return
-        if spec_dcap.accept_revoked and status in ["Revoked"]:
+        if spec_dcap.acceptRevoked and status in ["Revoked"]:
             return
-        raise Exception(f"TCB status ${status} not accepted")
+        raise Exception(f"TCB status {status} not accepted")
 
     def _dcap_find_tcb_level(
         self, tcb_levels: List[TcbLevel], cpusvn: List[int], pcesvn: int
@@ -298,7 +306,7 @@ class Verification:
         if not (flags & Verification.IASAttributeFlags.MODE64BIT):
             raise EnclaveQuoteFlagsError
         if flags & Verification.IASAttributeFlags.DEBUG:
-            if spec_dcap.accept_debug:
+            if spec_dcap.acceptDebug:
                 logger.warning(
                     "!!!WARNING!!! DEBUG quote is being accepted, quote is NOT to be trusted !!!WARNING!!!"
                 )
@@ -405,7 +413,7 @@ class Verification:
             )
         return quote[368:400]
 
-    def _verify_dcap_mrsigner(self, dcap: FatquoteDcap) -> bytes:
+    def _verify_dcap_mrsigner(self, dcap: FatquoteDcapMrsigner) -> bytes:
         if (
             self.attestation_specification.WhichOneof("attestation_specification")
             != "intelDcapMrsigner"
@@ -425,6 +433,17 @@ class Verification:
             raise MrsignerMismatchError(
                 f"Wrong isvprodid, expected 0x{hex(spec_dcap.isvprodid)}, actual 0x{hex(isvprodid)}"
             )
+
+        mrenclave = bytes(quote[112:144])
+        try:
+            verify_measurement_transparency(
+                serialize_length_delimited(dcap.sigstoreEvidence),
+                spec_dcap.sigstoreRootOlpcJson,
+                mrenclave,
+            )
+        except Exception as e:
+            raise TransparencyVerificationError(f"{e}")
+
         return quote[368:400]
 
     def verify(self, fatquote: Fatquote) -> bytes:
