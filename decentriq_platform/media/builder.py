@@ -53,6 +53,7 @@ class MediaDcrBuilder:
         self.enable_insights = False
         self.enable_lookalike = False
         self.enable_retargeting = False
+        self.enable_exclusion_targeting = False
         self.hide_absolute_values_from_insights = False
         self.enable_advertiser_audience_download = False
 
@@ -158,6 +159,14 @@ class MediaDcrBuilder:
         self.enable_retargeting = True
         return self
 
+    def with_exclusion_targeting(self) -> Self:
+        """
+        Enable the "exclusion targeting" feature set.
+        """
+        self.enable_exclusion_targeting = True
+        return self
+
+
     def with_advertiser_audience_download(self) -> Self:
         """
         Allow the advertiser to download the user ids for an audience.
@@ -204,6 +213,7 @@ class MediaDcrBuilder:
                     "workerProtocol": driver_spec.workerProtocol,
                 },
                 "enableDebugMode": False,
+                "enableExclusionTargeting": self.enable_exclusion_targeting,
                 "enableInsights": self.enable_insights,
                 "enableLookalike": self.enable_lookalike,
                 "enableRetargeting": self.enable_retargeting,

@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 class ActivationType(str, Enum):
     LOOKALIKE = "lookalike"
     RETARGET = "retarget"
+    EXCLUSION_TARGETING = "exclusion_targeting"
 
 
 @dataclass
