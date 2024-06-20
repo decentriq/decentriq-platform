@@ -14,6 +14,9 @@ class MediaInsightFeatures:
     def has_enable_retargeting(self) -> bool:
         return self._features_contain("ENABLE_RETARGETING")
 
+    def has_enable_exclusion_targeting(self) -> bool:
+        return self._features_contain("ENABLE_EXCLUSION_TARGETING")
+
     def has_enable_rate_limiting_on_publish_dataset(self) -> bool:
         return self._features_contain("ENABLE_RATE_LIMITING_ON_PUBLISH_DATASET")
 

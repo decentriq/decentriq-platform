@@ -22,6 +22,7 @@ from .publisher_computations import (
 )
 
 from .advertiser_computations import (
+    AvailableAudiencesComputation,
     GetAudiencesForAdvertiserComputation,
     GetAudienceUserListForAdvertiserComputation,
 )
@@ -121,9 +122,10 @@ class MediaDcr:
         if (
             not self.features.has_enable_lookalike()
             and not self.features.has_enable_retargeting()
+            and not self.features.has_enable_exclusion_targeting()
         ):
             raise Exception(
-                "Unable to retrieve audiences. Lookalike or Retargeting must be enabled."
+                "Unable to retrieve audiences. Lookalike, Retargeting or Exclusion Targeting must be enabled."
             )
 
         get_audiences_for_publisher_computation = GetAudiencesForPublisherComputation(
@@ -138,15 +140,34 @@ class MediaDcr:
         if (
             not self.features.has_enable_lookalike()
             and not self.features.has_enable_retargeting()
+            and not self.features.has_enable_exclusion_targeting()
         ):
             raise Exception(
-                "Unable to retrieve audience. Lookalike or Retargeting must be enabled."
+                "Unable to retrieve audience. Lookalike, Retargeting or Exclusion Targeting must be enabled."
             )
 
         get_audiences_for_advertiser_computation = GetAudiencesForAdvertiserComputation(
             dcr_id=self.id, client=self.client, session=self.session
         )
         return get_audiences_for_advertiser_computation.run_and_get_results()
+
+    def get_available_audiences(self) -> Dict[str, Any]:
+        """
+        Get the available audiences for the advertiser.
+        """
+        if (
+            not self.features.has_enable_lookalike()
+            and not self.features.has_enable_retargeting()
+            and not self.features.has_enable_exclusion_targeting()
+        ):
+            raise Exception(
+                "Unable to retrieve audience. Lookalike, Retargeting or Exclusion Targeting must be enabled."
+            )
+
+        get_available_audiences_computation = AvailableAudiencesComputation(
+            dcr_id=self.id, client=self.client, session=self.session
+        )
+        return get_available_audiences_computation.run_and_get_results()
 
     def get_audience_user_list(
         self,
@@ -176,7 +197,9 @@ class MediaDcr:
         in order for this feature to work.
         """
         if not self.features.has_enable_advertiser_audience_download():
-            raise Exception("This Media DCR does not support downloading audiences for advertisers.")
+            raise Exception(
+                "This Media DCR does not support downloading audiences for advertisers."
+            )
         computation = GetAudienceUserListForAdvertiserComputation(
             dcr_id=self.id,
             audience=activated_audience,
