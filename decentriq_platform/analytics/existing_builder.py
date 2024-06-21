@@ -31,6 +31,8 @@ from .sql_compute_nodes import SqlComputeNodeDefinition
 from .sqlite_compute_nodes import SqliteComputeNodeDefinition
 from .synthetic_compute_nodes import SyntheticDataComputeNodeDefinition
 from .table_data_nodes import TableDataNodeDefinition
+from ..data_connectors import AwsImportConnectorDefinition, AwsExportConnectorDefinition
+from .dataset_sink_compute_nodes import DatasetSinkComputeNodeDefinition
 from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
 
 if TYPE_CHECKING:
@@ -181,7 +183,9 @@ class ExistingAnalyticsDcrBuilder:
         MatchingComputeNodeDefinition,
         SyntheticDataComputeNodeDefinition,
         PreviewComputeNodeDefinition,
+        AwsImportConnectorDefinition,
     ]:
+
         root_node = node.kind.root
         node_fields = root_node.model_fields
         compute_node_definition = None
@@ -225,6 +229,43 @@ class ExistingAnalyticsDcrBuilder:
             compute_node_definition = PreviewComputeNodeDefinition._from_high_level(
                 id, name, root_node.preview
             )
+        elif "importConnector" in node_fields:
+            import_connector = root_node.importConnector
+            credentials_dependency = import_connector.credentialsDependency
+            import_connector_kind = import_connector.kind.root.model_fields
+            if "aws" in import_connector_kind:
+                aws_config = import_connector.kind.root.aws
+                compute_node_definition = AwsImportConnectorDefinition._from_high_level(
+                    name,
+                    aws_config,
+                    credentials_dependency,
+                )
+            else:
+                raise Exception(
+                    f"Unknown import connector kind {import_connector_kind}"
+                )
+        elif "exportConnector" in node_fields:
+            export_connector = root_node.exportConnector
+            credentials_dependency = export_connector.credentialsDependency
+            export_connector_kind = export_connector.kind.root.model_fields
+            export_connector_node_dependency = export_connector.dependency
+            if "aws" in export_connector_kind:
+                aws_config = export_connector.kind.root.aws
+                compute_node_definition = AwsExportConnectorDefinition._from_high_level(
+                    name,
+                    aws_config,
+                    credentials_dependency,
+                    export_connector_node_dependency,
+                )
+            else:
+                raise Exception(
+                    f"Unknown export connector kind {export_connector_kind}"
+                )
+        elif "datasetSink" in node_fields:
+            compute_node_definition = DatasetSinkComputeNodeDefinition._from_high_level(
+                id=id, name=name, node=root_node.datasetSink
+            )
+
         else:
             raise Exception("Unknown computation node type")
         return compute_node_definition

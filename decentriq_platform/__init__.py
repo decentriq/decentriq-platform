@@ -11,6 +11,7 @@ from . import (
     session,
     types,
     authentication,
+    data_connectors,
 )
 from .attestation import EnclaveSpecifications, enclave_specifications
 from .client import Client, Session, create_client
@@ -41,6 +42,7 @@ __pdoc__ = {
     "legacy": True,
     "decoder": False,
     "media": True,
+    "data_connectors": True,
 }
 
 __all__ = [
@@ -63,4 +65,5 @@ __all__ = [
     "legacy",
     "analytics",
     "media",
+    "data_connectors",
 ]
