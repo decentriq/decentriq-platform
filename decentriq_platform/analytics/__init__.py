@@ -32,6 +32,11 @@ from .table_data_nodes import (
     TableDataNode,
     TableDataNodeDefinition,
 )
+from .dataset_sink_compute_nodes import (
+    DatasetSinkComputationNode,
+    DatasetSinkComputeNodeDefinition,
+    SinkInputFormat,
+)
 from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
 
 __pdoc__ = {
@@ -57,6 +62,7 @@ __pdoc__ = {
     "sqlite_compute_nodes": False,
     "synthetic_compute_nodes": False,
     "table_data_nodes": False,
+    "dataset_sink_compute_nodes": False,
 }
 
 __docformat__ = "restructuredtext"
@@ -94,6 +100,9 @@ __all__ = [
     "PreviewComputeNode",
     "PreviewComputeNodeDefinition",
     "FileContent",
+    "DatasetSinkComputeNodeDefinition",
+    "DatasetSinkComputationNode",
+    "SinkInputFormat",
     # Data nodes
     "RawDataNode",
     "RawDataNodeDefinition",
