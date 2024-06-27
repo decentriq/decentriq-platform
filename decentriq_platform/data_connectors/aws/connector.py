@@ -9,16 +9,13 @@ from decentriq_dcr_compiler._schemas.data_science_data_room import (
     AwsConfig,
     ExportNodeDependency as ExportNodeDependencySchema,
 )
-from typing import TypeAlias
 from typing_extensions import Self
 
 from ..export_dependency_types import *
 from ..export_dependency_types import _get_export_node_dependency_from_high_level
 
-ImportConnectorDefinition: TypeAlias = NodeDefinition
 
-
-class AwsImportConnectorDefinition(ImportConnectorDefinition):
+class AwsImportConnectorDefinition(NodeDefinition):
     def __init__(
         self,
         name: str,
@@ -74,7 +71,7 @@ class AwsImportConnectorDefinition(ImportConnectorDefinition):
     def build(
         self,
         dcr_id: str,
-        node_definition: ImportConnectorDefinition,
+        node_definition: NodeDefinition,
         client: Client,
         session: Session,
     ) -> AwsImportConnector:
@@ -165,10 +162,7 @@ class AwsImportConnector(ComputationNode):
         return self.id
 
 
-ExportConnectorDefinition: TypeAlias = NodeDefinition
-
-
-class AwsExportConnectorDefinition(ExportConnectorDefinition):
+class AwsExportConnectorDefinition(NodeDefinition):
     def __init__(
         self,
         name: str,
@@ -226,7 +220,7 @@ class AwsExportConnectorDefinition(ExportConnectorDefinition):
     def build(
         self,
         dcr_id: str,
-        node_definition: ExportConnectorDefinition,
+        node_definition: NodeDefinition,
         client: Client,
         session: Session,
     ) -> AwsExportConnector:
@@ -292,7 +286,7 @@ class AwsExportConnector(ComputationNode):
         dcr_id: str,
         client: Client,
         session: Session,
-        connector_definition: ExportConnectorDefinition,
+        connector_definition: NodeDefinition,
     ) -> None:
         """
         Initialise an `AwsExportConnector`.
