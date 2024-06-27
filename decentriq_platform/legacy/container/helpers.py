@@ -1,4 +1,5 @@
-import zipfile, io
+import io
+import zipfile
 
 
 def read_result_as_zipfile(result: bytes):

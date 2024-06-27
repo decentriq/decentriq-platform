@@ -1,7 +1,6 @@
-from .data_lab import DataLab, DataLabConfig, ExistingDataLab
+from ..types import DataLabDatasetType, MatchingId, MatchingIdFormat
 from .builder import DataLabBuilder
-from ..types import DataLabDatasetType, MatchingIdFormat, MatchingId
-
+from .data_lab import DataLab, DataLabConfig, ExistingDataLab
 
 __pdoc__ = {
     "builder": False,

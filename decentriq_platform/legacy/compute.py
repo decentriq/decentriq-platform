@@ -1,13 +1,13 @@
 from typing import List
+
+from ..decoder import GcgDriverDecoder
 from ..proto import (
+    ComputeNodeFormat,
     DriverTaskConfig,
     NoopConfig,
-    serialize_length_delimited,
     StaticContentConfig,
-    ComputeNodeFormat,
+    serialize_length_delimited,
 )
-from ..decoder import GcgDriverDecoder
-
 from .node import Node
 
 

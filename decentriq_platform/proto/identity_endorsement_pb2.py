@@ -4,9 +4,8 @@
 """Generated protocol buffer code."""
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
-from google.protobuf import message as _message
-from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+from google.protobuf.internal import builder as _builder
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -16,109 +15,29 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1aidentity_endorsement.proto\x12\x14identity_endorsement\"\xd2\x01\n\x12\x45ndorsementRequest\x12L\n\x15pkiEndorsementRequest\x18\x02 \x01(\x0b\x32+.identity_endorsement.PkiEndorsementRequestH\x00\x12X\n\x1b\x64\x63rSecretEndorsementRequest\x18\x03 \x01(\x0b\x32\x31.identity_endorsement.DcrSecretEndorsementRequestH\x00\x42\x14\n\x12\x65ndorsementRequest\"\xd8\x01\n\x13\x45ndorsementResponse\x12N\n\x16pkiEndorsementResponse\x18\x02 \x01(\x0b\x32,.identity_endorsement.PkiEndorsementResponseH\x00\x12Z\n\x1c\x64\x63rSecretEndorsementResponse\x18\x03 \x01(\x0b\x32\x32.identity_endorsement.DcrSecretEndorsementResponseH\x00\x42\x15\n\x13\x65ndorsementResponse\"4\n\x15PkiEndorsementRequest\x12\x1b\n\x13\x63\x65rtificateChainPem\x18\x01 \x01(\x0c\"Z\n\x16PkiEndorsementResponse\x12@\n\x0epkiEndorsement\x18\x01 \x01(\x0b\x32(.identity_endorsement.EnclaveEndorsement\"0\n\x1b\x44\x63rSecretEndorsementRequest\x12\x11\n\tdcrSecret\x18\x01 \x01(\t\"{\n\x1c\x44\x63rSecretEndorsementResponse\x12\x46\n\x14\x64\x63rSecretEndorsement\x18\x01 \x01(\x0b\x32(.identity_endorsement.EnclaveEndorsement\x12\x13\n\x0b\x64\x63rSecretId\x18\x02 \x01(\x0c\"\xca\x01\n\x13\x45nclaveEndorsements\x12=\n\x0bpersonalPki\x18\x01 \x01(\x0b\x32(.identity_endorsement.EnclaveEndorsement\x12\x37\n\x05\x64qPki\x18\x02 \x01(\x0b\x32(.identity_endorsement.EnclaveEndorsement\x12;\n\tdcrSecret\x18\x03 \x01(\x0b\x32(.identity_endorsement.EnclaveEndorsement\"7\n\x12\x45nclaveEndorsement\x12!\n\x19\x65ndorsementCertificateDer\x18\x01 \x01(\x0c\"&\n\x08PkiClaim\x12\x1a\n\x12rootCertificateDer\x18\x01 \x01(\x0c\"%\n\x0e\x44\x63rSecretClaim\x12\x13\n\x0b\x64\x63rSecretId\x18\x01 \x01(\x0c\x62\x06proto3')
 
-
-
-_ENDORSEMENTREQUEST = DESCRIPTOR.message_types_by_name['EndorsementRequest']
-_ENDORSEMENTRESPONSE = DESCRIPTOR.message_types_by_name['EndorsementResponse']
-_PKIENDORSEMENTREQUEST = DESCRIPTOR.message_types_by_name['PkiEndorsementRequest']
-_PKIENDORSEMENTRESPONSE = DESCRIPTOR.message_types_by_name['PkiEndorsementResponse']
-_DCRSECRETENDORSEMENTREQUEST = DESCRIPTOR.message_types_by_name['DcrSecretEndorsementRequest']
-_DCRSECRETENDORSEMENTRESPONSE = DESCRIPTOR.message_types_by_name['DcrSecretEndorsementResponse']
-_ENCLAVEENDORSEMENTS = DESCRIPTOR.message_types_by_name['EnclaveEndorsements']
-_ENCLAVEENDORSEMENT = DESCRIPTOR.message_types_by_name['EnclaveEndorsement']
-_PKICLAIM = DESCRIPTOR.message_types_by_name['PkiClaim']
-_DCRSECRETCLAIM = DESCRIPTOR.message_types_by_name['DcrSecretClaim']
-EndorsementRequest = _reflection.GeneratedProtocolMessageType('EndorsementRequest', (_message.Message,), {
-  'DESCRIPTOR' : _ENDORSEMENTREQUEST,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.EndorsementRequest)
-  })
-_sym_db.RegisterMessage(EndorsementRequest)
-
-EndorsementResponse = _reflection.GeneratedProtocolMessageType('EndorsementResponse', (_message.Message,), {
-  'DESCRIPTOR' : _ENDORSEMENTRESPONSE,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.EndorsementResponse)
-  })
-_sym_db.RegisterMessage(EndorsementResponse)
-
-PkiEndorsementRequest = _reflection.GeneratedProtocolMessageType('PkiEndorsementRequest', (_message.Message,), {
-  'DESCRIPTOR' : _PKIENDORSEMENTREQUEST,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.PkiEndorsementRequest)
-  })
-_sym_db.RegisterMessage(PkiEndorsementRequest)
-
-PkiEndorsementResponse = _reflection.GeneratedProtocolMessageType('PkiEndorsementResponse', (_message.Message,), {
-  'DESCRIPTOR' : _PKIENDORSEMENTRESPONSE,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.PkiEndorsementResponse)
-  })
-_sym_db.RegisterMessage(PkiEndorsementResponse)
-
-DcrSecretEndorsementRequest = _reflection.GeneratedProtocolMessageType('DcrSecretEndorsementRequest', (_message.Message,), {
-  'DESCRIPTOR' : _DCRSECRETENDORSEMENTREQUEST,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.DcrSecretEndorsementRequest)
-  })
-_sym_db.RegisterMessage(DcrSecretEndorsementRequest)
-
-DcrSecretEndorsementResponse = _reflection.GeneratedProtocolMessageType('DcrSecretEndorsementResponse', (_message.Message,), {
-  'DESCRIPTOR' : _DCRSECRETENDORSEMENTRESPONSE,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.DcrSecretEndorsementResponse)
-  })
-_sym_db.RegisterMessage(DcrSecretEndorsementResponse)
-
-EnclaveEndorsements = _reflection.GeneratedProtocolMessageType('EnclaveEndorsements', (_message.Message,), {
-  'DESCRIPTOR' : _ENCLAVEENDORSEMENTS,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.EnclaveEndorsements)
-  })
-_sym_db.RegisterMessage(EnclaveEndorsements)
-
-EnclaveEndorsement = _reflection.GeneratedProtocolMessageType('EnclaveEndorsement', (_message.Message,), {
-  'DESCRIPTOR' : _ENCLAVEENDORSEMENT,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.EnclaveEndorsement)
-  })
-_sym_db.RegisterMessage(EnclaveEndorsement)
-
-PkiClaim = _reflection.GeneratedProtocolMessageType('PkiClaim', (_message.Message,), {
-  'DESCRIPTOR' : _PKICLAIM,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.PkiClaim)
-  })
-_sym_db.RegisterMessage(PkiClaim)
-
-DcrSecretClaim = _reflection.GeneratedProtocolMessageType('DcrSecretClaim', (_message.Message,), {
-  'DESCRIPTOR' : _DCRSECRETCLAIM,
-  '__module__' : 'identity_endorsement_pb2'
-  # @@protoc_insertion_point(class_scope:identity_endorsement.DcrSecretClaim)
-  })
-_sym_db.RegisterMessage(DcrSecretClaim)
-
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'identity_endorsement_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-
   DESCRIPTOR._options = None
-  _ENDORSEMENTREQUEST._serialized_start=53
-  _ENDORSEMENTREQUEST._serialized_end=263
-  _ENDORSEMENTRESPONSE._serialized_start=266
-  _ENDORSEMENTRESPONSE._serialized_end=482
-  _PKIENDORSEMENTREQUEST._serialized_start=484
-  _PKIENDORSEMENTREQUEST._serialized_end=536
-  _PKIENDORSEMENTRESPONSE._serialized_start=538
-  _PKIENDORSEMENTRESPONSE._serialized_end=628
-  _DCRSECRETENDORSEMENTREQUEST._serialized_start=630
-  _DCRSECRETENDORSEMENTREQUEST._serialized_end=678
-  _DCRSECRETENDORSEMENTRESPONSE._serialized_start=680
-  _DCRSECRETENDORSEMENTRESPONSE._serialized_end=803
-  _ENCLAVEENDORSEMENTS._serialized_start=806
-  _ENCLAVEENDORSEMENTS._serialized_end=1008
-  _ENCLAVEENDORSEMENT._serialized_start=1010
-  _ENCLAVEENDORSEMENT._serialized_end=1065
-  _PKICLAIM._serialized_start=1067
-  _PKICLAIM._serialized_end=1105
-  _DCRSECRETCLAIM._serialized_start=1107
-  _DCRSECRETCLAIM._serialized_end=1144
+  _globals['_ENDORSEMENTREQUEST']._serialized_start=53
+  _globals['_ENDORSEMENTREQUEST']._serialized_end=263
+  _globals['_ENDORSEMENTRESPONSE']._serialized_start=266
+  _globals['_ENDORSEMENTRESPONSE']._serialized_end=482
+  _globals['_PKIENDORSEMENTREQUEST']._serialized_start=484
+  _globals['_PKIENDORSEMENTREQUEST']._serialized_end=536
+  _globals['_PKIENDORSEMENTRESPONSE']._serialized_start=538
+  _globals['_PKIENDORSEMENTRESPONSE']._serialized_end=628
+  _globals['_DCRSECRETENDORSEMENTREQUEST']._serialized_start=630
+  _globals['_DCRSECRETENDORSEMENTREQUEST']._serialized_end=678
+  _globals['_DCRSECRETENDORSEMENTRESPONSE']._serialized_start=680
+  _globals['_DCRSECRETENDORSEMENTRESPONSE']._serialized_end=803
+  _globals['_ENCLAVEENDORSEMENTS']._serialized_start=806
+  _globals['_ENCLAVEENDORSEMENTS']._serialized_end=1008
+  _globals['_ENCLAVEENDORSEMENT']._serialized_start=1010
+  _globals['_ENCLAVEENDORSEMENT']._serialized_end=1065
+  _globals['_PKICLAIM']._serialized_start=1067
+  _globals['_PKICLAIM']._serialized_end=1105
+  _globals['_DCRSECRETCLAIM']._serialized_start=1107
+  _globals['_DCRSECRETCLAIM']._serialized_end=1144
 # @@protoc_insertion_point(module_scope)

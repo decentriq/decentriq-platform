@@ -1,13 +1,19 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Union, Any
-from .high_level_node import DataNode, ComputationNode
-from ..session import Session
-from .existing_builder import ExistingAnalyticsDcrBuilder
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+
+from typing_extensions import Self
+
 from ..attestation import enclave_specifications
-from typing_extensions import Self
+from ..session import Session
+from ..types import EnclaveSpecification
+from .existing_builder import ExistingAnalyticsDcrBuilder
+from .high_level_node import ComputationNode, DataNode
 from .node_definitions import NodeDefinition
-from typing_extensions import Self
+from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class AnalyticsDcrDefinition:
@@ -15,9 +21,15 @@ class AnalyticsDcrDefinition:
     A class representing an Analytics DCR Definition.
     """
 
-    def __init__(self, name: str, high_level: Dict[str, Any]) -> None:
+    def __init__(
+        self,
+        name: str,
+        high_level: Dict[str, Any],
+        enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
+    ) -> None:
         self.name = name
         self.high_level = high_level
+        self.enclave_specs = enclave_specs
 
     def _get_high_level_representation(self) -> Dict[str, Any]:
         return self.high_level
@@ -84,8 +96,9 @@ class AnalyticsDcr:
         """
         self.session.stop_data_room(self.id)
 
-    @staticmethod
+    @classmethod
     def _from_existing(
+        cls,
         dcr_id: str,
         *,
         client: Client,
@@ -117,7 +130,7 @@ class AnalyticsDcr:
         )
         existing_dcr_builder = ExistingAnalyticsDcrBuilder(dcr_id, client, session)
         cfg = existing_dcr_builder.get_configuration()
-        dcr = AnalyticsDcr(
+        dcr = cls(
             client=client,
             session=session,
             dcr_id=dcr_id,
@@ -125,3 +138,32 @@ class AnalyticsDcr:
             nodes=cfg.node_definitions,
         )
         return dcr
+
+    def participants(self) -> List[str]:
+        """
+        Retrieve the participants of the Analytics DCR as a list.
+        """
+        keys = list(self.high_level.keys())
+        if len(keys) != 1:
+            raise Exception(
+                f"Unable to extract Analytics DCR version. Expected a single top-level property indicating the DCR version."
+            )
+        dcr_version = keys[0]
+
+        dcr = self.high_level[dcr_version]
+        keys = list(dcr.keys())
+        if len(keys) != 1:
+            raise Exception(
+                f"Unable to extract the interactivity type for the Analytics DCR. Expected a single top-level property indicating the interactivity type."
+            )
+
+        dcr_type = keys[0]
+        if dcr_type == "interactive":
+            participants = dcr[dcr_type]["initialConfiguration"]["participants"]
+        elif dcr_type == "static":
+            participants = dcr[dcr_type]["participants"]
+        else:
+            raise Exception(
+                f'Unknown DCR type {dcr_type}. Expected "interactive" or "static" type.'
+            )
+        return [participant["user"] for participant in participants]

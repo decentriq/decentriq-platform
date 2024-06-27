@@ -1,12 +1,41 @@
 import base64
 import io
 import json
-from typing import Dict, Mapping, Optional, Text, Tuple
-from uuid import uuid4
 import uuid
 import zipfile
+from pathlib import Path
+from typing import Dict, Mapping, Optional, Text, Tuple
+from uuid import uuid4
+
+from decentriq_dcr_compiler import compiler
+from decentriq_dcr_compiler._schemas.create_data_lab import (
+    EnclaveSpecification as HlEnclaveSpecification,
+)
+from decentriq_dcr_compiler import (
+    CreateDataLab,
+    CreateDataLab3,
+    CreateDataLabComputeV2,
+    MediaInsightsRequest,
+)
+
+from ..media.request import Request
 from ..client import Client
+from ..helpers import (
+    create_session_from_driver_spec,
+    get_latest_enclave_specs_as_dictionary,
+)
+from ..keychain import Keychain, KeychainEntry
+from ..proto import (
+    CreateDcrPurpose,
+    DataRoom,
+    parse_length_delimited,
+    serialize_length_delimited,
+)
+from ..proto.length_delimited import parse_length_delimited, serialize_length_delimited
+from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
+from ..storage import Key
 from ..types import (
+    MATCHING_ID_INTERNAL_LOOKUP,
     DataLabDatasetType,
     DataLabDefinition,
     DryRunOptions,
@@ -14,24 +43,6 @@ from ..types import (
     JobId,
     MatchingId,
 )
-from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas import (
-    LookalikeMediaDataRoom,
-    CreateDataLab,
-    CreateDataLab2,
-    CreateDataLabComputeV1,
-)
-from ..proto import DataRoom, CreateDcrPurpose
-from ..proto.length_delimited import parse_length_delimited, serialize_length_delimited
-from ..storage import Key
-from ..keychain import Keychain, KeychainEntry
-from ..session import LATEST_GCG_PROTOCOL_VERSION, Session
-from ..helpers import (
-    get_latest_enclave_specs_as_dictionary,
-    create_session_from_driver_spec,
-)
-from ..types import MATCHING_ID_INTERNAL_LOOKUP
-from pathlib import Path
 
 
 class Dataset:
@@ -47,12 +58,14 @@ class DataLabConfig:
         has_demographics: bool,
         has_embeddings: bool,
         num_embeddings: int,
+        has_segments: bool,
         matching_id: MatchingId,
     ):
         self.name = name
         self.has_demographics = has_demographics
         self.has_embeddings = has_embeddings
         self.num_embeddings = num_embeddings
+        self.has_segments = has_segments
         self.matching_id = matching_id
 
 
@@ -78,7 +91,7 @@ class DataLab:
         self,
         client: Client,
         cfg: DataLabConfig,
-        existing_data_lab: ExistingDataLab = None,
+        existing_data_lab: Optional[ExistingDataLab] = None,
     ):
         self.client = client
         enclave_specs = get_latest_enclave_specs_as_dictionary(self.client)
@@ -103,23 +116,28 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                root=CreateDataLab2(
-                    v1=CreateDataLabComputeV1(
+                root=CreateDataLab3(
+                    v2=CreateDataLabComputeV2(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
-                        driverEnclaveSpecification=EnclaveSpecification(
+                        driverEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
                             id="",
                             workerProtocol=0,
                         ),
                         hasDemographics=self.cfg.has_demographics,
                         hasEmbeddings=self.cfg.has_embeddings,
+                        hasSegments=self.cfg.has_segments,
                         id=self.data_lab_id,
-                        matchingIdFormat=matching_id_format,
-                        matchingIdHashingAlgorithm=matching_id_hashing_algorithm,
+                        matchingIdFormat=matching_id_format.value,
+                        matchingIdHashingAlgorithm=(
+                            None
+                            if matching_id_hashing_algorithm is None
+                            else matching_id_hashing_algorithm.value
+                        ),
                         name=self.cfg.name,
                         numEmbeddings=self.cfg.num_embeddings,
                         publisherEmail=self.client.user_email,
-                        pythonEnclaveSpecification=EnclaveSpecification(
+                        pythonEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
                             id="",
                             workerProtocol=0,
@@ -171,9 +189,9 @@ class DataLab:
     def _get_data_lab_enclave_specs(
         self,
         enclave_specs: Dict[str, EnclaveSpecification],
-    ) -> (EnclaveSpecification, EnclaveSpecification):
-        driver_spec = {}
-        python_spec = {}
+    ) -> Tuple[HlEnclaveSpecification, HlEnclaveSpecification]:
+        driver_spec = None
+        python_spec = None
         for spec_id, spec in enclave_specs.items():
             spec_payload = {
                 "attestationProtoBase64": base64.b64encode(
@@ -184,10 +202,14 @@ class DataLab:
             }
             if "decentriq.driver" in spec_id:
                 spec["clientProtocols"] = [LATEST_GCG_PROTOCOL_VERSION]
-                driver_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+                driver_spec = HlEnclaveSpecification.parse_obj(spec_payload)
             elif "decentriq.python-ml-worker" in spec_id:
                 spec["clientProtocols"] = [LATEST_GCG_PROTOCOL_VERSION]
-                python_spec = compiler.EnclaveSpecification.parse_obj(spec_payload)
+                python_spec = HlEnclaveSpecification.parse_obj(spec_payload)
+        if driver_spec is None:
+            raise Exception("No driver enclave spec found for the datalab")
+        if python_spec is None:
+            raise Exception("No python-ml-worker enclave spec found for the datalab")
         return (driver_spec, python_spec)
 
     def provision_local_datasets(
@@ -195,7 +217,7 @@ class DataLab:
         key: Key,
         keychain: Keychain,
         matching_data_path: str,
-        segments_data_path: str,
+        segments_data_path: Optional[str] = None,
         demographics_data_path: Optional[str] = None,
         embeddings_data_path: Optional[str] = None,
     ):
@@ -332,10 +354,10 @@ class DataLab:
             self.data_lab_id,
             validation_job_id,
             statistics_job_id,
-            self.session.driver_attestation_specification_hash,
+            self.session.connection.channel.driver_attestation_specification_hash,
         )
 
-    def get_validation_report(self, timeout: int = None):
+    def get_validation_report(self, timeout: Optional[int] = None):
         """
         Retrieve the validation report. This function will block until the report is ready unless a timeout is specified.
 
@@ -376,12 +398,12 @@ class DataLab:
             result = session.get_computation_result(job_id, timeout=timeout)
             zip = zipfile.ZipFile(io.BytesIO(result), "r")
             if "validation-report.json" in zip.namelist():
-                validation_reports[
-                    node.removesuffix("_validation_report")
-                ] = json.loads(zip.read("validation-report.json").decode())
+                validation_reports[node.removesuffix("_validation_report")] = (
+                    json.loads(zip.read("validation-report.json").decode())
+                )
         return validation_reports
 
-    def get_statistics_report(self, timeout: int = None):
+    def get_statistics_report(self, timeout: Optional[int] = None):
         """
         Retrieve the statistics report. This function will block until the report is ready unless a timeout is specified.
 
@@ -423,6 +445,97 @@ class DataLab:
             return report
         else:
             raise Exception("Failed to retrieve statistics")
+
+    def provision_to_media_insights_data_room(
+        self, data_room_id: str, keychain: Keychain
+    ):
+        """
+        Provision the DataLab to the DCR with the given ID.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision the DataLab to.
+        - `keychain`: Keychain to use to provision the datasets.
+        """
+        # DataLab must be validated before it can be provisioned.
+        if not self._validated():
+            # Retrieve and store the statistics. This will validate the DataLab.
+            self.get_statistics_report()
+            # Check again if the DataLab is validated.
+            if not self._validated():
+                raise Exception("Can't provision to DCR. DataLab not validated.")
+
+        # Check compatibility.
+        midcr_hl, midcr_session = self._get_midcr(data_room_id)
+        compatible = compiler.is_data_lab_compatible_with_media_insights_dcr_serialized(
+            self.hl_data_lab.json(), midcr_hl
+        )
+        if not compatible:
+            raise Exception("DataLab is incompatible with DCR")
+
+        # Deprovision existing datalabs before provisioning new ones.
+        self._deprovision_existing_data_lab_from_media_dcr(data_room_id, midcr_session)
+
+        data_lab = self.client.get_data_lab(self.data_lab_id)
+        data_lab_datasets = self._get_data_lab_datasets_dict(data_lab)
+        # Provision all existing Data Lab datasets to the DCR.
+        for dataset_type, dataset in data_lab_datasets.items():
+            if not dataset:
+                # Dataset was not provisioned to the Data Lab.
+                continue
+            manifest_hash = dataset["manifestHash"]
+            encryption_key = keychain.get("dataset_key", manifest_hash)
+            if dataset_type == "MATCHING_DATA":
+                request_key = "publishPublisherUsersDataset"
+            elif dataset_type == "SEGMENTS_DATA":
+                request_key = "publishSegmentsDataset"
+            elif dataset_type == "DEMOGRAPHICS_DATA":
+                request_key = "publishDemographicsDataset"
+            elif dataset_type == "EMBEDDINGS_DATA":
+                request_key = "publishEmbeddingsDataset"
+            else:
+                raise Exception(
+                    f"Failed to provision Data Lab. Dataset type '{dataset_type}' unknown."
+                )
+            self._send_publish_dataset_request(
+                request_key, manifest_hash, encryption_key, midcr_session, data_room_id
+            )
+
+    def _deprovision_existing_data_lab_from_media_dcr(
+        self, dcr_id: str, session: Session
+    ):
+        midcr_driver_attestation_hash = self.client._get_midcr_driver_attestation_hash(
+            dcr_id
+        )
+        midcr_driver_spec = self.client._get_enclave_spec_from_hash(
+            midcr_driver_attestation_hash
+        )
+        endpoint_protocols = [3, 4, 5, 6]
+        protocol = session._get_client_protocol(endpoint_protocols)
+        midcr_driver_spec["clientProtocols"] = [protocol]
+        media_dcr = self.client.retrieve_media_dcr(dcr_id, [midcr_driver_spec])
+        media_dcr.deprovision_data_lab()
+
+    def _send_publish_dataset_request(
+        self,
+        request_key: str,
+        manifest_hash: str,
+        encryption_key: KeychainEntry,
+        session: Session,
+        data_room_id: str,
+    ):
+        request = MediaInsightsRequest.model_validate(
+            {
+                request_key: {
+                    "dataRoomIdHex": data_room_id,
+                    "datasetHashHex": manifest_hash,
+                    "encryptionKeyHex": encryption_key.value.hex(),
+                    "scopeIdHex": self.client._ensure_dcr_data_scope(data_room_id),
+                },
+            }
+        )
+        response = Request.send(request, session)
+        if request_key not in response.model_dump_json():
+            raise Exception(f'Failed to publish "{request_key}"')
 
     def provision_to_lookalike_media_data_room(
         self, data_room_id: str, keychain: Keychain
@@ -507,6 +620,21 @@ class DataLab:
         for dataset in data_lab["datasets"]:
             datasets_dict[dataset["name"]] = dataset["dataset"]
         return datasets_dict
+
+    def _get_midcr(self, data_room_id) -> Tuple[str, Session]:
+        midcr_driver_attestation_hash = self.client._get_midcr_driver_attestation_hash(
+            data_room_id
+        )
+        midcr_driver_spec = self.client._get_enclave_spec_from_hash(
+            midcr_driver_attestation_hash
+        )
+        if midcr_driver_spec == None:
+            raise Exception(f"Failed to find driver for data room {data_room_id}")
+
+        session = create_session_from_driver_spec(self.client, midcr_driver_spec)
+        existing_midcr = session.retrieve_data_room(data_room_id)
+        midcr_hl = existing_midcr.highLevelRepresentation.decode()
+        return (midcr_hl, session)
 
     def _get_lmdcr(self, data_room_id) -> Tuple[str, Session]:
         # Get the high level representation of the LMDCR.

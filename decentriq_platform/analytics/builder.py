@@ -1,21 +1,23 @@
 from __future__ import annotations
 
 import base64
-from enum import Enum
-from typing import Dict, List, Optional
-from typing_extensions import Self
+import functools
 import uuid
+from enum import Enum
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+from typing_extensions import Self
+
 from ..attestation import enclave_specifications
-from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
-from ..session import (
-    LATEST_WORKER_PROTOCOL_VERSION,
-    Session,
-)
 from ..proto.length_delimited import serialize_length_delimited
-from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
-from .node_definitions import NodeDefinition
+from ..session import LATEST_WORKER_PROTOCOL_VERSION
+from ..types import EnclaveSpecification
 from .analytics_dcr import AnalyticsDcrDefinition
+from .node_definitions import NodeDefinition
+from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 __all__ = [
@@ -31,6 +33,22 @@ class AnalyticsDcrType(str, Enum):
 class ParticipantPermission(Enum):
     DATA_OWNER = 1
     ANALYST = 2
+
+
+def _get_hl_specs(enclave_specs: Dict[str, EnclaveSpecification]):
+    specs = [
+        {
+            "attestationProtoBase64": base64.b64encode(
+                serialize_length_delimited(spec["proto"])
+            ).decode(),
+            "id": name,
+            "workerProtocol": spec.get(
+                "workerProtocol", LATEST_WORKER_PROTOCOL_VERSION
+            ),
+        }
+        for name, spec in enclave_specs.items()
+    ]
+    return specs
 
 
 class AnalyticsDcrBuilder:
@@ -61,9 +79,6 @@ class AnalyticsDcrBuilder:
         self.description = ""
         self.owner = None
         self.dcr_id = None
-        self.enable_development = False
-        self.enable_airlock = False
-        self.enable_auto_merge_feature = False
         self.compile_context = None
         self.node_definitions = []
         """The current list of Node Definitions that will be added to the Data Clean Room."""
@@ -109,6 +124,9 @@ class AnalyticsDcrBuilder:
         - `data_owner_of`: The names of the Data Nodes to which the user can
           connect a dataset.
         """
+        if any(permissions["user"] == email for permissions in self.permissions):
+            raise Exception(f"Participant with email {email} has already been added.")
+
         anaylst_permissions = [{"analyst": {"nodeId": node}} for node in analyst_of]
         data_owner_permissions = [
             {"dataOwner": {"nodeId": node}} for node in data_owner_of
@@ -116,14 +134,6 @@ class AnalyticsDcrBuilder:
         self.permissions.append(
             {"user": email, "permissions": anaylst_permissions + data_owner_permissions}
         )
-        return self
-
-    def with_auto_merge(self) -> Self:
-        """
-        Allow auto-merging of commits.
-        This allows non-conflicting changes to be merged without rebasing.
-        """
-        self.enable_auto_merge_feature = True
         return self
 
     def with_owner(self, email: str) -> Self:
@@ -134,30 +144,6 @@ class AnalyticsDcrBuilder:
         - `email`: The email address of the owner of the Data Clean Room.
         """
         self.owner = email
-        return self
-
-    def with_development_mode(self) -> Self:
-        """
-        Enable Development Mode in the Data Clean Room.
-
-        This allows Development Computations to be executed in the Data Clean Room.
-        Development Computations are not yet part of the Data Clean Room, but allow users
-        to run new computations on top of existing DCRs.
-        The driver enclave makes sure that only data to which the user already has access
-        can be read.
-        """
-        self.enable_development = True
-        return self
-
-    def with_airlock(self) -> Self:
-        """
-        Enable the Airlock feature in the Data Clean Room.
-
-        This requires Development Mode to be enabled.
-        The Airlock feature allows the addition of Preview Nodes that allow
-        restricting the amount of data that can be read from specific Data Nodes.
-        """
-        self.enable_airlock = True
         return self
 
     def add_node_definition(self, definition: NodeDefinition) -> Self:
@@ -195,25 +181,40 @@ class AnalyticsDcrBuilder:
         nodes = [
             node._get_high_level_representation() for node in self.node_definitions
         ]
+        required_workers = functools.reduce(
+            lambda a, b: a.union(b),
+            [set(node.required_workers) for node in self.node_definitions],
+            {"decentriq.driver"},
+        )
+        used_enclave_specs = {}
+        for worker in required_workers:
+            if worker in self.enclave_specs:
+                used_enclave_specs[worker] = self.enclave_specs[worker]
+            else:
+                raise Exception(
+                    f"One of the nodes you added requires a worker of type '{worker}',"
+                    " but no enclave specification matching this worker is known to this builder."
+                )
+        used_hl_enclave_specs = _get_hl_specs(used_enclave_specs)
         permissions = self._add_owner_permissions()
         hl_dcr = {
             DATA_SCIENCE_DCR_SUPPORTED_VERSION: {
                 # Only interactive DCRs are supported.
                 "interactive": {
                     "commits": [],
-                    "enableAutomergeFeature": self.enable_auto_merge_feature,
+                    "enableAutomergeFeature": True,
                     "initialConfiguration": {
                         "description": self.description,
-                        "enableAirlock": self.enable_airlock,
-                        "enableAllowEmptyFilesInValidation": False,
-                        "enableDevelopment": self.enable_development,
-                        "enablePostWorker": False,
+                        "enableAirlock": True,
+                        "enableAllowEmptyFilesInValidation": True,
+                        "enableDevelopment": True,
+                        "enablePostWorker": True,
                         "enableSafePythonWorkerStacktrace": True,
                         "enableServersideWasmValidation": True,
-                        "enableSqliteWorker": False,
-                        "enableTestDatasets": False,
+                        "enableSqliteWorker": True,
+                        "enableTestDatasets": True,
                         "enclaveRootCertificatePem": self.client.decentriq_ca_root_certificate.decode(),
-                        "enclaveSpecifications": self._get_hl_specs(),
+                        "enclaveSpecifications": used_hl_enclave_specs,
                         "id": self._generate_id(),
                         "nodes": nodes,
                         "participants": permissions,
@@ -222,7 +223,9 @@ class AnalyticsDcrBuilder:
                 }
             }
         }
-        return AnalyticsDcrDefinition(name=self.name, high_level=hl_dcr)
+        return AnalyticsDcrDefinition(
+            name=self.name, high_level=hl_dcr, enclave_specs=self.enclave_specs
+        )
 
     def _add_owner_permissions(self):
         for entry in self.permissions:
@@ -233,23 +236,8 @@ class AnalyticsDcrBuilder:
                 return self.permissions
 
         # Entry wasn't found for existing user, so add a new one.
-        self.permissions.append(
-            {"user": self.owner, "permissions": [{"manager": {}}]}
-        )
+        self.permissions.append({"user": self.owner, "permissions": [{"manager": {}}]})
         return self.permissions
-
-    def _get_hl_specs(self):
-        specs = [
-            {
-                "attestationProtoBase64": base64.b64encode(
-                    serialize_length_delimited(spec["proto"])
-                ).decode(),
-                "id": name,
-                "workerProtocol": LATEST_WORKER_PROTOCOL_VERSION,
-            }
-            for name, spec in self.enclave_specs.items()
-        ]
-        return specs
 
     @staticmethod
     def _generate_id():

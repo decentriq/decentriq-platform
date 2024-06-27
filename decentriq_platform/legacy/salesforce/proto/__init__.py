@@ -1,11 +1,11 @@
 from .salesforce_pb2 import (
-    SalesforceWorkerConfiguration,
-    SinkInput,
-    SingleFile,
-    RawFile,
-    ZipFile,
+    Core,
     ExportRole,
     ImportRole,
-    Core,
     MarketingCloud,
+    RawFile,
+    SalesforceWorkerConfiguration,
+    SingleFile,
+    SinkInput,
+    ZipFile,
 )

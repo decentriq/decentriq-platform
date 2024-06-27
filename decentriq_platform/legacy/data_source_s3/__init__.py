@@ -1,16 +1,16 @@
-from decentriq_platform.legacy.data_source_s3.proto.data_source_s3_pb2 import S3Provider
+from typing import Literal, Optional
+
 from google.protobuf.json_format import MessageToDict
+
+from decentriq_platform.legacy.data_source_s3.proto.data_source_s3_pb2 import S3Provider
+
 from ...proto import (
-    serialize_length_delimited,
     ComputeNodeFormat,
     parse_length_delimited,
+    serialize_length_delimited,
 )
 from ..node import Node
-from typing import Literal, Optional
-from .proto import (
-    DataSourceS3WorkerConfiguration,
-    S3Source,
-)
+from .proto import DataSourceS3WorkerConfiguration, S3Source
 
 __docformat__ = "restructuredtext"
 __pdoc__ = {
@@ -30,7 +30,7 @@ class DataSourceS3(Node):
         object_key: str,
         credentials_dependency: str,
         s3_provider: Literal["AWS", "GCS"],
-        region: Optional[str] = None,
+        region: str = "",
     ) -> None:
         """
         Create a S3 source node.
@@ -90,7 +90,6 @@ class DataSourceS3(Node):
 
 
 from ...decoder import DataSourceS3WorkerDecoder
-
 
 __all__ = [
     "DataSourceS3",

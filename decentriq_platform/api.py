@@ -1,9 +1,11 @@
-import requests
 from enum import Enum
+
+import requests
 from urllib3.util import Retry
+
 from .config import (
-    DECENTRIQ_REQUEST_RETRY_TOTAL,
     DECENTRIQ_REQUEST_RETRY_BACKOFF_FACTOR,
+    DECENTRIQ_REQUEST_RETRY_TOTAL,
 )
 
 retry = Retry(
@@ -19,7 +21,11 @@ class Endpoints(str, Enum):
 
 
 class ApiError(Exception):
-    pass
+    message: str
+
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
 
 
 class AuthorizationError(ApiError):

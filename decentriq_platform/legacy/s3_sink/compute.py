@@ -1,9 +1,11 @@
 from typing import List, Literal
+
 from google.protobuf.json_format import MessageToDict
-from .proto.compute_s3_sink_pb2 import S3SinkWorkerConfiguration, S3Object, S3Provider
-from ...proto.length_delimited import serialize_length_delimited, parse_length_delimited
+
 from ...proto import ComputeNodeFormat
+from ...proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from ..node import Node
+from .proto.compute_s3_sink_pb2 import S3Object, S3Provider, S3SinkWorkerConfiguration
 
 
 class S3SinkCompute(Node):

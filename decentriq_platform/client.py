@@ -1,65 +1,51 @@
-from __future__ import annotations
-
-from typing import BinaryIO, List, Dict, Optional, Tuple, TYPE_CHECKING
-
-# Avoid circular import client -> keychain -> client outside of typechecking
-if TYPE_CHECKING:
-    from .keychain import Keychain
-
-from .endorsement import Endorser
-
 import hashlib
 import json
 import os
-from threading import BoundedSemaphore
-from concurrent import futures
 from base64 import b64decode, b64encode
+from concurrent import futures
+from threading import BoundedSemaphore
+from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
 
-from .api import Api
+from decentriq_dcr_compiler import compiler
+from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
+from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
+
+from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
+from .api import Api, Endpoints, NotFoundError, retry
+from .attestation import enclave_specifications
 from .authentication import Auth, generate_key, generate_self_signed_certificate
 from .config import (
+    _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
     DECENTRIQ_CLIENT_ID,
     DECENTRIQ_HOST,
     DECENTRIQ_PORT,
     DECENTRIQ_USE_TLS,
-    _DECENTRIQ_UNSAFE_DISABLE_KNOWN_ROOT_CA_CHECK,
 )
+from .connection import Connection
+from .endorsement import Endorser
+from .graphql import GqlClient
+from .keychain import Keychain
+from .media import MediaDcr, MediaDcrDefinition
+from .proto import AttestationSpecification, AuthenticationMethod, CreateDcrKind
+from .proto import DataRoom as ProtoDataRoom
+from .proto import PkiPolicy, parse_length_delimited, serialize_length_delimited
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
-from .storage import Key, Chunker, create_encrypted_chunk, StorageCipher
+from .storage import Chunker, Key, StorageCipher, create_encrypted_chunk
 from .types import (
     CreateMediaComputeJobInput,
-    DataRoom,
-    DatasetUsage,
-    EnclaveSpecification,
-    DatasetDescription,
-    DataRoomDescription,
-    KeychainInstance,
     DataLabDefinition,
     DataLabListFilter,
+    DataRoom,
+    DataRoomDescription,
+    DataRoomKind,
+    DatasetDescription,
+    DatasetUsage,
+    EnclaveSpecification,
+    KeychainInstance,
     MediaComputeJob,
     MediaComputeJobFilterInput,
-    DataRoomKind,
 )
-from .api import NotFoundError
-from .proto import (
-    AttestationSpecification,
-    parse_length_delimited,
-    serialize_length_delimited,
-    AuthenticationMethod,
-    PkiPolicy,
-    DataRoom as ProtoDataRoom,
-    CreateDcrKind,
-)
-from .api import Endpoints, retry
-from .graphql import GqlClient
-from .attestation import EnclaveSpecifications, enclave_specifications, SPECIFICATIONS
-
-from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
-
-from .analytics import AnalyticsDcr
-
-import base64
+from .logger import logger
 
 
 class Client:
@@ -76,14 +62,15 @@ class Client:
 
     _api: Api
     _graphql: GqlClient
+    _connections: Dict[str, Connection]
 
     def __init__(
         self,
         user_email: str,
         api: Api,
         graphql: GqlClient,
-        request_timeout: int = None,
-        unsafe_disable_known_root_ca_check: Bool = False,
+        request_timeout: Optional[int] = None,
+        unsafe_disable_known_root_ca_check: bool = False,
     ):
         """
         Create a client instance.
@@ -96,6 +83,7 @@ class Client:
         self._graphql = graphql
         self.request_timeout = request_timeout
         self.unsafe_disable_known_root_ca_check = unsafe_disable_known_root_ca_check
+        self._connections = dict()
 
     def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
@@ -129,7 +117,7 @@ class Client:
         enclave_specs = []
         for spec_json in data["attestationSpecs"]:
             attestation_specification = AttestationSpecification()
-            spec_length_delimited = base64.b64decode(spec_json["spec"])
+            spec_length_delimited = b64decode(spec_json["spec"])
             parse_length_delimited(spec_length_delimited, attestation_specification)
             enclave_spec = EnclaveSpecification(
                 name=spec_json["name"],
@@ -195,34 +183,21 @@ class Client:
             raise Exception("Missing client supported protocol versions")
         attestation_proto = driver_spec["proto"]
         client_protocols = driver_spec["clientProtocols"]
-
         attestation_specification_hash = hashlib.sha256(
             serialize_length_delimited(attestation_proto)
         ).hexdigest()
-
-        data = self._graphql.post(
-            """
-            mutation CreateSession($input: CreateSessionInput!) {
-                session {
-                    create(input: $input) {
-                        record {
-                            id
-                        }
-                    }
-                }
-            }
-            """,
-            {
-                "input": {
-                    "enclaveAttestationHash": attestation_specification_hash,
-                }
-            },
-        )
-        session_id = data["session"]["create"]["record"]["id"]
+        connection = self._connections.get(attestation_specification_hash)
+        if connection is None:
+            connection = Connection(
+                attestation_proto,
+                self._api,
+                self._graphql,
+                self.unsafe_disable_known_root_ca_check,
+            )
+            self._connections[attestation_specification_hash] = connection
         session = Session(
             self,
-            session_id,
-            attestation_proto,
+            connection,
             client_protocols,
             auth=auth,
         )
@@ -311,7 +286,7 @@ class Client:
     def _set_datalab_segments_dataset(
         self,
         data_lab_id: str,
-        manifest_hash: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the segments dataset manifest hash in the database.
@@ -339,7 +314,7 @@ class Client:
     def _set_datalab_demographics_dataset(
         self,
         data_lab_id: str,
-        manifest_hash: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the demographics dataset manifest hash in the database.
@@ -367,7 +342,7 @@ class Client:
     def _set_datalab_embeddings_dataset(
         self,
         data_lab_id: str,
-        manifest_hash: str,
+        manifest_hash: Optional[str],
     ) -> str:
         """
         Store the embeddings dataset manifest hash in the database.
@@ -516,7 +491,7 @@ class Client:
         uploader.shutdown(wait=False)
 
         # create manifest and upload
-        manifest_hash, manifest_encrypted = create_encrypted_chunk(
+        manifest_hash_bytes, manifest_encrypted = create_encrypted_chunk(
             key.material,
             os.urandom(16),
             json.dumps(chunk_hashes).encode("utf-8"),
@@ -524,13 +499,13 @@ class Client:
             chunk_content_sizes=chunk_content_sizes,
         )
         scope_id = self._ensure_dataset_scope(
-            manifest_hash.hex(),
+            manifest_hash_bytes.hex(),
         )
         manifest_hash = self._finalize_upload(
             scope_id=scope_id,
             upload_id=upload_id,
             name=file_name,
-            manifest_hash=manifest_hash,
+            manifest_hash_bytes=manifest_hash_bytes,
             manifest_encrypted=manifest_encrypted,
             chunks=chunk_hashes,
             description=description,
@@ -588,7 +563,7 @@ class Client:
                 retry=retry,
             )
         except Exception as e:
-            print(e)
+            logger.error(e)
             raise e
 
     def _delete_user_upload(self, upload_id: str):
@@ -608,7 +583,7 @@ class Client:
         scope_id: str,
         upload_id: str,
         name: str,
-        manifest_hash: bytes,
+        manifest_hash_bytes: bytes,
         manifest_encrypted: bytes,
         chunks: List[str],
         description: Optional[str] = None,
@@ -631,7 +606,7 @@ class Client:
                 "input": {
                     "uploadId": upload_id,
                     "manifest": b64encode(manifest_encrypted).decode("ascii"),
-                    "manifestHash": manifest_hash.hex(),
+                    "manifestHash": manifest_hash_bytes.hex(),
                     "name": name,
                     "description": description,
                     "usage": usage,
@@ -719,7 +694,7 @@ class Client:
                 [f"- {dcr_id}" for dcr_id in data_rooms_ids_with_dataset]
             )
             if force:
-                print(
+                logger.warning(
                     "This dataset is published to the following data rooms."
                     " These data rooms might be in a broken state now:"
                     f"\n{id_list}"
@@ -1040,7 +1015,7 @@ class Client:
         cas_index: int,
         salt: Optional[str] = None,
         encrypted: Optional[bytes] = None,
-    ) -> KeychainInstance:
+    ) -> bool:
         data = self._graphql.post(
             """
             mutation CompareAndSwapKeychain($inner: CompareAndSwapKeychainInput!) {
@@ -1052,7 +1027,11 @@ class Client:
             {
                 "inner": {
                     "salt": salt,
-                    "encrypted": b64encode(encrypted).decode("ascii"),
+                    "encrypted": (
+                        b64encode(encrypted).decode("ascii")
+                        if encrypted is not None
+                        else None
+                    ),
                     "casIndex": cas_index,
                 }
             },
@@ -1190,6 +1169,7 @@ class Client:
                         name
                     }
                     statistics
+                    requireSegmentsDataset
                     requireDemographicsDataset
                     requireEmbeddingsDataset
                     isValidated
@@ -1264,6 +1244,28 @@ class Client:
             {"id": id},
         )
         return data["publishedLookalikeMediaDataRoom"]["driverAttestationHash"]
+
+    def _get_midcr_driver_attestation_hash(
+        self,
+        id: str,
+    ) -> str:
+        """
+        Get the driver attestation hash for the Media Insights DCR with the given ID.
+
+        **Parameters**:
+        - `id`: ID of the Media Insights DCR.
+        """
+        data = self._graphql.post(
+            """
+            query GetMediaInsightsDcr($id: String!) {
+                publishedMediaInsightsDcr(id: $id) {
+                    driverAttestationHash
+                }
+            }
+            """,
+            {"id": id},
+        )
+        return data["publishedMediaInsightsDcr"]["driverAttestationHash"]
 
     def get_lookalike_media_data_rooms(
         self,
@@ -1514,6 +1516,15 @@ class Client:
         *,
         enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
     ) -> AnalyticsDcr:
+        """
+        Publish an Analytics DCR.
+
+        **Parameters**:
+        - `dcr_definition`: Definition of the Analytics DCR.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
         data_room = DataScienceDataRoom.model_validate(
             dcr_definition._get_high_level_representation()
         )
@@ -1523,8 +1534,16 @@ class Client:
         low_level_data_room = ProtoDataRoom()
         parse_length_delimited(compiled_data_room.data_room, low_level_data_room)
 
-        # Get a new session
-        specs = enclave_specs if enclave_specs else enclave_specifications.latest()
+        # Get a new session.
+        # Determine which driver enclave spec (as given by the enclave_specs value)
+        # to use. If this is not explicitly specified, try to check whether it was
+        # already set on the builder that constructed the DCR definition.
+        # If this is also not specified, simply use the latest specifications known to this SDK.
+        specs = (
+            enclave_specs
+            or dcr_definition.enclave_specs
+            or enclave_specifications.latest()
+        )
         auth, _ = self.create_auth_using_decentriq_pki(specs)
         session = self.create_session(auth, specs)
 
@@ -1541,6 +1560,216 @@ class Client:
             dcr_id=dcr_id, client=self, enclave_specs=list(specs.values())
         )
         return published_ds_dcr
+
+    def retrieve_media_dcr(
+        self,
+        dcr_id,
+        enclave_specs: Optional[List[EnclaveSpecification]] = None,
+    ) -> MediaDcr:
+        """
+        Retrieve an existing Media DCR.
+
+        **Parameters**:
+        - `dcr_id`: Data Clean Room ID.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        return MediaDcr._from_existing(
+            dcr_id, client=self, enclave_specs=enclave_specs
+        )
+
+    def publish_media_dcr(
+        self,
+        dcr_definition: MediaDcrDefinition,
+        *,
+        enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
+    ) -> MediaDcr:
+        """
+        Publish a Media DCR.
+
+        **Parameters**:
+        - `dcr_definition`: Definition of the Media DCR.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        dcr = MediaInsightsDcrSchema.model_validate_json(
+            dcr_definition._high_level
+        )
+        # Ensure we create the latest known version of the DCR.
+        dcr_latest = compiler.upgrade_media_insights_dcr_to_latest(dcr)
+
+        compiled_serialized = compiler.compile_media_insights_dcr(dcr_latest)
+        low_level_dcr = ProtoDataRoom()
+        parse_length_delimited(compiled_serialized, low_level_dcr)
+
+        # Get a new session.
+        # Determine which driver enclave spec (as given by the enclave_specs value)
+        # to use. If this is not explicitly specified, try to check whether it was
+        # already set on the builder that constructed the DCR definition.
+        # If this is also not specified, simply use the latest specifications known to this SDK.
+        specs = (
+            enclave_specs
+            or dcr_definition._enclave_specs
+            or enclave_specifications.latest()
+        )
+        auth, _ = self.create_auth_using_decentriq_pki(specs)
+        session = self.create_session(auth, specs)
+
+        dcr_id = session.publish_data_room(
+            low_level_dcr,
+            kind=CreateDcrKind.MEDIA_INSIGHTS,
+            high_level_representation=dcr_latest.model_dump_json(
+                by_alias=True
+            ).encode(),
+        )
+        existing_dcr = MediaDcr._from_existing(
+            dcr_id=dcr_id,
+            client=self,
+            enclave_specs=list(specs.values()),
+        )
+        return existing_dcr
+
+    def _provision_data_lab_to_midcr(
+        self,
+        data_room_id: str,
+        data_lab_id: str,
+    ) -> DataLabDefinition:
+        """
+        Provision a DataLab to a Media DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision to.
+        - `data_lab_id`: ID of the DataLab to be provisioned.
+        """
+        data = self._graphql.post(
+            """
+            mutation ProvisionDataLabToMediaInsightsDcr($input: ProvisionDataLabInput!) {
+                dataLab {
+                    provisionDataLabToMediaInsightsDcr(input: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "dataRoomId": data_room_id,
+                    "dataLabId": data_lab_id,
+                }
+            },
+        )
+        return data["dataLab"]["provisionDataLabToMediaInsightsDcr"]["publishedDataLab"]
+
+    def _deprovision_data_lab_from_midcr(self, data_room_id: str) -> DataLabDefinition:
+        """
+        Deprovision a DataLab from a Media DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to deprovision from.
+        """
+        data = self._graphql.post(
+            """
+            mutation DeprovisionDataLabFromMediaInsightsDcr($input: String!) {
+                dataLab {
+                    deprovisionDataLabFromMediaInsightsDcr(mediaInsightsDcrId: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": data_room_id,
+            },
+        )
+        return data["dataLab"]["deprovisionDataLabFromMediaInsightsDcr"][
+            "publishedDataLab"
+        ]
 
 
 def create_client(
@@ -1593,7 +1822,7 @@ class BoundedExecutor:
         def done_callback(f):
             error = f.exception()
             if error:
-                print(f"Error in future: {error}")
+                logger.error(f"Error in future: {error}")
             self.semaphore.release()
 
         self.semaphore.acquire()

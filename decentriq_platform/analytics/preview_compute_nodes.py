@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import PreviewComputationNode
-from .high_level_node import ComputationNode
-from typing import Dict, List, Optional
-from .node_definitions import NodeDefinition
-from ..session import Session
-from typing_extensions import Self
 import json
+from typing import TYPE_CHECKING, Dict, List, Optional
+
+from decentriq_dcr_compiler.schemas.data_science_data_room import PreviewComputationNode
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import ComputationNode
+from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class PreviewComputeNodeDefinition(NodeDefinition):
@@ -31,7 +36,6 @@ class PreviewComputeNodeDefinition(NodeDefinition):
         """
         super().__init__(name=name, id=id or name)
         self.quota_bytes = quota_bytes
-        self.specification_id = "decentriq.python-ml-worker-32-64"
         self.dependency = dependency
 
     def _get_high_level_representation(self) -> Dict[str, str]:
@@ -54,8 +58,8 @@ class PreviewComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
-    @staticmethod
-    def _from_high_level(id: str, name: str, node: PreviewComputationNode) -> Self:
+    @classmethod
+    def _from_high_level(cls, id: str, name: str, node: PreviewComputationNode) -> Self:
         """
         Instantiate a `PreviewComputeNodeDefinition` from its high level representation.
 
@@ -64,12 +68,16 @@ class PreviewComputeNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `PreviewComputeNode`.
         """
         preview_node = json.loads(node.model_dump_json())
-        return PreviewComputeNodeDefinition(
+        return cls(
             id=id,
             name=name,
             dependency=preview_node["dependency"],
             quota_bytes=preview_node["quotaBytes"],
         )
+
+    @property
+    def required_workers(self):
+        return ["decentriq.driver"]
 
     def build(
         self,
@@ -140,7 +148,6 @@ class PreviewComputeNode(ComputationNode):
         )
         self.dependency = dependency
         self.quota_bytes = quota_bytes
-        self.specification_id = "decentriq.python-ml-worker-32-64"
         self.node_definition = node_definition
 
     def _get_computation_id(self) -> str:

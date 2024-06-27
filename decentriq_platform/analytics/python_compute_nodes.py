@@ -1,15 +1,20 @@
 from __future__ import annotations
 
-from .high_level_node import ContainerComputationNode
-from .script import FileContent, ScriptingLanguage
-from ..session import Session
-from typing import Optional, List, Dict
-from .node_definitions import NodeDefinition
-from typing_extensions import Self
+import json
+from typing import TYPE_CHECKING, Dict, List, Optional
+
 from decentriq_dcr_compiler.schemas.data_science_data_room import (
     ScriptingComputationNode,
 )
-import json
+from typing_extensions import Self
+
+from ..session import Session
+from .high_level_node import ContainerComputationNode
+from .node_definitions import NodeDefinition
+from .script import FileContent, ScriptingLanguage
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class PythonComputeNodeDefinition(NodeDefinition):
@@ -87,7 +92,13 @@ class PythonComputeNodeDefinition(NodeDefinition):
         }
         return computation_node
 
+    @property
+    def required_workers(self):
+        return [self.scripting_specification_id, self.static_content_specification_id]
+
+    @classmethod
     def _from_high_level(
+        cls,
         id: str,
         name: str,
         node: ScriptingComputationNode,
@@ -100,7 +111,7 @@ class PythonComputeNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `PythonComputeNode`.
         """
         scripting_node = json.loads(node.model_dump_json())
-        return PythonComputeNodeDefinition(
+        return cls(
             id=id,
             name=name,
             script=scripting_node["mainScript"]["content"],

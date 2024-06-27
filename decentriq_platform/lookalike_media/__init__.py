@@ -1,8 +1,5 @@
 from .builder import LookalikeMediaDcrBuilder
-from .lookalike_media import (
-    LookalikeMediaDcr, provision_dataset, DatasetType
-)
-
+from .lookalike_media import DatasetType, LookalikeMediaDcr, provision_dataset
 
 __pdoc__ = {
     "builder": False,

@@ -1,8 +1,10 @@
-from .storage import Key
-from .proto import AttestationSpecification
-from typing import List, Dict, Optional, Any
-from typing_extensions import TypedDict
 from enum import Enum
+from typing import Any, Dict, List, Optional
+
+from typing_extensions import TypedDict
+
+from .proto import AttestationSpecification
+from .storage import Key
 
 
 class JobId:
@@ -150,6 +152,9 @@ class EnclaveSpecification(TypedDict):
     This class includes information about an enclave deployed in the platform.
     Please refer to `decentriq_platform.EnclaveSpecifications` for a detailed explanation.
     """
+
+    name: str
+    version: str
 
     proto: AttestationSpecification
     """The Protobuf object."""
@@ -349,9 +354,9 @@ class PublishedDataset(TypedDict):
 
 class OverlapInsightsCacheKey(TypedDict):
     dataRoomId: str
-    advertiserDatasetHash: str
-    publisherUsersDatasetHash: str
-    publisherSegmentsDatasetHash: str
+    advertiserDatasetHash: Optional[str]
+    publisherUsersDatasetHash: Optional[str]
+    publisherSegmentsDatasetHash: Optional[str]
     publisherDemographicsDatasetHash: Optional[str]
     publisherEmbeddingsDatasetHash: Optional[str]
     publishedDatasets: List[PublishedDataset]

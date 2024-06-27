@@ -1,18 +1,22 @@
 from __future__ import annotations
 
-from enum import Enum
-import io, json
-from typing import Dict, Optional, List
+import io
+import json
 import zipfile
-from .high_level_node import DataNode
-from ..session import Session
 from dataclasses import dataclass
-from ..storage import Key
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
-    TableLeafNodeV2,
-)
+from enum import Enum
+from typing import TYPE_CHECKING, Dict, List, Optional, cast
+
+from decentriq_dcr_compiler.schemas.data_science_data_room import TableLeafNodeV2
 from typing_extensions import Self
+
+from ..session import Session
+from ..storage import Key
+from .high_level_node import DataNode
 from .node_definitions import NodeDefinition
+
+if TYPE_CHECKING:
+    from ..client import Client
 
 
 class PrimitiveType(str, Enum):
@@ -104,6 +108,8 @@ class TableDataNodeDefinition(NodeDefinition):
         super().__init__(name, id=id or name)
         self.is_required = is_required
         self.columns = columns
+        self.specification_id = "decentriq.python-ml-worker-32-64"
+        self.static_content_specification_id = "decentriq.driver"
 
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
@@ -119,7 +125,8 @@ class TableDataNodeDefinition(NodeDefinition):
             if column.hash_with:
                 validation["hashWith"] = column.hash_with.value
             if column.in_range:
-                validation["inRange"] = column.in_range.value
+                # TODO: fix this
+                validation["inRange"] = column.in_range
             column_entries.append(
                 {
                     "name": column.name,
@@ -141,8 +148,8 @@ class TableDataNodeDefinition(NodeDefinition):
                         "table": {
                             "columns": column_entries,
                             "validationNode": {
-                                "staticContentSpecificationId": "decentriq.driver",
-                                "pythonSpecificationId": "decentriq.python-ml-worker-32-64",
+                                "staticContentSpecificationId": self.static_content_specification_id,
+                                "pythonSpecificationId": self.specification_id,
                                 "validation": {},
                             },
                         }
@@ -152,8 +159,13 @@ class TableDataNodeDefinition(NodeDefinition):
         }
         return table_node
 
-    @staticmethod
+    @property
+    def required_workers(self):
+        return [self.static_content_specification_id, self.specification_id]
+
+    @classmethod
     def _from_high_level(
+        cls,
         id: str,
         name: str,
         node: TableLeafNodeV2,
@@ -183,7 +195,7 @@ class TableDataNodeDefinition(NodeDefinition):
             )
             for column in node_dict["columns"]
         ]
-        return TableDataNodeDefinition(
+        return cls(
             id=id,
             name=name,
             columns=columns,
@@ -212,7 +224,7 @@ class TableDataNodeDefinition(NodeDefinition):
             columns=self.columns,
             is_required=self.is_required,
             dcr_id=dcr_id,
-            node_definition=node_definition,
+            node_definition=cast(TableDataNodeDefinition, node_definition),
             client=client,
             session=session,
             id=self.id,
