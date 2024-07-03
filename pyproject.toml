@@ -27,6 +27,7 @@ sqloxide = "^0.1.26"
 typing-extensions = "^4.4.0"
 # Force version to be >= 3.7 due to vuln (transitive dependency of `requests` package)
 idna = "^3.7"
+urllib3 = "1.26.19"
 
 [tool.poetry.dev-dependencies]
 black = "^24.4.0"
