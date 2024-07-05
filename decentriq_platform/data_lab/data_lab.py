@@ -13,8 +13,8 @@ from decentriq_dcr_compiler._schemas.create_data_lab import (
 )
 from decentriq_dcr_compiler import (
     CreateDataLab,
-    CreateDataLab3,
-    CreateDataLabComputeV2,
+    CreateDataLab4,
+    CreateDataLabComputeV3,
     MediaInsightsRequest,
 )
 
@@ -116,8 +116,8 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                root=CreateDataLab3(
-                    v2=CreateDataLabComputeV2(
+                root=CreateDataLab4(
+                    v3=CreateDataLabComputeV3(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
                         driverEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
