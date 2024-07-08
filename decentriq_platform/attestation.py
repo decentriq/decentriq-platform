@@ -674,6 +674,23 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-ml-worker-32-64:v24": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="24",
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "a98870cf9077d2cd6bcfdb9d0d4ddffdabca0386517a6dc75e7c315c7c191b91c31b47e375108f1745cf0aae70bf8c1c"
+                ),
+                roughtimePubKey=new_roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
         name="decentriq.python-synth-data-worker-32-64",
         version="10",

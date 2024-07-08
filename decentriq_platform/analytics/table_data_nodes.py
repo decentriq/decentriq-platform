@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional, cast
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import TableLeafNodeV2
+from decentriq_dcr_compiler.schemas import TableLeafNodeV2
 from typing_extensions import Self
 
 from ..session import Session

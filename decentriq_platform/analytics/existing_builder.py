@@ -8,8 +8,8 @@ from decentriq_dcr_compiler import (
     upgrade_data_science_data_room_to_latest,
     verify_data_room,
 )
-from decentriq_dcr_compiler.schemas.data_science_commit import DataScienceCommitV6
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
+from decentriq_dcr_compiler.schemas import DataScienceCommitV6
+from decentriq_dcr_compiler.schemas import (
     ComputationNodeV6,
     DataScienceDataRoom,
     DataScienceDataRoomConfigurationV6,

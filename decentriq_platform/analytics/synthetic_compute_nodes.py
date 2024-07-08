@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
+from decentriq_dcr_compiler.schemas import (
     SyntheticDataComputationNode,
 )
 from typing_extensions import Self

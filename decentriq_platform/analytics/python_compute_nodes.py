@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
+from decentriq_dcr_compiler.schemas import (
     ScriptingComputationNode,
 )
 from typing_extensions import Self

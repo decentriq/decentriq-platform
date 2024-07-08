@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Dict, List, Optional, cast
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import RawLeafNode
+from decentriq_dcr_compiler.schemas import RawLeafNode
 from typing_extensions import Self
 
 from ..session import Session

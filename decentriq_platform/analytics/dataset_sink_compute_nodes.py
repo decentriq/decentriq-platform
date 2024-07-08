@@ -6,7 +6,7 @@ import json
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import zipfile
 
-from decentriq_dcr_compiler.schemas.data_science_data_room import (
+from decentriq_dcr_compiler.schemas import (
     DatasetSinkComputationNode,
     DatasetSinkInput,
 )
