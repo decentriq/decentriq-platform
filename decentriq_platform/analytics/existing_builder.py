@@ -8,11 +8,11 @@ from decentriq_dcr_compiler import (
     upgrade_data_science_data_room_to_latest,
     verify_data_room,
 )
-from decentriq_dcr_compiler.schemas import DataScienceCommitV6
+from decentriq_dcr_compiler.schemas import DataScienceCommitV8
 from decentriq_dcr_compiler.schemas import (
     ComputationNodeV6,
     DataScienceDataRoom,
-    DataScienceDataRoomConfigurationV6,
+    DataScienceDataRoomConfigurationV8,
     LeafNodeV2,
     Participant,
     ScriptingLanguage,
@@ -93,7 +93,7 @@ class ExistingAnalyticsDcrBuilder:
 
     def _get_data_room(
         self,
-    ) -> Tuple[(DataScienceDataRoomConfigurationV6, List[DataScienceCommitV6], bool)]:
+    ) -> Tuple[(DataScienceDataRoomConfigurationV8, List[DataScienceCommitV8], bool)]:
         # Verify that the LL and HL match
         existing_dcr = self.session.retrieve_data_room(self.dcr_id)
         existing_dcr.highLevelRepresentation.decode()
@@ -129,15 +129,15 @@ class ExistingAnalyticsDcrBuilder:
                 raise Exception("Expected DCR to be either static or interactive")
 
     def _get_participants(
-        self, config: DataScienceDataRoomConfigurationV6
+        self, config: DataScienceDataRoomConfigurationV8
     ) -> List[Participant]:
         participants = [participant for participant in config.participants]
         return participants
 
     def _get_nodes(
         self,
-        config: DataScienceDataRoomConfigurationV6,
-        commits: List[DataScienceCommitV6],
+        config: DataScienceDataRoomConfigurationV8,
+        commits: List[DataScienceCommitV8],
     ) -> List[NodeDefinition]:
         nodes = []
         hl_nodes = config.nodes

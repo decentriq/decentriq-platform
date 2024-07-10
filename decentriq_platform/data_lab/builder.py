@@ -24,6 +24,20 @@ class DataLabBuilder:
         self.client = client
         self.existing = False
         self.data_lab_id: Optional[str] = None
+        self._force_spark_validation = False
+
+    def _with_force_spark_validation(self, use_spark: bool):
+        """
+        Whether to force the data lab to use spark for checking
+        whether datasets are valid. If this is false,
+        the validation pipeline will decide based on the file size
+        whether to use spark or not.
+
+        **Parameters**:
+        - `use_spark`: Force validation to use spark.
+        """
+        self._force_spark_validation = use_spark
+        return self
 
     def with_name(self, name: str):
         """
@@ -89,6 +103,7 @@ class DataLabBuilder:
                 data_lab_definition["numEmbeddings"],
                 data_lab_definition["requireSegmentsDataset"],
                 data_lab_definition["matchingIdFormat"],
+                force_spark_validation=data_lab_definition["forceSparkValidation"],
             )
             existing_data_lab = ExistingDataLab(data_lab_definition, self.keychain)
             return DataLab(self.client, cfg, existing_data_lab)
@@ -101,5 +116,6 @@ class DataLabBuilder:
                 self.num_embeddings,
                 self.has_segments,
                 self.matching_id,
+                force_spark_validation=self._force_spark_validation,
             )
             return DataLab(self.client, cfg)

@@ -95,6 +95,7 @@ class TableDataNodeDefinition(NodeDefinition):
         columns: List[Column],
         is_required: bool,
         id: Optional[str] = None,
+        unique_column_combinations: list[list[int]] = [],
     ) -> None:
         """
         Initialise a `TableDataNodeDefinition` instance.
@@ -104,12 +105,20 @@ class TableDataNodeDefinition(NodeDefinition):
         - `columns`: Definition of the columns that make up the `TableDataNodeDefinition`.
         - `is_required`: Flag determining if the `RawDataNode` must be present for dependent computations.
         - `id`: Optional ID of the `TableDataNodeDefinition`
+        - `unique_column_combinations`: Check that the given combination of
+          columns are unique across the dataset. This should be a list of lists,
+          where the inner lists list the 0-based column indices.
+          For example, passing the list `[[0], [0, 1]]` would result in the enclave
+          checking that all values in the first column are unique.
+          It would further check that all tuples formed by the first and second
+          column are unique.
         """
         super().__init__(name, id=id or name)
         self.is_required = is_required
         self.columns = columns
         self.specification_id = "decentriq.python-ml-worker-32-64"
         self.static_content_specification_id = "decentriq.driver"
+        self.unique_column_combinations = unique_column_combinations
 
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
@@ -138,6 +147,16 @@ class TableDataNodeDefinition(NodeDefinition):
                 }
             )
 
+        table_validation = {}
+        if self.unique_column_combinations:
+            table_validation["uniqueness"] = {
+                "uniqueKeys": [
+                    {
+                        "columns": indices
+                    }
+                ] for indices in self.unique_column_combinations
+            }
+
         table_node = {
             "id": self.id,
             "name": self.name,
@@ -150,7 +169,7 @@ class TableDataNodeDefinition(NodeDefinition):
                             "validationNode": {
                                 "staticContentSpecificationId": self.static_content_specification_id,
                                 "pythonSpecificationId": self.specification_id,
-                                "validation": {},
+                                "validation": table_validation,
                             },
                         }
                     },

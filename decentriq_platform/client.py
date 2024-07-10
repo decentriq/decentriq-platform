@@ -1180,6 +1180,7 @@ class Client:
                     statisticsComputeJobId
                     jobsDriverAttestationHash
                     highLevelRepresentationAsString
+                    forceSparkValidation
                 }
             }
             """,

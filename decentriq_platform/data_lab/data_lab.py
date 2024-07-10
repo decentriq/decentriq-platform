@@ -13,8 +13,8 @@ from decentriq_dcr_compiler._schemas.create_data_lab import (
 )
 from decentriq_dcr_compiler import (
     CreateDataLab,
-    CreateDataLab4,
-    CreateDataLabComputeV3,
+    CreateDataLab5,
+    CreateDataLabComputeV4,
     MediaInsightsRequest,
 )
 
@@ -60,6 +60,7 @@ class DataLabConfig:
         num_embeddings: int,
         has_segments: bool,
         matching_id: MatchingId,
+        force_spark_validation: bool = False,
     ):
         self.name = name
         self.has_demographics = has_demographics
@@ -67,6 +68,7 @@ class DataLabConfig:
         self.num_embeddings = num_embeddings
         self.has_segments = has_segments
         self.matching_id = matching_id
+        self._force_spark_validation = force_spark_validation
 
 
 class ExistingDataLab:
@@ -116,8 +118,8 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                root=CreateDataLab4(
-                    v3=CreateDataLabComputeV3(
+                root=CreateDataLab5(
+                    v4=CreateDataLabComputeV4(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
                         driverEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
@@ -142,6 +144,7 @@ class DataLab:
                             id="",
                             workerProtocol=0,
                         ),
+                        forceSparkValidation=self.cfg._force_spark_validation
                     ),
                 )
             )
