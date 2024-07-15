@@ -497,41 +497,47 @@ pydantic = "==2.*"
 
 [[package]]
 name = "decentriq-transparency-verification"
-version = "0.1.0.dev1"
+version = "0.1.0.dev2"
 description = ""
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp310-cp310-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:0d08b214907bbfa5802451c4ee21643fd16ee7b0f5a4f884c6bde4dbe8496eb3"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:d2af030bdc96cc49d3e924e3be9d632b3188d85387d0ee2cff3b6d01bf277a48"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp310-cp310-manylinux_2_34_x86_64.whl", hash = "sha256:06f3e80463aad6b5cf75ebcf246c77c85fe8a0371caabd9cbd5afe22de075000"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp310-none-win32.whl", hash = "sha256:11744b9d3776bbc69c479da950420f5aa256b0cc021e571c65ea298efc84a0b8"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp310-none-win_amd64.whl", hash = "sha256:aa530337734534949f1ec737bac56d8b627377d1941da598bb0800d95c397f5b"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp311-cp311-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:f19f999c5f2cadfa5b2a61119b36475776622b40d651edcf44a4ddc8b24f0d5a"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:e275243fa86d5846cb413923f2bc8682558311fe0fdb69e79efbaa14792fc113"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:8710637b857ef80c32e4fe2259c19266a4e4ff96e02cad98c8f6d0e5b169ce7a"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp311-none-win32.whl", hash = "sha256:7c883b530385d43ab91e2dce7fd9cc9d3b96de707952f937725a1b36870d43d3"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp311-none-win_amd64.whl", hash = "sha256:ff71c3af405811440e704c6234e41132b77443659c3ecceabce32c8bb1b5e235"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp312-cp312-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:0ebf4afb81e72dd1b86b590b73aa99ccb65c8d25b56bebccee8d065af0d96a58"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:40c0d2ee28cccf0c5192267d18a46810354fd4f44188cddc2c6254b600931b85"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:42278c8a431cbc8d66c75b7f787f7f424a00892453fce924df74e9f9f13abf2e"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp312-none-win32.whl", hash = "sha256:c015376e84b70bb6c2fcc3b63ac09f280727b032e6d01aa1a7fa40b93ed1f1e6"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp312-none-win_amd64.whl", hash = "sha256:20f1cd8ae8add599de98b805e9df03d485c965beb0d5e7697c7f332c73119aad"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp37-cp37m-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:e7e35ca85c20bcc128bb073fb15019b9bf54021186b8f221f84a09d7278dc3fd"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp37-cp37m-macosx_10_12_x86_64.whl", hash = "sha256:e901d4bcaa036deb3aa8a31eb745f074fdf5a608b224735600f15546ce0d8269"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp37-cp37m-manylinux_2_34_x86_64.whl", hash = "sha256:fada59a4187210f0597be8f2e5f298da4d31aeb78c1fbaa1933c73085db9a31d"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp37-none-win32.whl", hash = "sha256:c08a6fa71fb1bd3716f8e3be5702b4e4f9c522ff0b8f3cf1e3b1e1603e283028"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp37-none-win_amd64.whl", hash = "sha256:03e18d98a966ba263b9b12d9634a7970a731246d180d834f65110147a2a9f8be"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp38-cp38-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:1ff01e31b5f2e2998e6d64cae3400d020fce3fcd3d771ff8a518f96e74c8c898"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp38-cp38-macosx_10_12_x86_64.whl", hash = "sha256:ba6d982529940486d2dcb65f77a5d285a723f4e2675e982b50a7686e6cf2e9ae"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp38-cp38-manylinux_2_34_x86_64.whl", hash = "sha256:fd1dffcdc53820f0d23a51fbde78f9ca32139b9121781f8679018665e7ea7fa6"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp38-none-win32.whl", hash = "sha256:916d2ff34f8b57152cf981e7ceae8f401478568b05658050ed163d58dfd18f5b"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp38-none-win_amd64.whl", hash = "sha256:088d874f658315c712389f4686c1442714d16196211dfb405ca326455ca56f07"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp39-cp39-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:367d0dac2324673c570721912c90ec0e57e394e00c03229b7eded06b26b25fc5"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:d586c16f0d404efeb9cbafc74d19f38df8c4a2c67a7f49f241d4c3c7ff9f7df0"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp39-cp39-manylinux_2_34_x86_64.whl", hash = "sha256:af298036982e4126e2d03edd18028f252627d08d99c7c617b22247e9a52755c4"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp39-none-win32.whl", hash = "sha256:8c1aa859b4e78c7ba63085b95dba0440d9c0cd0c30d93c2393d96c9926218cbd"},
-    {file = "decentriq_transparency_verification-0.1.0.dev1-cp39-none-win_amd64.whl", hash = "sha256:abe55f2094d0232b32cdeabbf961570c868ff503a4da4b0874615346d9cb336c"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp310-cp310-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:9d1632f16c4a49d451aa05c077a0ad4845600a3282670962d4712bc611de1370"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:d6cb7fe9495a39fdf05c3c1d2cc16b4514f6c349ca89166e83786804ad9fbb83"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp310-cp310-manylinux_2_27_x86_64.whl", hash = "sha256:8d26ba977f1d28c67756803d7fe34701679eef47d2e185139cd2199337a3ff35"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp310-cp310-manylinux_2_34_x86_64.whl", hash = "sha256:69b5f7ba78c31510451326dc9b127c500fbb71d289f26df023e23ff91e58e70f"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp310-none-win32.whl", hash = "sha256:e6866edcd26725859485bffdb46068c5bddf0032a37846bb22e85f77119ab044"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp310-none-win_amd64.whl", hash = "sha256:568bc2e9406af7ecbe8cd251761e207194991a44fee1cb7b19cfff605e7f4048"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp311-cp311-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:0ce3cb031a77d98f2b615376349c1f5830b6da9ea27aa182438ef884eaaed2ca"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:a201dfc667a4d9aa6ed1aa73fa9d1ee541f28673aa961a2e1c05e9d84cb1ed06"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp311-cp311-manylinux_2_27_x86_64.whl", hash = "sha256:9fe933d71e443b25041d56419bbedf9c7717cf86ad003ac55d6a23ae76adc2c8"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp311-cp311-manylinux_2_34_x86_64.whl", hash = "sha256:b4393975e56e44d684e7a625990546831a9f93422bcc3e475e5b003e014aa467"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp311-none-win32.whl", hash = "sha256:eb78f7e43322af98f447a697b6f6da6227ac6557d4478e5152a7d9f044bb9121"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp311-none-win_amd64.whl", hash = "sha256:5daef1075c815bbd0560183e6787df4d51aa699d3abaf4d3e152247fee6e03e4"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp312-cp312-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:31a49ce2f03e8738dad4323527b621c678d0bcb22de853822b1f09973aa157a5"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:0e760f6889457f3edbb30d16cf005b545cabf37f2708aec741d55a77ca0044c1"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp312-cp312-manylinux_2_27_x86_64.whl", hash = "sha256:fa6f877ff804577a51e8918e93660ff164d06e359c50cabd5b9f7c3c76a50aa3"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp312-cp312-manylinux_2_34_x86_64.whl", hash = "sha256:7fc5628f0daf7ca31de690495183256e4122158bdab116dd769d36f2bd6650db"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp312-none-win32.whl", hash = "sha256:e0657e3ca10d275ccae1a423d1f56c92c42fd3cd6231a19a6a23a223cec9325c"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp312-none-win_amd64.whl", hash = "sha256:3085aa0958b4d586c9527f8a7977d38961c05058ffad62c43ffc4c853d637167"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp37-cp37m-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:37816ab24eb999e1bc4a4025ad1a6ddd26272a78c9ff805bf52a7890ecec0be0"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp37-cp37m-macosx_10_12_x86_64.whl", hash = "sha256:6439b4aa80a3735117d0abefd53eb6b90636d7200d8235a3969eb99230fefe5c"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp37-cp37m-manylinux_2_27_x86_64.whl", hash = "sha256:25170a255aa57c67e0729061d59cd6dd29551f555c9abd978cb2c607b0ffbd73"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp37-cp37m-manylinux_2_34_x86_64.whl", hash = "sha256:8c79aca0731a8210908eeb04024c05547330a921a265859bd463cc974d65067c"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp37-none-win32.whl", hash = "sha256:29ff76b4d9b8882b0363a1b236b7dc8db9a83c58b44102d1d987431419ee5bf6"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp37-none-win_amd64.whl", hash = "sha256:3855845a2491908bcc53f3c0909afb430c229e5ef20eac57fc6650890a918ecd"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp38-cp38-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:0cdc9c38a88ceaa0ee045abca170b2fa99d0a9a29a5e5e2658929b05cc5128d3"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp38-cp38-macosx_10_12_x86_64.whl", hash = "sha256:1e0324580bbd961a17ce3ef416518c86df270b5c9c7570de543c11975a2431f1"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp38-cp38-manylinux_2_27_x86_64.whl", hash = "sha256:f408f3e49368de44f3ff07127799eabc592e5c8c1b20ae9dc58a036ae8542334"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp38-cp38-manylinux_2_34_x86_64.whl", hash = "sha256:1e1ac9a4a70666cefb554bb0f87848fdd427103a263cedab857b3b16345398f2"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp38-none-win32.whl", hash = "sha256:b5d24c9fdce53467a37d4cc375397465c811e1584a2345af1e5a9fe92f55251d"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp38-none-win_amd64.whl", hash = "sha256:9fe7180c3c156fe0d28a86d0dd5175df91394ccf496b85024d328a67d1413455"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp39-cp39-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:207fed3ff10d08f67fb173896ad8c44ded6af3e6dd9632fc502bbcc6febfd90a"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:1037abd459d89a0084319d39b505b5f28c95e96e4d5aca697273bcd5a57adb17"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp39-cp39-manylinux_2_27_x86_64.whl", hash = "sha256:eb05f994565a98351095b04b65bb0331b51724b2e84cda9fbaf31490046c9fd4"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp39-cp39-manylinux_2_34_x86_64.whl", hash = "sha256:ddec9d1a7ddc4aca0b4a965c7837b1e2c154ca3f785669f06e538c58aea9173b"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp39-none-win32.whl", hash = "sha256:3087f2906268ed5863f57e72dcd9d01559265aa9e021616d6606b491235c1ea6"},
+    {file = "decentriq_transparency_verification-0.1.0.dev2-cp39-none-win_amd64.whl", hash = "sha256:163a0735c59b41c065859c72a8e202e1ea78162be37ad7a3ee76172fdfa65ad2"},
 ]
 
 [[package]]
@@ -1126,4 +1132,4 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "662bd6bc8f066dfea4c9e2b49375e0d6b689e8426457d0529f2b492e6cd7a6ff"
+content-hash = "2ea9a7bcf225e9c37b4ddbf275eeda0e039ea957beb1fe0dff3d0eba2354f126"

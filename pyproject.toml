@@ -5,7 +5,7 @@ homepage = "https://github.com/decentriq/decentriq-platform"
 name = "decentriq-platform"
 readme = 'README.md'
 repository = "https://github.com/decentriq/decentriq-platform"
-version = "0.31.1"
+version = "0.31.2"
 
 [tool.poetry.dependencies]
 # main package
@@ -14,7 +14,7 @@ cbor2 = "^5.4.6"
 chily = "^0.8.0"
 cryptography = "^42.0.8"
 decentriq-dcr-compiler = "0.12.0-dev3"
-decentriq-transparency-verification = "0.1.0dev1"
+decentriq-transparency-verification = "0.1.0dev2"
 ecdsa = "^0.18.0"
 pem = "^21.2.0"
 protobuf = "4.21.9"
