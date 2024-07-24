@@ -1,0 +1,31 @@
+syntax = "proto3";
+package microsoft_dsp;
+
+message SingleFile { string name = 1; }
+
+message RawFile {}
+
+message ZipFile {
+  oneof selection { SingleFile singleFile = 1; }
+}
+
+message SinkInput {
+  string dependency = 1;
+  string name = 2;
+  oneof file {
+    RawFile raw = 3;
+    ZipFile zip = 4;
+  }
+}
+
+message SegmentInfo {
+  string short_name = 1;
+  string code = 2;
+}
+
+message MicrosoftDspWorkerConfiguration {
+  SinkInput input = 1;
+  string credentials_dependency = 2;
+  int32 member_id = 3;
+  SegmentInfo segment_info = 4;
+}

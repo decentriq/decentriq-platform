@@ -38,6 +38,8 @@ __pdoc__ = {
     "salesforce": True,
     "data_lab": True,
     "permutive": True,
+    "microsoft_dsp": True,
+    "adform_dsp": True,
 }
 
 __all__ = [
@@ -80,4 +82,6 @@ __all__ = [
     "salesforce",
     "data_lab",
     "permutive",
+    "microsoft_dsp",
+    "adform_dsp",
 ]
