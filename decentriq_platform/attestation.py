@@ -1122,6 +1122,25 @@ SPECIFICATIONS = {
         decoder=S3SinkWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.s3-sink-worker:v8": EnclaveSpecification(
+        name="decentriq.s3-sink-worker",
+        version="8",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "2688a034d8c871d653b485efd7053d2bfcdf97f150cd4080202c14ec36dfbaa8"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=S3SinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.salesforce-worker:v1": EnclaveSpecification(
         name="decentriq.salesforce-worker",
         version="1",
@@ -1792,6 +1811,25 @@ SPECIFICATIONS = {
         ),
         workerProtocols=[1],
         decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.adform-dsp-worker:v1": EnclaveSpecification(
+        name="decentriq.adform-dsp-worker",
+        version="1",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "b08e50cbd7b1951e895d79af6a5aa53e35e8970addeb329ec4fbcabcf38ac07d"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=AdformDspWorkerDecoder(),
         clientProtocols=None,
     ),
 }
