@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Dict, Any, Self
+from typing import Optional, Dict, Any
+from typing_extensions import Self
 
 
 class ActivationType(str, Enum):
