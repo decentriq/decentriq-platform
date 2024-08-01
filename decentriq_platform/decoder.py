@@ -17,6 +17,8 @@ from .proto import (
     S3SinkWorkerConfiguration,
     SalesforceWorkerConfiguration,
     SqlWorkerConfiguration,
+    MicrosoftDspWorkerConfiguration,
+    AdformDspWorkerConfiguration,
     parse_length_delimited,
 )
 
@@ -119,5 +121,19 @@ class DataSourceSalesforceWorkerDecoder:
 class SqlWorkerDecoder:
     def decode(self, config: bytes):
         config_decoded = SqlWorkerConfiguration()
+        parse_length_delimited(config, config_decoded)
+        return MessageToDict(config_decoded)
+
+
+class MicrosoftDspWorkerDecoder:
+    def decode(self, config: bytes):
+        config_decoded = MicrosoftDspWorkerConfiguration()
+        parse_length_delimited(config, config_decoded)
+        return MessageToDict(config_decoded)
+
+
+class AdformDspWorkerDecoder:
+    def decode(self, config: bytes):
+        config_decoded = AdformDspWorkerConfiguration()
         parse_length_delimited(config, config_decoded)
         return MessageToDict(config_decoded)

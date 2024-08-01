@@ -1,0 +1,24 @@
+syntax = "proto3";
+package adform_dsp;
+
+message SingleFile { string name = 1; }
+
+message RawFile {}
+
+message ZipFile {
+  oneof selection { SingleFile singleFile = 1; }
+}
+
+message SinkInput {
+  string dependency = 1;
+  string name = 2;
+  oneof file {
+    RawFile raw = 3;
+    ZipFile zip = 4;
+  }
+}
+
+message AdformDspWorkerConfiguration {
+  SinkInput input = 1;
+  repeated string segment_owners = 2;
+}

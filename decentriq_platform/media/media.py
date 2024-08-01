@@ -385,8 +385,14 @@ class MediaDcr:
         **Parameters**:
         - `audiences`: List of audiences that should be made available to the Publisher.
         """
+        audiences_list = self._create_activated_audiences_list(audiences)
         activate_audience_list_json = json.dumps(
-            {"activated_audiences": [audience.as_dict() for audience in audiences]}
+            {
+                "advertiser_manifest_hash": self._get_advertiser_manifest_hash(),
+                "activated_audiences": [
+                    audience.as_dict() for audience in audiences_list
+                ],
+            }
         )
         key = Key()
         manifest_hash = self.client.upload_dataset(
@@ -400,6 +406,55 @@ class MediaDcr:
             "activated_audiences.json",
             key,
         )
+
+    # Create an activated audiences list that contains all previously
+    # activated audiences together with the newly activated audiences.
+    def _create_activated_audiences_list(
+        self, audiences: List[Audience]
+    ) -> List[Audience]:
+
+        # Generates a dictionary key for a given audience.
+        def generate_key(audience: Audience) -> str:
+            if audience.reach:
+                # The key for lookalike audiences.
+                return f"{audience.audience_type}-{audience.activation_type.value}-{audience.reach}"
+            else:
+                # The key for non-lookalike audiences.
+                return f"{audience.audience_type}-{audience.activation_type.value}"
+
+        existing_audiences = self.get_audiences_for_advertiser()
+        activated_audiences_dict: Dict[str, Audience] = {}
+
+        # Store the existing audiences in a map.
+        for activated_audience in existing_audiences["activated_audiences"]:
+            audience = Audience.from_activated_audience(activated_audience)
+            key = generate_key(audience)
+            activated_audiences_dict[key] = audience
+
+        # Ensure all new published audiences are included.
+        for audience in audiences:
+            key = generate_key(audience)
+            activated_audience = activated_audiences_dict.get(key)
+            if activated_audience:
+                # Audience already exists. Update the "is_published" flag to
+                # that specified by the user.
+                activated_audience.is_published = audience.is_published
+                activated_audiences_dict[key] = activated_audience
+            else:
+                # Entry doesn't exist. Add it.
+                activated_audiences_dict[key] = audience
+        return activated_audiences_dict.values()
+
+    def _get_advertiser_manifest_hash(self) -> str:
+        request = MediaInsightsRequest.model_validate(
+            {
+                "retrievePublishedDatasets": {
+                    "dataRoomIdHex": self.id,
+                },
+            }
+        )
+        response = Request.send(request, self.session).model_dump()
+        return response["retrievePublishedDatasets"]["advertiserDatasetHashHex"]
 
     def participants(self) -> Dict[str, Any]:
         """

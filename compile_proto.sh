@@ -40,6 +40,8 @@ AZURE_BLOB_STORAGE_PACKAGE_PROTO=(azure_blob_storage.proto)
 GOOGLE_AD_MANAGER_PACKAGE_PROTO=(google_ad_manager.proto)
 SALESFORCE_PACKAGE_PROTO=(salesforce.proto)
 PERMUTIVE_PACKAGE_PROTO=(permutive.proto)
+MICROSOFT_DSP_PACKAGE_PROTO=(microsoft_dsp.proto)
+ADFORM_DSP_PACKAGE_PROTO=(adform_dsp.proto)
 
 compile_pb "decentriq_platform/proto" "${MAIN_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/proto" "${SQL_PACKAGE_PROTO[@]}"
@@ -55,3 +57,5 @@ compile_pb "decentriq_platform/proto" "${AZURE_BLOB_STORAGE_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/proto" "${GOOGLE_AD_MANAGER_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/proto" "${SALESFORCE_PACKAGE_PROTO[@]}"
 compile_pb "decentriq_platform/proto" "${PERMUTIVE_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/proto" "${MICROSOFT_DSP_PACKAGE_PROTO[@]}"
+compile_pb "decentriq_platform/proto" "${ADFORM_DSP_PACKAGE_PROTO[@]}"

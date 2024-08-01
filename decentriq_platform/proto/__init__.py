@@ -128,3 +128,5 @@ from .metering_pb2 import CreateDcrKind, CreateDcrPurpose, DcrMetadata
 from .permutive_pb2 import PermutiveWorkerConfiguration
 from .salesforce_pb2 import SalesforceWorkerConfiguration
 from .synth_data_pb2 import Column, Mask, SyntheticDataConf
+from .microsoft_dsp_pb2 import MicrosoftDspWorkerConfiguration
+from .adform_dsp_pb2 import AdformDspWorkerConfiguration

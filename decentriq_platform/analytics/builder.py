@@ -84,6 +84,20 @@ class AnalyticsDcrBuilder:
         """The current list of Node Definitions that will be added to the Data Clean Room."""
         self.permissions = []
         """The list of permissions that will be added to the Data Clean Room."""
+        self._force_spark_validation = False
+        """Whether to force validation pipelines to use spark."""
+
+    def _with_force_spark_validation(self, use_spark: bool) -> Self:
+        """
+        Whether to force the any validation pipeline part of this DCR
+        to use spark. If this is false, the validation pipeline will decide
+        based on the file size whether to use spark or not.
+
+        **Parameters**:
+        - `use_spark`: Force validation to use spark.
+        """
+        self._force_spark_validation = use_spark
+        return self
 
     def with_name(self, name: str) -> Self:
         """
@@ -215,6 +229,7 @@ class AnalyticsDcrBuilder:
                         "enableTestDatasets": True,
                         "enclaveRootCertificatePem": self.client.decentriq_ca_root_certificate.decode(),
                         "enclaveSpecifications": used_hl_enclave_specs,
+                        "enableForceSparkValidation": self._force_spark_validation,
                         "id": self._generate_id(),
                         "nodes": nodes,
                         "participants": permissions,

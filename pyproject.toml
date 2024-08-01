@@ -5,17 +5,16 @@ homepage = "https://github.com/decentriq/decentriq-platform"
 name = "decentriq-platform"
 readme = 'README.md'
 repository = "https://github.com/decentriq/decentriq-platform"
-version = "0.29.1"
+version = "0.32.0"
 
 [tool.poetry.dependencies]
 # main package
 asn1crypto = "^1.5.1"
 cbor2 = "^5.4.6"
-certifi = "^2023.7.22"
 chily = "^0.8.0"
 cryptography = "^42.0.8"
-decentriq-dcr-compiler = "0.9.0"
-decentriq-transparency-verification = "0.1.0dev1"
+decentriq-dcr-compiler = "0.12.0"
+decentriq-transparency-verification = "0.1.0dev2"
 ecdsa = "^0.18.0"
 pem = "^21.2.0"
 protobuf = "4.21.9"
@@ -23,10 +22,10 @@ pyOpenSSL = "^24.0.0"
 python = "^3.9"
 requests = "^2.32.0"
 sgx-ias-structs = "^0.1.8"
-sqloxide = "^0.1.26"
 typing-extensions = "^4.4.0"
 # Force version to be >= 3.7 due to vuln (transitive dependency of `requests` package)
 idna = "^3.7"
+urllib3 = "1.26.19"
 
 [tool.poetry.dev-dependencies]
 black = "^24.4.0"

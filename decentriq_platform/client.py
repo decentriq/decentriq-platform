@@ -7,7 +7,7 @@ from threading import BoundedSemaphore
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
 
 from decentriq_dcr_compiler import compiler
-from decentriq_dcr_compiler.schemas.data_science_data_room import DataScienceDataRoom
+from decentriq_dcr_compiler.schemas import DataScienceDataRoom
 from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
 
 from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
@@ -1180,6 +1180,7 @@ class Client:
                     statisticsComputeJobId
                     jobsDriverAttestationHash
                     highLevelRepresentationAsString
+                    forceSparkValidation
                 }
             }
             """,
