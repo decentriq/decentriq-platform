@@ -86,6 +86,24 @@ class SinkInput(google.protobuf.message.Message):
 global___SinkInput = SinkInput
 
 @typing_extensions.final
+class MemberInfo(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ID_FIELD_NUMBER: builtins.int
+    NAME_FIELD_NUMBER: builtins.int
+    id: builtins.int
+    name: builtins.str
+    def __init__(
+        self,
+        *,
+        id: builtins.int = ...,
+        name: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["id", b"id", "name", b"name"]) -> None: ...
+
+global___MemberInfo = MemberInfo
+
+@typing_extensions.final
 class SegmentInfo(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
@@ -108,24 +126,22 @@ class MicrosoftDspWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     INPUT_FIELD_NUMBER: builtins.int
-    CREDENTIALS_DEPENDENCY_FIELD_NUMBER: builtins.int
-    MEMBER_ID_FIELD_NUMBER: builtins.int
+    MEMBER_INFO_FIELD_NUMBER: builtins.int
     SEGMENT_INFO_FIELD_NUMBER: builtins.int
     @property
     def input(self) -> global___SinkInput: ...
-    credentials_dependency: builtins.str
-    member_id: builtins.int
+    @property
+    def member_info(self) -> global___MemberInfo: ...
     @property
     def segment_info(self) -> global___SegmentInfo: ...
     def __init__(
         self,
         *,
         input: global___SinkInput | None = ...,
-        credentials_dependency: builtins.str = ...,
-        member_id: builtins.int = ...,
+        member_info: global___MemberInfo | None = ...,
         segment_info: global___SegmentInfo | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["input", b"input", "segment_info", b"segment_info"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["credentials_dependency", b"credentials_dependency", "input", b"input", "member_id", b"member_id", "segment_info", b"segment_info"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["input", b"input", "member_info", b"member_info", "segment_info", b"segment_info"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["input", b"input", "member_info", b"member_info", "segment_info", b"segment_info"]) -> None: ...
 
 global___MicrosoftDspWorkerConfiguration = MicrosoftDspWorkerConfiguration

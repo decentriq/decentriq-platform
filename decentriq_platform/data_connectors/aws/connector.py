@@ -201,7 +201,9 @@ class AwsExportConnectorDefinition(NodeDefinition):
                 "computation": {
                     "kind": {
                         "exportConnector": {
-                            "credentialsDependency": self.credentials_dependency,
+                            "credentialsDependency": {
+                                "user": self.credentials_dependency,
+                            },
                             "kind": {
                                 "aws": {
                                     "bucket": self.bucket,

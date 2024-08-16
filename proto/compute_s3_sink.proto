@@ -2,46 +2,60 @@ syntax = "proto3";
 package compute_s3_sink;
 
 enum S3Provider {
-    AWS = 0;
-    GCS = 1;
+  AWS = 0;
+  GCS = 1;
 }
 
 message S3SinkWorkerConfiguration {
-    string endpoint = 1;
-    // S3 region can be left empty for a GCS sink worker
-    string region = 2;
-    string credentialsDependency = 3;
-    repeated S3Object objects = 4;
-    S3Provider s3Provider = 5;
+  string endpoint = 1;
+  // S3 region can be left empty for a GCS sink worker
+  string region = 2;
+  string credentialsDependency = 3 [ deprecated = true ]; // Use `credentials` instead.
+  repeated S3Object objects = 4;
+  S3Provider s3Provider = 5;
+  oneof credentials {
+    UserDefinedCredentials userDefinedCredentials = 6;
+    DqDspCredentials dqDspCredentials = 7;
+  }
+}
+
+message UserDefinedCredentials {
+  // This is the dependency node ID for the
+  // user provided credentials.
+  string userDefinedCredentials = 1;
+}
+
+message DqDspCredentials { DspCredentialsType dspType = 1; }
+
+enum DspCredentialsType {
+  SPLICKY = 0;
 }
 
 message S3Object {
-    string dependency = 1;
-    oneof format {
-        ZipObject zip = 2;
-        RawObject raw = 3;
-    }
+  string dependency = 1;
+  oneof format {
+    ZipObject zip = 2;
+    RawObject raw = 3;
+  }
 }
 
-message RawObject {
-    string key = 1;
-}
+message RawObject { string key = 1; }
 
 message ZipObject {
-    oneof kind {
-    	SingleFile singleFile = 1;
-    	FullContent fullContent = 2;
-    }
+  oneof kind {
+    SingleFile singleFile = 1;
+    FullContent fullContent = 2;
+  }
 }
 
 message SingleFile {
-    string key = 1;
-    string path = 2;
+  string key = 1;
+  string path = 2;
 }
 
 message FullContent {}
 
 message S3Credentials {
-    string accessKey = 1;
-    string secretKey = 2;
+  string accessKey = 1;
+  string secretKey = 2;
 }

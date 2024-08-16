@@ -23,6 +23,7 @@ message MeteringRequest {
         CreateDatasetRequest createDataset = 9;
         GetOrCreateDatasetScopeRequest getOrCreateDatasetScope = 10;
         MergeDcrCommitRequest mergeDcrCommit = 11;
+        GetDataConnectorCredentialsRequest getDataConnectorCredentials = 12;
     }
 }
 
@@ -39,6 +40,7 @@ message MeteringSuccessResponse {
         CreateDatasetResponse createDataset = 9;
         GetOrCreateDatasetScopeResponse getOrCreateDatasetScope = 10;
         MergeDcrCommitResponse mergeDcrCommit = 11;
+        GetDataConnectorCredentialsResponse dataConnectorCredentials = 12;
     }
 }
 
@@ -236,3 +238,25 @@ message SubmitWorkerExecutionTimeRequest {
 }
 
 message SubmitWorkerExecutionTimeResponse {}
+
+message SplickyCredentials {}
+
+message MicrosoftDspMember {
+    string member = 1;
+}
+
+message CredentialsKind {
+    oneof credentials {
+        SplickyCredentials splicky = 1;
+        MicrosoftDspMember microsoftDspMember = 2;
+    }
+}
+
+message GetDataConnectorCredentialsRequest {
+    CredentialsKind kind = 1;
+}
+
+message GetDataConnectorCredentialsResponse {
+    /// Credentials as a serialised JSON object.
+    string credentials = 1;
+}

@@ -33,6 +33,19 @@ AWS: S3Provider.ValueType  # 0
 GCS: S3Provider.ValueType  # 1
 global___S3Provider = S3Provider
 
+class _DspCredentialsType:
+    ValueType = typing.NewType("ValueType", builtins.int)
+    V: typing_extensions.TypeAlias = ValueType
+
+class _DspCredentialsTypeEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._EnumTypeWrapper[_DspCredentialsType.ValueType], builtins.type):
+    DESCRIPTOR: google.protobuf.descriptor.EnumDescriptor
+    SPLICKY: _DspCredentialsType.ValueType  # 0
+
+class DspCredentialsType(_DspCredentialsType, metaclass=_DspCredentialsTypeEnumTypeWrapper): ...
+
+SPLICKY: DspCredentialsType.ValueType  # 0
+global___DspCredentialsType = DspCredentialsType
+
 @typing_extensions.final
 class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
@@ -42,13 +55,20 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     CREDENTIALSDEPENDENCY_FIELD_NUMBER: builtins.int
     OBJECTS_FIELD_NUMBER: builtins.int
     S3PROVIDER_FIELD_NUMBER: builtins.int
+    USERDEFINEDCREDENTIALS_FIELD_NUMBER: builtins.int
+    DQDSPCREDENTIALS_FIELD_NUMBER: builtins.int
     endpoint: builtins.str
     region: builtins.str
     """S3 region can be left empty for a GCS sink worker"""
     credentialsDependency: builtins.str
+    """Use `credentials` instead."""
     @property
     def objects(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___S3Object]: ...
     s3Provider: global___S3Provider.ValueType
+    @property
+    def userDefinedCredentials(self) -> global___UserDefinedCredentials: ...
+    @property
+    def dqDspCredentials(self) -> global___DqDspCredentials: ...
     def __init__(
         self,
         *,
@@ -57,10 +77,47 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
         credentialsDependency: builtins.str = ...,
         objects: collections.abc.Iterable[global___S3Object] | None = ...,
         s3Provider: global___S3Provider.ValueType = ...,
+        userDefinedCredentials: global___UserDefinedCredentials | None = ...,
+        dqDspCredentials: global___DqDspCredentials | None = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["credentialsDependency", b"credentialsDependency", "endpoint", b"endpoint", "objects", b"objects", "region", b"region", "s3Provider", b"s3Provider"]) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["credentials", b"credentials", "dqDspCredentials", b"dqDspCredentials", "userDefinedCredentials", b"userDefinedCredentials"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["credentials", b"credentials", "credentialsDependency", b"credentialsDependency", "dqDspCredentials", b"dqDspCredentials", "endpoint", b"endpoint", "objects", b"objects", "region", b"region", "s3Provider", b"s3Provider", "userDefinedCredentials", b"userDefinedCredentials"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["credentials", b"credentials"]) -> typing_extensions.Literal["userDefinedCredentials", "dqDspCredentials"] | None: ...
 
 global___S3SinkWorkerConfiguration = S3SinkWorkerConfiguration
+
+@typing_extensions.final
+class UserDefinedCredentials(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    USERDEFINEDCREDENTIALS_FIELD_NUMBER: builtins.int
+    userDefinedCredentials: builtins.str
+    """This is the dependency node ID for the
+    user provided credentials.
+    """
+    def __init__(
+        self,
+        *,
+        userDefinedCredentials: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["userDefinedCredentials", b"userDefinedCredentials"]) -> None: ...
+
+global___UserDefinedCredentials = UserDefinedCredentials
+
+@typing_extensions.final
+class DqDspCredentials(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DSPTYPE_FIELD_NUMBER: builtins.int
+    dspType: global___DspCredentialsType.ValueType
+    def __init__(
+        self,
+        *,
+        dspType: global___DspCredentialsType.ValueType = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["dspType", b"dspType"]) -> None: ...
+
+global___DqDspCredentials = DqDspCredentials
 
 @typing_extensions.final
 class S3Object(google.protobuf.message.Message):

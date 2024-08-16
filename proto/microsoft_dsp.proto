@@ -18,6 +18,11 @@ message SinkInput {
   }
 }
 
+message MemberInfo {
+  int32 id = 1;
+  string name = 2;
+}
+
 message SegmentInfo {
   string short_name = 1;
   string code = 2;
@@ -25,7 +30,6 @@ message SegmentInfo {
 
 message MicrosoftDspWorkerConfiguration {
   SinkInput input = 1;
-  string credentials_dependency = 2;
-  int32 member_id = 3;
-  SegmentInfo segment_info = 4;
+  MemberInfo member_info = 2;
+  SegmentInfo segment_info = 3;
 }

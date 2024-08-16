@@ -6,4 +6,7 @@ from .compute_s3_sink_pb2 import (
     S3SinkWorkerConfiguration,
     SingleFile,
     ZipObject,
+    DqDspCredentials,
+    UserDefinedCredentials,
+    DspCredentialsType,
 )
