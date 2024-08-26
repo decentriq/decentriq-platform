@@ -8,6 +8,7 @@ from .matching_compute_nodes import (
 from .node_definitions import *
 from .preview_compute_nodes import PreviewComputeNode, PreviewComputeNodeDefinition
 from .python_compute_nodes import PythonComputeNode, PythonComputeNodeDefinition
+from .python_environment_compute_nodes import PythonEnvironmentComputeNode, PythonEnvironmentComputeNodeDefinition
 from .r_compute_nodes import RComputeNode, RComputeNodeDefinition
 from .raw_data_nodes import RawDataNode, RawDataNodeDefinition
 from .s3_sink_compute_nodes import (
@@ -74,7 +75,8 @@ __all__ = [
     "AnalyticsDcrBuilder",
     # Compute nodes
     "PythonScript",
-    "PythonComputeNodeDefinition",
+    "PythonEnvironmentComputeNode",
+    "PythonEnvironmentComputeNodeDefinition",
     "RScript",
     "RComputeNodeDefinition",
     "PythonComputeNode",

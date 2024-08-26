@@ -28,6 +28,7 @@ class PythonComputeNodeDefinition(NodeDefinition):
         enable_logs_on_success: bool = False,
         output: Optional[str] = "/output",
         id: Optional[str] = None,
+        custom_environment: Optional[str] = None,
     ) -> None:
         """
         Initialise a `PythonComputeNodeDefinition`.
@@ -52,6 +53,7 @@ class PythonComputeNodeDefinition(NodeDefinition):
         self.output = output
         self.scripting_specification_id = "decentriq.python-ml-worker-32-64"
         self.static_content_specification_id = "decentriq.driver"
+        self.custom_environment = custom_environment
 
     def _get_high_level_representation(self) -> Dict[str, str]:
         """
@@ -82,7 +84,11 @@ class PythonComputeNodeDefinition(NodeDefinition):
                                 "content": self.script,
                             },
                             "output": self.output,
-                            "scriptingLanguage": ScriptingLanguage.python.value,
+                            "scriptingLanguage": {
+                                "python": {} if self.custom_environment is None else {
+                                    "customVirtualEnvironmentId": self.custom_environment
+                                }
+                            },
                             "scriptingSpecificationId": self.scripting_specification_id,
                             "staticContentSpecificationId": self.static_content_specification_id,
                         }
@@ -123,6 +129,7 @@ class PythonComputeNodeDefinition(NodeDefinition):
             enable_logs_on_error=scripting_node["enableLogsOnError"],
             enable_logs_on_success=scripting_node["enableLogsOnSuccess"],
             output=scripting_node["output"],
+            custom_environment=scripting_node["scriptingLanguage"]["python"]["customVirtualEnvironmentId"]
         )
 
     def build(
@@ -155,6 +162,7 @@ class PythonComputeNodeDefinition(NodeDefinition):
             enable_logs_on_success=self.enable_logs_on_success,
             output=self.output,
             id=self.id,
+            custom_environment=self.custom_environment,
         )
 
 
@@ -177,6 +185,7 @@ class PythonComputeNode(ContainerComputationNode):
         enable_logs_on_error: bool = False,
         enable_logs_on_success: bool = False,
         output: Optional[str] = "/output",
+        custom_environment: Optional[str] = None,
     ) -> None:
         """
         Initialise a `PythonComputeNode`:
@@ -212,6 +221,7 @@ class PythonComputeNode(ContainerComputationNode):
         self.output = output
         self.scripting_specification_id = "decentriq.python-ml-worker-32-64"
         self.static_content_specification_id = "decentriq.driver"
+        self.custom_environment = custom_environment
 
     def _get_computation_id(self) -> str:
         """
