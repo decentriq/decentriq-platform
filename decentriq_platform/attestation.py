@@ -691,6 +691,23 @@ SPECIFICATIONS = {
         decoder=ContainerWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.python-ml-worker-32-64:v25": EnclaveSpecification(
+        name="decentriq.python-ml-worker-32-64",
+        version="25",
+        proto=AttestationSpecification(
+            amdSnp=AttestationSpecificationAmdSnp(
+                amdArkDer=amd_snp_ark_der,
+                measurement=bytes.fromhex(
+                    "d356a7728e7da8c697af46c9c81bb0b0907deba09d7d47ee8b82f915c4e97ebd58859c8d59717da3e3f5df2be9fcfcd3"
+                ),
+                roughtimePubKey=new_roughtime_public_key,
+                decentriqDer=decentriq_root_ca_der,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=ContainerWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.python-synth-data-worker-32-64:v10": EnclaveSpecification(
         name="decentriq.python-synth-data-worker-32-64",
         version="10",
@@ -1585,6 +1602,25 @@ SPECIFICATIONS = {
             intelDcap=AttestationSpecificationIntelDcap(
                 mrenclave=bytes.fromhex(
                     "eae60f5bc9ca4cb67fd253206a9a8b4d723f0ce799bb6c9c9b366eb9b7ba8cbd"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GoogleAdManagerWorkerDecoder(),
+        clientProtocols=None,
+    ),
+    "decentriq.google-ad-manager-worker:v4": EnclaveSpecification(
+        name="decentriq.google-ad-manager-worker",
+        version="4",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "299741f85a17bab044857bd6a91efb996f3ed492271f31ccc9e9ce98d5127670"
                 ),
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 acceptDebug=False,
