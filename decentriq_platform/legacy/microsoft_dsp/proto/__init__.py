@@ -5,4 +5,5 @@ from .microsoft_dsp_pb2 import (
     SinkInput,
     ZipFile,
     SegmentInfo,
+    MemberInfo,
 )

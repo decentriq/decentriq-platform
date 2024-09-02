@@ -5,7 +5,12 @@ from ...proto import (
     serialize_length_delimited,
 )
 from ..node import Node
-from .proto import MicrosoftDspWorkerConfiguration, SinkInput, SegmentInfo
+from .proto import (
+    MicrosoftDspWorkerConfiguration,
+    SinkInput,
+    SegmentInfo,
+    MemberInfo,
+)
 
 
 class DataSinkMicrosoftDsp(Node):
@@ -16,16 +21,15 @@ class DataSinkMicrosoftDsp(Node):
     def __init__(
         self,
         name: str,
-        credentials_dependency: str,
         input: SinkInput,
         member_id: str,
+        member_name: str,
         segment_short_name: str,
         segment_code: str,
     ) -> None:
         config = MicrosoftDspWorkerConfiguration(
-            credentials_dependency=credentials_dependency,
             input=input,
-            member_id=member_id,
+            member_info=MemberInfo(id=member_id, name=member_name),
             segment_info=SegmentInfo(short_name=segment_short_name, code=segment_code),
         )
         config_serialized = serialize_length_delimited(config)
@@ -33,7 +37,7 @@ class DataSinkMicrosoftDsp(Node):
             name,
             config=config_serialized,
             enclave_type="decentriq.microsoft-dsp-worker",
-            dependencies=[credentials_dependency, input.dependency],
+            dependencies=[input.dependency],
             output_format=ComputeNodeFormat.RAW,
         )
 

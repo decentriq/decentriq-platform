@@ -13,27 +13,35 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x63ompute_s3_sink.proto\x12\x0f\x63ompute_s3_sink\"\xb9\x01\n\x19S3SinkWorkerConfiguration\x12\x10\n\x08\x65ndpoint\x18\x01 \x01(\t\x12\x0e\n\x06region\x18\x02 \x01(\t\x12\x1d\n\x15\x63redentialsDependency\x18\x03 \x01(\t\x12*\n\x07objects\x18\x04 \x03(\x0b\x32\x19.compute_s3_sink.S3Object\x12/\n\ns3Provider\x18\x05 \x01(\x0e\x32\x1b.compute_s3_sink.S3Provider\"~\n\x08S3Object\x12\x12\n\ndependency\x18\x01 \x01(\t\x12)\n\x03zip\x18\x02 \x01(\x0b\x32\x1a.compute_s3_sink.ZipObjectH\x00\x12)\n\x03raw\x18\x03 \x01(\x0b\x32\x1a.compute_s3_sink.RawObjectH\x00\x42\x08\n\x06\x66ormat\"\x18\n\tRawObject\x12\x0b\n\x03key\x18\x01 \x01(\t\"{\n\tZipObject\x12\x31\n\nsingleFile\x18\x01 \x01(\x0b\x32\x1b.compute_s3_sink.SingleFileH\x00\x12\x33\n\x0b\x66ullContent\x18\x02 \x01(\x0b\x32\x1c.compute_s3_sink.FullContentH\x00\x42\x06\n\x04kind\"\'\n\nSingleFile\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"\r\n\x0b\x46ullContent\"5\n\rS3Credentials\x12\x11\n\taccessKey\x18\x01 \x01(\t\x12\x11\n\tsecretKey\x18\x02 \x01(\t*\x1e\n\nS3Provider\x12\x07\n\x03\x41WS\x10\x00\x12\x07\n\x03GCS\x10\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15\x63ompute_s3_sink.proto\x12\x0f\x63ompute_s3_sink\"\xd6\x02\n\x19S3SinkWorkerConfiguration\x12\x10\n\x08\x65ndpoint\x18\x01 \x01(\t\x12\x0e\n\x06region\x18\x02 \x01(\t\x12!\n\x15\x63redentialsDependency\x18\x03 \x01(\tB\x02\x18\x01\x12*\n\x07objects\x18\x04 \x03(\x0b\x32\x19.compute_s3_sink.S3Object\x12/\n\ns3Provider\x18\x05 \x01(\x0e\x32\x1b.compute_s3_sink.S3Provider\x12I\n\x16userDefinedCredentials\x18\x06 \x01(\x0b\x32\'.compute_s3_sink.UserDefinedCredentialsH\x00\x12=\n\x10\x64qDspCredentials\x18\x07 \x01(\x0b\x32!.compute_s3_sink.DqDspCredentialsH\x00\x42\r\n\x0b\x63redentials\"8\n\x16UserDefinedCredentials\x12\x1e\n\x16userDefinedCredentials\x18\x01 \x01(\t\"H\n\x10\x44qDspCredentials\x12\x34\n\x07\x64spType\x18\x01 \x01(\x0e\x32#.compute_s3_sink.DspCredentialsType\"~\n\x08S3Object\x12\x12\n\ndependency\x18\x01 \x01(\t\x12)\n\x03zip\x18\x02 \x01(\x0b\x32\x1a.compute_s3_sink.ZipObjectH\x00\x12)\n\x03raw\x18\x03 \x01(\x0b\x32\x1a.compute_s3_sink.RawObjectH\x00\x42\x08\n\x06\x66ormat\"\x18\n\tRawObject\x12\x0b\n\x03key\x18\x01 \x01(\t\"{\n\tZipObject\x12\x31\n\nsingleFile\x18\x01 \x01(\x0b\x32\x1b.compute_s3_sink.SingleFileH\x00\x12\x33\n\x0b\x66ullContent\x18\x02 \x01(\x0b\x32\x1c.compute_s3_sink.FullContentH\x00\x42\x06\n\x04kind\"\'\n\nSingleFile\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"\r\n\x0b\x46ullContent\"5\n\rS3Credentials\x12\x11\n\taccessKey\x18\x01 \x01(\t\x12\x11\n\tsecretKey\x18\x02 \x01(\t*\x1e\n\nS3Provider\x12\x07\n\x03\x41WS\x10\x00\x12\x07\n\x03GCS\x10\x01*!\n\x12\x44spCredentialsType\x12\x0b\n\x07SPLICKY\x10\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'compute_s3_sink_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_S3PROVIDER']._serialized_start=620
-  _globals['_S3PROVIDER']._serialized_end=650
+  _globals['_S3SINKWORKERCONFIGURATION'].fields_by_name['credentialsDependency']._options = None
+  _globals['_S3SINKWORKERCONFIGURATION'].fields_by_name['credentialsDependency']._serialized_options = b'\030\001'
+  _globals['_S3PROVIDER']._serialized_start=909
+  _globals['_S3PROVIDER']._serialized_end=939
+  _globals['_DSPCREDENTIALSTYPE']._serialized_start=941
+  _globals['_DSPCREDENTIALSTYPE']._serialized_end=974
   _globals['_S3SINKWORKERCONFIGURATION']._serialized_start=43
-  _globals['_S3SINKWORKERCONFIGURATION']._serialized_end=228
-  _globals['_S3OBJECT']._serialized_start=230
-  _globals['_S3OBJECT']._serialized_end=356
-  _globals['_RAWOBJECT']._serialized_start=358
-  _globals['_RAWOBJECT']._serialized_end=382
-  _globals['_ZIPOBJECT']._serialized_start=384
-  _globals['_ZIPOBJECT']._serialized_end=507
-  _globals['_SINGLEFILE']._serialized_start=509
-  _globals['_SINGLEFILE']._serialized_end=548
-  _globals['_FULLCONTENT']._serialized_start=550
-  _globals['_FULLCONTENT']._serialized_end=563
-  _globals['_S3CREDENTIALS']._serialized_start=565
-  _globals['_S3CREDENTIALS']._serialized_end=618
+  _globals['_S3SINKWORKERCONFIGURATION']._serialized_end=385
+  _globals['_USERDEFINEDCREDENTIALS']._serialized_start=387
+  _globals['_USERDEFINEDCREDENTIALS']._serialized_end=443
+  _globals['_DQDSPCREDENTIALS']._serialized_start=445
+  _globals['_DQDSPCREDENTIALS']._serialized_end=517
+  _globals['_S3OBJECT']._serialized_start=519
+  _globals['_S3OBJECT']._serialized_end=645
+  _globals['_RAWOBJECT']._serialized_start=647
+  _globals['_RAWOBJECT']._serialized_end=671
+  _globals['_ZIPOBJECT']._serialized_start=673
+  _globals['_ZIPOBJECT']._serialized_end=796
+  _globals['_SINGLEFILE']._serialized_start=798
+  _globals['_SINGLEFILE']._serialized_end=837
+  _globals['_FULLCONTENT']._serialized_start=839
+  _globals['_FULLCONTENT']._serialized_end=852
+  _globals['_S3CREDENTIALS']._serialized_start=854
+  _globals['_S3CREDENTIALS']._serialized_end=907
 # @@protoc_insertion_point(module_scope)
