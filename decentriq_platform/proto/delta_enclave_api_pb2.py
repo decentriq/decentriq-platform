@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x64\x65lta_enclave_api.proto\x12\x11\x64\x65lta_enclave_api\"\x91\x01\n\x07Request\x12:\n\x0c\x64\x65ltaRequest\x18\x01 \x01(\x0b\x32\".delta_enclave_api.DataNoncePubkeyH\x00\x12?\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32#.delta_enclave_api.ExtensionMessageH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x01(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\"j\n\x16SealedEncryptedMessage\x12\x36\n\x10\x65ncryptedMessage\x18\x01 \x01(\x0b\x32\x1c.delta_enclave_api.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x01(\x0c\"W\n\x10\x45ncryptionHeader\x12/\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x1b.delta_enclave_api.ChilyKeyH\x00\x42\x12\n\x10\x65ncryptionHeader\"#\n\x08\x43hilyKey\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x01(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x01(\x03\"\x83\x01\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x01(\x0c\x12!\n\x14untrustedContentSize\x18\x02 \x01(\x04H\x00\x88\x01\x01\x12\"\n\x1auntrustedChunkContentSizes\x18\x03 \x03(\x04\x42\x17\n\x15_untrustedContentSizeb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x64\x65lta_enclave_api.proto\x12\x11\x64\x65lta_enclave_api\"\xcf\x01\n\x07Request\x12:\n\x0c\x64\x65ltaRequest\x18\x01 \x01(\x0b\x32\".delta_enclave_api.DataNoncePubkeyH\x00\x12?\n\x10\x65xtensionMessage\x18\x02 \x01(\x0b\x32#.delta_enclave_api.ExtensionMessageH\x00\x12<\n\x0e\x64\x65ltaRequestV2\x18\x03 \x01(\x0b\x32\".delta_enclave_api.DataNoncePubkeyH\x00\x42\t\n\x07request\"1\n\x10\x45xtensionMessage\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\"T\n\x08Response\x12\x1c\n\x12successfulResponse\x18\x01 \x01(\x0cH\x00\x12\x1e\n\x14unsuccessfulResponse\x18\x02 \x01(\tH\x00\x42\n\n\x08response\">\n\x0f\x44\x61taNoncePubkey\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\x12\x0e\n\x06pubkey\x18\x03 \x01(\x0c\"(\n\tDataNonce\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05nonce\x18\x02 \x01(\x0c\"j\n\x16SealedEncryptedMessage\x12\x36\n\x10\x65ncryptedMessage\x18\x01 \x01(\x0b\x32\x1c.delta_enclave_api.DataNonce\x12\x18\n\x10sealingKeyParams\x18\x02 \x01(\x0c\"W\n\x10\x45ncryptionHeader\x12/\n\x08\x63hilyKey\x18\x01 \x01(\x0b\x32\x1b.delta_enclave_api.ChilyKeyH\x00\x42\x12\n\x10\x65ncryptionHeader\"#\n\x08\x43hilyKey\x12\x17\n\x0f\x65ncryptionNonce\x18\x02 \x01(\x0c\" \n\rVersionHeader\x12\x0f\n\x07version\x18\x01 \x01(\x03\"\x83\x01\n\x0b\x43hunkHeader\x12\x14\n\x0c\x65xtraEntropy\x18\x01 \x01(\x0c\x12!\n\x14untrustedContentSize\x18\x02 \x01(\x04H\x00\x88\x01\x01\x12\"\n\x1auntrustedChunkContentSizes\x18\x03 \x03(\x04\x42\x17\n\x15_untrustedContentSizeb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -21,23 +21,23 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'delta_enclave_api_pb2', _gl
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _globals['_REQUEST']._serialized_start=47
-  _globals['_REQUEST']._serialized_end=192
-  _globals['_EXTENSIONMESSAGE']._serialized_start=194
-  _globals['_EXTENSIONMESSAGE']._serialized_end=243
-  _globals['_RESPONSE']._serialized_start=245
-  _globals['_RESPONSE']._serialized_end=329
-  _globals['_DATANONCEPUBKEY']._serialized_start=331
-  _globals['_DATANONCEPUBKEY']._serialized_end=393
-  _globals['_DATANONCE']._serialized_start=395
-  _globals['_DATANONCE']._serialized_end=435
-  _globals['_SEALEDENCRYPTEDMESSAGE']._serialized_start=437
-  _globals['_SEALEDENCRYPTEDMESSAGE']._serialized_end=543
-  _globals['_ENCRYPTIONHEADER']._serialized_start=545
-  _globals['_ENCRYPTIONHEADER']._serialized_end=632
-  _globals['_CHILYKEY']._serialized_start=634
-  _globals['_CHILYKEY']._serialized_end=669
-  _globals['_VERSIONHEADER']._serialized_start=671
-  _globals['_VERSIONHEADER']._serialized_end=703
-  _globals['_CHUNKHEADER']._serialized_start=706
-  _globals['_CHUNKHEADER']._serialized_end=837
+  _globals['_REQUEST']._serialized_end=254
+  _globals['_EXTENSIONMESSAGE']._serialized_start=256
+  _globals['_EXTENSIONMESSAGE']._serialized_end=305
+  _globals['_RESPONSE']._serialized_start=307
+  _globals['_RESPONSE']._serialized_end=391
+  _globals['_DATANONCEPUBKEY']._serialized_start=393
+  _globals['_DATANONCEPUBKEY']._serialized_end=455
+  _globals['_DATANONCE']._serialized_start=457
+  _globals['_DATANONCE']._serialized_end=497
+  _globals['_SEALEDENCRYPTEDMESSAGE']._serialized_start=499
+  _globals['_SEALEDENCRYPTEDMESSAGE']._serialized_end=605
+  _globals['_ENCRYPTIONHEADER']._serialized_start=607
+  _globals['_ENCRYPTIONHEADER']._serialized_end=694
+  _globals['_CHILYKEY']._serialized_start=696
+  _globals['_CHILYKEY']._serialized_end=731
+  _globals['_VERSIONHEADER']._serialized_start=733
+  _globals['_VERSIONHEADER']._serialized_end=765
+  _globals['_CHUNKHEADER']._serialized_start=768
+  _globals['_CHUNKHEADER']._serialized_end=899
 # @@protoc_insertion_point(module_scope)

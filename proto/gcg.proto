@@ -3,6 +3,8 @@ package gcg;
 
 import "data_room.proto";
 import "identity_endorsement.proto";
+import "release_policy.proto";
+import "secret_store.proto";
 
 message GcgRequest {
   UserAuth userAuth = 1;
@@ -32,7 +34,6 @@ message GcgRequest {
     ReadAuxiliaryStateRequest readAuxiliaryStateRequest = 21;
     RetrieveUsedAirlockQuotaRequest retrieveUsedAirlockQuotaRequest = 22;
     GetResultsSizeRequest getResultsSizeRequest = 23;
-
     identity_endorsement.EndorsementRequest endorsementRequest = 101;
   }
 }
@@ -69,6 +70,7 @@ message GcgResponse {
 
     identity_endorsement.EndorsementResponse endorsementResponse = 101;
   }
+
 }
 
 message UserAuth {
@@ -309,4 +311,158 @@ message GetResultsSizeResponse {
   uint64 sizeBytes = 1;
 }
 
+message GcgRequestV2 {
+  oneof request {
+    UnauthenticatedRequest unauthenticated = 1;
+    AuthenticatedRequest authenticated = 2;
+  }
+}
 
+message AuthenticatedRequest {
+  oneof token {
+    string accessToken = 1;
+    string apiToken = 2;
+  }
+  oneof request {
+    CreatePolicyRequest createPolicy = 3;
+    secret_store_api.SecretStoreRequest secretStore = 4;
+    UpdateDataRoomStatusRequest updateStatus = 5;
+    GetVerificationKeyRequest getVerificationKey = 6;
+    DcrActionRequest dcrAction = 7;
+    CreateApiTokenRequest createApiToken = 8;
+    GetApiTokensRequest getApiTokens = 9;
+    DeleteApiTokenRequest deleteApiToken = 10;
+  }
+}
+
+message AuthenticatedResponse {
+  oneof response {
+    CreatePolicyResponse createPolicy = 3;
+    secret_store_api.SecretStoreResponse secretStore = 4;
+    UpdateDataRoomStatusResponse updateStatus = 5;
+    GetVerificationKeyResponse getVerificationKey = 6;
+    DcrActionResponse dcrAction = 7;
+    CreateApiTokenResponse createApiToken = 8;
+    GetApiTokensResponse getApiTokens = 9;
+    DeleteApiTokenResponse deleteApiToken = 10;
+  }
+}
+
+message UnauthenticatedRequest {
+  oneof request {
+    AuthenticationRequest authentication = 1;
+  }
+}
+
+message GcgResponseV2 {
+  oneof response {
+    GcgSuccessfulResponseV2 success = 1;
+    string failure = 2;
+  }
+}
+
+message AuthenticationRequest {
+  oneof request {
+    EmailStartAuthenticationRequest emailStart = 2;
+    EmailFinishAuthenticationRequest emailFinish = 3;
+  }
+}
+
+message AuthenticationResponse {
+  oneof response {
+    EmailStartAuthenticationResponse emailStart = 2;
+    EmailFinishAuthenticationResponse emailFinish = 3;
+  }
+}
+
+message EmailStartAuthenticationRequest {
+  string email = 1;
+}
+
+message EmailStartAuthenticationResponse {
+}
+
+message EmailFinishAuthenticationRequest {
+  string email = 1;
+  string code = 2;
+}
+
+message EmailFinishAuthenticationResponse {
+  oneof response {
+    EmailFinishAuthenticationResponseIncorrectCode incorrectCode = 1;
+    EmailFinishAuthenticationResponseNotFound notFound = 2;
+    EmailFinishAuthenticationResponseSuccess success = 3;
+  }
+}
+
+message EmailFinishAuthenticationResponseIncorrectCode {}
+message EmailFinishAuthenticationResponseNotFound {}
+message EmailFinishAuthenticationResponseSuccess {
+  string token = 1;
+}
+
+message GcgSuccessfulResponseV2 {
+  oneof response {
+    UnauthenticatedResponse unauthenticated = 1;
+    AuthenticatedResponse authenticated = 2;
+  }
+}
+
+message UnauthenticatedResponse {
+  oneof response {
+    AuthenticationResponse authentication = 1;
+  }
+}
+
+message GetVerificationKeyRequest {
+}
+
+message GetVerificationKeyResponse {
+    bytes verificationKey = 1;
+}
+
+message CreatePolicyRequest {
+    release_policy_api.ReleasePolicy policy = 1;
+    /// Required if referencing a dataset as part of the policy
+    optional bytes scope = 2;
+}
+
+message CreatePolicyResponse {
+    string policyId = 1;
+}
+
+message DcrActionRequest {
+    bytes dataRoomId = 1;
+    bytes action = 2;
+}
+
+message DcrActionResponse {
+    bytes response = 1;
+}
+
+message CreateApiTokenRequest {
+  string name = 1;
+}
+
+message CreateApiTokenResponse {
+  string token = 1;
+}
+
+message GetApiTokensRequest {
+}
+
+message GetApiTokensResponse {
+  repeated GetApiTokenResult tokens = 1;
+}
+
+message GetApiTokenResult {
+  string name = 1;
+  string token = 2;
+}
+
+message DeleteApiTokenRequest {
+  string token = 1;
+}
+
+message DeleteApiTokenResponse {
+}

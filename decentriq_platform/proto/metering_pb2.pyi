@@ -10,6 +10,7 @@ import google.protobuf.descriptor
 import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
+import integrity_store_pb2
 import sys
 import typing
 
@@ -98,6 +99,8 @@ class MeteringRequest(google.protobuf.message.Message):
     GETORCREATEDATASETSCOPE_FIELD_NUMBER: builtins.int
     MERGEDCRCOMMIT_FIELD_NUMBER: builtins.int
     GETDATACONNECTORCREDENTIALS_FIELD_NUMBER: builtins.int
+    INTEGRITYSTORE_FIELD_NUMBER: builtins.int
+    GETAZURECOMMUNICATIONCREDENTIALS_FIELD_NUMBER: builtins.int
     @property
     def createDcr(self) -> global___CreateDcrRequest: ...
     @property
@@ -122,6 +125,10 @@ class MeteringRequest(google.protobuf.message.Message):
     def mergeDcrCommit(self) -> global___MergeDcrCommitRequest: ...
     @property
     def getDataConnectorCredentials(self) -> global___GetDataConnectorCredentialsRequest: ...
+    @property
+    def integrityStore(self) -> integrity_store_pb2.IntegrityStoreRequest: ...
+    @property
+    def getAzureCommunicationCredentials(self) -> global___GetAzureCommunicationCredentialsRequest: ...
     def __init__(
         self,
         *,
@@ -137,10 +144,12 @@ class MeteringRequest(google.protobuf.message.Message):
         getOrCreateDatasetScope: global___GetOrCreateDatasetScopeRequest | None = ...,
         mergeDcrCommit: global___MergeDcrCommitRequest | None = ...,
         getDataConnectorCredentials: global___GetDataConnectorCredentialsRequest | None = ...,
+        integrityStore: integrity_store_pb2.IntegrityStoreRequest | None = ...,
+        getAzureCommunicationCredentials: global___GetAzureCommunicationCredentialsRequest | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getDataConnectorCredentials", b"getDataConnectorCredentials", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getDataConnectorCredentials", b"getDataConnectorCredentials", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset", "getOrCreateDatasetScope", "mergeDcrCommit", "getDataConnectorCredentials"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getAzureCommunicationCredentials", b"getAzureCommunicationCredentials", "getDataConnectorCredentials", b"getDataConnectorCredentials", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "integrityStore", b"integrityStore", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dcrInteraction", b"dcrInteraction", "getAzureCommunicationCredentials", b"getAzureCommunicationCredentials", "getDataConnectorCredentials", b"getDataConnectorCredentials", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "integrityStore", b"integrityStore", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "request", b"request", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset", "getOrCreateDatasetScope", "mergeDcrCommit", "getDataConnectorCredentials", "integrityStore", "getAzureCommunicationCredentials"] | None: ...
 
 global___MeteringRequest = MeteringRequest
 
@@ -160,6 +169,8 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
     GETORCREATEDATASETSCOPE_FIELD_NUMBER: builtins.int
     MERGEDCRCOMMIT_FIELD_NUMBER: builtins.int
     DATACONNECTORCREDENTIALS_FIELD_NUMBER: builtins.int
+    INTEGRITYSTORE_FIELD_NUMBER: builtins.int
+    GETAZURECOMMUNICATIONCREDENTIALS_FIELD_NUMBER: builtins.int
     @property
     def createDcr(self) -> global___CreateDcrResponse: ...
     @property
@@ -184,6 +195,10 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
     def mergeDcrCommit(self) -> global___MergeDcrCommitResponse: ...
     @property
     def dataConnectorCredentials(self) -> global___GetDataConnectorCredentialsResponse: ...
+    @property
+    def integrityStore(self) -> integrity_store_pb2.IntegrityStoreResponse: ...
+    @property
+    def getAzureCommunicationCredentials(self) -> global___GetAzureCommunicationCredentialsResponse: ...
     def __init__(
         self,
         *,
@@ -199,10 +214,12 @@ class MeteringSuccessResponse(google.protobuf.message.Message):
         getOrCreateDatasetScope: global___GetOrCreateDatasetScopeResponse | None = ...,
         mergeDcrCommit: global___MergeDcrCommitResponse | None = ...,
         dataConnectorCredentials: global___GetDataConnectorCredentialsResponse | None = ...,
+        integrityStore: integrity_store_pb2.IntegrityStoreResponse | None = ...,
+        getAzureCommunicationCredentials: global___GetAzureCommunicationCredentialsResponse | None = ...,
     ) -> None: ...
-    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dataConnectorCredentials", b"dataConnectorCredentials", "dcrInteraction", b"dcrInteraction", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dataConnectorCredentials", b"dataConnectorCredentials", "dcrInteraction", b"dcrInteraction", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
-    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset", "getOrCreateDatasetScope", "mergeDcrCommit", "dataConnectorCredentials"] | None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dataConnectorCredentials", b"dataConnectorCredentials", "dcrInteraction", b"dcrInteraction", "getAzureCommunicationCredentials", b"getAzureCommunicationCredentials", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "integrityStore", b"integrityStore", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createDataset", b"createDataset", "createDcr", b"createDcr", "createDcrCommit", b"createDcrCommit", "dataConnectorCredentials", b"dataConnectorCredentials", "dcrInteraction", b"dcrInteraction", "getAzureCommunicationCredentials", b"getAzureCommunicationCredentials", "getOrCreateDatasetScope", b"getOrCreateDatasetScope", "integrityStore", b"integrityStore", "mergeDcrCommit", b"mergeDcrCommit", "publishDataset", b"publishDataset", "response", b"response", "stopDcr", b"stopDcr", "submitWorkerExecutionTime", b"submitWorkerExecutionTime", "unpublishDataset", b"unpublishDataset", "workerMetadata", b"workerMetadata"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["createDcr", "createDcrCommit", "stopDcr", "publishDataset", "unpublishDataset", "workerMetadata", "submitWorkerExecutionTime", "dcrInteraction", "createDataset", "getOrCreateDatasetScope", "mergeDcrCommit", "dataConnectorCredentials", "integrityStore", "getAzureCommunicationCredentials"] | None: ...
 
 global___MeteringSuccessResponse = MeteringSuccessResponse
 
@@ -857,3 +874,37 @@ class GetDataConnectorCredentialsResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["credentials", b"credentials"]) -> None: ...
 
 global___GetDataConnectorCredentialsResponse = GetDataConnectorCredentialsResponse
+
+@typing_extensions.final
+class GetAzureCommunicationCredentialsRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___GetAzureCommunicationCredentialsRequest = GetAzureCommunicationCredentialsRequest
+
+@typing_extensions.final
+class GetAzureCommunicationCredentialsResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ENDPOINT_FIELD_NUMBER: builtins.int
+    ACCESSKEY_FIELD_NUMBER: builtins.int
+    SENDEREMAIL_FIELD_NUMBER: builtins.int
+    endpoint: builtins.str
+    """ACS -> Overview -> Endpoint"""
+    accessKey: builtins.str
+    """ACS -> Settings -> Keys"""
+    senderEmail: builtins.str
+    """ECS -> Settings -> Provision Domains -> <domain> -> Email Services -> MailFrom addresses"""
+    def __init__(
+        self,
+        *,
+        endpoint: builtins.str = ...,
+        accessKey: builtins.str = ...,
+        senderEmail: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["accessKey", b"accessKey", "endpoint", b"endpoint", "senderEmail", b"senderEmail"]) -> None: ...
+
+global___GetAzureCommunicationCredentialsResponse = GetAzureCommunicationCredentialsResponse

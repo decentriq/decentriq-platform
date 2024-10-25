@@ -14,7 +14,7 @@ from .graphql import GqlClient
 from .proto.attestation_pb2 import AttestationSpecification, Fatquote
 from .proto.data_room_pb2 import ComputeNodeProtocol
 from .proto.delta_enclave_api_pb2 import DataNoncePubkey, Request, Response
-from .proto.gcg_pb2 import GcgRequest, GcgResponse, Pki, UserAuth
+from .proto.gcg_pb2 import GcgRequest, GcgRequestV2, GcgResponse, GcgResponseV2, Pki, UserAuth
 from .proto.length_delimited import parse_length_delimited, serialize_length_delimited
 from .verification import Verification
 from .logger import logger
@@ -57,6 +57,7 @@ class Channel:
     enclave_public_key: Any
     driver_attestation_specification: AttestationSpecification
     driver_attestation_specification_hash: str
+    channel_keypair: chily.Keypair
 
     def __init__(
         self,
@@ -126,21 +127,22 @@ class Channel:
         self.driver_attestation_specification_hash = (
             driver_attestation_specification_hash
         )
+        self.channel_keypair = chily.Keypair.from_random()
 
-    def _encrypt_and_encode_data(self, data: bytes, auth: Auth) -> DataNoncePubkey:
+    def _encrypt_and_encode_data(self, data: bytes) -> DataNoncePubkey:
         nonce = chily.Nonce.from_random()
-        cipher = chily.Cipher(auth.keypair.secret, self.enclave_public_key)
+        cipher = chily.Cipher(self.channel_keypair.secret, self.enclave_public_key)
         encrypted_data = cipher.encrypt("client sent session data", data, nonce)
         data_nonce_pubkey = datanoncepubkey_to_message(
             bytes(encrypted_data),
             bytes(nonce.bytes),
-            bytes(auth.keypair.public_key.bytes),
+            bytes(self.channel_keypair.public_key.bytes),
         )
         return data_nonce_pubkey
 
-    def _decode_and_decrypt_data(self, data: bytes, auth: Auth) -> bytes:
+    def _decode_and_decrypt_data(self, data: bytes) -> bytes:
         decoded_data, data_nonce, _ = message_to_datanoncepubkey(data)
-        cipher = chily.Cipher(auth.keypair.secret, self.enclave_public_key)
+        cipher = chily.Cipher(self.channel_keypair.secret, self.enclave_public_key)
         return cipher.decrypt(
             "client received session data",
             decoded_data,
@@ -149,14 +151,14 @@ class Channel:
 
     def _get_message_auth(self, auth: Auth) -> UserAuth:
         shared_key = bytes(
-            auth.keypair.secret.diffie_hellman(self.enclave_public_key).bytes
+            self.channel_keypair.secret.diffie_hellman(self.enclave_public_key).bytes
         )
         hkdf = HKDF(
             algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b""
         )
         mac_key = hkdf.derive(shared_key)
         mac_tag = hmac.digest(mac_key, auth.user_id.encode(), "sha512")
-        public_keys = bytes(auth.keypair.public_key.bytes) + bytes(
+        public_keys = bytes(self.channel_keypair.public_key.bytes) + bytes(
             self.enclave_public_key.bytes
         )
         signature = auth.sign(public_keys)
@@ -171,18 +173,42 @@ class Channel:
         )
         return user_auth
 
+    def send_request_v2(
+        self,
+        request: GcgRequestV2,
+    ) -> GcgResponseV2:
+        serialized_request = serialize_length_delimited(
+            self._encrypt_and_encode_data(
+                serialize_length_delimited(request),
+            )
+        )
+        url = Endpoints.SESSION_MESSAGES_V2.replace(":sessionId", self.session_id)
+        enclave_response: bytes = self.api.post(
+            url,
+            serialized_request,
+            {"Content-type": "application/octet-stream", "Accept-Version": "2"},
+        ).content
+        response_container = Response()
+        parse_length_delimited(enclave_response, response_container)
+        if response_container.HasField("unsuccessfulResponse"):
+            raise Exception(response_container.unsuccessfulResponse)
+        decrypted_response = self._decode_and_decrypt_data(
+            response_container.successfulResponse,
+        )
+        response = GcgResponseV2()
+        parse_length_delimited(decrypted_response, response)
+        return response
+
     def send_request_raw(
         self,
         request: bytes,
         protocol: int,
-        auth: Auth,
     ) -> List[bytes]:
         gcg_protocol = serialize_length_delimited(ComputeNodeProtocol(version=protocol))
         serialized_request = serialize_length_delimited(
             Request(
                 deltaRequest=self._encrypt_and_encode_data(
                     gcg_protocol + request,
-                    auth,
                 )
             )
         )
@@ -205,7 +231,6 @@ class Channel:
             else:
                 decrypted_response = self._decode_and_decrypt_data(
                     response_container.successfulResponse,
-                    auth,
                 )
                 response_protocol = ComputeNodeProtocol()
                 response_offset = parse_length_delimited(
@@ -224,10 +249,9 @@ class Channel:
         request: CompilerRequest,
         decompile_response: Callable[[List[bytes]], CompilerResponse],
         protocol: int,
-        auth: Auth,
     ) -> CompilerResponse:
         compiled_request = compile_request(request, self)
-        responses = self.send_request_raw(compiled_request, protocol, auth)
+        responses = self.send_request_raw(compiled_request, protocol)
         response = decompile_response(responses)
         return response
 
@@ -252,7 +276,7 @@ class Channel:
 
         request.userAuth.CopyFrom(self._get_message_auth(auth))
         responses_encoded = self.send_request_raw(
-            serialize_length_delimited(request), protocol, auth
+            serialize_length_delimited(request), protocol
         )
         responses = list(map(parse_response, responses_encoded))
         return responses

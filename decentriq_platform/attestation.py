@@ -1,5 +1,6 @@
 import base64
 from typing import Any, Dict, List, Tuple, cast
+import pkgutil
 
 import asn1crypto.pem
 
@@ -14,6 +15,7 @@ from .proto import (
     AttestationSpecification,
     AttestationSpecificationAmdSnp,
     AttestationSpecificationIntelDcap,
+    AttestationSpecificationIntelDcapMrsigner,
 )
 from .types import EnclaveSpecification
 
@@ -30,6 +32,7 @@ amd_snp_ark_der = cast(Tuple[Any, Any, bytes], asn1crypto.pem.unarmor(amd_snp_ar
     2
 ]
 
+sigstore_root_olpc_json = pkgutil.get_data(__name__, "5.root.json")
 
 # From https://developers.cloudflare.com/time-services/roughtime/recipes/
 # See announcement about new server https://groups.google.com/a/chromium.org/g/proto-roughtime/c/vbmjoudG184/m/aXMLEAktBAAJ
@@ -242,6 +245,27 @@ SPECIFICATIONS = {
                 mrenclave=bytes.fromhex(
                     "ae290dfdee2759066341697af5441993ff6df00359be52439c551c37416f77e1"
                 ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GcgDriverDecoder(),
+        clientProtocols=[6],
+    ),
+    "decentriq.driver:v22": EnclaveSpecification(
+        name="decentriq.driver",
+        version="22",
+        proto=AttestationSpecification(
+            intelDcapMrsigner=AttestationSpecificationIntelDcapMrsigner(
+                mrsigner=bytes.fromhex(
+                    "469ba38fe548952095beed8daf89f9629a9bd1644a01e218e770569b1e669ee9"
+                ),
+                isvprodid=2,
+                sigstoreRootOlpcJson=sigstore_root_olpc_json,
                 dcapRootCaDer=intel_sgx_dcap_root_ca_der,
                 acceptDebug=False,
                 acceptOutOfDate=False,

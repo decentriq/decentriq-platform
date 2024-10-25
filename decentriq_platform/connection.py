@@ -5,7 +5,7 @@ from .authentication import Auth
 from .channel import Channel, CompilerRequest, CompilerResponse
 from .graphql import GqlClient
 from .proto.attestation_pb2 import AttestationSpecification
-from .proto.gcg_pb2 import GcgRequest, GcgResponse
+from .proto.gcg_pb2 import GcgRequest, GcgRequestV2, GcgResponse, GcgResponseV2
 
 Response = TypeVar("Response")
 
@@ -69,6 +69,12 @@ class Connection:
                 raise e
         raise Exception("Maximum retry limit reached")
 
+    def send_request_v2(
+        self,
+        request: GcgRequestV2,
+    ) -> GcgResponseV2:
+        return self._retry_request(Channel.send_request_v2, request)
+
     def send_request(
         self,
         request: GcgRequest,
@@ -81,10 +87,9 @@ class Connection:
         self,
         request: bytes,
         protocol: int,
-        auth: Auth,
     ) -> List[bytes]:
         return self._retry_request(
-            Channel.send_request_raw, request, protocol, auth
+            Channel.send_request_raw, request, protocol
         )
 
     def send_compilable_request(
@@ -93,7 +98,6 @@ class Connection:
         request: CompilerRequest,
         decompile_response: Callable[[List[bytes]], CompilerResponse],
         protocol: int,
-        auth: Auth,
     ) -> CompilerResponse:
         return cast(
             CompilerResponse,
@@ -103,6 +107,5 @@ class Connection:
                 request,
                 decompile_response,
                 protocol,
-                auth,
             ),
         )

@@ -18,6 +18,7 @@ from .client import Client, Session, create_client
 from .endorsement import Endorser
 from .keychain import Keychain, KeychainEntry
 from .storage import Key
+from .archv2 import SessionV2, Secret
 
 __docformat__ = "restructuredtext"
 
@@ -41,7 +42,6 @@ __pdoc__ = {
     "data_lab": True,
     "legacy": True,
     "decoder": False,
-    "media": True,
     "data_connectors": True,
 }
 
@@ -64,6 +64,7 @@ __all__ = [
     "data_lab",
     "legacy",
     "analytics",
-    "media",
     "data_connectors",
+    "SessionV2",
+    "Secret"
 ]

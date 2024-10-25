@@ -17,6 +17,7 @@ retry = Retry(
 class Endpoints(str, Enum):
     GRAPHQL = "/graphql"
     SESSION_MESSAGES = "/sessions/:sessionId/messages"
+    SESSION_MESSAGES_V2 = "/sessions/:sessionId/messages_v2"
     USER_UPLOAD_CHUNKS = "/uploads/:uploadId/chunks/:chunkHash"
 
 
@@ -47,7 +48,7 @@ class ServerError(ApiError):
 class Api:
     def __init__(
         self,
-        api_token,
+        platform_api_token,
         client_id,
         host,
         port,
@@ -63,7 +64,7 @@ class Api:
             protocol = "http"
         self.base_url = f"{protocol}://{host}:{port}{api_prefix}"
         auth_headers = {
-            "Authorization": "Bearer " + api_token,
+            "Authorization": "Bearer " + platform_api_token,
             "Authorization-Type": "app",
             "Authorization-Client": client_id,
         }

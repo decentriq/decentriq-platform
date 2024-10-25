@@ -52,7 +52,6 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
 
     ENDPOINT_FIELD_NUMBER: builtins.int
     REGION_FIELD_NUMBER: builtins.int
-    CREDENTIALSDEPENDENCY_FIELD_NUMBER: builtins.int
     OBJECTS_FIELD_NUMBER: builtins.int
     S3PROVIDER_FIELD_NUMBER: builtins.int
     USERDEFINEDCREDENTIALS_FIELD_NUMBER: builtins.int
@@ -60,8 +59,6 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
     endpoint: builtins.str
     region: builtins.str
     """S3 region can be left empty for a GCS sink worker"""
-    credentialsDependency: builtins.str
-    """Use `credentials` instead."""
     @property
     def objects(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___S3Object]: ...
     s3Provider: global___S3Provider.ValueType
@@ -74,14 +71,13 @@ class S3SinkWorkerConfiguration(google.protobuf.message.Message):
         *,
         endpoint: builtins.str = ...,
         region: builtins.str = ...,
-        credentialsDependency: builtins.str = ...,
         objects: collections.abc.Iterable[global___S3Object] | None = ...,
         s3Provider: global___S3Provider.ValueType = ...,
         userDefinedCredentials: global___UserDefinedCredentials | None = ...,
         dqDspCredentials: global___DqDspCredentials | None = ...,
     ) -> None: ...
     def HasField(self, field_name: typing_extensions.Literal["credentials", b"credentials", "dqDspCredentials", b"dqDspCredentials", "userDefinedCredentials", b"userDefinedCredentials"]) -> builtins.bool: ...
-    def ClearField(self, field_name: typing_extensions.Literal["credentials", b"credentials", "credentialsDependency", b"credentialsDependency", "dqDspCredentials", b"dqDspCredentials", "endpoint", b"endpoint", "objects", b"objects", "region", b"region", "s3Provider", b"s3Provider", "userDefinedCredentials", b"userDefinedCredentials"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["credentials", b"credentials", "dqDspCredentials", b"dqDspCredentials", "endpoint", b"endpoint", "objects", b"objects", "region", b"region", "s3Provider", b"s3Provider", "userDefinedCredentials", b"userDefinedCredentials"]) -> None: ...
     def WhichOneof(self, oneof_group: typing_extensions.Literal["credentials", b"credentials"]) -> typing_extensions.Literal["userDefinedCredentials", "dqDspCredentials"] | None: ...
 
 global___S3SinkWorkerConfiguration = S3SinkWorkerConfiguration

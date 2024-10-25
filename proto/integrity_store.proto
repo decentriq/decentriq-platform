@@ -1,0 +1,53 @@
+syntax = "proto3";
+package integrity_store_api;
+
+message IntegrityStoreRequest {
+    oneof request {
+        CompareAndSwapRequest cas = 1;
+    }
+}
+
+message IntegrityStoreResponse {
+    oneof response {
+        CompareAndSwapResponse cas = 1;
+    }
+}
+
+// Try to store an entry under the given id.
+// If 'expectedCasIndex' is null, the request will only succeed if there is no existing entry stored under that id.
+// Otherwise, the store will check that the existing entry is at `expectedCasIndex`, and if it is, it is swapped with 'newValue'.
+// If 'newValue' is null then the entry is tombstoned instead. Note that both initial insertion and deletion are atomic as
+// well, i.e. two parallel insertions or deletions will have only one succeed.
+//
+// Creating an entry -> expectedCasIndex == null, newEntry != null
+// Getting an entry -> expectedCasIndex == null, newEntry == null
+// Deleting an entry -> expectedCasIndex != null, newEntry == null
+// Updating an entry -> expectedCasIndex != null, newEntry != null
+message CompareAndSwapRequest {
+    string id = 1;
+    string content_type = 2;
+    optional uint64 expectedCasIndex = 3;
+    optional IntegrityStoreValue newValue = 4;
+}
+
+// Response of a CAS operation.
+// 'swapped' indicates whether the swapping operation was successful. Regardless of success the previous value is
+// returned, null meaning that there was no value associated with the id.
+message CompareAndSwapResponse {
+    bool swapped = 1;
+    optional uint64 previousCasIndex = 2;
+    optional IntegrityStoreValue previousValue = 3;
+
+}
+
+message IntegrityStoreValue {
+    /// Specifies how to interpret the "content" and "signature" fields
+    /// (e.g. what algorithm was used when creating the signature).
+    uint32 version = 1;
+    /// Generic stringified payload
+    optional string plaintextContent = 2;
+    /// Signature over (content, contentType, version, id)
+    optional bytes plaintextSignature = 3;
+    /// Encrypted payload
+    optional bytes encryptedContent = 4;
+}

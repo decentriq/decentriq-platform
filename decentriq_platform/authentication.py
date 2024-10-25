@@ -40,7 +40,6 @@ class Auth:
         self.certificate_chain = certificate_chain
         self.kp = keypair
         self.user_id = user_id
-        self.keypair = chily.Keypair.from_random()
         self._endorsements = EnclaveEndorsements()
 
     def _get_user_id(self) -> str:

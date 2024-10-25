@@ -109,6 +109,15 @@ from .gcg_pb2 import (
     UpdateDataRoomStatusRequest,
     UpdateDataRoomStatusResponse,
     UserAuth,
+    GcgRequestV2,
+    GcgResponseV2,
+    AuthenticatedRequest,
+    AuthenticatedResponse,
+    UnauthenticatedRequest,
+    UnauthenticatedResponse,
+    CreatePolicyRequest,
+    GetVerificationKeyRequest,
+    DcrActionRequest,
 )
 from .google_ad_manager_pb2 import GoogleAdManagerWorkerConfiguration
 from .google_dv_360_sink_pb2 import GoogleDv360SinkWorkerConfiguration
@@ -130,3 +139,20 @@ from .salesforce_pb2 import SalesforceWorkerConfiguration
 from .synth_data_pb2 import Column, Mask, SyntheticDataConf
 from .microsoft_dsp_pb2 import MicrosoftDspWorkerConfiguration
 from .adform_dsp_pb2 import AdformDspWorkerConfiguration
+from .release_policy_pb2 import (
+    ReleasePolicy,
+    ReleasePolicyV0,
+    AllowedComputeContext,
+    DcrComputeContext,
+    ComputationResultReference,
+    SecretSource,
+    DataSource,
+    DatasetDataSource,
+)
+from .integrity_store_pb2 import (
+    IntegrityStoreRequest,
+    IntegrityStoreResponse,
+    CompareAndSwapRequest,
+    CompareAndSwapResponse,
+    IntegrityStoreValue,
+)

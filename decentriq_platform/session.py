@@ -124,7 +124,6 @@ class Session:
     client: Client
     connection: Connection
     auth: Auth
-    keypair: Any
     client_protocols: List[int]
 
     def __init__(
@@ -141,7 +140,6 @@ class Session:
         self.client = client
         self.connection = connection
         self.auth = auth
-        self.keypair = chily.Keypair.from_random()
         self.client_protocols = client_protocols
 
     def _get_client_protocol(self, endpoint_protocols: List[int]) -> int:
@@ -239,7 +237,7 @@ class Session:
         Use this method if any of the convenience methods (such as `run_computation`) don't perform
         the exact task you want.
         """
-        responses = self.connection.send_request_raw(request, protocol, self.auth)
+        responses = self.connection.send_request_raw(request, protocol)
         return responses
 
     def send_compilable_request(
@@ -250,7 +248,7 @@ class Session:
         protocol: int,
     ) -> CompilerResponse:
         response = self.connection.send_compilable_request(
-            compile_request, request, decompile_response, protocol, self.auth
+            compile_request, request, decompile_response, protocol
         )
         return response
 

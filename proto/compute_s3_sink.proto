@@ -10,7 +10,6 @@ message S3SinkWorkerConfiguration {
   string endpoint = 1;
   // S3 region can be left empty for a GCS sink worker
   string region = 2;
-  string credentialsDependency = 3 [ deprecated = true ]; // Use `credentials` instead.
   repeated S3Object objects = 4;
   S3Provider s3Provider = 5;
   oneof credentials {

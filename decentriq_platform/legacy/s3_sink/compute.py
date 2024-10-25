@@ -72,7 +72,6 @@ class S3SinkCompute(Node):
         configuration = S3SinkWorkerConfiguration(
             endpoint=endpoint,
             region=region,
-            credentialsDependency="",
             userDefinedCredentials=user_defined_credentials,
             dqDspCredentials=dq_dsp_credentials,
         )

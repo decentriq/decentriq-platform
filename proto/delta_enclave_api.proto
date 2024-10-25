@@ -10,6 +10,7 @@ message Request {
     oneof request {
         DataNoncePubkey deltaRequest = 1;
         ExtensionMessage extensionMessage = 2;
+        DataNoncePubkey deltaRequestV2 = 3;
     }
 }
 

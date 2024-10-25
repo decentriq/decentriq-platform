@@ -1,7 +1,7 @@
 import hashlib
 import json
 import os
-from base64 import b64decode, b64encode
+from base64 import b64decode, b64encode, urlsafe_b64decode, urlsafe_b64encode
 from concurrent import futures
 from threading import BoundedSemaphore
 from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas import DataScienceDataRoom
 from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
+
+from decentriq_platform.archv2.session import SessionV2
 
 from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
 from .api import Api, Endpoints, NotFoundError, retry
@@ -67,6 +69,7 @@ class Client:
     def __init__(
         self,
         user_email: str,
+        enclave_api_token: str,
         api: Api,
         graphql: GqlClient,
         request_timeout: Optional[int] = None,
@@ -79,6 +82,7 @@ class Client:
         use the function `create_client`.
         """
         self.user_email = user_email
+        self.enclave_api_token = enclave_api_token
         self._api = api
         self._graphql = graphql
         self.request_timeout = request_timeout
@@ -106,7 +110,7 @@ class Client:
         data = self._graphql.post(
             """
             {
-                attestationSpecs {
+                attestationSpecsV2 {
                     name
                     version
                     spec
@@ -115,7 +119,7 @@ class Client:
             """
         )
         enclave_specs = []
-        for spec_json in data["attestationSpecs"]:
+        for spec_json in data["attestationSpecsV2"]:
             attestation_specification = AttestationSpecification()
             spec_length_delimited = b64decode(spec_json["spec"])
             parse_length_delimited(spec_length_delimited, attestation_specification)
@@ -154,6 +158,38 @@ class Client:
             )
         auth, _ = self.create_auth_using_decentriq_pki(driver_enclave_spec)
         return self.create_session(auth, driver_enclave_spec)
+
+    def create_session_v2(
+        self,
+        *,
+        driver_spec: Optional[EnclaveSpecification],
+    ) -> SessionV2:
+        """
+        Creates a new `decentriq_platform.session.SessionV2` instance to communicate
+        with a driver enclave.
+        """
+        # TODO: archv2 use the mrsigner driver we should default to that one, if none is specified
+        if driver_spec is None:
+            driver_spec = enclave_specifications.latest()["gcg-driver"]
+        attestation_proto = driver_spec["proto"]
+        attestation_specification_hash = hashlib.sha256(
+            serialize_length_delimited(attestation_proto)
+        ).hexdigest()
+        connection = self._connections.get(attestation_specification_hash)
+        if connection is None:
+            connection = Connection(
+                attestation_proto,
+                self._api,
+                self._graphql,
+                self.unsafe_disable_known_root_ca_check,
+            )
+            self._connections[attestation_specification_hash] = connection
+        session = SessionV2(
+            self,
+            connection,
+        )
+
+        return session
 
     def create_session(
         self,
@@ -1793,8 +1829,14 @@ def create_client(
         account settings in the Decentriq UI.
     - `user_email`: The email address of the user that generated the given API token.
     """
+
+    enclave_api_token = api_token
+    enclave_api_token_raw = urlsafe_b64decode(enclave_api_token)
+    platform_api_token_raw = hashlib.sha256(enclave_api_token_raw).digest()
+    platform_api_token = urlsafe_b64encode(platform_api_token_raw).decode("ascii")
+
     api = Api(
-        api_token,
+        platform_api_token,
         client_id,
         api_host,
         api_port,
@@ -1807,6 +1849,7 @@ def create_client(
 
     return Client(
         user_email,
+        enclave_api_token,
         api,
         graphql,
         request_timeout=request_timeout,

@@ -10,6 +10,8 @@ import google.protobuf.internal.containers
 import google.protobuf.internal.enum_type_wrapper
 import google.protobuf.message
 import identity_endorsement_pb2
+import release_policy_pb2
+import secret_store_pb2
 import sys
 import typing
 
@@ -1334,3 +1336,547 @@ class GetResultsSizeResponse(google.protobuf.message.Message):
     def ClearField(self, field_name: typing_extensions.Literal["sizeBytes", b"sizeBytes"]) -> None: ...
 
 global___GetResultsSizeResponse = GetResultsSizeResponse
+
+@typing_extensions.final
+class GcgRequestV2(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    UNAUTHENTICATED_FIELD_NUMBER: builtins.int
+    AUTHENTICATED_FIELD_NUMBER: builtins.int
+    @property
+    def unauthenticated(self) -> global___UnauthenticatedRequest: ...
+    @property
+    def authenticated(self) -> global___AuthenticatedRequest: ...
+    def __init__(
+        self,
+        *,
+        unauthenticated: global___UnauthenticatedRequest | None = ...,
+        authenticated: global___AuthenticatedRequest | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["authenticated", b"authenticated", "request", b"request", "unauthenticated", b"unauthenticated"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["authenticated", b"authenticated", "request", b"request", "unauthenticated", b"unauthenticated"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["unauthenticated", "authenticated"] | None: ...
+
+global___GcgRequestV2 = GcgRequestV2
+
+@typing_extensions.final
+class AuthenticatedRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    ACCESSTOKEN_FIELD_NUMBER: builtins.int
+    APITOKEN_FIELD_NUMBER: builtins.int
+    CREATEPOLICY_FIELD_NUMBER: builtins.int
+    SECRETSTORE_FIELD_NUMBER: builtins.int
+    UPDATESTATUS_FIELD_NUMBER: builtins.int
+    GETVERIFICATIONKEY_FIELD_NUMBER: builtins.int
+    DCRACTION_FIELD_NUMBER: builtins.int
+    CREATEAPITOKEN_FIELD_NUMBER: builtins.int
+    GETAPITOKENS_FIELD_NUMBER: builtins.int
+    DELETEAPITOKEN_FIELD_NUMBER: builtins.int
+    accessToken: builtins.str
+    apiToken: builtins.str
+    @property
+    def createPolicy(self) -> global___CreatePolicyRequest: ...
+    @property
+    def secretStore(self) -> secret_store_pb2.SecretStoreRequest: ...
+    @property
+    def updateStatus(self) -> global___UpdateDataRoomStatusRequest: ...
+    @property
+    def getVerificationKey(self) -> global___GetVerificationKeyRequest: ...
+    @property
+    def dcrAction(self) -> global___DcrActionRequest: ...
+    @property
+    def createApiToken(self) -> global___CreateApiTokenRequest: ...
+    @property
+    def getApiTokens(self) -> global___GetApiTokensRequest: ...
+    @property
+    def deleteApiToken(self) -> global___DeleteApiTokenRequest: ...
+    def __init__(
+        self,
+        *,
+        accessToken: builtins.str = ...,
+        apiToken: builtins.str = ...,
+        createPolicy: global___CreatePolicyRequest | None = ...,
+        secretStore: secret_store_pb2.SecretStoreRequest | None = ...,
+        updateStatus: global___UpdateDataRoomStatusRequest | None = ...,
+        getVerificationKey: global___GetVerificationKeyRequest | None = ...,
+        dcrAction: global___DcrActionRequest | None = ...,
+        createApiToken: global___CreateApiTokenRequest | None = ...,
+        getApiTokens: global___GetApiTokensRequest | None = ...,
+        deleteApiToken: global___DeleteApiTokenRequest | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["accessToken", b"accessToken", "apiToken", b"apiToken", "createApiToken", b"createApiToken", "createPolicy", b"createPolicy", "dcrAction", b"dcrAction", "deleteApiToken", b"deleteApiToken", "getApiTokens", b"getApiTokens", "getVerificationKey", b"getVerificationKey", "request", b"request", "secretStore", b"secretStore", "token", b"token", "updateStatus", b"updateStatus"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["accessToken", b"accessToken", "apiToken", b"apiToken", "createApiToken", b"createApiToken", "createPolicy", b"createPolicy", "dcrAction", b"dcrAction", "deleteApiToken", b"deleteApiToken", "getApiTokens", b"getApiTokens", "getVerificationKey", b"getVerificationKey", "request", b"request", "secretStore", b"secretStore", "token", b"token", "updateStatus", b"updateStatus"]) -> None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["createPolicy", "secretStore", "updateStatus", "getVerificationKey", "dcrAction", "createApiToken", "getApiTokens", "deleteApiToken"] | None: ...
+    @typing.overload
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["token", b"token"]) -> typing_extensions.Literal["accessToken", "apiToken"] | None: ...
+
+global___AuthenticatedRequest = AuthenticatedRequest
+
+@typing_extensions.final
+class AuthenticatedResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    CREATEPOLICY_FIELD_NUMBER: builtins.int
+    SECRETSTORE_FIELD_NUMBER: builtins.int
+    UPDATESTATUS_FIELD_NUMBER: builtins.int
+    GETVERIFICATIONKEY_FIELD_NUMBER: builtins.int
+    DCRACTION_FIELD_NUMBER: builtins.int
+    CREATEAPITOKEN_FIELD_NUMBER: builtins.int
+    GETAPITOKENS_FIELD_NUMBER: builtins.int
+    DELETEAPITOKEN_FIELD_NUMBER: builtins.int
+    @property
+    def createPolicy(self) -> global___CreatePolicyResponse: ...
+    @property
+    def secretStore(self) -> secret_store_pb2.SecretStoreResponse: ...
+    @property
+    def updateStatus(self) -> global___UpdateDataRoomStatusResponse: ...
+    @property
+    def getVerificationKey(self) -> global___GetVerificationKeyResponse: ...
+    @property
+    def dcrAction(self) -> global___DcrActionResponse: ...
+    @property
+    def createApiToken(self) -> global___CreateApiTokenResponse: ...
+    @property
+    def getApiTokens(self) -> global___GetApiTokensResponse: ...
+    @property
+    def deleteApiToken(self) -> global___DeleteApiTokenResponse: ...
+    def __init__(
+        self,
+        *,
+        createPolicy: global___CreatePolicyResponse | None = ...,
+        secretStore: secret_store_pb2.SecretStoreResponse | None = ...,
+        updateStatus: global___UpdateDataRoomStatusResponse | None = ...,
+        getVerificationKey: global___GetVerificationKeyResponse | None = ...,
+        dcrAction: global___DcrActionResponse | None = ...,
+        createApiToken: global___CreateApiTokenResponse | None = ...,
+        getApiTokens: global___GetApiTokensResponse | None = ...,
+        deleteApiToken: global___DeleteApiTokenResponse | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["createApiToken", b"createApiToken", "createPolicy", b"createPolicy", "dcrAction", b"dcrAction", "deleteApiToken", b"deleteApiToken", "getApiTokens", b"getApiTokens", "getVerificationKey", b"getVerificationKey", "response", b"response", "secretStore", b"secretStore", "updateStatus", b"updateStatus"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["createApiToken", b"createApiToken", "createPolicy", b"createPolicy", "dcrAction", b"dcrAction", "deleteApiToken", b"deleteApiToken", "getApiTokens", b"getApiTokens", "getVerificationKey", b"getVerificationKey", "response", b"response", "secretStore", b"secretStore", "updateStatus", b"updateStatus"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["createPolicy", "secretStore", "updateStatus", "getVerificationKey", "dcrAction", "createApiToken", "getApiTokens", "deleteApiToken"] | None: ...
+
+global___AuthenticatedResponse = AuthenticatedResponse
+
+@typing_extensions.final
+class UnauthenticatedRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    AUTHENTICATION_FIELD_NUMBER: builtins.int
+    @property
+    def authentication(self) -> global___AuthenticationRequest: ...
+    def __init__(
+        self,
+        *,
+        authentication: global___AuthenticationRequest | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["authentication", b"authentication", "request", b"request"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["authentication", b"authentication", "request", b"request"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["authentication"] | None: ...
+
+global___UnauthenticatedRequest = UnauthenticatedRequest
+
+@typing_extensions.final
+class GcgResponseV2(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SUCCESS_FIELD_NUMBER: builtins.int
+    FAILURE_FIELD_NUMBER: builtins.int
+    @property
+    def success(self) -> global___GcgSuccessfulResponseV2: ...
+    failure: builtins.str
+    def __init__(
+        self,
+        *,
+        success: global___GcgSuccessfulResponseV2 | None = ...,
+        failure: builtins.str = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["failure", b"failure", "response", b"response", "success", b"success"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["failure", b"failure", "response", b"response", "success", b"success"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["success", "failure"] | None: ...
+
+global___GcgResponseV2 = GcgResponseV2
+
+@typing_extensions.final
+class AuthenticationRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    EMAILSTART_FIELD_NUMBER: builtins.int
+    EMAILFINISH_FIELD_NUMBER: builtins.int
+    @property
+    def emailStart(self) -> global___EmailStartAuthenticationRequest: ...
+    @property
+    def emailFinish(self) -> global___EmailFinishAuthenticationRequest: ...
+    def __init__(
+        self,
+        *,
+        emailStart: global___EmailStartAuthenticationRequest | None = ...,
+        emailFinish: global___EmailFinishAuthenticationRequest | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["emailFinish", b"emailFinish", "emailStart", b"emailStart", "request", b"request"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["emailFinish", b"emailFinish", "emailStart", b"emailStart", "request", b"request"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["request", b"request"]) -> typing_extensions.Literal["emailStart", "emailFinish"] | None: ...
+
+global___AuthenticationRequest = AuthenticationRequest
+
+@typing_extensions.final
+class AuthenticationResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    EMAILSTART_FIELD_NUMBER: builtins.int
+    EMAILFINISH_FIELD_NUMBER: builtins.int
+    @property
+    def emailStart(self) -> global___EmailStartAuthenticationResponse: ...
+    @property
+    def emailFinish(self) -> global___EmailFinishAuthenticationResponse: ...
+    def __init__(
+        self,
+        *,
+        emailStart: global___EmailStartAuthenticationResponse | None = ...,
+        emailFinish: global___EmailFinishAuthenticationResponse | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["emailFinish", b"emailFinish", "emailStart", b"emailStart", "response", b"response"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["emailFinish", b"emailFinish", "emailStart", b"emailStart", "response", b"response"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["emailStart", "emailFinish"] | None: ...
+
+global___AuthenticationResponse = AuthenticationResponse
+
+@typing_extensions.final
+class EmailStartAuthenticationRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    EMAIL_FIELD_NUMBER: builtins.int
+    email: builtins.str
+    def __init__(
+        self,
+        *,
+        email: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["email", b"email"]) -> None: ...
+
+global___EmailStartAuthenticationRequest = EmailStartAuthenticationRequest
+
+@typing_extensions.final
+class EmailStartAuthenticationResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___EmailStartAuthenticationResponse = EmailStartAuthenticationResponse
+
+@typing_extensions.final
+class EmailFinishAuthenticationRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    EMAIL_FIELD_NUMBER: builtins.int
+    CODE_FIELD_NUMBER: builtins.int
+    email: builtins.str
+    code: builtins.str
+    def __init__(
+        self,
+        *,
+        email: builtins.str = ...,
+        code: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["code", b"code", "email", b"email"]) -> None: ...
+
+global___EmailFinishAuthenticationRequest = EmailFinishAuthenticationRequest
+
+@typing_extensions.final
+class EmailFinishAuthenticationResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    INCORRECTCODE_FIELD_NUMBER: builtins.int
+    NOTFOUND_FIELD_NUMBER: builtins.int
+    SUCCESS_FIELD_NUMBER: builtins.int
+    @property
+    def incorrectCode(self) -> global___EmailFinishAuthenticationResponseIncorrectCode: ...
+    @property
+    def notFound(self) -> global___EmailFinishAuthenticationResponseNotFound: ...
+    @property
+    def success(self) -> global___EmailFinishAuthenticationResponseSuccess: ...
+    def __init__(
+        self,
+        *,
+        incorrectCode: global___EmailFinishAuthenticationResponseIncorrectCode | None = ...,
+        notFound: global___EmailFinishAuthenticationResponseNotFound | None = ...,
+        success: global___EmailFinishAuthenticationResponseSuccess | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["incorrectCode", b"incorrectCode", "notFound", b"notFound", "response", b"response", "success", b"success"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["incorrectCode", b"incorrectCode", "notFound", b"notFound", "response", b"response", "success", b"success"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["incorrectCode", "notFound", "success"] | None: ...
+
+global___EmailFinishAuthenticationResponse = EmailFinishAuthenticationResponse
+
+@typing_extensions.final
+class EmailFinishAuthenticationResponseIncorrectCode(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___EmailFinishAuthenticationResponseIncorrectCode = EmailFinishAuthenticationResponseIncorrectCode
+
+@typing_extensions.final
+class EmailFinishAuthenticationResponseNotFound(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___EmailFinishAuthenticationResponseNotFound = EmailFinishAuthenticationResponseNotFound
+
+@typing_extensions.final
+class EmailFinishAuthenticationResponseSuccess(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TOKEN_FIELD_NUMBER: builtins.int
+    token: builtins.str
+    def __init__(
+        self,
+        *,
+        token: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["token", b"token"]) -> None: ...
+
+global___EmailFinishAuthenticationResponseSuccess = EmailFinishAuthenticationResponseSuccess
+
+@typing_extensions.final
+class GcgSuccessfulResponseV2(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    UNAUTHENTICATED_FIELD_NUMBER: builtins.int
+    AUTHENTICATED_FIELD_NUMBER: builtins.int
+    @property
+    def unauthenticated(self) -> global___UnauthenticatedResponse: ...
+    @property
+    def authenticated(self) -> global___AuthenticatedResponse: ...
+    def __init__(
+        self,
+        *,
+        unauthenticated: global___UnauthenticatedResponse | None = ...,
+        authenticated: global___AuthenticatedResponse | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["authenticated", b"authenticated", "response", b"response", "unauthenticated", b"unauthenticated"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["authenticated", b"authenticated", "response", b"response", "unauthenticated", b"unauthenticated"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["unauthenticated", "authenticated"] | None: ...
+
+global___GcgSuccessfulResponseV2 = GcgSuccessfulResponseV2
+
+@typing_extensions.final
+class UnauthenticatedResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    AUTHENTICATION_FIELD_NUMBER: builtins.int
+    @property
+    def authentication(self) -> global___AuthenticationResponse: ...
+    def __init__(
+        self,
+        *,
+        authentication: global___AuthenticationResponse | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["authentication", b"authentication", "response", b"response"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["authentication", b"authentication", "response", b"response"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["response", b"response"]) -> typing_extensions.Literal["authentication"] | None: ...
+
+global___UnauthenticatedResponse = UnauthenticatedResponse
+
+@typing_extensions.final
+class GetVerificationKeyRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___GetVerificationKeyRequest = GetVerificationKeyRequest
+
+@typing_extensions.final
+class GetVerificationKeyResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    VERIFICATIONKEY_FIELD_NUMBER: builtins.int
+    verificationKey: builtins.bytes
+    def __init__(
+        self,
+        *,
+        verificationKey: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["verificationKey", b"verificationKey"]) -> None: ...
+
+global___GetVerificationKeyResponse = GetVerificationKeyResponse
+
+@typing_extensions.final
+class CreatePolicyRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    POLICY_FIELD_NUMBER: builtins.int
+    SCOPE_FIELD_NUMBER: builtins.int
+    @property
+    def policy(self) -> release_policy_pb2.ReleasePolicy: ...
+    scope: builtins.bytes
+    """/ Required if referencing a dataset as part of the policy"""
+    def __init__(
+        self,
+        *,
+        policy: release_policy_pb2.ReleasePolicy | None = ...,
+        scope: builtins.bytes | None = ...,
+    ) -> None: ...
+    def HasField(self, field_name: typing_extensions.Literal["_scope", b"_scope", "policy", b"policy", "scope", b"scope"]) -> builtins.bool: ...
+    def ClearField(self, field_name: typing_extensions.Literal["_scope", b"_scope", "policy", b"policy", "scope", b"scope"]) -> None: ...
+    def WhichOneof(self, oneof_group: typing_extensions.Literal["_scope", b"_scope"]) -> typing_extensions.Literal["scope"] | None: ...
+
+global___CreatePolicyRequest = CreatePolicyRequest
+
+@typing_extensions.final
+class CreatePolicyResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    POLICYID_FIELD_NUMBER: builtins.int
+    policyId: builtins.str
+    def __init__(
+        self,
+        *,
+        policyId: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["policyId", b"policyId"]) -> None: ...
+
+global___CreatePolicyResponse = CreatePolicyResponse
+
+@typing_extensions.final
+class DcrActionRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    DATAROOMID_FIELD_NUMBER: builtins.int
+    ACTION_FIELD_NUMBER: builtins.int
+    dataRoomId: builtins.bytes
+    action: builtins.bytes
+    def __init__(
+        self,
+        *,
+        dataRoomId: builtins.bytes = ...,
+        action: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["action", b"action", "dataRoomId", b"dataRoomId"]) -> None: ...
+
+global___DcrActionRequest = DcrActionRequest
+
+@typing_extensions.final
+class DcrActionResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    RESPONSE_FIELD_NUMBER: builtins.int
+    response: builtins.bytes
+    def __init__(
+        self,
+        *,
+        response: builtins.bytes = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["response", b"response"]) -> None: ...
+
+global___DcrActionResponse = DcrActionResponse
+
+@typing_extensions.final
+class CreateApiTokenRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    NAME_FIELD_NUMBER: builtins.int
+    name: builtins.str
+    def __init__(
+        self,
+        *,
+        name: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["name", b"name"]) -> None: ...
+
+global___CreateApiTokenRequest = CreateApiTokenRequest
+
+@typing_extensions.final
+class CreateApiTokenResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TOKEN_FIELD_NUMBER: builtins.int
+    token: builtins.str
+    def __init__(
+        self,
+        *,
+        token: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["token", b"token"]) -> None: ...
+
+global___CreateApiTokenResponse = CreateApiTokenResponse
+
+@typing_extensions.final
+class GetApiTokensRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___GetApiTokensRequest = GetApiTokensRequest
+
+@typing_extensions.final
+class GetApiTokensResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TOKENS_FIELD_NUMBER: builtins.int
+    @property
+    def tokens(self) -> google.protobuf.internal.containers.RepeatedCompositeFieldContainer[global___GetApiTokenResult]: ...
+    def __init__(
+        self,
+        *,
+        tokens: collections.abc.Iterable[global___GetApiTokenResult] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["tokens", b"tokens"]) -> None: ...
+
+global___GetApiTokensResponse = GetApiTokensResponse
+
+@typing_extensions.final
+class GetApiTokenResult(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    NAME_FIELD_NUMBER: builtins.int
+    TOKEN_FIELD_NUMBER: builtins.int
+    name: builtins.str
+    token: builtins.str
+    def __init__(
+        self,
+        *,
+        name: builtins.str = ...,
+        token: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["name", b"name", "token", b"token"]) -> None: ...
+
+global___GetApiTokenResult = GetApiTokenResult
+
+@typing_extensions.final
+class DeleteApiTokenRequest(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    TOKEN_FIELD_NUMBER: builtins.int
+    token: builtins.str
+    def __init__(
+        self,
+        *,
+        token: builtins.str = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["token", b"token"]) -> None: ...
+
+global___DeleteApiTokenRequest = DeleteApiTokenRequest
+
+@typing_extensions.final
+class DeleteApiTokenResponse(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    def __init__(
+        self,
+    ) -> None: ...
+
+global___DeleteApiTokenResponse = DeleteApiTokenResponse

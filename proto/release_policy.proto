@@ -1,0 +1,79 @@
+syntax = "proto3";
+package release_policy_api;
+
+// message Identity {
+//     oneof kind {
+//         string user = 1;
+//         Organization organization = 2;
+//     }
+// }
+
+// message MediaComputeContext {
+//     repeated Identity advertiser;
+//     repeated Identity publisher;
+// }
+
+/// Identifies a particular DCR
+message DcrComputeContext {
+    string dataRoomId = 1;
+}
+
+message AllowedComputeContext {
+    oneof kind {
+        DcrComputeContext dcr = 1;
+        // MediaComputeContext media = 2;
+    }
+}
+
+message ReleasePolicyV0 {
+    // Identifies the source of a secret.
+    // The policy creator must own this secret.
+    SecretSource secretSource = 1;
+    /// Determines in which computation context a secret can be released.
+    AllowedComputeContext allowedComputeContext = 2;
+    /// Identifies to which data this policy applies
+    DataSource dataSource = 3;
+}
+
+message ReleasePolicy {
+    oneof version {
+        ReleasePolicyV0 v0 = 1;
+    }
+}
+
+/// Contains information for a driver enclave to identify a particular result
+/// of a (potentially multi-result) task, for which the result key can be derived.
+/// The driver will be able to lookup the job, regenerate the plan, and find
+/// the task result with the given hash.
+message ComputationResultReference {
+    string jobId = 1;
+    string resultHash = 2;
+}
+
+/// Informs the enclave on how and where to get a particular secret
+/// (such as an encryption key) from.
+message SecretSource {
+    oneof kind {
+        string secretStoreId = 1;
+        /// Refers to an encryption key in a user's own key store
+        /// Refers to a computation result of some node in another DCR
+        // ComputationResultReference computationResult = 2;
+        /// Indirectly refers to a secret source definition stored in the integrity store
+        // string integrityStoreId = 3;
+    }
+}
+
+message DataSource {
+    oneof kind {
+        DatasetDataSource dataset = 1;
+        ComputeResultDataSource computeResult = 2;
+    }
+}
+
+message DatasetDataSource {
+    string manifestHash = 1;
+}
+
+message ComputeResultDataSource {
+    string resultHash = 1;
+}

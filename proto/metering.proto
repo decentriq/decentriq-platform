@@ -4,6 +4,7 @@ package metering;
 
 import "attestation.proto";
 import "data_room.proto";
+import "integrity_store.proto";
 
 message EnclaveInfo {
     string attestationSpecHashHex = 1;
@@ -24,6 +25,8 @@ message MeteringRequest {
         GetOrCreateDatasetScopeRequest getOrCreateDatasetScope = 10;
         MergeDcrCommitRequest mergeDcrCommit = 11;
         GetDataConnectorCredentialsRequest getDataConnectorCredentials = 12;
+        integrity_store_api.IntegrityStoreRequest integrityStore = 13;
+        GetAzureCommunicationCredentialsRequest getAzureCommunicationCredentials = 14;
     }
 }
 
@@ -41,6 +44,8 @@ message MeteringSuccessResponse {
         GetOrCreateDatasetScopeResponse getOrCreateDatasetScope = 10;
         MergeDcrCommitResponse mergeDcrCommit = 11;
         GetDataConnectorCredentialsResponse dataConnectorCredentials = 12;
+        integrity_store_api.IntegrityStoreResponse integrityStore = 13;
+        GetAzureCommunicationCredentialsResponse getAzureCommunicationCredentials = 14;
     }
 }
 
@@ -259,4 +264,16 @@ message GetDataConnectorCredentialsRequest {
 message GetDataConnectorCredentialsResponse {
     /// Credentials as a serialised JSON object.
     string credentials = 1;
+}
+
+message GetAzureCommunicationCredentialsRequest {
+}
+
+message GetAzureCommunicationCredentialsResponse {
+    // ACS -> Overview -> Endpoint
+    string endpoint = 1;
+    // ACS -> Settings -> Keys
+    string accessKey = 2;
+    // ECS -> Settings -> Provision Domains -> <domain> -> Email Services -> MailFrom addresses
+    string senderEmail = 3;
 }
