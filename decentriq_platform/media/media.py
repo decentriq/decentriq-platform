@@ -8,7 +8,6 @@ from ..storage import Key
 from ..session import Session
 from typing_extensions import Self
 from ..attestation import enclave_specifications
-from ..keychain import Keychain, KeychainEntry
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas import (
     MediaInsightsRequest,
@@ -208,13 +207,12 @@ class MediaDcr:
         )
         return computation.run_and_get_results()
 
-    def provision_from_data_lab(self, data_lab_id: str, keychain: Keychain):
+    def provision_from_data_lab(self, data_lab_id: str):
         """
         Provision the DataLab with the given ID to the Media DCR.
 
         **Parameters**:
         - `data_lab_id`: ID of the DataLab to provision to the Media DCR.
-        - `keychain`: Keychain to use to provision datasets from the DataLab.
         """
         # First deprovision any existing datalabs before provisioning a new one.
         # This ensures that we don't get into issues with optional datasets not
@@ -243,7 +241,7 @@ class MediaDcr:
                 # Dataset was not provisioned to the Data Lab.
                 continue
             manifest_hash = dataset["manifestHash"]
-            encryption_key = keychain.get("dataset_key", manifest_hash)
+            encryption_key = self.client.get_dataset_key(manifest_hash)
             if dataset_type == "MATCHING_DATA":
                 request_key = "publishPublisherUsersDataset"
             elif dataset_type == "SEGMENTS_DATA":
@@ -270,14 +268,14 @@ class MediaDcr:
             )
 
     def _send_publish_dataset_request(
-        self, request_key: str, manifest_hash: str, encryption_key: KeychainEntry
+        self, request_key: str, manifest_hash: str, encryption_key: bytes
     ):
         request = MediaInsightsRequest.model_validate(
             {
                 request_key: {
                     "dataRoomIdHex": self.id,
                     "datasetHashHex": manifest_hash,
-                    "encryptionKeyHex": encryption_key.value.hex(),
+                    "encryptionKeyHex": encryption_key.hex(),
                     "scopeIdHex": self.client._ensure_dcr_data_scope(self.id),
                 },
             }

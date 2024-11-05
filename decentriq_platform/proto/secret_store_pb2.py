@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12secret_store.proto\x12\x10secret_store_api\"2\n\x10SecretStoreEntry\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\x12\r\n\x05state\x18\x02 \x01(\x0c\"I\n\x13\x43reateSecretRequest\x12\x32\n\x06secret\x18\x01 \x01(\x0b\x32\".secret_store_api.SecretStoreEntry\"\"\n\x14\x43reateSecretResponse\x12\n\n\x02id\x18\x01 \x01(\t\"/\n\x10GetSecretRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\r\"Y\n\x11GetSecretResponse\x12\x32\n\x06secret\x18\x01 \x01(\x0b\x32\".secret_store_api.SecretStoreEntry\x12\x10\n\x08\x63\x61sIndex\x18\x02 \x01(\x04\";\n\x13RemoveSecretRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x18\n\x10\x65xpectedCasIndex\x18\x02 \x01(\x04\"\'\n\x14RemoveSecretResponse\x12\x0f\n\x07removed\x18\x01 \x01(\x08\"N\n\x16UpdateSecretAclRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06newAcl\x18\x02 \x01(\x0c\x12\x18\n\x10\x65xpectedCasIndex\x18\x03 \x01(\x04\"*\n\x17UpdateSecretAclResponse\x12\x0f\n\x07updated\x18\x01 \x01(\x08\"\x9b\x02\n\x12SecretStoreRequest\x12=\n\x0c\x63reateSecret\x18\x01 \x01(\x0b\x32%.secret_store_api.CreateSecretRequestH\x00\x12\x37\n\tgetSecret\x18\x02 \x01(\x0b\x32\".secret_store_api.GetSecretRequestH\x00\x12=\n\x0cremoveSecret\x18\x03 \x01(\x0b\x32%.secret_store_api.RemoveSecretRequestH\x00\x12\x43\n\x0fupdateSecretAcl\x18\x04 \x01(\x0b\x32(.secret_store_api.UpdateSecretAclRequestH\x00\x42\t\n\x07request\"\xa1\x02\n\x13SecretStoreResponse\x12>\n\x0c\x63reateSecret\x18\x01 \x01(\x0b\x32&.secret_store_api.CreateSecretResponseH\x00\x12\x38\n\tgetSecret\x18\x02 \x01(\x0b\x32#.secret_store_api.GetSecretResponseH\x00\x12>\n\x0cremoveSecret\x18\x03 \x01(\x0b\x32&.secret_store_api.RemoveSecretResponseH\x00\x12\x44\n\x0fupdateSecretAcl\x18\x04 \x01(\x0b\x32).secret_store_api.UpdateSecretAclResponseH\x00\x42\n\n\x08responseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12secret_store.proto\x12\x10secret_store_api\"2\n\x10SecretStoreEntry\x12\x0f\n\x07\x63ontent\x18\x01 \x01(\x0c\x12\r\n\x05state\x18\x02 \x01(\x0c\"I\n\x13\x43reateSecretRequest\x12\x32\n\x06secret\x18\x01 \x01(\x0b\x32\".secret_store_api.SecretStoreEntry\"\"\n\x14\x43reateSecretResponse\x12\n\n\x02id\x18\x01 \x01(\t\"/\n\x10GetSecretRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\r\"Y\n\x11GetSecretResponse\x12\x32\n\x06secret\x18\x01 \x01(\x0b\x32\".secret_store_api.SecretStoreEntry\x12\x10\n\x08\x63\x61sIndex\x18\x02 \x01(\x04\";\n\x13RemoveSecretRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x18\n\x10\x65xpectedCasIndex\x18\x02 \x01(\x04\"\'\n\x14RemoveSecretResponse\x12\x0f\n\x07removed\x18\x01 \x01(\x08\"_\n\x16UpdateSecretAclRequest\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0e\n\x06newAcl\x18\x02 \x01(\x0c\x12\x0f\n\x07version\x18\x03 \x01(\r\x12\x18\n\x10\x65xpectedCasIndex\x18\x04 \x01(\x04\"*\n\x17UpdateSecretAclResponse\x12\x0f\n\x07updated\x18\x01 \x01(\x08\"\x9b\x02\n\x12SecretStoreRequest\x12=\n\x0c\x63reateSecret\x18\x01 \x01(\x0b\x32%.secret_store_api.CreateSecretRequestH\x00\x12\x37\n\tgetSecret\x18\x02 \x01(\x0b\x32\".secret_store_api.GetSecretRequestH\x00\x12=\n\x0cremoveSecret\x18\x03 \x01(\x0b\x32%.secret_store_api.RemoveSecretRequestH\x00\x12\x43\n\x0fupdateSecretAcl\x18\x04 \x01(\x0b\x32(.secret_store_api.UpdateSecretAclRequestH\x00\x42\t\n\x07request\"\xa1\x02\n\x13SecretStoreResponse\x12>\n\x0c\x63reateSecret\x18\x01 \x01(\x0b\x32&.secret_store_api.CreateSecretResponseH\x00\x12\x38\n\tgetSecret\x18\x02 \x01(\x0b\x32#.secret_store_api.GetSecretResponseH\x00\x12>\n\x0cremoveSecret\x18\x03 \x01(\x0b\x32&.secret_store_api.RemoveSecretResponseH\x00\x12\x44\n\x0fupdateSecretAcl\x18\x04 \x01(\x0b\x32).secret_store_api.UpdateSecretAclResponseH\x00\x42\n\n\x08responseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,11 +35,11 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_REMOVESECRETRESPONSE']._serialized_start=404
   _globals['_REMOVESECRETRESPONSE']._serialized_end=443
   _globals['_UPDATESECRETACLREQUEST']._serialized_start=445
-  _globals['_UPDATESECRETACLREQUEST']._serialized_end=523
-  _globals['_UPDATESECRETACLRESPONSE']._serialized_start=525
-  _globals['_UPDATESECRETACLRESPONSE']._serialized_end=567
-  _globals['_SECRETSTOREREQUEST']._serialized_start=570
-  _globals['_SECRETSTOREREQUEST']._serialized_end=853
-  _globals['_SECRETSTORERESPONSE']._serialized_start=856
-  _globals['_SECRETSTORERESPONSE']._serialized_end=1145
+  _globals['_UPDATESECRETACLREQUEST']._serialized_end=540
+  _globals['_UPDATESECRETACLRESPONSE']._serialized_start=542
+  _globals['_UPDATESECRETACLRESPONSE']._serialized_end=584
+  _globals['_SECRETSTOREREQUEST']._serialized_start=587
+  _globals['_SECRETSTOREREQUEST']._serialized_end=870
+  _globals['_SECRETSTORERESPONSE']._serialized_start=873
+  _globals['_SECRETSTORERESPONSE']._serialized_end=1162
 # @@protoc_insertion_point(module_scope)

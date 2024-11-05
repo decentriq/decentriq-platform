@@ -33,6 +33,8 @@ amd_snp_ark_der = cast(Tuple[Any, Any, bytes], asn1crypto.pem.unarmor(amd_snp_ar
 ]
 
 sigstore_root_olpc_json = pkgutil.get_data(__name__, "5.root.json")
+if sigstore_root_olpc_json is None:
+    raise ValueError("Could not load sigstore root OLPC JSON")
 
 # From https://developers.cloudflare.com/time-services/roughtime/recipes/
 # See announcement about new server https://groups.google.com/a/chromium.org/g/proto-roughtime/c/vbmjoudG184/m/aXMLEAktBAAJ
@@ -256,9 +258,9 @@ SPECIFICATIONS = {
         decoder=GcgDriverDecoder(),
         clientProtocols=[6],
     ),
-    "decentriq.driver:v22": EnclaveSpecification(
+    "decentriq.driver:mrsigner": EnclaveSpecification(
         name="decentriq.driver",
-        version="22",
+        version="mrsigner",
         proto=AttestationSpecification(
             intelDcapMrsigner=AttestationSpecificationIntelDcapMrsigner(
                 mrsigner=bytes.fromhex(

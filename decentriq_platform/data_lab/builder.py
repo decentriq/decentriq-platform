@@ -1,6 +1,5 @@
 from typing import Optional, cast, TYPE_CHECKING
 from ..client import Client
-from ..keychain import Keychain
 from ..types import MatchingId
 from .data_lab import DataLab, DataLabConfig, ExistingDataLab
 
@@ -76,17 +75,15 @@ class DataLabBuilder:
     def with_segments(self):
         self.has_segments = True
 
-    def from_existing(self, data_lab_id: str, keychain: Keychain):
+    def from_existing(self, data_lab_id: str):
         """
         Construct a new DataLab from an existing DataLab with the given ID.
 
         **Parameters**:
         - `data_lab_id`: The ID of the existing DataLab.
-        - `keychain`: The keychain to use to provision datasets from the old DataLab to the new DataLab.
         """
         self.existing = True
         self.data_lab_id = data_lab_id
-        self.keychain = keychain
 
     def build(self) -> DataLab:
         """
@@ -105,7 +102,7 @@ class DataLabBuilder:
                 data_lab_definition["matchingIdFormat"],
                 force_spark_validation=data_lab_definition["forceSparkValidation"],
             )
-            existing_data_lab = ExistingDataLab(data_lab_definition, self.keychain)
+            existing_data_lab = ExistingDataLab(data_lab_definition)
             return DataLab(self.client, cfg, existing_data_lab)
         else:
             # Build a new DataLab using the specified enclave specifications.

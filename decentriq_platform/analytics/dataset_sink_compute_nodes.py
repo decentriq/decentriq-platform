@@ -10,12 +10,13 @@ from decentriq_dcr_compiler.schemas import (
     DatasetSinkComputationNode,
     DatasetSinkInput,
 )
+from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState
 from typing_extensions import Self
 
-from ..keychain import Keychain, KeychainEntry
 from ..storage import Key
 
 from ..session import Session
+from ..archv2 import Secret
 from .high_level_node import ComputationNode
 from .node_definitions import NodeDefinition
 
@@ -233,18 +234,32 @@ class DatasetSinkComputeNode(ComputationNode):
         """
         return self.id
 
-    def store_dataset_in_keychain(self, keychain: Keychain) -> Dict[str, Any]:
+    def store_dataset_key(self, key: Key) -> Dict[str, Any]:
         """
         Store the dataset to the Decentriq Platform and add an entry to
-        the keychain for the encryption key used to encrypt the dataset.
-
-        **Parameters**:
-        - `keychain`: The keychain to store the dataset encryption key.
+        the secret store for the encryption key used to encrypt the dataset.
         """
         result = self.run_computation_and_get_results_as_bytes()
         result_zip = zipfile.ZipFile(io.BytesIO(result), "r")
         datasets_json = json.loads(result_zip.read("datasets.json").decode())
+        session_v2 = self.client.create_session_v2()
         for dataset in datasets_json["datasets"]:
             manifest_hash = dataset["manifestHash"]
-            keychain.insert(KeychainEntry("dataset_key", manifest_hash, Key().material))
+            encryption_key_secret = Secret(secret=key.material, state=SecretStoreEntryState.model_validate(
+                {
+                    "version": "V0",
+                    "acl": {
+                        "type": "UsersList",
+                        "users": [
+                            {
+                                "id": self.client.user_email,
+                                "role": "Owner",
+                            },
+                        ],
+                    },
+                    "type": "DatasetKey",
+                    "manifest_hash": manifest_hash,
+                }
+            ))
+            session_v2.create_secret(encryption_key_secret)
         return datasets_json["datasets"]

@@ -10,7 +10,6 @@ from ..helpers import (
     create_session_from_driver_spec,
     get_latest_enclave_specs_as_dictionary,
 )
-from ..keychain import Keychain
 from ..proto import serialize_length_delimited
 from ..types import MATCHING_ID_INTERNAL_LOOKUP, MatchingId
 from .lookalike_media import ExistingLookalikeMediaDcr, LookalikeMediaDcr
@@ -106,17 +105,15 @@ class LookalikeMediaDcrBuilder:
         """
         self.matching_id = matching_id
 
-    def from_existing(self, lmdcr_id: str, keychain: Keychain):
+    def from_existing(self, lmdcr_id: str):
         """
         Construct a new Lookalike Media DCR from an existing Lookalike Media DCR with the given ID.
 
         **Parameters**:
         - `lmdcr_id`: The ID of the existing Lookalike Media DCR.
-        - `keychain`: The keychain to use to provision datasets from the old Lookalike Media DCR to the new Lookalike Media DCR.
         """
         self.existing = True
         self.lmdcr_id = lmdcr_id
-        self.keychain = keychain
 
     def build_and_publish(self) -> LookalikeMediaDcr:
         """

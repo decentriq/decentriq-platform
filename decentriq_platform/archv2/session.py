@@ -20,9 +20,10 @@ from ..proto.secret_store_pb2 import (
     GetSecretRequest,
     RemoveSecretRequest,
     CreateSecretRequest,
+    UpdateSecretAclRequest,
 )
 from .secret import Secret
-from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState, SECRET_STORE_ENTRY_STATE_VERSION
+from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState, SECRET_STORE_ENTRY_STATE_VERSION, v0
 
 if TYPE_CHECKING:
     from ..client import Client
@@ -139,3 +140,21 @@ class SessionV2:
                 + str(secret_store_response.WhichOneof("response"))
             )
         return secret_store_response.createSecret.id
+    
+    def update_secret_acl(self, secret_id: str, new_acl: v0.SecretStoreEntryAcl, expected_cas_index: int) -> bool:
+        """Update a secret ACL"""
+        request = SecretStoreRequest(
+            updateSecretAcl=UpdateSecretAclRequest(
+                id=secret_id,
+                newAcl=new_acl.model_dump_json().encode("utf-8"),
+                version=SECRET_STORE_ENTRY_STATE_VERSION,
+                expectedCasIndex=expected_cas_index
+            )
+        )
+        secret_store_response = self.send_secret_store_request(request)
+        if not secret_store_response.HasField("updateSecretAcl"):
+            raise Exception(
+                f"Expected `updatedSecretAcl`, got "
+                + str(secret_store_response.WhichOneof("response"))
+            )
+        return secret_store_response.updateSecretAcl.updated

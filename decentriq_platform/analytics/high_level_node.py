@@ -5,7 +5,6 @@ import zipfile
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, BinaryIO, Optional
 
-from ..keychain import Keychain
 from ..session import Session
 from ..storage import Key
 from .sql_helper import read_sql_query_result_as_string
@@ -292,7 +291,6 @@ class DataNode(HighLevelNode, ABC):
         data: BinaryIO,
         key: Key,
         name: str,
-        store_in_keychain: Optional[Keychain] = None,
         description: str = "",
     ):
         """
@@ -302,7 +300,6 @@ class DataNode(HighLevelNode, ABC):
         - `data`: Binary representation of the data to be uploaded.
         - `key`: Key to be used for encrypting the data.
         - `name`: Name of the file.
-        - `store_in_keychain`: An optional keychain in which to store the dataset key.
         - `description`: An optional description of the dataset.
         """
         if not self.dcr_id:
@@ -312,7 +309,6 @@ class DataNode(HighLevelNode, ABC):
             data,
             key,
             name,
-            store_in_keychain=store_in_keychain,
             description=description,
         )
         self.publish_dataset(manifest_hash, key)

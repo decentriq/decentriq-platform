@@ -16,7 +16,6 @@ from . import (
 from .attestation import EnclaveSpecifications, enclave_specifications
 from .client import Client, Session, create_client
 from .endorsement import Endorser
-from .keychain import Keychain, KeychainEntry
 from .storage import Key
 from .archv2 import SessionV2, Secret
 
@@ -52,7 +51,6 @@ __all__ = [
     "enclave_specifications",
     "EnclaveSpecifications",
     "Key",
-    "KeychainEntry",
     "lookalike_media",
     "storage",
     "attestation",
@@ -60,7 +58,6 @@ __all__ = [
     "authentication",
     "session",
     "Endorser",
-    "Keychain",
     "data_lab",
     "legacy",
     "analytics",

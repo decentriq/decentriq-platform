@@ -3,7 +3,6 @@ from ..attestation import EnclaveSpecifications, enclave_specifications
 from ..client import Client, create_client
 from ..data_lab import DataLabBuilder
 from ..endorsement import Endorser
-from ..keychain import Keychain, KeychainEntry
 from ..lookalike_media import LookalikeMediaDcr, LookalikeMediaDcrBuilder
 from ..session import Session
 from ..storage import Key
@@ -57,7 +56,6 @@ __all__ = [
     "enclave_specifications",
     "EnclaveSpecifications",
     "Key",
-    "KeychainEntry",
     "StaticContent",
     "Noop",
     "sql",
@@ -76,7 +74,6 @@ __all__ = [
     "session",
     "node",
     "Endorser",
-    "Keychain",
     "data_source_snowflake",
     "azure_blob_storage",
     "salesforce",

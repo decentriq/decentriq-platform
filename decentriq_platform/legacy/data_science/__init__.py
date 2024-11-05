@@ -1,7 +1,5 @@
 import io
-from typing import Optional
 
-from ..keychain import Keychain, KeychainEntry
 from ..session import Session
 from ..storage import Key
 
@@ -22,7 +20,6 @@ def provision_tabular_dataset(
     key: Key,
     data_node: str,
     data_room_id: str,
-    store_in_keychain: Optional[Keychain] = None,
     description: str = "",
 ) -> str:
     """
@@ -38,14 +35,13 @@ def provision_tabular_dataset(
     - `data_node`: The name of the data node as seen in the Decentriq UI.
     - `data_room_id`: To which data room the dataset should be published. This is the id you
         get when publishing a data room.
-    - `store_in_keychain`: An optional keychain in which to store the dataset key.
     - `description`: An optional description of the dataset.
 
     **Returns**:
     The manifest hash (dataset id) in case the upload succeeded.
     """
     manifest_hash = session.client.upload_dataset(
-        data, key, name, description=description, store_in_keychain=store_in_keychain
+        data, key, name, description=description
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=f"{data_node}_leaf", key=key
@@ -61,7 +57,6 @@ def provision_raw_dataset(
     key: Key,
     data_node: str,
     data_room_id: str,
-    store_in_keychain: Optional[Keychain] = None,
     description: str = "",
 ) -> str:
     """
@@ -77,14 +72,13 @@ def provision_raw_dataset(
     - `data_node`: The name of the data node as seen in the Decentriq UI.
     - `data_room_id`: To which data room the dataset should be published. This is the id you
         get when publishing a data room.
-    - `store_in_keychain`: An optional keychain in which to store the dataset key.
     - `description`: An optional description of the dataset.
 
     **Returns**:
     The manifest hash (dataset id) in case the upload succeeded.
     """
     manifest_hash = session.client.upload_dataset(
-        data, key, name, description=description, store_in_keychain=store_in_keychain
+        data, key, name, description=description
     )
     session.publish_dataset(data_room_id, manifest_hash, leaf_id=data_node, key=key)
     return manifest_hash

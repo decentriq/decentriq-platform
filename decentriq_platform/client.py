@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas import DataScienceDataRoom
 from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
-
-from decentriq_platform.archv2.session import SessionV2
+from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState
 
 from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
 from .api import Api, Endpoints, NotFoundError, retry
@@ -22,16 +21,17 @@ from .config import (
     DECENTRIQ_HOST,
     DECENTRIQ_PORT,
     DECENTRIQ_USE_TLS,
+    DECENTRIQ_MRSIGNER_ATTESTATION_SPECIFICATION,
 )
 from .connection import Connection
 from .endorsement import Endorser
 from .graphql import GqlClient
-from .keychain import Keychain
 from .media import MediaDcr, MediaDcrDefinition
 from .proto import AttestationSpecification, AuthenticationMethod, CreateDcrKind
 from .proto import DataRoom as ProtoDataRoom
 from .proto import PkiPolicy, parse_length_delimited, serialize_length_delimited
 from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
+from .archv2 import Secret, SessionV2
 from .storage import Chunker, Key, StorageCipher, create_encrypted_chunk
 from .types import (
     CreateMediaComputeJobInput,
@@ -43,7 +43,6 @@ from .types import (
     DatasetDescription,
     DatasetUsage,
     EnclaveSpecification,
-    KeychainInstance,
     MediaComputeJob,
     MediaComputeJobFilterInput,
 )
@@ -65,6 +64,8 @@ class Client:
     _api: Api
     _graphql: GqlClient
     _connections: Dict[str, Connection]
+    _mrsigner_driver_spec: AttestationSpecification
+    _cached_session_v2: Optional[SessionV2] = None
 
     def __init__(
         self,
@@ -74,6 +75,7 @@ class Client:
         graphql: GqlClient,
         request_timeout: Optional[int] = None,
         unsafe_disable_known_root_ca_check: bool = False,
+        custom_mrsigner_driver_spec: Optional[AttestationSpecification] = None,
     ):
         """
         Create a client instance.
@@ -88,6 +90,18 @@ class Client:
         self.request_timeout = request_timeout
         self.unsafe_disable_known_root_ca_check = unsafe_disable_known_root_ca_check
         self._connections = dict()
+        if custom_mrsigner_driver_spec is not None:
+            self._mrsigner_driver_spec = custom_mrsigner_driver_spec
+        else:
+            if DECENTRIQ_MRSIGNER_ATTESTATION_SPECIFICATION is not None:
+                mrsigner_decoded_spec = AttestationSpecification()
+                parse_length_delimited(
+                    b64decode(DECENTRIQ_MRSIGNER_ATTESTATION_SPECIFICATION),
+                    mrsigner_decoded_spec,
+                )
+                self._mrsigner_driver_spec = mrsigner_decoded_spec
+            else:
+                self._mrsigner_driver_spec = enclave_specifications.specifications["decentriq.driver:mrsigner"]["proto"]
 
     def check_enclave_availability(self, specs: Dict[str, EnclaveSpecification]):
         """
@@ -161,35 +175,31 @@ class Client:
 
     def create_session_v2(
         self,
-        *,
-        driver_spec: Optional[EnclaveSpecification],
     ) -> SessionV2:
         """
         Creates a new `decentriq_platform.session.SessionV2` instance to communicate
         with a driver enclave.
         """
-        # TODO: archv2 use the mrsigner driver we should default to that one, if none is specified
-        if driver_spec is None:
-            driver_spec = enclave_specifications.latest()["gcg-driver"]
-        attestation_proto = driver_spec["proto"]
-        attestation_specification_hash = hashlib.sha256(
-            serialize_length_delimited(attestation_proto)
-        ).hexdigest()
-        connection = self._connections.get(attestation_specification_hash)
-        if connection is None:
-            connection = Connection(
-                attestation_proto,
-                self._api,
-                self._graphql,
-                self.unsafe_disable_known_root_ca_check,
+        if self._cached_session_v2 is None:
+            attestation_proto = self._mrsigner_driver_spec
+            attestation_specification_hash = hashlib.sha256(
+                serialize_length_delimited(attestation_proto)
+            ).hexdigest()
+            connection = self._connections.get(attestation_specification_hash)
+            if connection is None:
+                connection = Connection(
+                    attestation_proto,
+                    self._api,
+                    self._graphql,
+                    self.unsafe_disable_known_root_ca_check,
+                )
+                self._connections[attestation_specification_hash] = connection
+            session = SessionV2(
+                self,
+                connection,
             )
-            self._connections[attestation_specification_hash] = connection
-        session = SessionV2(
-            self,
-            connection,
-        )
-
-        return session
+            self._cached_session_v2 = session
+        return self._cached_session_v2
 
     def create_session(
         self,
@@ -477,7 +487,7 @@ class Client:
         chunk_size: int = 8 * 1024**2,
         parallel_uploads: int = 8,
         usage: DatasetUsage = DatasetUsage.PUBLISHED,
-        store_in_keychain: Optional[Keychain] = None,
+        store_encryption_key: Optional[bool] = True,
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -492,7 +502,6 @@ class Client:
         - `description`: An optional file description.
         - `chunk_size`: Size of the chunks into which the stream is split in bytes.
         - `parallel_uploads`: Whether to upload chunks in parallel.
-        - `store_in_keychain`: An optional keychain in which to store the dataset key.
         """
         uploader = BoundedExecutor(
             bound=parallel_uploads * 2, max_workers=parallel_uploads
@@ -548,14 +557,39 @@ class Client:
             usage=usage,
         )
 
-        if store_in_keychain:
-            from .keychain import KeychainEntry
-
-            store_in_keychain.insert(
-                KeychainEntry("dataset_key", manifest_hash, key.material)
-            )
+        if store_encryption_key:
+            session_v2 = self.create_session_v2()
+            encryption_key_secret = Secret(secret=key.material, state=SecretStoreEntryState.model_validate(
+                {
+                    "version": "V0",
+                    "acl": {
+                        "type": "UsersList",
+                        "users": [
+                            {
+                                "id": self.user_email,
+                                "role": "Owner",
+                            },
+                        ],
+                    },
+                    "type": "DatasetKey",
+                    "manifest_hash": manifest_hash,
+                }
+            ))
+            session_v2.create_secret(encryption_key_secret)
 
         return manifest_hash
+    
+    def get_dataset_key(self, manifest_hash: str) -> bytes:
+        dataset = self.get_dataset(manifest_hash)
+        if dataset is None:
+            raise Exception(f"Dataset with manifest hash {manifest_hash} not found")
+        dataset_encryption_key_secret_id = dataset["encryptionKeySecretId"]
+        if dataset_encryption_key_secret_id is None:
+            raise Exception(f"Dataset with manifest hash {manifest_hash} has no associated secret")
+        session_v2 = self.create_session_v2()
+        dataset_encryption_key_secret, _ = session_v2.get_secret(dataset_encryption_key_secret_id)
+        dataset_key = dataset_encryption_key_secret.secret
+        return dataset_key
 
     def _encrypt_and_upload_chunk(
         self, chunk_hash: bytes, chunk_data: bytes, key: bytes, upload_id: str
@@ -673,6 +707,8 @@ class Client:
                         manifestHash
                         description
                         createdAt
+                        encryptionKeySecretId
+                        metadataSecretId
                     }
                 }
                 """,
@@ -1000,91 +1036,6 @@ class Client:
             {"scopeId": scope_id},
         )
         return data["scope"]
-
-    def get_keychain_instance(self) -> Optional[KeychainInstance]:
-        data = self._graphql.post(
-            """
-            query GetKeychain {
-                myself {
-                    keychain {
-                        userId
-                        salt
-                        encrypted
-                        casIndex
-                    }
-                }
-            }
-            """
-        )
-        keychain = data["myself"]["keychain"]
-        if keychain:
-            keychain["encrypted"] = b64decode(keychain["encrypted"])
-        return keychain
-
-    def create_keychain_instance(self, salt: str, encrypted: bytes) -> KeychainInstance:
-        data = self._graphql.post(
-            """
-            mutation CreateKeychain($inner: CreateKeychainInput!) {
-                keychain {
-                    create(inner: $inner) {
-                    userId
-                    salt
-                    encrypted
-                    casIndex
-                    }
-                }
-            }
-            """,
-            {
-                "inner": {
-                    "salt": salt,
-                    "encrypted": b64encode(encrypted).decode("ascii"),
-                }
-            },
-        )
-        keychain = data["keychain"]["create"]
-        keychain["encrypted"] = b64decode(keychain["encrypted"])
-        return keychain
-
-    def compare_and_swap_keychain(
-        self,
-        cas_index: int,
-        salt: Optional[str] = None,
-        encrypted: Optional[bytes] = None,
-    ) -> bool:
-        data = self._graphql.post(
-            """
-            mutation CompareAndSwapKeychain($inner: CompareAndSwapKeychainInput!) {
-                keychain {
-                    compareAndSwap(inner: $inner)
-                }
-            }
-            """,
-            {
-                "inner": {
-                    "salt": salt,
-                    "encrypted": (
-                        b64encode(encrypted).decode("ascii")
-                        if encrypted is not None
-                        else None
-                    ),
-                    "casIndex": cas_index,
-                }
-            },
-        )
-        return data["keychain"]["compareAndSwap"]
-
-    def reset_keychain(self):
-        _ = self._graphql.post(
-            """
-            mutation ResetKeychain {
-                keychain {
-                    reset
-                }
-            }
-            """
-        )
-        return
 
     def list_data_labs(
         self, filter: Optional[DataLabListFilter] = None

@@ -24,7 +24,6 @@ from ..helpers import (
     create_session_from_driver_spec,
     get_latest_enclave_specs_as_dictionary,
 )
-from ..keychain import Keychain, KeychainEntry
 from ..proto import (
     CreateDcrPurpose,
     DataRoom,
@@ -75,9 +74,7 @@ class ExistingDataLab:
     def __init__(
         self,
         data_lab_definition: DataLabDefinition,
-        keychain: Keychain,
     ):
-        self.keychain = keychain
         self.id = data_lab_definition["id"]
         self.high_level_representation = data_lab_definition[
             "highLevelRepresentationAsString"
@@ -156,37 +153,36 @@ class DataLab:
     def _populate_datasets_cache_from_existing(
         self, existing_data_lab: ExistingDataLab
     ):
-        keychain = existing_data_lab.keychain
         match_dataset = existing_data_lab.match_dataset
         if match_dataset is not None:
             manifest_hash = match_dataset["manifestHash"]
-            key = keychain.get("dataset_key", manifest_hash)
+            key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.MATCH] = Dataset(
-                manifest_hash, Key(key.value)
+                manifest_hash, Key(key)
             )
 
         segments_dataset = existing_data_lab.segments_dataset
         if segments_dataset is not None:
             manifest_hash = segments_dataset["manifestHash"]
-            key = keychain.get("dataset_key", manifest_hash)
+            key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.SEGMENTS] = Dataset(
-                manifest_hash, Key(key.value)
+                manifest_hash, Key(key)
             )
 
         demographics_dataset = existing_data_lab.demographics_dataset
         if self.cfg.has_demographics and demographics_dataset is not None:
             manifest_hash = demographics_dataset["manifestHash"]
-            key = keychain.get("dataset_key", manifest_hash)
+            key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.DEMOGRAPHICS] = Dataset(
-                manifest_hash, Key(key.value)
+                manifest_hash, Key(key)
             )
 
         embeddings_dataset = existing_data_lab.embeddings_dataset
         if self.cfg.has_embeddings and embeddings_dataset is not None:
             manifest_hash = embeddings_dataset["manifestHash"]
-            key = keychain.get("dataset_key", manifest_hash)
+            key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.EMBEDDINGS] = Dataset(
-                manifest_hash, Key(key.value)
+                manifest_hash, Key(key)
             )
 
     def _get_data_lab_enclave_specs(
@@ -218,18 +214,16 @@ class DataLab:
     def provision_local_datasets(
         self,
         key: Key,
-        keychain: Keychain,
         matching_data_path: str,
         segments_data_path: Optional[str] = None,
         demographics_data_path: Optional[str] = None,
         embeddings_data_path: Optional[str] = None,
     ):
         """
-        Upload local datasets to the keychain and provision to the DataLab.
+        Upload local datasets and provision to the DataLab.
 
         **Parameters**
         - `key`: The key used to encrypt the dataset.
-        - `keychain`: The keychain where the key will be stored.
         - `match`: The file path to the "match" dataset.
         - `segments`: The file path to the "segments" dataset.
         - `demographics`: The file path to the "demographics" dataset.
@@ -237,14 +231,14 @@ class DataLab:
         """
         if matching_data_path is not None:
             dataset_name = Path(matching_data_path).stem
-            dataset_id = self._upload_dataset_to_keychain(
-                matching_data_path, dataset_name, key, keychain
+            dataset_id = self._upload_dataset(
+                matching_data_path, dataset_name, key
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.MATCH)
         if segments_data_path is not None:
             dataset_name = Path(segments_data_path).stem
-            dataset_id = self._upload_dataset_to_keychain(
-                segments_data_path, dataset_name, key, keychain
+            dataset_id = self._upload_dataset(
+                segments_data_path, dataset_name, key
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.SEGMENTS)
         if embeddings_data_path is not None:
@@ -252,8 +246,8 @@ class DataLab:
             self._check_dataset_type_permitted(
                 dataset_type=DataLabDatasetType.EMBEDDINGS
             )
-            dataset_id = self._upload_dataset_to_keychain(
-                embeddings_data_path, dataset_name, key, keychain
+            dataset_id = self._upload_dataset(
+                embeddings_data_path, dataset_name, key
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.EMBEDDINGS)
         if demographics_data_path is not None:
@@ -261,17 +255,16 @@ class DataLab:
             self._check_dataset_type_permitted(
                 dataset_type=DataLabDatasetType.DEMOGRAPHICS
             )
-            dataset_id = self._upload_dataset_to_keychain(
-                demographics_data_path, dataset_name, key, keychain
+            dataset_id = self._upload_dataset(
+                demographics_data_path, dataset_name, key
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.DEMOGRAPHICS)
 
-    def _upload_dataset_to_keychain(
-        self, file_path: str, name: str, key: Key, keychain: Keychain
+    def _upload_dataset(
+        self, file_path: str, name: str, key: Key
     ):
         with open(file_path, "rb") as file:
             dataset_id = self.client.upload_dataset(file, key, name)
-            keychain.insert(KeychainEntry("dataset_key", dataset_id, key.material))
             return dataset_id
 
     def provision_dataset(
@@ -450,14 +443,13 @@ class DataLab:
             raise Exception("Failed to retrieve statistics")
 
     def provision_to_media_insights_data_room(
-        self, data_room_id: str, keychain: Keychain
+        self, data_room_id: str
     ):
         """
         Provision the DataLab to the DCR with the given ID.
 
         **Parameters**:
         - `data_room_id`: ID of the DCR to provision the DataLab to.
-        - `keychain`: Keychain to use to provision the datasets.
         """
         # DataLab must be validated before it can be provisioned.
         if not self._validated():
@@ -486,7 +478,7 @@ class DataLab:
                 # Dataset was not provisioned to the Data Lab.
                 continue
             manifest_hash = dataset["manifestHash"]
-            encryption_key = keychain.get("dataset_key", manifest_hash)
+            encryption_key = self.client.get_dataset_key(manifest_hash)
             if dataset_type == "MATCHING_DATA":
                 request_key = "publishPublisherUsersDataset"
             elif dataset_type == "SEGMENTS_DATA":
@@ -522,7 +514,7 @@ class DataLab:
         self,
         request_key: str,
         manifest_hash: str,
-        encryption_key: KeychainEntry,
+        encryption_key: bytes,
         session: Session,
         data_room_id: str,
     ):
@@ -531,7 +523,7 @@ class DataLab:
                 request_key: {
                     "dataRoomIdHex": data_room_id,
                     "datasetHashHex": manifest_hash,
-                    "encryptionKeyHex": encryption_key.value.hex(),
+                    "encryptionKeyHex": encryption_key.hex(),
                     "scopeIdHex": self.client._ensure_dcr_data_scope(data_room_id),
                 },
             }
@@ -541,14 +533,13 @@ class DataLab:
             raise Exception(f'Failed to publish "{request_key}"')
 
     def provision_to_lookalike_media_data_room(
-        self, data_room_id: str, keychain: Keychain
+        self, data_room_id: str
     ):
         """
         Provision the DataLab to the DCR with the given ID.
 
         **Parameters**:
         - `data_room_id`: ID of the DCR to provision the DataLab to.
-        - `keychain`: Keychain to use to provision the datasets.
         """
         # DataLab must be validated before it can be provisioned.
         if not self._validated():
@@ -584,9 +575,9 @@ class DataLab:
         for required_dataset in lmdcr_datasets.required:
             lmdcr_node_name = self._get_lmdcr_node_name(required_dataset)
             manifest_hash = data_lab_datasets[required_dataset]["manifestHash"]
-            retrieved_key = keychain.get("dataset_key", manifest_hash)
+            retrieved_key = self.client.get_dataset_key(manifest_hash)
             lmdcr_session.publish_dataset(
-                data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key.value)
+                data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
             )
 
         # Provision optional datasets if the DataLab is able to.
@@ -599,9 +590,9 @@ class DataLab:
                 continue
             lmdcr_node_name = self._get_lmdcr_node_name(optional_dataset)
             manifest_hash = data_lab_datasets[optional_dataset]["manifestHash"]
-            retrieved_key = keychain.get("dataset_key", manifest_hash)
+            retrieved_key = self.client.get_dataset_key(manifest_hash)
             lmdcr_session.publish_dataset(
-                data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key.value)
+                data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
             )
 
     @staticmethod

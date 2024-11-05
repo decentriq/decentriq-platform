@@ -152,18 +152,21 @@ class UpdateSecretAclRequest(google.protobuf.message.Message):
 
     ID_FIELD_NUMBER: builtins.int
     NEWACL_FIELD_NUMBER: builtins.int
+    VERSION_FIELD_NUMBER: builtins.int
     EXPECTEDCASINDEX_FIELD_NUMBER: builtins.int
     id: builtins.str
     newAcl: builtins.bytes
+    version: builtins.int
     expectedCasIndex: builtins.int
     def __init__(
         self,
         *,
         id: builtins.str = ...,
         newAcl: builtins.bytes = ...,
+        version: builtins.int = ...,
         expectedCasIndex: builtins.int = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["expectedCasIndex", b"expectedCasIndex", "id", b"id", "newAcl", b"newAcl"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["expectedCasIndex", b"expectedCasIndex", "id", b"id", "newAcl", b"newAcl", "version", b"version"]) -> None: ...
 
 global___UpdateSecretAclRequest = UpdateSecretAclRequest
 

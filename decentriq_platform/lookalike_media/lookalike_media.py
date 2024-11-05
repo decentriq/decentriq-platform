@@ -16,7 +16,6 @@ from decentriq_dcr_compiler import (
 from ..channel import Channel
 from ..client import Client
 from ..helpers import get_latest_enclave_specs_as_dictionary
-from ..keychain import Keychain, KeychainEntry
 from ..proto import (
     CreateDcrKind,
     DataRoom,
@@ -129,13 +128,12 @@ class LookalikeMediaDcr:
         )
         return (lmdcr, lmdcr_id)
 
-    def provision_from_data_lab(self, data_lab_id: str, keychain: Keychain):
+    def provision_from_data_lab(self, data_lab_id: str):
         """
         Provision the DataLab with the given ID to the Lookalike Media DCR.
 
         **Parameters**:
         - `data_lab_id`: ID of the DataLab to provision to the Lookalike Media DCR.
-        - `keychain`: Keychain to use to provision datasets from the DataLab.
         """
         # Check DataLab is validated
         data_lab = self.client.get_data_lab(data_lab_id)
@@ -170,9 +168,9 @@ class LookalikeMediaDcr:
         for required_dataset in lmdcr_datasets.required:
             lmdcr_node_name = self._get_lmdcr_node_name(required_dataset)
             manifest_hash = data_lab_datasets[required_dataset]["manifestHash"]
-            retrieved_key = keychain.get("dataset_key", manifest_hash)
+            retrieved_key = self.client.get_dataset_key(manifest_hash)
             self.session.publish_dataset(
-                self.id, manifest_hash, lmdcr_node_name, Key(retrieved_key.value)
+                self.id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
             )
 
         # Provision optional datasets if the DataLab is able to.
@@ -185,9 +183,9 @@ class LookalikeMediaDcr:
                 continue
             lmdcr_node_name = self._get_lmdcr_node_name(optional_dataset)
             manifest_hash = data_lab_datasets[optional_dataset]["manifestHash"]
-            retrieved_key = keychain.get("dataset_key", manifest_hash)
+            retrieved_key = self.client.get_dataset_key(manifest_hash)
             self.session.publish_dataset(
-                self.id, manifest_hash, lmdcr_node_name, Key(retrieved_key.value)
+                self.id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
             )
 
         # Update DB.
@@ -381,14 +379,6 @@ class LookalikeMediaDcr:
         else:
             raise Exception("Failed to retrieve overlap insights")
 
-    def _upload_dataset_to_keychain(
-        self, file_path: str, name: str, key: Key, keychain: Keychain
-    ):
-        with open(file_path, "rb") as file:
-            dataset_id = self.client.upload_dataset(file, key, name)
-            keychain.insert(KeychainEntry("dataset_key", dataset_id, key.material))
-            return dataset_id
-
     def retrieve_audit_log(self) -> str:
         """
         Retrieve the Lookalike Media DCR audit log.
@@ -406,11 +396,10 @@ def provision_dataset(
     key: Key,
     data_room_id: str,
     dataset_type: DatasetType,
-    store_in_keychain: Optional[Keychain] = None,
     description: str = "",
 ) -> str:
     manifest_hash = session.client.upload_dataset(
-        data, key, name, description=description, store_in_keychain=store_in_keychain
+        data, key, name, description=description
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=dataset_type.value, key=key

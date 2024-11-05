@@ -130,6 +130,8 @@ class DatasetDescription(TypedDict):
     """Size of the dataset"""
     usage: DatasetUsage
     """Usage"""
+    encryptionKeySecretId: Optional[str]
+    metadataSecretId: Optional[str]
 
 
 class SignatureResponse(TypedDict):
@@ -223,13 +225,6 @@ class TcbInfoContainer(TypedDict):
 class IasResponse(TypedDict):
     isvEnclaveQuoteBody: str
     isvEnclaveQuoteStatus: str
-
-
-class KeychainInstance(TypedDict):
-    userId: str
-    salt: str
-    encrypted: bytes
-    casIndex: int
 
 
 class TestDataset(TypedDict):
