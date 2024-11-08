@@ -4,12 +4,13 @@ import os
 from base64 import b64decode, b64encode, urlsafe_b64decode, urlsafe_b64encode
 from concurrent import futures
 from threading import BoundedSemaphore
-from typing import TYPE_CHECKING, BinaryIO, Dict, List, Optional, Tuple
+from typing import BinaryIO, Dict, List, Optional, Tuple, cast
 
 from decentriq_dcr_compiler import compiler
 from decentriq_dcr_compiler.schemas import DataScienceDataRoom
 from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
-from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState
+from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState as SecretStoreEntryStateSchema, v0 as v0_schema
+from decentriq_dcr_compiler.types.secret_store_entry_state import v0
 
 from .analytics import AnalyticsDcr, AnalyticsDcrDefinition
 from .api import Api, Endpoints, NotFoundError, retry
@@ -21,7 +22,7 @@ from .config import (
     DECENTRIQ_HOST,
     DECENTRIQ_PORT,
     DECENTRIQ_USE_TLS,
-    DECENTRIQ_MRSIGNER_ATTESTATION_SPECIFICATION,
+    DECENTRIQ_MRSIGNER_DRIVER_ATTESTATION_SPECIFICATION,
 )
 from .connection import Connection
 from .endorsement import Endorser
@@ -34,6 +35,7 @@ from .session import LATEST_WORKER_PROTOCOL_VERSION, Session
 from .archv2 import Secret, SessionV2
 from .storage import Chunker, Key, StorageCipher, create_encrypted_chunk
 from .types import (
+    JSONType,
     CreateMediaComputeJobInput,
     DataLabDefinition,
     DataLabListFilter,
@@ -48,6 +50,33 @@ from .types import (
 )
 from .logger import logger
 
+class SecretStoreOptions:
+    def __init__(
+        self,
+        *,
+        store_encryption_key: bool = True,
+        encryption_key_acl: Optional[JSONType] = None,
+        encryption_key_acl_version: int = 0,
+    ):
+        self.store_encryption_key = store_encryption_key
+        if not store_encryption_key and encryption_key_acl is not None:
+            raise ValueError("Encryption key ACL can only be set when storing the encryption key")
+        # Validate the encryption key ACL
+        if encryption_key_acl is not None:
+            if encryption_key_acl_version == 0:
+                # Check it's in valid format
+                v0_schema.SecretStoreEntryAcl.model_validate(encryption_key_acl)
+                # Check it contains at least one owner
+                validated_encryption_key_acl = cast(v0.SecretStoreEntryAcl, encryption_key_acl)
+                if validated_encryption_key_acl["type"] == "UsersList":
+                    if not any(user["role"] == "Owner" for user in validated_encryption_key_acl["users"]):
+                        raise ValueError("Encryption key ACL must contain at least one owner")
+                else:
+                    raise ValueError(f"Unsupported encryption key ACL type {validated_encryption_key_acl['type']}")
+            else:
+                raise ValueError(f"Unsupported encryption key ACL version {encryption_key_acl_version}")
+        self.encryption_key_acl = encryption_key_acl
+        self.encryption_key_acl_version = encryption_key_acl_version
 
 class Client:
     """
@@ -93,10 +122,10 @@ class Client:
         if custom_mrsigner_driver_spec is not None:
             self._mrsigner_driver_spec = custom_mrsigner_driver_spec
         else:
-            if DECENTRIQ_MRSIGNER_ATTESTATION_SPECIFICATION is not None:
+            if DECENTRIQ_MRSIGNER_DRIVER_ATTESTATION_SPECIFICATION is not None:
                 mrsigner_decoded_spec = AttestationSpecification()
                 parse_length_delimited(
-                    b64decode(DECENTRIQ_MRSIGNER_ATTESTATION_SPECIFICATION),
+                    b64decode(DECENTRIQ_MRSIGNER_DRIVER_ATTESTATION_SPECIFICATION),
                     mrsigner_decoded_spec,
                 )
                 self._mrsigner_driver_spec = mrsigner_decoded_spec
@@ -475,7 +504,7 @@ class Client:
             },
         )
         return data["dataLab"]["setStatistics"]["record"]["id"]
-
+    
     def upload_dataset(
         self,
         data: BinaryIO,
@@ -487,7 +516,7 @@ class Client:
         chunk_size: int = 8 * 1024**2,
         parallel_uploads: int = 8,
         usage: DatasetUsage = DatasetUsage.PUBLISHED,
-        store_encryption_key: Optional[bool] = True,
+        secret_store_options: Optional[SecretStoreOptions] = None,
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -557,29 +586,36 @@ class Client:
             usage=usage,
         )
 
-        if store_encryption_key:
+        if secret_store_options is None:
+            secret_store_options = SecretStoreOptions()
+        if secret_store_options.store_encryption_key:
             session_v2 = self.create_session_v2()
-            encryption_key_secret = Secret(secret=key.material, state=SecretStoreEntryState.model_validate(
-                {
-                    "version": "V0",
-                    "acl": {
-                        "type": "UsersList",
-                        "users": [
-                            {
-                                "id": self.user_email,
-                                "role": "Owner",
-                            },
-                        ],
-                    },
-                    "type": "DatasetKey",
-                    "manifest_hash": manifest_hash,
+
+            if secret_store_options.encryption_key_acl_version == 0:
+                acl = secret_store_options.encryption_key_acl if secret_store_options.encryption_key_acl is not None else {
+                    "type": "UsersList",
+                    "users": [
+                        {
+                            "id": self.user_email,
+                            "role": "Owner",
+                        },
+                    ],
                 }
-            ))
+                encryption_key_secret = Secret(secret=key.material, state=SecretStoreEntryStateSchema.model_validate(
+                    {
+                        "version": "V0",
+                        "acl": acl,
+                        "type": "DatasetKey",
+                        "manifest_hash": manifest_hash,
+                    }
+                ))
+            else:
+                raise ValueError(f"Unsupported encryption key ACL version {secret_store_options.encryption_key_acl_version}")
             session_v2.create_secret(encryption_key_secret)
 
         return manifest_hash
     
-    def get_dataset_key(self, manifest_hash: str) -> bytes:
+    def get_dataset_key(self, manifest_hash: str) -> Key:
         dataset = self.get_dataset(manifest_hash)
         if dataset is None:
             raise Exception(f"Dataset with manifest hash {manifest_hash} not found")
@@ -589,7 +625,7 @@ class Client:
         session_v2 = self.create_session_v2()
         dataset_encryption_key_secret, _ = session_v2.get_secret(dataset_encryption_key_secret_id)
         dataset_key = dataset_encryption_key_secret.secret
-        return dataset_key
+        return Key(dataset_key)
 
     def _encrypt_and_upload_chunk(
         self, chunk_hash: bytes, chunk_data: bytes, key: bytes, upload_id: str

@@ -1,8 +1,9 @@
 import csv
 import io
 import zipfile
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple, TYPE_CHECKING
 
+from ...client import SecretStoreOptions
 from ...proto import AuthenticationMethod, Permission
 from ...proto.length_delimited import parse_length_delimited
 from ...session import Session
@@ -12,7 +13,6 @@ from ..compute import Noop
 from ..permission import Permissions
 from .compute import SqlSchemaVerifier
 from .proto import TableSchema
-
 
 def _data_node_id(node: str):
     return f"{node}_leaf"
@@ -282,6 +282,7 @@ def upload_and_publish_tabular_dataset(
     session: Session,
     description: str = "",
     validate: bool = True,
+    secret_store_options: Optional[SecretStoreOptions] = None,
     **kwargs,
 ) -> str:
     """
@@ -309,7 +310,7 @@ def upload_and_publish_tabular_dataset(
     The manifest hash (dataset id) in case the upload and validation succeeded.
     """
     manifest_hash = session.client.upload_dataset(
-        data, key, table, description=description
+        data, key, table, description=description, secret_store_options=secret_store_options
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=_data_node_id(table), key=key

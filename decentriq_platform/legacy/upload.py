@@ -3,7 +3,7 @@ from typing import Optional
 
 from .session import Session
 from .storage import Key
-
+from ..client import SecretStoreOptions
 
 def provision_tabular_dataset_to_data_science_data_room(
     data: io.BytesIO,
@@ -13,6 +13,7 @@ def provision_tabular_dataset_to_data_science_data_room(
     data_node: str,
     data_room_id: str,
     description: str = "",
+    secret_store_options: Optional[SecretStoreOptions] = None,
 ) -> str:
     """
     Convenience function for uploading data to a tabular data node in a Data Science Data Room.
@@ -34,6 +35,7 @@ def provision_tabular_dataset_to_data_science_data_room(
         key,
         data_node,
         description=description,
+        secret_store_options=secret_store_options,
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=f"{data_node}_leaf", key=key
@@ -49,6 +51,7 @@ def provision_raw_dataset_to_data_science_data_room(
     data_node: str,
     data_room_id: str,
     description: str = "",
+    secret_store_options: Optional[SecretStoreOptions] = None,
 ) -> str:
     """
     Convenience function for uploading data to a raw leaf node in a Data Science Data Room.
@@ -70,6 +73,7 @@ def provision_raw_dataset_to_data_science_data_room(
         key,
         data_node,
         description=description,
+        secret_store_options=secret_store_options,
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=f"{data_node}_leaf", key=key
@@ -85,6 +89,7 @@ def provision_matching_dataset_to_lookalike_media_data_room(
     data_node: str,
     data_room_id: str,
     description: str = "",
+    secret_store_options: Optional[SecretStoreOptions] = None,
 ) -> str:
     """
     Convenience function for uploading matching data to a Lookalike Media Data Room.
@@ -106,6 +111,7 @@ def provision_matching_dataset_to_lookalike_media_data_room(
         key,
         data_node,
         description=description,
+        secret_store_options=secret_store_options,
     )
     session.publish_dataset(data_room_id, manifest_hash, leaf_id="matching", key=key)
     return manifest_hash

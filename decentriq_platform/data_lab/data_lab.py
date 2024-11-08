@@ -19,7 +19,7 @@ from decentriq_dcr_compiler import (
 )
 
 from ..media.request import Request
-from ..client import Client
+from ..client import Client, SecretStoreOptions
 from ..helpers import (
     create_session_from_driver_spec,
     get_latest_enclave_specs_as_dictionary,
@@ -42,7 +42,6 @@ from ..types import (
     JobId,
     MatchingId,
 )
-
 
 class Dataset:
     def __init__(self, manifest_hash: str, key: Key):
@@ -158,7 +157,7 @@ class DataLab:
             manifest_hash = match_dataset["manifestHash"]
             key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.MATCH] = Dataset(
-                manifest_hash, Key(key)
+                manifest_hash, key
             )
 
         segments_dataset = existing_data_lab.segments_dataset
@@ -166,7 +165,7 @@ class DataLab:
             manifest_hash = segments_dataset["manifestHash"]
             key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.SEGMENTS] = Dataset(
-                manifest_hash, Key(key)
+                manifest_hash, key
             )
 
         demographics_dataset = existing_data_lab.demographics_dataset
@@ -174,7 +173,7 @@ class DataLab:
             manifest_hash = demographics_dataset["manifestHash"]
             key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.DEMOGRAPHICS] = Dataset(
-                manifest_hash, Key(key)
+                manifest_hash, key
             )
 
         embeddings_dataset = existing_data_lab.embeddings_dataset
@@ -182,7 +181,7 @@ class DataLab:
             manifest_hash = embeddings_dataset["manifestHash"]
             key = self.client.get_dataset_key(manifest_hash)
             self.datasets[DataLabDatasetType.EMBEDDINGS] = Dataset(
-                manifest_hash, Key(key)
+                manifest_hash, key
             )
 
     def _get_data_lab_enclave_specs(
@@ -218,6 +217,8 @@ class DataLab:
         segments_data_path: Optional[str] = None,
         demographics_data_path: Optional[str] = None,
         embeddings_data_path: Optional[str] = None,
+        *,
+        secret_store_options: Optional[SecretStoreOptions] = None,
     ):
         """
         Upload local datasets and provision to the DataLab.
@@ -232,13 +233,13 @@ class DataLab:
         if matching_data_path is not None:
             dataset_name = Path(matching_data_path).stem
             dataset_id = self._upload_dataset(
-                matching_data_path, dataset_name, key
+                matching_data_path, dataset_name, key, secret_store_options
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.MATCH)
         if segments_data_path is not None:
             dataset_name = Path(segments_data_path).stem
             dataset_id = self._upload_dataset(
-                segments_data_path, dataset_name, key
+                segments_data_path, dataset_name, key, secret_store_options
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.SEGMENTS)
         if embeddings_data_path is not None:
@@ -247,7 +248,7 @@ class DataLab:
                 dataset_type=DataLabDatasetType.EMBEDDINGS
             )
             dataset_id = self._upload_dataset(
-                embeddings_data_path, dataset_name, key
+                embeddings_data_path, dataset_name, key, secret_store_options
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.EMBEDDINGS)
         if demographics_data_path is not None:
@@ -256,15 +257,15 @@ class DataLab:
                 dataset_type=DataLabDatasetType.DEMOGRAPHICS
             )
             dataset_id = self._upload_dataset(
-                demographics_data_path, dataset_name, key
+                demographics_data_path, dataset_name, key, secret_store_options
             )
             self.provision_dataset(dataset_id, key, DataLabDatasetType.DEMOGRAPHICS)
 
     def _upload_dataset(
-        self, file_path: str, name: str, key: Key
+        self, file_path: str, name: str, key: Key, secret_store_options: Optional[SecretStoreOptions]
     ):
         with open(file_path, "rb") as file:
-            dataset_id = self.client.upload_dataset(file, key, name)
+            dataset_id = self.client.upload_dataset(file, key, name, secret_store_options=secret_store_options)
             return dataset_id
 
     def provision_dataset(
@@ -577,7 +578,7 @@ class DataLab:
             manifest_hash = data_lab_datasets[required_dataset]["manifestHash"]
             retrieved_key = self.client.get_dataset_key(manifest_hash)
             lmdcr_session.publish_dataset(
-                data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
+                data_room_id, manifest_hash, lmdcr_node_name, retrieved_key
             )
 
         # Provision optional datasets if the DataLab is able to.
@@ -592,7 +593,7 @@ class DataLab:
             manifest_hash = data_lab_datasets[optional_dataset]["manifestHash"]
             retrieved_key = self.client.get_dataset_key(manifest_hash)
             lmdcr_session.publish_dataset(
-                data_room_id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
+                data_room_id, manifest_hash, lmdcr_node_name, retrieved_key
             )
 
     @staticmethod

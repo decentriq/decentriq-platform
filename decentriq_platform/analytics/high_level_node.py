@@ -10,7 +10,7 @@ from ..storage import Key
 from .sql_helper import read_sql_query_result_as_string
 
 if TYPE_CHECKING:
-    from ..client import Client
+    from ..client import Client, SecretStoreOptions
     from .node_definitions import NodeDefinition
 
 
@@ -292,6 +292,8 @@ class DataNode(HighLevelNode, ABC):
         key: Key,
         name: str,
         description: str = "",
+        *,
+        secret_store_options: Optional[SecretStoreOptions] = None,
     ):
         """
         Upload data to the Decentriq Platform and publish it to the `DataNode`.
@@ -310,6 +312,7 @@ class DataNode(HighLevelNode, ABC):
             key,
             name,
             description=description,
+            secret_store_options=secret_store_options,
         )
         self.publish_dataset(manifest_hash, key)
 

@@ -4,7 +4,7 @@ import json
 import numbers
 import zipfile
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 from decentriq_dcr_compiler import (
     LookalikeMediaDataRoom,
@@ -14,13 +14,11 @@ from decentriq_dcr_compiler import (
 )
 
 from ..channel import Channel
-from ..client import Client
+from ..client import Client, SecretStoreOptions
 from ..helpers import get_latest_enclave_specs_as_dictionary
 from ..proto import (
     CreateDcrKind,
     DataRoom,
-    GcgRequest,
-    UserAuth,
     parse_length_delimited,
     serialize_length_delimited,
 )
@@ -170,7 +168,7 @@ class LookalikeMediaDcr:
             manifest_hash = data_lab_datasets[required_dataset]["manifestHash"]
             retrieved_key = self.client.get_dataset_key(manifest_hash)
             self.session.publish_dataset(
-                self.id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
+                self.id, manifest_hash, lmdcr_node_name, retrieved_key
             )
 
         # Provision optional datasets if the DataLab is able to.
@@ -185,7 +183,7 @@ class LookalikeMediaDcr:
             manifest_hash = data_lab_datasets[optional_dataset]["manifestHash"]
             retrieved_key = self.client.get_dataset_key(manifest_hash)
             self.session.publish_dataset(
-                self.id, manifest_hash, lmdcr_node_name, Key(retrieved_key)
+                self.id, manifest_hash, lmdcr_node_name, retrieved_key
             )
 
         # Update DB.
@@ -397,9 +395,10 @@ def provision_dataset(
     data_room_id: str,
     dataset_type: DatasetType,
     description: str = "",
+    secret_store_options: Optional[SecretStoreOptions] = None,
 ) -> str:
     manifest_hash = session.client.upload_dataset(
-        data, key, name, description=description
+        data, key, name, description=description, secret_store_options=secret_store_options
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=dataset_type.value, key=key

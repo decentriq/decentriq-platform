@@ -1,11 +1,12 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypeAlias
 
 from typing_extensions import TypedDict
 
 from .proto import AttestationSpecification
 from .storage import Key
 
+JSONType: TypeAlias = dict[str, "JSONType"] | list["JSONType"] | str | int | float | bool | None
 
 class JobId:
     """
@@ -131,7 +132,9 @@ class DatasetDescription(TypedDict):
     usage: DatasetUsage
     """Usage"""
     encryptionKeySecretId: Optional[str]
+    """Secret store entry id for the encryption key"""
     metadataSecretId: Optional[str]
+    """Secret store entry id for the metadata"""
 
 
 class SignatureResponse(TypedDict):

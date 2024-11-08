@@ -1,7 +1,10 @@
 import io
+from typing import Optional, TYPE_CHECKING
 
+from ...client import SecretStoreOptions
 from ..session import Session
 from ..storage import Key
+
 
 __docformat__ = "restructuredtext"
 
@@ -21,6 +24,7 @@ def provision_tabular_dataset(
     data_node: str,
     data_room_id: str,
     description: str = "",
+    secret_store_options: Optional[SecretStoreOptions] = None,
 ) -> str:
     """
     Convenience function for uploading data to a tabular data node in a Data Science Data Room.
@@ -41,7 +45,7 @@ def provision_tabular_dataset(
     The manifest hash (dataset id) in case the upload succeeded.
     """
     manifest_hash = session.client.upload_dataset(
-        data, key, name, description=description
+        data, key, name, description=description, secret_store_options=secret_store_options
     )
     session.publish_dataset(
         data_room_id, manifest_hash, leaf_id=f"{data_node}_leaf", key=key
@@ -58,6 +62,7 @@ def provision_raw_dataset(
     data_node: str,
     data_room_id: str,
     description: str = "",
+    secret_store_options: Optional[SecretStoreOptions] = None,
 ) -> str:
     """
     Convenience function for uploading data to a raw leaf node in a Data Science Data Room.
@@ -78,7 +83,7 @@ def provision_raw_dataset(
     The manifest hash (dataset id) in case the upload succeeded.
     """
     manifest_hash = session.client.upload_dataset(
-        data, key, name, description=description
+        data, key, name, description=description, secret_store_options=secret_store_options
     )
     session.publish_dataset(data_room_id, manifest_hash, leaf_id=data_node, key=key)
     return manifest_hash

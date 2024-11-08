@@ -268,14 +268,14 @@ class MediaDcr:
             )
 
     def _send_publish_dataset_request(
-        self, request_key: str, manifest_hash: str, encryption_key: bytes
+        self, request_key: str, manifest_hash: str, encryption_key: Key
     ):
         request = MediaInsightsRequest.model_validate(
             {
                 request_key: {
                     "dataRoomIdHex": self.id,
                     "datasetHashHex": manifest_hash,
-                    "encryptionKeyHex": encryption_key.hex(),
+                    "encryptionKeyHex": encryption_key.material.hex(),
                     "scopeIdHex": self.client._ensure_dcr_data_scope(self.id),
                 },
             }

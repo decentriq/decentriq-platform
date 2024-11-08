@@ -14,7 +14,7 @@ from . import (
     data_connectors,
 )
 from .attestation import EnclaveSpecifications, enclave_specifications
-from .client import Client, Session, create_client
+from .client import Client, Session, create_client, SecretStoreOptions
 from .endorsement import Endorser
 from .storage import Key
 from .archv2 import SessionV2, Secret
@@ -63,5 +63,6 @@ __all__ = [
     "analytics",
     "data_connectors",
     "SessionV2",
-    "Secret"
+    "Secret",
+    "SecretStoreOptions",
 ]
