@@ -53,6 +53,7 @@ class _CreateDcrKindEnumTypeWrapper(google.protobuf.internal.enum_type_wrapper._
     MEDIA: _CreateDcrKind.ValueType  # 2
     LOOKALIKE_MEDIA: _CreateDcrKind.ValueType  # 3
     MEDIA_INSIGHTS: _CreateDcrKind.ValueType  # 4
+    AB_MEDIA: _CreateDcrKind.ValueType  # 5
 
 class CreateDcrKind(_CreateDcrKind, metaclass=_CreateDcrKindEnumTypeWrapper): ...
 
@@ -61,6 +62,7 @@ DATASCIENCE: CreateDcrKind.ValueType  # 1
 MEDIA: CreateDcrKind.ValueType  # 2
 LOOKALIKE_MEDIA: CreateDcrKind.ValueType  # 3
 MEDIA_INSIGHTS: CreateDcrKind.ValueType  # 4
+AB_MEDIA: CreateDcrKind.ValueType  # 5
 global___CreateDcrKind = CreateDcrKind
 
 @typing_extensions.final

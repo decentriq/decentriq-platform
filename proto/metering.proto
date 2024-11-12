@@ -70,6 +70,7 @@ enum CreateDcrKind {
     MEDIA = 2;
     LOOKALIKE_MEDIA = 3;
     MEDIA_INSIGHTS = 4;
+    AB_MEDIA = 5;
 }
 
 message DcrMetadata {
