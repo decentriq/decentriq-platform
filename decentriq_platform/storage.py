@@ -129,10 +129,8 @@ class StorageCipher:
         encrypted_data = self.cipher.encrypt("storage cipher", data, nonce)
 
         encryption_header = EncryptionHeader()
-        encryption_header.chilyKey.encryptionNonce = bytes(nonce.bytes)
+        encryption_header.chilyKey.encryptionNonce = nonce.bytes
 
         serialized_encryption_header = serialize_length_delimited(encryption_header)
-        encrypted_data_with_header = bytes(
-            list(serialized_encryption_header) + encrypted_data
-        )
+        encrypted_data_with_header = serialized_encryption_header + encrypted_data
         return encrypted_data_with_header

@@ -134,9 +134,9 @@ class Channel:
         cipher = chily.Cipher(self.channel_keypair.secret, self.enclave_public_key)
         encrypted_data = cipher.encrypt("client sent session data", data, nonce)
         data_nonce_pubkey = datanoncepubkey_to_message(
-            bytes(encrypted_data),
-            bytes(nonce.bytes),
-            bytes(self.channel_keypair.public_key.bytes),
+            encrypted_data,
+            nonce.bytes,
+            self.channel_keypair.public_key.bytes,
         )
         return data_nonce_pubkey
 
@@ -150,17 +150,13 @@ class Channel:
         )
 
     def _get_message_auth(self, auth: Auth) -> UserAuth:
-        shared_key = bytes(
-            self.channel_keypair.secret.diffie_hellman(self.enclave_public_key).bytes
-        )
+        shared_key = self.channel_keypair.secret.diffie_hellman(self.enclave_public_key).bytes
         hkdf = HKDF(
             algorithm=hashes.SHA512(), length=64, info=b"IdP KDF Context", salt=b""
         )
         mac_key = hkdf.derive(shared_key)
         mac_tag = hmac.digest(mac_key, auth.user_id.encode(), "sha512")
-        public_keys = bytes(self.channel_keypair.public_key.bytes) + bytes(
-            self.enclave_public_key.bytes
-        )
+        public_keys = self.channel_keypair.public_key.bytes + self.enclave_public_key.bytes
         signature = auth.sign(public_keys)
         sigma_auth = Sigma(signature, mac_tag, auth)
         user_auth = UserAuth(

@@ -12,6 +12,7 @@ from . import (
     types,
     authentication,
     data_connectors,
+    ab_media,
 )
 from .attestation import EnclaveSpecifications, enclave_specifications
 from .client import Client, Session, create_client, SecretStoreOptions
@@ -42,6 +43,7 @@ __pdoc__ = {
     "legacy": True,
     "decoder": False,
     "data_connectors": True,
+    "ab_media": True,
 }
 
 __all__ = [
@@ -62,6 +64,7 @@ __all__ = [
     "legacy",
     "analytics",
     "data_connectors",
+    "ab_media",
     "SessionV2",
     "Secret",
     "SecretStoreOptions",

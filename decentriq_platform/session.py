@@ -17,7 +17,6 @@ from typing import (
     Tuple,
 )
 
-import chily
 from decentriq_dcr_compiler import compiler
 
 

@@ -7,8 +7,10 @@ from threading import BoundedSemaphore
 from typing import BinaryIO, Dict, List, Optional, Tuple, cast
 
 from decentriq_dcr_compiler import compiler
+from decentriq_dcr_compiler import ab_media as ab_media_compiler
 from decentriq_dcr_compiler.schemas import DataScienceDataRoom
 from decentriq_dcr_compiler.schemas import MediaInsightsDcr as MediaInsightsDcrSchema
+from decentriq_dcr_compiler.schemas import AbMediaDcr as AbMediaDcrSchema
 from decentriq_dcr_compiler.schemas.secret_store_entry_state import SecretStoreEntryState as SecretStoreEntryStateSchema, v0 as v0_schema
 from decentriq_dcr_compiler.types.secret_store_entry_state import v0
 
@@ -28,6 +30,7 @@ from .connection import Connection
 from .endorsement import Endorser
 from .graphql import GqlClient
 from .media import MediaDcr, MediaDcrDefinition
+from .ab_media import AbMediaDcr, AbMediaDcrDefinition
 from .proto import AttestationSpecification, AuthenticationMethod, CreateDcrKind
 from .proto import DataRoom as ProtoDataRoom
 from .proto import PkiPolicy, parse_length_delimited, serialize_length_delimited
@@ -47,6 +50,7 @@ from .types import (
     EnclaveSpecification,
     MediaComputeJob,
     MediaComputeJobFilterInput,
+    OrganizationUser,
 )
 from .logger import logger
 
@@ -61,22 +65,40 @@ class SecretStoreOptions:
         self.store_encryption_key = store_encryption_key
         if not store_encryption_key and encryption_key_acl is not None:
             raise ValueError("Encryption key ACL can only be set when storing the encryption key")
+        self.encryption_key_acl = encryption_key_acl
+        self.encryption_key_acl_version = encryption_key_acl_version
+    
+    def validate_users(self, client_user: str, organization_user: List[OrganizationUser]):
         # Validate the encryption key ACL
-        if encryption_key_acl is not None:
-            if encryption_key_acl_version == 0:
+        if self.encryption_key_acl is not None:
+            if self.encryption_key_acl_version == 0:
                 # Check it's in valid format
-                v0_schema.SecretStoreEntryAcl.model_validate(encryption_key_acl)
-                # Check it contains at least one owner
-                validated_encryption_key_acl = cast(v0.SecretStoreEntryAcl, encryption_key_acl)
+                v0_schema.SecretStoreEntryAcl.model_validate(self.encryption_key_acl)
+                validated_encryption_key_acl = cast(v0.SecretStoreEntryAcl, self.encryption_key_acl)
                 if validated_encryption_key_acl["type"] == "UsersList":
+                    # Check it contains at least one owner
                     if not any(user["role"] == "Owner" for user in validated_encryption_key_acl["users"]):
                         raise ValueError("Encryption key ACL must contain at least one owner")
+                    # Check:
+                    # - it contains only users from the organization
+                    # - users are migrated
+                    for user in validated_encryption_key_acl["users"]:
+                        if user["id"] == client_user:
+                            continue
+                        valid_user = False
+                        for org_user in organization_user:
+                            if user["id"] == org_user["email"]:
+                                if org_user["migrationCompletedAt"] or org_user["needsMigration"] == False:
+                                    valid_user = True
+                                    break
+                                else:
+                                    raise ValueError("Encryption key ACL must contain only migrated users")
+                        if not valid_user:
+                            raise ValueError("Encryption key ACL must contain only users from your organization")
                 else:
                     raise ValueError(f"Unsupported encryption key ACL type {validated_encryption_key_acl['type']}")
             else:
-                raise ValueError(f"Unsupported encryption key ACL version {encryption_key_acl_version}")
-        self.encryption_key_acl = encryption_key_acl
-        self.encryption_key_acl_version = encryption_key_acl_version
+                raise ValueError(f"Unsupported encryption key ACL version {self.encryption_key_acl_version}")
 
 class Client:
     """
@@ -504,7 +526,7 @@ class Client:
             },
         )
         return data["dataLab"]["setStatistics"]["record"]["id"]
-    
+
     def upload_dataset(
         self,
         data: BinaryIO,
@@ -531,7 +553,15 @@ class Client:
         - `description`: An optional file description.
         - `chunk_size`: Size of the chunks into which the stream is split in bytes.
         - `parallel_uploads`: Whether to upload chunks in parallel.
+        - `usage`: The usage of the dataset.
+        - `secret_store_options`: Options for the secret store.
+            It can be used to specify if the encryption key should be stored in the secret store
+            and can also be used to provide a custom ACL for the encryption key.
         """
+        if secret_store_options is None:
+            secret_store_options = SecretStoreOptions()
+        else:
+            secret_store_options.validate_users(self.user_email, self._get_my_organization_users())
         uploader = BoundedExecutor(
             bound=parallel_uploads * 2, max_workers=parallel_uploads
         )
@@ -584,10 +614,9 @@ class Client:
             chunks=chunk_hashes,
             description=description,
             usage=usage,
+            size=sum(chunk_content_sizes),
         )
 
-        if secret_store_options is None:
-            secret_store_options = SecretStoreOptions()
         if secret_store_options.store_encryption_key:
             session_v2 = self.create_session_v2()
 
@@ -614,7 +643,7 @@ class Client:
             session_v2.create_secret(encryption_key_secret)
 
         return manifest_hash
-    
+
     def get_dataset_key(self, manifest_hash: str) -> Key:
         dataset = self.get_dataset(manifest_hash)
         if dataset is None:
@@ -692,6 +721,7 @@ class Client:
         manifest_hash_bytes: bytes,
         manifest_encrypted: bytes,
         chunks: List[str],
+        size: int,
         description: Optional[str] = None,
         usage: Optional[DatasetUsage] = None,
     ) -> str:
@@ -718,6 +748,7 @@ class Client:
                     "usage": usage,
                     "chunkHashes": chunks,
                     "scopeId": scope_id,
+                    "size": size,
                 }
             },
             retry=retry,
@@ -794,7 +825,7 @@ class Client:
         Note, however, that this might put some data rooms in a broken
         state as they might try to read data that does not exist anymore.
         """
-        data_rooms_ids_with_dataset = self._get_data_room_ids_for_publication(
+        data_rooms_ids_with_dataset = self._get_data_room_ids_with_published_dataset(
             manifest_hash
         )
         if data_rooms_ids_with_dataset:
@@ -1001,9 +1032,9 @@ class Client:
         cert_chain_pem = data["certificateAuthority"]["userCertificate"]
         return cert_chain_pem
 
-    def _get_data_rooms_with_published_dataset(
+    def _get_data_room_ids_with_published_dataset(
         self, manifest_hash
-    ) -> List[DataRoomDescription]:
+    ) -> List[str]:
         data = self._graphql.post(
             """
                 query GetDatasetPublications($manifestHash: HexString!) {
@@ -1012,15 +1043,6 @@ class Client:
                             nodes {
                                 dataRoom {
                                     id
-                                    title
-                                    driverAttestationHash
-                                    isStopped
-                                    createdAt
-                                    updatedAt
-                                    owner {
-                                        email
-                                    }
-                                    kind
                                 }
                             }
                         }
@@ -1034,16 +1056,8 @@ class Client:
         publications = data["datasetByManifestHash"]["publications"]["nodes"]
 
         if publications:
-            dcrs = [publication["dataRoom"] for publication in publications]
-            deduplicated_dcrs = ({dcr["id"]: dcr for dcr in dcrs}).values()
-            return list(deduplicated_dcrs)
-        else:
-            return []
-
-    def _get_data_room_ids_for_publication(self, manifest_hash) -> List[str]:
-        data_rooms = self._get_data_rooms_with_published_dataset(manifest_hash)
-        if data_rooms:
-            return [data_room["id"] for data_room in data_rooms]
+            dcr_ids = list(set([publication["dataRoom"]["id"] for publication in publications]))
+            return dcr_ids
         else:
             return []
 
@@ -1655,6 +1669,76 @@ class Client:
         )
         return existing_dcr
 
+    def retrieve_ab_media_dcr(
+        self,
+        dcr_id,
+        enclave_specs: Optional[List[EnclaveSpecification]] = None,
+    ) -> AbMediaDcr:
+        """
+        Retrieve an existing Audience Builder DCR.
+
+        **Parameters**:
+        - `dcr_id`: Data Clean Room ID.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        return AbMediaDcr._from_existing(
+            dcr_id, client=self, enclave_specs=enclave_specs
+        )
+
+    def publish_ab_media_dcr(
+        self,
+        dcr_definition: AbMediaDcrDefinition,
+        *,
+        enclave_specs: Optional[Dict[str, EnclaveSpecification]] = None,
+    ) -> AbMediaDcr:
+        """
+        Publish an Audience Builder DCR.
+
+        **Parameters**:
+        - `dcr_definition`: Definition of the Audience Builder DCR.
+        - `enclave_specs`: The enclave specifications that are considered
+          to be trusted. If not specified, all enclave specifications known
+          to this version of the SDK will be used.
+        """
+        dcr = AbMediaDcrSchema.model_validate_json(
+            json.dumps(dcr_definition._high_level)
+        )
+        # Ensure we create the latest known version of the DCR.
+        dcr_latest = ab_media_compiler.upgrade_ab_media_dcr_to_latest(dcr)
+
+        compiled_serialized = ab_media_compiler.compile_ab_media_dcr(dcr_latest)
+        low_level_dcr = ProtoDataRoom()
+        parse_length_delimited(compiled_serialized, low_level_dcr)
+
+        # Get a new session.
+        # Determine which driver enclave spec (as given by the enclave_specs value)
+        # to use. If this is not explicitly specified, try to check whether it was
+        # already set on the builder that constructed the DCR definition.
+        # If this is also not specified, simply use the latest specifications known to this SDK.
+        specs = (
+            enclave_specs
+            or dcr_definition._enclave_specs
+            or enclave_specifications.latest()
+        )
+        auth, _ = self.create_auth_using_decentriq_pki(specs)
+        session = self.create_session(auth, specs)
+
+        dcr_id = session.publish_data_room(
+            low_level_dcr,
+            kind=CreateDcrKind.AB_MEDIA,
+            high_level_representation=dcr_latest.model_dump_json(
+                by_alias=True
+            ).encode(),
+        )
+        existing_dcr = AbMediaDcr._from_existing(
+            dcr_id=dcr_id,
+            client=self,
+            enclave_specs=list(specs.values()),
+        )
+        return existing_dcr
+
     def _provision_data_lab_to_midcr(
         self,
         data_room_id: str,
@@ -1794,6 +1878,168 @@ class Client:
         return data["dataLab"]["deprovisionDataLabFromMediaInsightsDcr"][
             "publishedDataLab"
         ]
+
+    def _provision_data_lab_to_ab_dcr(
+        self,
+        data_room_id: str,
+        data_lab_id: str,
+    ) -> DataLabDefinition:
+        """
+        Provision a DataLab to an Audience Builder DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to provision to.
+        - `data_lab_id`: ID of the DataLab to be provisioned.
+        """
+        data = self._graphql.post(
+            """
+            mutation ProvisionDataLabToMediaInsightsDcr($input: ProvisionDataLabInput!) {
+                dataLab {
+                    provisionDataLabToMediaInsightsDcr(input: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "dataRoomId": data_room_id,
+                    "dataLabId": data_lab_id,
+                }
+            },
+        )
+        return data["dataLab"]["provisionDataLabToMediaInsightsDcr"]["publishedDataLab"]
+
+    def _deprovision_data_lab_from_ab_dcr(self, data_room_id: str) -> DataLabDefinition:
+        """
+        Deprovision a DataLab from an Audience Builder DCR.
+
+        **Parameters**:
+        - `data_room_id`: ID of the DCR to deprovision from.
+        """
+        data = self._graphql.post(
+            """
+            mutation DeprovisionDataLabFromMediaInsightsDcr($input: String!) {
+                dataLab {
+                    deprovisionDataLabFromMediaInsightsDcr(mediaInsightsDcrId: $input) {
+                        publishedDataLab {
+                            id
+                            name
+                            datasets {
+                                name
+                                dataset {
+                                    id
+                                    manifestHash
+                                    name
+                                }
+                            }
+                            usersDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            segmentsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            demographicsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            embeddingsDataset {
+                                id
+                                manifestHash
+                                name
+                            }
+                            statistics
+                            requireDemographicsDataset
+                            requireEmbeddingsDataset
+                            isValidated
+                            numEmbeddings
+                            matchingIdFormat
+                            matchingIdHashingAlgorithm
+                            validationComputeJobId
+                            statisticsComputeJobId
+                            jobsDriverAttestationHash
+                            highLevelRepresentationAsString
+                        }
+                    }
+                }
+            }
+            """,
+            {
+                "input": data_room_id,
+            },
+        )
+        return data["dataLab"]["deprovisionDataLabFromMediaInsightsDcr"][
+            "publishedDataLab"
+        ]
+
+    def _get_my_organization_users(self) -> List[OrganizationUser]:
+        data = self._graphql.post(
+            """
+            query MyOrganizationUsers() {
+                myself {
+                    organization {
+                        users {
+                            nodes {
+                                id
+                                email
+                                migrationCompletedAt
+                                needsMigration
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+        return data["myself"]["organization"]["users"]["nodes"]
+
 
 
 def create_client(

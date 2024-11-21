@@ -493,7 +493,7 @@ class DataLab:
                     f"Failed to provision Data Lab. Dataset type '{dataset_type}' unknown."
                 )
             self._send_publish_dataset_request(
-                request_key, manifest_hash, encryption_key, midcr_session, data_room_id
+                request_key, manifest_hash, encryption_key.material, midcr_session, data_room_id
             )
 
     def _deprovision_existing_data_lab_from_media_dcr(

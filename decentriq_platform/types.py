@@ -373,3 +373,9 @@ MATCHING_ID_INTERNAL_LOOKUP = {
         TableColumnHashingAlgorithm.SHA256_HEX,
     ),
 }
+
+class OrganizationUser(TypedDict):
+    id: str
+    email: str
+    migrationCompletedAt: Optional[str]
+    needsMigration: bool
