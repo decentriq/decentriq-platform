@@ -128,6 +128,7 @@ class AbMediaDcrBuilder:
         Enable the "rule-based" feature set.
         """
         self.enable_rule_based = True
+        self.enable_remarketing = True
         return self
 
     def with_advertiser_audience_download(self) -> Self:

@@ -257,10 +257,17 @@ class AdvertiserApi:
                     f'Audience with name "{audience_name}" not in the list of available audiences'
                 )
 
-            # Set the status of the audience to "published".
             audience_to_activate = audiences_dict[audience_name]
-            audience_to_activate["mutable"]["status"] = "published"
-            audiences_dict[audience_name] = audience_to_activate
+
+            has_remarketing = self.features.has_enable_remarketing()
+            if not has_remarketing and audience_to_activate["kind"] == "advertiser":
+                raise Exception(
+                    f"The audience '{audience_name}' is of type 'advertiser', but this DCR does not allow remarketing."
+                )
+            else:
+                # Set the status of the audience to "published".
+                audience_to_activate["mutable"]["status"] = "published"
+                audiences_dict[audience_name] = audience_to_activate
 
         # Update the audiences in the `audiences.json`.
         audiences_json["audiences"] = [a for a in audiences_dict.values()]
@@ -296,6 +303,9 @@ class AdvertiserApi:
         new_audiences_by_id = {a.id: a for a in audiences}
         all_audiences = existing_audiences + [new_audience.as_dict() for new_audience in audiences]
         for audience in audiences:
+            if audience.kind == "advertiser":
+                raise Exception("Advertiser audiences cannot be added through this function")
+
             if isinstance(audience, LookalikeAudienceDefinition):
                 # Additional checks for lookalike audiences.
                 if not self.features.has_enable_lookalike_audiences():
