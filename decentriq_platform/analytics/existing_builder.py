@@ -31,7 +31,14 @@ from .sql_compute_nodes import SqlComputeNodeDefinition
 from .sqlite_compute_nodes import SqliteComputeNodeDefinition
 from .synthetic_compute_nodes import SyntheticDataComputeNodeDefinition
 from .table_data_nodes import TableDataNodeDefinition
-from ..data_connectors import AwsImportConnectorDefinition, AwsExportConnectorDefinition
+from ..data_connectors import (
+    AwsImportConnectorDefinition,
+    AwsExportConnectorDefinition,
+    GcsImportConnectorDefinition,
+    GcsExportConnectorDefinition,
+    AzureBlobStorageImportConnectorDefinition,
+    AzureBlobStorageExportConnectorDefinition,
+)
 from .dataset_sink_compute_nodes import DatasetSinkComputeNodeDefinition
 from .version import DATA_SCIENCE_DCR_SUPPORTED_VERSION
 
@@ -184,6 +191,12 @@ class ExistingAnalyticsDcrBuilder:
         SyntheticDataComputeNodeDefinition,
         PreviewComputeNodeDefinition,
         AwsImportConnectorDefinition,
+        AwsExportConnectorDefinition,
+        GcsImportConnectorDefinition,
+        GcsExportConnectorDefinition,
+        AzureBlobStorageImportConnectorDefinition,
+        AzureBlobStorageExportConnectorDefinition,
+
     ]:
 
         root_node = node.kind.root
@@ -241,6 +254,19 @@ class ExistingAnalyticsDcrBuilder:
                     aws_config,
                     credentials_dependency,
                 )
+            elif "gcs" in import_connector_kind:
+                config = import_connector.kind.root.gcs
+                compute_node_definition = GcsImportConnectorDefinition._from_high_level(
+                    name,
+                    config,
+                    credentials_dependency,
+                )
+            elif "azure" in import_connector_kind:
+                config = import_connector.kind.root.azure
+                compute_node_definition = AzureBlobStorageImportConnectorDefinition._from_high_level(
+                    name,
+                    credentials_dependency,
+                )
             else:
                 raise Exception(
                     f"Unknown import connector kind {import_connector_kind}"
@@ -255,6 +281,21 @@ class ExistingAnalyticsDcrBuilder:
                 compute_node_definition = AwsExportConnectorDefinition._from_high_level(
                     name,
                     aws_config,
+                    credentials_dependency,
+                    export_connector_node_dependency,
+                )
+            elif "gcs" in export_connector_kind:
+                config = export_connector.kind.root.gcs
+                compute_node_definition = GcsExportConnectorDefinition._from_high_level(
+                    name,
+                    config,
+                    credentials_dependency,
+                    export_connector_node_dependency,
+                )
+            elif "azure" in export_connector_kind:
+                config = export_connector.kind.root.azure
+                compute_node_definition = AzureBlobStorageExportConnectorDefinition._from_high_level(
+                    name,
                     credentials_dependency,
                     export_connector_node_dependency,
                 )
