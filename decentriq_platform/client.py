@@ -914,10 +914,13 @@ class Client:
         auth = Auth(cert_chain_pem, keypair, self.user_email)
         return auth
 
-    def get_data_room_descriptions(self) -> List[DataRoomDescription]:
+    def get_data_room_descriptions(self, *, exclude_stopped_dcrs: bool = False) -> List[DataRoomDescription]:
         """
-        Returns the a list of descriptions of all the data rooms a user created
-        or participates in.
+        Returns a list of data room descriptions that a user has created or
+        participates in. 
+        
+        Setting `exclude_stopped_dcrs` to `True` omits stopped data room descriptions 
+        from the returned list.
         """
         data = self._graphql.post(
             """
@@ -939,9 +942,16 @@ class Client:
             }
             """
         )
-        return [
+        all_dcr_descriptions = [
             DataRoomDescription(**item) for item in data["publishedDataRooms"]["nodes"]
         ]
+        if exclude_stopped_dcrs:
+            active_dcr_descriptions = [
+                d for d in all_dcr_descriptions if d["isStopped"] == False
+            ]
+            return active_dcr_descriptions
+        else:
+            return all_dcr_descriptions
 
     def get_data_room_description(
         self, data_room_hash, enclave_specs
