@@ -1,12 +1,12 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional, TypeAlias
+from typing import Any, Dict, List, Optional, Union
 
-from typing_extensions import TypedDict
+from typing_extensions import TypedDict, TypeAlias
 
 from .proto import AttestationSpecification
 from .storage import Key
 
-JSONType: TypeAlias = dict[str, "JSONType"] | list["JSONType"] | str | int | float | bool | None
+JSONType: TypeAlias = Union[Dict[str, "JSONType"], List["JSONType"], str, int, float, bool, None]
 
 class JobId:
     """
