@@ -304,6 +304,7 @@ class DataLabDefinition(TypedDict):
     highLevelRepresentationAsString: str
     createdAt: str
     updatedAt: str
+    dropInvalidRows: bool
 
 
 class DataLabListFilter(Enum):

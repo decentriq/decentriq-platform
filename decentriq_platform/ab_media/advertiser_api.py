@@ -14,6 +14,7 @@ from .advertiser_computations import (
     EstimateAudienceSizeForAdvertiserLalComputation,
     GetLookalikeAudienceStatisticsComputation,
     GetDataAttributesComputation,
+    GetAudiencesValidationReport,
 )
 from .helper import (
     get_parameter_payloads,
@@ -201,6 +202,25 @@ class AdvertiserApi:
             )
             result = computation.run_and_get_results()
             return result["audience_size"]
+
+    def get_validation_report(self) -> dict[str, Any]:
+        """Get the validation reports for the advertiser datasets.
+
+        Validation reports contain information about issues that were found
+        in the provisioned data (e.g. values that don't match the expected schema
+        or duplicated rows).
+
+        **Returns**:
+        A dictionary with a single key "audiences" under which the validation
+        report is stored.
+        """
+        if not self.features.has_enable_drop_invalid_rows():
+            raise Exception("This Audience Builder DCR does not validation of advertiser datasets.")
+        return GetAudiencesValidationReport(
+            dcr_id=self.dcr_id,
+            client=self.client,
+            session=self.session
+        ).run_and_get_results()
 
     def get_audience_user_list(self, audience_name: str) -> List[str]:
         """

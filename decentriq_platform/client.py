@@ -67,7 +67,7 @@ class SecretStoreOptions:
             raise ValueError("Encryption key ACL can only be set when storing the encryption key")
         self.encryption_key_acl = encryption_key_acl
         self.encryption_key_acl_version = encryption_key_acl_version
-    
+
     def validate_users(self, client_user: str, organization_user: List[OrganizationUser]):
         # Validate the encryption key ACL
         if self.encryption_key_acl is not None:
@@ -917,9 +917,9 @@ class Client:
     def get_data_room_descriptions(self, *, exclude_stopped_dcrs: bool = False) -> List[DataRoomDescription]:
         """
         Returns a list of data room descriptions that a user has created or
-        participates in. 
-        
-        Setting `exclude_stopped_dcrs` to `True` omits stopped data room descriptions 
+        participates in.
+
+        Setting `exclude_stopped_dcrs` to `True` omits stopped data room descriptions
         from the returned list.
         """
         data = self._graphql.post(
@@ -1228,6 +1228,7 @@ class Client:
                     jobsDriverAttestationHash
                     highLevelRepresentationAsString
                     forceSparkValidation
+                    dropInvalidRows
                 }
             }
             """,

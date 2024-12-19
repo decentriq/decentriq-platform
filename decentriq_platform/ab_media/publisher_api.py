@@ -12,6 +12,9 @@ from .publisher_computations import (
     EstimateAudienceSizeForPublisherLalComputation,
     GetAudienceUserListForPublisherLalComputation,
     ComputeInsightsComputation,
+    GetSegmentsValidationReport,
+    GetMatchingValidationReport,
+    GetDemographicsValidationReport,
 )
 from .helper import (
     get_parameter_payloads,
@@ -177,6 +180,40 @@ class PublisherApi:
             dcr_id=self.dcr_id, client=self.client, session=self.session
         )
         return overlap_insights_computation.run_and_get_results()
+
+    def get_validation_report(self) -> dict[str, Any]:
+        """Get the validation reports for the advertiser datasets.
+
+        Validation reports contain information about issues that were found
+        in the provisioned data (e.g. values that don't match the expected schema
+        or duplicated rows).
+
+        **Returns**:
+        A dictionary with keys "matching", "segments", "demographics". Each
+        key points to the validation report of the respective dataset.
+        """
+        if not self.features.has_enable_drop_invalid_rows():
+            raise Exception("This Audience Builder DCR does not validation of publisher datasets.")
+        matching_report = GetMatchingValidationReport(
+            dcr_id=self.dcr_id,
+            client=self.client,
+            session=self.session
+        ).run_and_get_results()
+        segments_report = GetSegmentsValidationReport(
+            dcr_id=self.dcr_id,
+            client=self.client,
+            session=self.session
+        ).run_and_get_results()
+        demographics_report = GetDemographicsValidationReport(
+            dcr_id=self.dcr_id,
+            client=self.client,
+            session=self.session
+        ).run_and_get_results()
+        return {
+            "matching": matching_report,
+            "segments": segments_report,
+            "demographics": demographics_report,
+        }
 
     def provision_from_data_lab(self, data_lab_id: str):
         """

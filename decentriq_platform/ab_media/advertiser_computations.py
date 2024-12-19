@@ -326,3 +326,33 @@ class GetDataAttributesComputation(Computation):
             "attributes.json", interval=interval, timeout=timeout
         )
         return json.loads(results)
+
+
+class GetAudiencesValidationReport(Computation):
+    def __init__(
+        self,
+        dcr_id: str,
+        client: Client,
+        session: Session,
+    ) -> None:
+        super().__init__(dcr_id=dcr_id, client=client, session=session)
+
+    def node_id(self) -> str:
+        return "audiences_validation_report"
+
+    def run(self) -> None:
+        super().run(
+            request_type="getAudiencesValidationReport",
+        )
+
+    def run_and_get_results(
+        self, interval: int = 5, timeout: Optional[int] = None
+    ) -> dict[str, Any]:
+        self.run()
+        report_str = super().get_results_str_from_zip(
+            "validation-report.json", interval=interval, timeout=timeout
+        )
+        report = json.loads(report_str)
+        return {
+            "audiences": report
+        }

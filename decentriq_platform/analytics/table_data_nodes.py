@@ -95,6 +95,7 @@ class TableDataNodeDefinition(NodeDefinition):
         columns: List[Column],
         is_required: bool,
         id: Optional[str] = None,
+        drop_invalid_rows: bool = False,
         unique_column_combinations: list[list[int]] = [],
     ) -> None:
         """
@@ -105,6 +106,7 @@ class TableDataNodeDefinition(NodeDefinition):
         - `columns`: Definition of the columns that make up the `TableDataNodeDefinition`.
         - `is_required`: Flag determining if the `RawDataNode` must be present for dependent computations.
         - `id`: Optional ID of the `TableDataNodeDefinition`
+        - `drop_invalid_rows`: Whether to automatically drop rows that are marked as invalid during the validation step.
         - `unique_column_combinations`: Check that the given combination of
           columns are unique across the dataset. This should be a list of lists,
           where the inner lists list the 0-based column indices.
@@ -118,6 +120,7 @@ class TableDataNodeDefinition(NodeDefinition):
         self.columns = columns
         self.specification_id = "decentriq.python-ml-worker-32-64"
         self.static_content_specification_id = "decentriq.driver"
+        self.drop_invalid_rows = drop_invalid_rows
         self.unique_column_combinations = unique_column_combinations
 
     def _get_high_level_representation(self) -> Dict[str, str]:
@@ -148,6 +151,7 @@ class TableDataNodeDefinition(NodeDefinition):
             )
 
         table_validation = {}
+
         if self.unique_column_combinations:
             table_validation["uniqueness"] = {
                 "uniqueKeys": [
@@ -170,6 +174,7 @@ class TableDataNodeDefinition(NodeDefinition):
                                 "staticContentSpecificationId": self.static_content_specification_id,
                                 "pythonSpecificationId": self.specification_id,
                                 "validation": table_validation,
+                                "dropInvalidRows": self.drop_invalid_rows,
                             },
                         }
                     },
@@ -198,6 +203,7 @@ class TableDataNodeDefinition(NodeDefinition):
         - `node`: Pydantic model of the `TableDataNodeDefinition`.
         """
         node_dict = json.loads(node.model_dump_json())
+        drop_invalid_rows = node_dict["validationNode"].get("dropInvalidRows", False)
         columns = [
             Column(
                 name=column["name"],
@@ -219,6 +225,7 @@ class TableDataNodeDefinition(NodeDefinition):
             name=name,
             columns=columns,
             is_required=is_required,
+            drop_invalid_rows=drop_invalid_rows,
         )
 
     def build(

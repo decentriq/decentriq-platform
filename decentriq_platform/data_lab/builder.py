@@ -24,6 +24,7 @@ class DataLabBuilder:
         self.existing = False
         self.data_lab_id: Optional[str] = None
         self._force_spark_validation = False
+        self.drop_invalid_rows = True
 
     def _with_force_spark_validation(self, use_spark: bool):
         """
@@ -46,6 +47,12 @@ class DataLabBuilder:
         - `name`: Name to be used for the DataLab.
         """
         self.name = name
+
+    def with_disable_drop_invalid_rows(self):
+        """
+        Disable dropping of invalid rows in the Data Lab.
+        """
+        self.drop_invalid_rows = False
 
     def with_matching_id_format(self, matching_id: MatchingId):
         """
@@ -101,6 +108,7 @@ class DataLabBuilder:
                 data_lab_definition["requireSegmentsDataset"],
                 data_lab_definition["matchingIdFormat"],
                 force_spark_validation=data_lab_definition["forceSparkValidation"],
+                drop_invalid_rows=data_lab_definition["dropInvalidRows"],
             )
             existing_data_lab = ExistingDataLab(data_lab_definition)
             return DataLab(self.client, cfg, existing_data_lab)
@@ -114,5 +122,6 @@ class DataLabBuilder:
                 self.has_segments,
                 self.matching_id,
                 force_spark_validation=self._force_spark_validation,
+                drop_invalid_rows=self.drop_invalid_rows,
             )
             return DataLab(self.client, cfg)

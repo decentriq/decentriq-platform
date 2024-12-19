@@ -186,3 +186,80 @@ class ComputeInsightsComputation(Computation):
             "segments.json", interval=interval, timeout=timeout
         )
         return json.loads(result)
+
+def _get_validation_results(node, **kwargs) -> Optional[dict[str, Any]]:
+    node.run()
+    try:
+        report_str = node.get_results_str_from_zip("validation-report.json", **kwargs)
+        return json.loads(report_str)
+    except Exception as e:
+        if "Input file does not exist" in str(e):
+            return None
+        else:
+            raise e
+
+class GetMatchingValidationReport(Computation):
+    def __init__(
+        self,
+        dcr_id: str,
+        client: Client,
+        session: Session,
+    ) -> None:
+        super().__init__(dcr_id=dcr_id, client=client, session=session)
+
+    def node_id(self) -> str:
+        return "matching_validation_report"
+
+    def run(self) -> None:
+        super().run(
+            request_type="getMatchingValidationReport",
+        )
+
+    def run_and_get_results(
+        self, interval: int = 5, timeout: Optional[int] = None
+    ) -> Optional[dict[str, Any]]:
+        return _get_validation_results(self, interval=interval, timeout=timeout)
+
+class GetSegmentsValidationReport(Computation):
+    def __init__(
+        self,
+        dcr_id: str,
+        client: Client,
+        session: Session,
+    ) -> None:
+        super().__init__(dcr_id=dcr_id, client=client, session=session)
+
+    def node_id(self) -> str:
+        return "segments_validation_report"
+
+    def run(self) -> None:
+        super().run(
+            request_type="getSegmentsValidationReport",
+        )
+
+    def run_and_get_results(
+        self, interval: int = 5, timeout: Optional[int] = None
+    ) -> Optional[dict[str, Any]]:
+        return _get_validation_results(self, interval=interval, timeout=timeout)
+
+class GetDemographicsValidationReport(Computation):
+    def __init__(
+        self,
+        dcr_id: str,
+        client: Client,
+        session: Session,
+    ) -> None:
+        super().__init__(dcr_id=dcr_id, client=client, session=session)
+
+    def node_id(self) -> str:
+        return "demographics_validation_report"
+
+    def run(self) -> None:
+        super().run(
+            request_type="getDemographicsValidationReport",
+        )
+
+    def run_and_get_results(
+        self, interval: int = 5, timeout: Optional[int] = None
+    ) -> Optional[dict[str, Any]]:
+        return _get_validation_results(self, interval=interval, timeout=timeout)

@@ -15,6 +15,9 @@ class AbMediaDcrFeatures:
     def has_enable_model_performance_evaluation(self) -> bool:
         return self._features_contain("ENABLE_MODEL_PERFORMANCE_EVALUATION")
 
+    def has_enable_drop_invalid_rows(self) -> bool:
+        return self._features_contain("ENABLE_DROP_INVALID_ROWS")
+
     def has_enable_debug_mode(self) -> bool:
         debug_enabled = self._features_contain("ENABLE_DEBUG_MODE")
         if debug_enabled:

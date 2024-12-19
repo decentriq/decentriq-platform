@@ -13,8 +13,8 @@ from decentriq_dcr_compiler._schemas.create_data_lab import (
 )
 from decentriq_dcr_compiler import (
     CreateDataLab,
-    CreateDataLab7,
-    CreateDataLabComputeV6,
+    CreateDataLab8,
+    CreateDataLabComputeV7,
     MediaInsightsRequest,
 )
 
@@ -59,6 +59,7 @@ class DataLabConfig:
         has_segments: bool,
         matching_id: MatchingId,
         force_spark_validation: bool = False,
+        drop_invalid_rows: bool = True
     ):
         self.name = name
         self.has_demographics = has_demographics
@@ -67,6 +68,7 @@ class DataLabConfig:
         self.has_segments = has_segments
         self.matching_id = matching_id
         self._force_spark_validation = force_spark_validation
+        self.drop_invalid_rows = drop_invalid_rows
 
 
 class ExistingDataLab:
@@ -114,8 +116,8 @@ class DataLab:
                 matching_id_hashing_algorithm,
             ) = MATCHING_ID_INTERNAL_LOOKUP[self.cfg.matching_id]
             create_data_lab = CreateDataLab(
-                root=CreateDataLab7(
-                    v6=CreateDataLabComputeV6(
+                root=CreateDataLab8(
+                    v7=CreateDataLabComputeV7(
                         authenticationRootCertificatePem=self.client.decentriq_ca_root_certificate.decode(),
                         driverEnclaveSpecification=HlEnclaveSpecification(
                             attestationProtoBase64="",
@@ -140,7 +142,8 @@ class DataLab:
                             id="",
                             workerProtocol=0,
                         ),
-                        forceSparkValidation=self.cfg._force_spark_validation
+                        forceSparkValidation=self.cfg._force_spark_validation,
+                        dropInvalidRows=self.cfg.drop_invalid_rows,
                     ),
                 )
             )
@@ -331,10 +334,11 @@ class DataLab:
         self._update_enclave_specs()
         self.dcr_id = self._construct_backing_dcr(self.session)
         for dataset_type, dataset in self.datasets.items():
-            node_name = self._get_data_lab_node_names(dataset_type)
+            node_name = self._get_data_lab_node_names(dataset_type, features)
             self.session.publish_dataset(
                 self.dcr_id, dataset.manifest_hash, node_name, dataset.key
             )
+
         # Start validation jobs
         validation_job_id = self.session._submit_compute(
             self.dcr_id,
@@ -342,6 +346,7 @@ class DataLab:
             dry_run=dry_run,
             parameters=parameters,
         ).jobId.hex()
+
         # Start statistics job
         statistics_job_id = self.session._submit_compute(
             self.dcr_id, ["publisher_data_statistics"]
@@ -673,31 +678,32 @@ class DataLab:
         auth, _ = self.client.create_auth_using_decentriq_pki(enclave_specs)
         self.session = self.client.create_session(auth, enclave_specs)
 
-    def _get_data_lab_node_names(self, dataset_type: DataLabDatasetType):
+    def _get_data_lab_node_names(self, dataset_type: DataLabDatasetType, features: list[str]):
         if dataset_type == DataLabDatasetType.EMBEDDINGS:
-            return compiler.get_data_lab_node_id(compiler.DataLabNode.Embeddings)
+            return compiler.get_data_lab_node_id(compiler.DataLabNode.Embeddings, features)
         elif dataset_type == DataLabDatasetType.DEMOGRAPHICS:
-            return compiler.get_data_lab_node_id(compiler.DataLabNode.Demographics)
+            return compiler.get_data_lab_node_id(compiler.DataLabNode.Demographics, features)
         elif dataset_type == DataLabDatasetType.MATCH:
-            return compiler.get_data_lab_node_id(compiler.DataLabNode.Users)
+            return compiler.get_data_lab_node_id(compiler.DataLabNode.Users, features)
         elif dataset_type == DataLabDatasetType.SEGMENTS:
-            return compiler.get_data_lab_node_id(compiler.DataLabNode.Segments)
+            return compiler.get_data_lab_node_id(compiler.DataLabNode.Segments, features)
 
     def _get_validation_nodes(self):
         features = self._get_features()
         validation_nodes = []
         if "VALIDATE_MATCHING" in features:
-            users = self._get_data_lab_node_names(DataLabDatasetType.MATCH)
+            users = self._get_data_lab_node_names(DataLabDatasetType.MATCH, features)
             validation_nodes.append(users)
         if "VALIDATE_SEGMENTS" in features:
-            segments = self._get_data_lab_node_names(DataLabDatasetType.SEGMENTS)
+            segments = self._get_data_lab_node_names(DataLabDatasetType.SEGMENTS, features)
             validation_nodes.append(segments)
         if "VALIDATE_EMBEDDINGS" in features and self.cfg.has_embeddings:
-            embeddings = self._get_data_lab_node_names(DataLabDatasetType.EMBEDDINGS)
+            embeddings = self._get_data_lab_node_names(DataLabDatasetType.EMBEDDINGS, features)
             validation_nodes.append(embeddings)
         if "VALIDATE_DEMOGRAPHICS" in features and self.cfg.has_demographics:
             demographics = self._get_data_lab_node_names(
-                DataLabDatasetType.DEMOGRAPHICS
+                DataLabDatasetType.DEMOGRAPHICS,
+                features
             )
             validation_nodes.append(demographics)
         # Add the appropriate suffix for the validation nodes.
