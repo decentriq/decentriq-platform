@@ -34,6 +34,11 @@ class AnalyticsDcrDefinition:
     def _get_high_level_representation(self) -> Dict[str, Any]:
         return self.high_level
 
+    def _get_description(self) -> str:
+        return self.high_level[DATA_SCIENCE_DCR_SUPPORTED_VERSION]["interactive"][
+            "initialConfiguration"
+        ]["description"]
+
 
 class AnalyticsDcr:
     """

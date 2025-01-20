@@ -1574,9 +1574,9 @@ class Client:
           to be trusted. If not specified, all enclave specifications known
           to this version of the SDK will be used.
         """
-        data_room = DataScienceDataRoom.model_validate(
-            dcr_definition._get_high_level_representation()
-        )
+        hl = dcr_definition._get_high_level_representation()
+
+        data_room = DataScienceDataRoom.model_validate(hl)
         compiled_data_room = compiler.compile_data_science_data_room(data_room)
         self.compile_context = compiled_data_room.compile_context
 
@@ -1608,6 +1608,33 @@ class Client:
         published_ds_dcr = AnalyticsDcr._from_existing(
             dcr_id=dcr_id, client=self, enclave_specs=list(specs.values())
         )
+
+        data_room_description = self.get_data_room_description(dcr_id, specs)
+        if not data_room_description:
+            raise Exception(f"Failed to get data room description for DCR ID {dcr_id}")
+
+        # Notify participants of DCR creation.
+        data = self._graphql.post(
+            """
+            mutation NotifyParticipants($input: InviteParticipantsInput!) {
+                publishedDataRoom {
+                    inviteParticipants(input: $input) {
+                        id
+                    }
+                }
+            }
+            """,
+            {
+                "input": {
+                    "publishedDataRoomEnclaveId": dcr_id,
+                    "publishedDataRoomDriverAttestationHash": data_room_description[
+                        "driverAttestationHash"
+                    ],
+                    "dataRoomDescription": dcr_definition._get_description(),
+                },
+            },
+        )
+
         return published_ds_dcr
 
     def retrieve_media_dcr(
