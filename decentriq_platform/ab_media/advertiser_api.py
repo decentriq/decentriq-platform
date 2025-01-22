@@ -450,6 +450,7 @@ class AdvertiserApi:
             io.BytesIO(json.dumps(audiences_json).encode()),
             key,
             "audiences.json",
+            is_accessory=True,
         )
         publish_audiences_json = PublishAudiencesJson(
             dcr_id=self.dcr_id,

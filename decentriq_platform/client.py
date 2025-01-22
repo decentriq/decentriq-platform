@@ -539,6 +539,7 @@ class Client:
         parallel_uploads: int = 8,
         usage: DatasetUsage = DatasetUsage.PUBLISHED,
         secret_store_options: Optional[SecretStoreOptions] = None,
+        is_accessory: bool = False
     ) -> str:
         """
         Uploads `data` as a file usable by enclaves and returns the
@@ -557,6 +558,7 @@ class Client:
         - `secret_store_options`: Options for the secret store.
             It can be used to specify if the encryption key should be stored in the secret store
             and can also be used to provide a custom ACL for the encryption key.
+        - `is_accessory`: Whether this dataset should be hidden from the datasets page.
         """
         if secret_store_options is None:
             secret_store_options = SecretStoreOptions()
@@ -615,6 +617,7 @@ class Client:
             description=description,
             usage=usage,
             size=sum(chunk_content_sizes),
+            is_accessory=is_accessory,
         )
 
         if secret_store_options.store_encryption_key:
@@ -724,6 +727,7 @@ class Client:
         size: int,
         description: Optional[str] = None,
         usage: Optional[DatasetUsage] = None,
+        is_accessory: bool = False,
     ) -> str:
         data = self._graphql.post(
             """
@@ -749,6 +753,7 @@ class Client:
                     "chunkHashes": chunks,
                     "scopeId": scope_id,
                     "size": size,
+                    "isAccessory": is_accessory,
                 }
             },
             retry=retry,
