@@ -601,15 +601,18 @@ class DataLab:
                 data_room_id, manifest_hash, lmdcr_node_name, retrieved_key
             )
 
-    @staticmethod
-    def is_validation_passed(validation_report: Dict[str, str]) -> bool:
-        return (
-            validation_report["dataset_users"]["report"]["outcome"] == "PASSED"
-            and validation_report["dataset_segments"]["report"]["outcome"] == "PASSED"
-            and validation_report["dataset_embeddings"]["report"]["outcome"] == "PASSED"
-            and validation_report["dataset_demographics"]["report"]["outcome"]
-            == "PASSED"
-        )
+    def is_validation_passed(self, validation_report: Dict[str, str]) -> bool:
+        """
+        Check whether or not DataLab validation has passed.
+
+        **Parameters**:
+        - `validation_report`: Result of calling `get_validation_report` on this DataLab.
+        """
+        node_names = self._nodes_to_be_validated()
+        for name in node_names:
+            if validation_report[name]["report"]["outcome"] != "PASSED":
+                return False
+        return True
 
     def _validated(self) -> bool:
         data_lab = self.client.get_data_lab(self.data_lab_id)
@@ -689,26 +692,31 @@ class DataLab:
             return compiler.get_data_lab_node_id(compiler.DataLabNode.Segments, features)
 
     def _get_validation_nodes(self):
+        validation_nodes = self._nodes_to_be_validated()
+        # Add the appropriate suffix for the validation nodes.
+        validation_nodes = [node + "_validation_report" for node in validation_nodes]
+        return validation_nodes
+
+    # Returns the node names of the nodes that require validation.
+    def _nodes_to_be_validated(self) -> list[str]:
         features = self._get_features()
-        validation_nodes = []
+        nodes = []
         if "VALIDATE_MATCHING" in features:
             users = self._get_data_lab_node_names(DataLabDatasetType.MATCH, features)
-            validation_nodes.append(users)
+            nodes.append(users)
         if "VALIDATE_SEGMENTS" in features:
             segments = self._get_data_lab_node_names(DataLabDatasetType.SEGMENTS, features)
-            validation_nodes.append(segments)
+            nodes.append(segments)
         if "VALIDATE_EMBEDDINGS" in features and self.cfg.has_embeddings:
             embeddings = self._get_data_lab_node_names(DataLabDatasetType.EMBEDDINGS, features)
-            validation_nodes.append(embeddings)
+            nodes.append(embeddings)
         if "VALIDATE_DEMOGRAPHICS" in features and self.cfg.has_demographics:
             demographics = self._get_data_lab_node_names(
                 DataLabDatasetType.DEMOGRAPHICS,
                 features
             )
-            validation_nodes.append(demographics)
-        # Add the appropriate suffix for the validation nodes.
-        validation_nodes = [node + "_validation_report" for node in validation_nodes]
-        return validation_nodes
+            nodes.append(demographics)
+        return nodes
 
     def _get_features(self):
         features = compiler.get_data_lab_features(self.hl_data_lab)
