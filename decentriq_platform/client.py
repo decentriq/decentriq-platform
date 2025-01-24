@@ -959,16 +959,19 @@ class Client:
             return all_dcr_descriptions
 
     def get_data_room_description(
-        self, data_room_hash, enclave_specs
+            self, data_room_hash, enclave_specs=None
     ) -> Optional[DataRoomDescription]:
         """
         Get a single data room description.
         """
-        driver_spec = enclave_specs["decentriq.driver"]
-        attestation_proto = driver_spec["proto"]
-        driver_attestation_hash = hashlib.sha256(
-            serialize_length_delimited(attestation_proto)
-        ).hexdigest()
+        if enclave_specs is not None:
+            driver_spec = enclave_specs["decentriq.driver"]
+            attestation_proto = driver_spec["proto"]
+            driver_attestation_hash = hashlib.sha256(
+                serialize_length_delimited(attestation_proto)
+            ).hexdigest()
+        else:
+            driver_attestation_hash = None
         return self._get_data_room_by_hash(data_room_hash, driver_attestation_hash)
 
     def _get_data_room_kind(
@@ -993,7 +996,7 @@ class Client:
         return data["publishedDataRoom"]["kind"]
 
     def _get_data_room_by_hash(
-        self, data_room_hash: str, driver_attestation_hash: str
+        self, data_room_hash: str, driver_attestation_hash: Optional[str] = None
     ) -> Optional[DataRoomDescription]:
         data = self._graphql.post(
             """
@@ -1014,13 +1017,12 @@ class Client:
             """,
             {
                 "dataRoomHash": data_room_hash,
-                "driverAttestationHash": driver_attestation_hash,
             },
         )
         result = data.get("publishedDataRoom")
         if result is not None:
             dcr: DataRoomDescription = result
-            if dcr["driverAttestationHash"] != driver_attestation_hash:
+            if driver_attestation_hash is not None and dcr["driverAttestationHash"] != driver_attestation_hash:
                 raise Exception(
                     f"Driver attestation hash for request dataroom doesn't match '{dcr['driverAttestationHash']}' != {driver_attestation_hash})"
                 )

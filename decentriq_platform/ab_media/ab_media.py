@@ -120,7 +120,10 @@ class AbMediaDcr:
             If not specified, the latest enclave specifications will be used.
         """
         specs = enclave_specs if enclave_specs else enclave_specifications.all()
-        specs_dict = {spec["name"]: spec for spec in specs}
+        if enclave_specs:
+            specs_dict = {spec["name"]: spec for spec in specs}
+        else:
+            specs_dict = None
         existing_data_room_description = client.get_data_room_description(
             dcr_id, enclave_specs=specs_dict
         )
