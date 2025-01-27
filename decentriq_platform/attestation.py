@@ -1351,6 +1351,25 @@ SPECIFICATIONS = {
         decoder=PermutiveWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.permutive-worker:v3": EnclaveSpecification(
+        name="decentriq.permutive-worker",
+        version="3",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "1e6d951bdf25b17f787fc71c7e753ddc79fadeac66143b1f119ca7ac3c54075a"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=PermutiveWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.dataset-sink-worker:v1": EnclaveSpecification(
         name="decentriq.dataset-sink-worker",
         version="1",
