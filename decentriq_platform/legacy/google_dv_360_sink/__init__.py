@@ -28,6 +28,7 @@ class GoogleDv360Sink(Node):
         displayName: str,
         description: str,
         membershipDurationDays: str,
+        userConsentGiven: bool,
     ) -> None:
         config = GoogleDv360SinkWorkerConfiguration(
             input=input,
@@ -36,6 +37,7 @@ class GoogleDv360Sink(Node):
             displayName=displayName,
             description=description,
             membershipDurationDays=membershipDurationDays,
+            userConsentGiven=userConsentGiven,
         )
         config_serialized = serialize_length_delimited(config)
         dependencies = [input.dependency, credentialsDependency]

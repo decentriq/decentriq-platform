@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18google_dv_360_sink.proto\x12\x12google_dv_360_sink\"\x1a\n\nSingleFile\x12\x0c\n\x04name\x18\x01 \x01(\t\"\t\n\x07RawFile\"L\n\x07ZipFile\x12\x34\n\nsingleFile\x18\x01 \x01(\x0b\x32\x1e.google_dv_360_sink.SingleFileH\x00\x42\x0b\n\tselection\"\x8d\x01\n\tSinkInput\x12\x12\n\ndependency\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12*\n\x03raw\x18\x03 \x01(\x0b\x32\x1b.google_dv_360_sink.RawFileH\x00\x12*\n\x03zip\x18\x04 \x01(\x0b\x32\x1b.google_dv_360_sink.ZipFileH\x00\x42\x06\n\x04\x66ile\"\xd1\x01\n\"GoogleDv360SinkWorkerConfiguration\x12,\n\x05input\x18\x01 \x01(\x0b\x32\x1d.google_dv_360_sink.SinkInput\x12\x1d\n\x15\x63redentialsDependency\x18\x02 \x01(\t\x12\x14\n\x0c\x61\x64vertiserId\x18\x03 \x01(\t\x12\x13\n\x0b\x64isplayName\x18\x04 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x05 \x01(\t\x12\x1e\n\x16membershipDurationDays\x18\x06 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18google_dv_360_sink.proto\x12\x12google_dv_360_sink\"\x1a\n\nSingleFile\x12\x0c\n\x04name\x18\x01 \x01(\t\"\t\n\x07RawFile\"L\n\x07ZipFile\x12\x34\n\nsingleFile\x18\x01 \x01(\x0b\x32\x1e.google_dv_360_sink.SingleFileH\x00\x42\x0b\n\tselection\"\x8d\x01\n\tSinkInput\x12\x12\n\ndependency\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12*\n\x03raw\x18\x03 \x01(\x0b\x32\x1b.google_dv_360_sink.RawFileH\x00\x12*\n\x03zip\x18\x04 \x01(\x0b\x32\x1b.google_dv_360_sink.ZipFileH\x00\x42\x06\n\x04\x66ile\"\xeb\x01\n\"GoogleDv360SinkWorkerConfiguration\x12,\n\x05input\x18\x01 \x01(\x0b\x32\x1d.google_dv_360_sink.SinkInput\x12\x1d\n\x15\x63redentialsDependency\x18\x02 \x01(\t\x12\x14\n\x0c\x61\x64vertiserId\x18\x03 \x01(\t\x12\x13\n\x0b\x64isplayName\x18\x04 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x05 \x01(\t\x12\x1e\n\x16membershipDurationDays\x18\x06 \x01(\t\x12\x18\n\x10userConsentGiven\x18\x07 \x01(\x08\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -29,5 +29,5 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_SINKINPUT']._serialized_start=166
   _globals['_SINKINPUT']._serialized_end=307
   _globals['_GOOGLEDV360SINKWORKERCONFIGURATION']._serialized_start=310
-  _globals['_GOOGLEDV360SINKWORKERCONFIGURATION']._serialized_end=519
+  _globals['_GOOGLEDV360SINKWORKERCONFIGURATION']._serialized_end=545
 # @@protoc_insertion_point(module_scope)

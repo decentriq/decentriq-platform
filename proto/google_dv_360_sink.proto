@@ -29,4 +29,5 @@ message GoogleDv360SinkWorkerConfiguration {
     string displayName = 4;
     string description = 5;
     string membershipDurationDays = 6;
+    bool userConsentGiven = 7;
 }
