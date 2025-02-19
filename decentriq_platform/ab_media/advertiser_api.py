@@ -15,6 +15,7 @@ from .advertiser_computations import (
     GetLookalikeAudienceStatisticsComputation,
     GetDataAttributesComputation,
     GetAudiencesValidationReport,
+    ComputeOverlapStatistics,
 )
 from .helper import (
     get_parameter_payloads,
@@ -388,6 +389,34 @@ class AdvertiserApi:
             Attribute(k, v["values"]) for k, v in results["attributes"].items()
         ]
         return attributes
+
+    def get_overlap_statistics(self) -> Dict[str, list[Any]]:
+        """Get a report on how many users per audience were matched in the
+        publisher's dataset. All numbers are rounded for privacy.
+
+        **Returns**:
+        A report with the following structure:
+
+        ```
+        {
+            "overlap_statistics": [
+                {
+                    "audience_type": string,
+                    "overlap_size": integer,
+                    "andvertiser_size": integer
+                }
+            ]
+        }
+        ```
+
+        If the DCR was configured to hide absolute audience counts, the
+        values are omitted from the report.
+        """
+        return ComputeOverlapStatistics(
+            dcr_id=self.dcr_id,
+            client=self.client,
+            session=self.session,
+        ).run_and_get_results()
 
     def get_lookalike_audience_statistics(
         self, audience_name: str

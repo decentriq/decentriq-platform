@@ -356,3 +356,31 @@ class GetAudiencesValidationReport(Computation):
         return {
             "audiences": report
         }
+
+
+class ComputeOverlapStatistics(Computation):
+    def __init__(
+        self,
+        dcr_id: str,
+        client: Client,
+        session: Session,
+    ) -> None:
+        super().__init__(dcr_id=dcr_id, client=client, session=session)
+
+    def node_id(self) -> str:
+        return "compute_overlap_statistics"
+
+    def run(self) -> None:
+        super().run(
+            request_type="computeOverlapStatistics",
+        )
+
+    def run_and_get_results(
+        self, interval: int = 5, timeout: Optional[int] = None
+    ) -> dict[str, Any]:
+        self.run()
+        statistics_str = super().get_results_str_from_zip(
+            "overlap.json", interval=interval, timeout=timeout
+        )
+        statistics = json.loads(statistics_str)
+        return statistics

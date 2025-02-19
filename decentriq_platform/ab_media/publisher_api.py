@@ -16,6 +16,7 @@ from .publisher_computations import (
     GetMatchingValidationReport,
     GetDemographicsValidationReport,
 )
+from .advertiser_computations import ComputeOverlapStatistics
 from .helper import (
     get_parameter_payloads,
     audience_depends_on_lookalike,
@@ -180,6 +181,34 @@ class PublisherApi:
             dcr_id=self.dcr_id, client=self.client, session=self.session
         )
         return overlap_insights_computation.run_and_get_results()
+
+    def get_overlap_statistics(self) -> Dict[str, list[Any]]:
+        """Get a report on how many users per audience were matched in the
+        publisher's dataset. All numbers are rounded for privacy.
+
+        **Returns**:
+        A report with the following structure:
+
+        ```
+        {
+            "overlap_statistics": [
+                {
+                    "audience_type": string,
+                    "overlap_size": integer,
+                    "andvertiser_size": integer
+                }
+            ]
+        }
+        ```
+
+        If the DCR was configured to hide absolute audience counts, the
+        values are omitted from the report.
+        """
+        return ComputeOverlapStatistics(
+            dcr_id=self.dcr_id,
+            client=self.client,
+            session=self.session,
+        ).run_and_get_results()
 
     def get_validation_report(self) -> dict[str, Any]:
         """Get the validation reports for the advertiser datasets.
