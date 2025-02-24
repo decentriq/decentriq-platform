@@ -1959,6 +1959,25 @@ SPECIFICATIONS = {
         decoder=GoogleDv360SinkWorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.google-dv-360-sink-worker:v7": EnclaveSpecification(
+        name="decentriq.google-dv-360-sink-worker",
+        version="7",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "26561cc7e12bbc49f8ea3cf162a9368bdf7a346cda1d4e1e0f2f3fd1552a7b32"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=GoogleDv360SinkWorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.azure-blob-storage-worker:v2": EnclaveSpecification(
         name="decentriq.azure-blob-storage-worker",
         version="2",
