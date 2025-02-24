@@ -1598,6 +1598,25 @@ SPECIFICATIONS = {
         decoder=DataSourceS3WorkerDecoder(),
         clientProtocols=None,
     ),
+    "decentriq.data-source-s3-worker:v8": EnclaveSpecification(
+        name="decentriq.data-source-s3-worker",
+        version="8",
+        proto=AttestationSpecification(
+            intelDcap=AttestationSpecificationIntelDcap(
+                mrenclave=bytes.fromhex(
+                    "72ef6d1943d14ef8004c1419f2028c353131aaa6f167779eabbaa38a4e400285"
+                ),
+                dcapRootCaDer=intel_sgx_dcap_root_ca_der,
+                acceptDebug=False,
+                acceptOutOfDate=False,
+                acceptConfigurationNeeded=False,
+                acceptRevoked=False,
+            )
+        ),
+        workerProtocols=[1],
+        decoder=DataSourceS3WorkerDecoder(),
+        clientProtocols=None,
+    ),
     "decentriq.data-source-snowflake-worker:v1": EnclaveSpecification(
         name="decentriq.data-source-snowflake-worker",
         version="1",
