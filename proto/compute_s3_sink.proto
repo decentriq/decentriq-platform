@@ -16,6 +16,8 @@ message S3SinkWorkerConfiguration {
     UserDefinedCredentials userDefinedCredentials = 6;
     DqDspCredentials dqDspCredentials = 7;
   }
+  // Optional content type for the S3 object
+  optional string contentType = 8;
 }
 
 message UserDefinedCredentials {

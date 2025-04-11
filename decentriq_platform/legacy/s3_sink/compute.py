@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Literal, Union
+from typing import List, Literal, Optional, Union
 
 from ...proto import ComputeNodeFormat
 from ...proto.length_delimited import serialize_length_delimited
@@ -31,6 +31,7 @@ class S3SinkCompute(Node):
         s3_provider: Literal["AWS", "GCS"],
         objects: List[S3Object],
         region: str = "",
+        content_type: Optional[str] = None,
     ) -> None:
         """
         Create a container compute node.
@@ -74,6 +75,7 @@ class S3SinkCompute(Node):
             region=region,
             userDefinedCredentials=user_defined_credentials,
             dqDspCredentials=dq_dsp_credentials,
+            contentType=content_type,
         )
 
         configuration.objects.extend(objects)
