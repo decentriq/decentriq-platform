@@ -28,7 +28,7 @@ class MetaSink(Node):
         access_token_dependency: str,
         ad_account_id: str,
         audience_name: str,
-        api_version: str = "20.0",
+        api_version: str = "21.0",
     ) -> None:
         config = MetaSinkWorkerConfiguration(
             input=input,
