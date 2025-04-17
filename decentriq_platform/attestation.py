@@ -2349,7 +2349,15 @@ class EnclaveSpecifications:
         for enclave_identifier in self.specifications:
             enclave_type, enclave_version = enclave_identifier.split(":")
             previous_version = latest_version_by_type.get(enclave_type)
-            if previous_version is None or enclave_version == "mrsigner" or (previous_version != "mrsigner" and previous_version < enclave_version):
+            if (
+                previous_version is None
+                or enclave_version == "mrsigner"
+                or (
+                    previous_version != "mrsigner"
+                    and int(previous_version.replace("v", "")) # Versions are in the form `v10`. Remove the 'v' prefix.
+                    < int(enclave_version.replace("v", ""))
+                )
+            ):
                 latest_spec_by_type[enclave_type] = self.specifications[
                     enclave_identifier
                 ]
