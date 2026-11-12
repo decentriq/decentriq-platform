@@ -1,3 +1,7 @@
+> [!WARNING]
+> **This repository is no longer maintained.**
+> Install the latest version of the Decentriq Python SDK from PyPI: `pip install decentriq-platform` ([pypi.org/project/decentriq-platform](https://pypi.org/project/decentriq-platform/)).
+
 # Decentriq - Python SDK
 
 The Decentriq Python SDK exposes the [Decentriq platform](platform.decentriq.com)'s functionality via easy-to-use programming constructs and, as such, allows
